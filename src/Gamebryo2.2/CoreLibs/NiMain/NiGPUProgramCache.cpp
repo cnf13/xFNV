@@ -400,7 +400,7 @@ bool NiGPUProgramCache::LoadEntry(NiBinaryStream& kStream, bool& bDeprecated) {
     }
 
     // EXE-INLINED 0xEE92D0
-    auto ReadString = [&] __attribute__((always_inline)) {
+    auto ReadString = [&] {
         uiLength = 0;
         uiSize = 4;
         kStream.BinaryRead(&uiLength, 4, &uiSize, 1);

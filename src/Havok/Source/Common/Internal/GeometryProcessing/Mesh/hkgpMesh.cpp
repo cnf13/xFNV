@@ -8721,7 +8721,7 @@ hkgpMeshInternals::Ring* hkgpMeshInternals::createRing(hkgpMeshBase::Edge edge) 
 // z); the larger area sorts first.
 void hkAlgorithm::quickSortRecursive(hkgpMeshBase::Triangle** apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
     // EXE-INLINED none: hkgpMesh::SortByArea::operator()
-    const auto area = [](const hkgpMeshBase::Triangle* pTriangle) __attribute__((always_inline)) -> float {
+    const auto area = [](const hkgpMeshBase::Triangle* pTriangle) -> float {
         const __m128 v0 = pTriangle->m_vertices[0]->m_position.m_quad;
         const __m128 d1 = _mm_sub_ps(pTriangle->m_vertices[1]->m_position.m_quad, v0);
         const __m128 d2 = _mm_sub_ps(pTriangle->m_vertices[2]->m_position.m_quad, v0);

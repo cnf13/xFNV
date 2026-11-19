@@ -1192,7 +1192,7 @@ void hkGeometryProcessing::buildTransposedArray(
 // of each (A's edges outer, B's inner, edge i running from vertex i to vertex i + 1) and the nine differences A[i] -
 // B[j] (i outer). The spans' bounds are compared as floats, so a NaN projection leaves the bounds as they are.
 int32_t hkGeometryProcessing::checkTrianglesIntersection(const hkVector4* triangleA, const hkVector4* triangleB) {
-    auto overlap = [&](const hkVector4& axis) __attribute__((always_inline)) {
+    auto overlap = [&](const hkVector4& axis) {
         Span<hkSimdReal> spanA;
         Span<hkSimdReal> spanB;
         spanA.setFromVertices(axis, triangleA, 3);

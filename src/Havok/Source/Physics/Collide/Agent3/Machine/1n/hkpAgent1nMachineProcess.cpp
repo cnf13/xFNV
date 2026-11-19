@@ -668,7 +668,7 @@ void hkAgentNmMachine_Process(hkpAgent1nTrack& agentTrack, const hkpAgent3Proces
 	uint32_t keyA;
 	uint32_t keyB;
 	// The child shapes of the current keys, fetched again only when a key changes.
-    auto extractShapes = [&] __attribute__((always_inline)) {
+    auto extractShapes = [&] {
 		if (lastKeyB != keyB) {
 			lastKeyB = keyB;
 			bodyB.m_shape = shapeContainerB->getChildShape(keyB, shapeBufferB);

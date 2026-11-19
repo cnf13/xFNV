@@ -218,7 +218,7 @@ hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeR
     HK_TIMER_BEGIN("rcCapsule", nullptr);
 
     // hkVector4::dot3 on two quads, the sum in lane 0.
-    auto dot3 = [](__m128 a, __m128 b) __attribute__((always_inline)) {
+    auto dot3 = [](__m128 a, __m128 b) {
         hkVector4 kA;
         kA.m_quad = a;
         hkVector4 kB;
@@ -226,7 +226,7 @@ hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeR
         return kA.dot3(kB).getQuad();
     };
     // EXE-INLINED none: the inverse length of hkVector4::normalize3, in all four lanes
-    auto invLength = [](__m128 aLengthSq) __attribute__((always_inline)) {
+    auto invLength = [](__m128 aLengthSq) {
         const __m128 kEstimate = _mm_rsqrt_ss(aLengthSq);
         const __m128 kIsZero = _mm_cmpeq_ss(aLengthSq, _mm_set_ss(0.0f));
         const __m128 kInverse = _mm_mul_ss(
@@ -238,7 +238,7 @@ hkBool hkpCapsuleShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeR
     };
 
     hkBool result;
-    result.m_bool = [&] __attribute__((always_inline)) -> char {
+    result.m_bool = [&] -> char {
         alignas(16) hkVector4 closest;
         closestPointLineSeg(input.m_from, m_vertexA, m_vertexB, closest);
         const __m128 kStartOffset = _mm_sub_ps(input.m_from.m_quad, closest.m_quad);

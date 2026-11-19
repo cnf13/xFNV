@@ -1572,7 +1572,7 @@ void hkpBoxBoxCollisionDetection::checkCompleteness(
 // cp gets fcp's id, fpp's point and normal in world space, and fpp's distance as the normal's w. A face of A: B's
 // vertex, minus the normal sign times A's face axis; a face of B: A's vertex and B's face axis; an edge pair: A's point
 // and fpp's normal.
-[[gnu::always_inline]] inline void hkpBoxBoxCollisionDetection::contactPointFromFeaturePointCache(
+inline void hkpBoxBoxCollisionDetection::contactPointFromFeaturePointCache(
     hkpProcessCdPoint& ccpOut,
     const hkpFeatureContactPoint& fcp,
     const hkpFeaturePointCache& fpp

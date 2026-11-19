@@ -133,11 +133,9 @@ void hkpCylinderShape::getAabbImpl(const hkTransform& localToWorld, float tolera
 hkBool hkpCylinderShape::castRayImpl(const hkpShapeRayCastInput& input, hkpShapeRayCastOutput& results) const {
     hkBool result;
     // EXE-INLINED none: hkVector4::dot3, the sum in lane 0
-    auto sum3 = [](__m128 v) __attribute__((always_inline)) {
-        return _mm_add_ss(_mm_shuffle_ps(v, v, 170), _mm_add_ss(_mm_shuffle_ps(v, v, 85), v));
-    };
+    auto sum3 = [](__m128 v) { return _mm_add_ss(_mm_shuffle_ps(v, v, 170), _mm_add_ss(_mm_shuffle_ps(v, v, 85), v)); };
     // EXE-INLINED none: hkVector4::lengthInverse3, broadcast
-    auto lengthInverse = [](__m128 len2) __attribute__((always_inline)) {
+    auto lengthInverse = [](__m128 len2) {
         const __m128 approx = _mm_rsqrt_ss(len2);
         const __m128 refined = _mm_mul_ss(
             _mm_mul_ss(_mm_set_ss(0.5f), approx),
