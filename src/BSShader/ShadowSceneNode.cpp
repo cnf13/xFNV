@@ -1864,10 +1864,7 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
     if (fdirlum > 0.4) {
         NiPoint3 lightdir = -pdirlight->m_kWorldDir;
         lightdir.Unitize();
-        // EXE-INLINED 0x45BB20
-        blendedVect.x = lightdir.x * 1000.0;
-        blendedVect.y = lightdir.y * 1000.0;
-        blendedVect.z = lightdir.z * 1000.0;
+        blendedVect = lightdir * 1000.0f;
         uinumlights = 1;
     }
     else {
@@ -1945,10 +1942,7 @@ bool ShadowSceneNode::GetAverageLightPos(const NiPoint3& aTargetCenter, const Ni
             NiDirectionalLight* pSun = static_cast<NiDirectionalLight*>(pSunLight->spLight.m_pObject);
             NiPoint3 lightdir = -pSun->m_kWorldDir;
             lightdir.Unitize();
-            // EXE-INLINED 0x45BB20
-            blendedVect.x = lightdir.x * 1000.0;
-            blendedVect.y = lightdir.y * 1000.0;
-            blendedVect.z = lightdir.z * 1000.0;
+            blendedVect = lightdir * 1000.0f;
             uinumlights = 1;
         }
     }

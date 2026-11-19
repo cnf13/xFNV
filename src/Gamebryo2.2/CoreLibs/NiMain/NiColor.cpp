@@ -28,8 +28,12 @@ void NiColor::Clamp() {
     }
 }
 
+// The weighted sum is computed in double and rounded to float once, as the game does (x87, the float weights widened
+// to double).
 float NiColor::Luminance() const {
-    return g * 0.36f + r * 0.31f + b * 0.32f;
+    return static_cast<float>(
+        static_cast<double>(g) * 0.36f + static_cast<double>(r) * 0.31f + static_cast<double>(b) * 0.32f
+    );
 }
 
 bool NiColor::operator==(const NiColor& c) const {

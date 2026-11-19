@@ -1186,20 +1186,7 @@ void bhkCharacterController::processConstraintsCallback(
                     }
                     else {
                         rsurface.m_plane.m_quad[2] = 0.0f;
-                        hkVector4 diff;
-                        diff.m_quad = rsurface.m_plane.m_quad;
-                        // EXE-INLINED none: hkVector4::normalize3IfNotZero, through hkMath::sqrtInverse (__CIsqrt, then
-                        // 1 / root rounded to a float).
-                        const __m128 sq = _mm_mul_ps(diff.m_quad, diff.m_quad);
-                        const float flen2 = _mm_cvtss_f32(
-                            _mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq))
-                        );
-                        if (flen2 != 0.0f) {
-                            const float flen = std::sqrt(flen2);
-                            const float finv = 1.0 / flen;
-                            rsurface.m_plane.m_quad =
-                                _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(finv), _mm_set_ss(finv), 0), diff.m_quad);
-                        }
+                        rsurface.m_plane.normalize3IfNotZero();
                     }
                     break;
                 }
@@ -1214,18 +1201,7 @@ void bhkCharacterController::processConstraintsCallback(
         iFlags &= ~POSSIBLE_PATH_OBSTACLE;
     }
     bAllSurfacesStopped = iSupportCount == static_cast<uint32_t>(inumInvalid);
-    // EXE-INLINED none: hkVector4::normalize3IfNotZero, as above.
-    hkVector4 kNormal;
-    kNormal.m_quad = hkSupportNorm.m_quad;
-    const __m128 sqNormal = _mm_mul_ps(kNormal.m_quad, kNormal.m_quad);
-    const float fnormalLen2 = _mm_cvtss_f32(_mm_add_ss(
-        _mm_shuffle_ps(sqNormal, sqNormal, 0xAA), _mm_add_ss(_mm_shuffle_ps(sqNormal, sqNormal, 0x55), sqNormal)
-    ));
-    if (fnormalLen2 != 0.0f) {
-        const float flen = std::sqrt(fnormalLen2);
-        const float finv = 1.0 / flen;
-        hkSupportNorm.m_quad = _mm_mul_ps(_mm_shuffle_ps(_mm_set_ss(finv), _mm_set_ss(finv), 0), kNormal.m_quad);
-    }
+    hkSupportNorm.normalize3IfNotZero();
     pTLS->eMemContext = eOldContext;
 }
 

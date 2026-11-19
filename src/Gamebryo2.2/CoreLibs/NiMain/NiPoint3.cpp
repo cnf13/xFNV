@@ -77,8 +77,11 @@ NiPoint3& NiPoint3::Clear() {
     return *(::new (this) NiPoint3(0.0f, 0.0f, 0.0f));
 }
 
+// The sum of squares is computed in double and rounded to float before the root, as the game does (x87).
 float NiPoint3::Length() const {
-    return NiSqrt(x * x + y * y + z * z);
+    return NiSqrt(
+        static_cast<float>(static_cast<double>(x) * x + static_cast<double>(y) * y + static_cast<double>(z) * z)
+    );
 }
 
 float NiPoint3::SqrLength() const {

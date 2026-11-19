@@ -100,11 +100,21 @@ NiMatrix3 NiMatrix3::operator*(const NiMatrix3& mat) const {
     return result;
 }
 
+// Each row's sum of products is computed in double and rounded to float once, as the game does (x87).
 NiPoint3 NiMatrix3::operator*(const NiPoint3& pt) const {
     NiPoint3 result;
-    float z = m_pEntry[2][0] * pt.x + m_pEntry[2][1] * pt.y + m_pEntry[2][2] * pt.z;
-    float y = m_pEntry[1][0] * pt.x + m_pEntry[1][1] * pt.y + m_pEntry[1][2] * pt.z;
-    float x = m_pEntry[0][0] * pt.x + m_pEntry[0][1] * pt.y + m_pEntry[0][2] * pt.z;
+    float z = static_cast<float>(
+        static_cast<double>(m_pEntry[2][0]) * pt.x + static_cast<double>(m_pEntry[2][1]) * pt.y +
+        static_cast<double>(m_pEntry[2][2]) * pt.z
+    );
+    float y = static_cast<float>(
+        static_cast<double>(m_pEntry[1][0]) * pt.x + static_cast<double>(m_pEntry[1][1]) * pt.y +
+        static_cast<double>(m_pEntry[1][2]) * pt.z
+    );
+    float x = static_cast<float>(
+        static_cast<double>(m_pEntry[0][0]) * pt.x + static_cast<double>(m_pEntry[0][1]) * pt.y +
+        static_cast<double>(m_pEntry[0][2]) * pt.z
+    );
     ::new (&result) NiPoint3(x, y, z);
     return result;
 }

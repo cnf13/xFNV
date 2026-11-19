@@ -468,12 +468,7 @@ bool NiPSysMeshEmitter::EmitFromFace(NiGeometry* pkGeomEmitter, NiPoint3& kPosit
         kNormal.y = static_cast<float>(kSum2.y * 0.3333333432674408);
         kNormal.z = static_cast<float>(0.3333333432674408 * kSum2.z);
         NiPoint3::UnitizeVector(kNormal);
-        // EXE-INLINED none: NiPoint3::Length (the sum rounded to float, then the exe's __CIsqrt)
-        float fSqrLength = static_cast<float>(
-            static_cast<double>(kVelocity.y) * kVelocity.y + static_cast<double>(kVelocity.x) * kVelocity.x +
-            static_cast<double>(kVelocity.z) * kVelocity.z
-        );
-        float fSpeed = std::sqrt(fSqrLength);
+        float fSpeed = kVelocity.Length();
         kVelocity.x = kNormal.x * fSpeed;
         kVelocity.y = kNormal.y * fSpeed;
         kVelocity.z = fSpeed * kNormal.z;
@@ -584,12 +579,7 @@ bool NiPSysMeshEmitter::EmitFromEdge(NiGeometry* pkGeomEmitter, NiPoint3& kPosit
         kNormal.y = static_cast<float>(kSum.y * 0.5);
         kNormal.z = static_cast<float>(0.5 * kSum.z);
         NiPoint3::UnitizeVector(kNormal);
-        // EXE-INLINED none: NiPoint3::Length (the sum rounded to float, then the exe's __CIsqrt)
-        float fSqrLength = static_cast<float>(
-            static_cast<double>(kVelocity.y) * kVelocity.y + static_cast<double>(kVelocity.x) * kVelocity.x +
-            static_cast<double>(kVelocity.z) * kVelocity.z
-        );
-        float fSpeed = std::sqrt(fSqrLength);
+        float fSpeed = kVelocity.Length();
         kVelocity.x = kNormal.x * fSpeed;
         kVelocity.y = kNormal.y * fSpeed;
         kVelocity.z = fSpeed * kNormal.z;

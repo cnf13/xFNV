@@ -153,15 +153,7 @@ void NiPSysGravityFieldModifier::UpdateNoAttenuationNoDist(float fTime, NiPSysDa
     kPSys.Invert(kInvPSys);
     NiTransform kFieldToPSys = kInvPSys * kField;
 
-    // EXE-INLINED 0x4B4500
-    const NiMatrix3& kRotate = kFieldToPSys.m_Rotate;
-    NiPoint3 kDir;
-    kDir.x = m_kDirection.y * kRotate.m_pEntry[0][1] + m_kDirection.x * kRotate.m_pEntry[0][0] +
-        m_kDirection.z * kRotate.m_pEntry[0][2];
-    kDir.y = m_kDirection.x * kRotate.m_pEntry[1][0] + m_kDirection.y * kRotate.m_pEntry[1][1] +
-        m_kDirection.z * kRotate.m_pEntry[1][2];
-    kDir.z = m_kDirection.x * kRotate.m_pEntry[2][0] + m_kDirection.y * kRotate.m_pEntry[2][1] +
-        m_kDirection.z * kRotate.m_pEntry[2][2];
+    NiPoint3 kDir = kFieldToPSys.m_Rotate * m_kDirection;
     kDir.Unitize();
     float fMagnitude = m_fMagnitude;
     kDir.x = kDir.x * fMagnitude;

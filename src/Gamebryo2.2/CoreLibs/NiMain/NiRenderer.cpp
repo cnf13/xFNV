@@ -304,34 +304,8 @@ bool NiRenderer::PackParticleStripUtil_GetVerts(
         );
         float fAngle = NiACos(fDot);
         kRot.MakeRotation(fAngle, kSide.x, kSide.y, kSide.z);
-        // EXE-INLINED 0x4B4500
-        const NiPoint3* pkPt = aPreviousDir[1];
-        kUp.x = static_cast<float>(
-            static_cast<double>(pkPt->x) * kRot.m_pEntry[0][0] + static_cast<double>(pkPt->y) * kRot.m_pEntry[0][1] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[0][2]
-        );
-        kUp.y = static_cast<float>(
-            static_cast<double>(pkPt->y) * kRot.m_pEntry[1][1] + static_cast<double>(pkPt->x) * kRot.m_pEntry[1][0] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[1][2]
-        );
-        kUp.z = static_cast<float>(
-            static_cast<double>(pkPt->y) * kRot.m_pEntry[2][1] + static_cast<double>(pkPt->x) * kRot.m_pEntry[2][0] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[2][2]
-        );
-        // EXE-INLINED 0x4B4500
-        pkPt = aPreviousDir[2];
-        kSide.x = static_cast<float>(
-            static_cast<double>(pkPt->x) * kRot.m_pEntry[0][0] + static_cast<double>(pkPt->y) * kRot.m_pEntry[0][1] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[0][2]
-        );
-        kSide.y = static_cast<float>(
-            static_cast<double>(pkPt->x) * kRot.m_pEntry[1][0] + static_cast<double>(pkPt->y) * kRot.m_pEntry[1][1] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[1][2]
-        );
-        kSide.z = static_cast<float>(
-            static_cast<double>(pkPt->x) * kRot.m_pEntry[2][0] + static_cast<double>(pkPt->y) * kRot.m_pEntry[2][1] +
-            static_cast<double>(pkPt->z) * kRot.m_pEntry[2][2]
-        );
+        kUp = kRot * *aPreviousDir[1];
+        kSide = kRot * *aPreviousDir[2];
     }
     else if (!aNextPoint) {
         return false;

@@ -7207,9 +7207,7 @@ void ShadowLightShader::SetupGeometryConstants_AmbientEmittance(
             void* pIterator = nullptr;
             ShadowSceneLight* psslight = pprop->GetFirstActiveNonShadowLight(pIterator);
             NiColor ksunColor = BSShaderManager::pShadowSceneNode[0]->pSunLight->spLight.m_pObject->m_kDiff;
-            // EXE-INLINED 0xB719E0
-            float fSunLuminance =
-                ksunColor.g * 0.36000001430511475 + ksunColor.r * 0.3100000023841858 + ksunColor.b * 0.3199999928474426;
+            float fSunLuminance = ksunColor.Luminance();
             if (psslight) {
                 const NiBound* pBound = BSShaderManager::pCurrentRenderPass->pGeometry->m_kWorldBound;
                 if (!pBound) {
