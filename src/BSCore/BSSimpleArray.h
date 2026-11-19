@@ -116,6 +116,20 @@ public:
     T& operator[](uint32_t auiIndex);
     const T& operator[](uint32_t auiIndex) const;
 
+    // The items below GetSize(), for range-for. Not in the game's class.
+    T* begin() {
+        return pBuffer;
+    }
+    T* end() {
+        return pBuffer + iSize;
+    }
+    const T* begin() const {
+        return pBuffer;
+    }
+    const T* end() const {
+        return pBuffer + iSize;
+    }
+
     // Capacity to grow to when the buffer is full.
     uint32_t _GetNewSizeForGrow() const;
 

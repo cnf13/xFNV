@@ -63,6 +63,14 @@ public:
 
     T* GetBase() const;
 
+    // The slots below GetSize(), empty ones included as GetAt returns them, for range-for. Not in Gamebryo.
+    T* begin() const {
+        return m_pBase;
+    }
+    T* end() const {
+        return m_pBase + m_usSize;
+    }
+
     const T& GetAt(uint32_t uiIndex) const;
 
     // uiIndex must be below the allocated size.
