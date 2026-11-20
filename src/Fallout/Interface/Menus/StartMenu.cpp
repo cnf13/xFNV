@@ -177,7 +177,7 @@ bool StartMenu::MainMenuIdle() {
             this->Fade(eMainTitle, true, Tile::kTileValue_Alpha, 1.0f);
             LoadingMenu::SetupForStartMenu(1);
         }
-        else if (fAlpha == 255.0) {
+        else if (fAlpha == 255.0f || XFNV_FIX_FAST_MAIN_MENU) {
             this->_UpdateProfileSpecificData();
             int32_t iMaxLevel = iMaxCharacterLevel.UInt();
             const int32_t iMinMaxLevel = 30;
