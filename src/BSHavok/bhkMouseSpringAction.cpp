@@ -1,0 +1,239 @@
+#include "BSHavok/bhkMouseSpringAction.h"
+
+#include "BSCore/MemoryManager.h"
+#include "BSHavok/bhkAction.h"
+#include "BSHavok/bhkEntity.h"
+#include "BSHavok/bhkRefObject.h"
+#include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkStream.h"
+#include "BSHavok/bhkUnaryAction.h"
+#include "BSHavok/bhkWorldObject.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESFile.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
+
+NiRTTI bhkMouseSpringAction::ms_RTTI("bhkMouseSpringAction", &bhkUnaryAction::ms_RTTI);
+
+bhkMouseSpringAction::bhkMouseSpringAction() {
+    ++iCount;
+}
+
+bhkMouseSpringAction::bhkMouseSpringAction(const hkMouseSpringActionCinfo& arInfo) {
+    bhkMouseSpringAction::Init(arInfo);
+    ++iCount;
+}
+
+bhkMouseSpringAction::~bhkMouseSpringAction() {
+    bhkSerializable::Kill();
+    --iCount;
+}
+
+NiObject* bhkMouseSpringAction::CreateClone(NiCloningProcess& arCloneData) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bhkSerializable::CloneCritLock();
+    bhkMouseSpringAction* pClone = new bhkMouseSpringAction;
+    // The base body is called directly, not through the vtable, so the call is qualified.
+    bhkUnaryAction::CopyMembers(pClone, arCloneData);
+    bhkSerializable::CloneCritUnlock();
+    return pClone;
+}
+
+// The base's fields, then, for a big-endian source, the creation info's two positions and its four floats byte-swapped
+// in place. The stream's byte is compared with 1: any other byte swaps. A cinfo built here is not killed.
+void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
+    bhkUnaryAction::LoadBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSourceIsLittleEndian)) != 1) {
+        bool bCreated;
+        hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
+    }
+}
+
+// For a big-endian save, the creation info's two positions and four floats are byte-swapped in place around the base's
+// write and swapped back after it. The stream's byte is compared with 1 and read again after the base call.
+void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
+    bool bCreated;
+    hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
+    }
+    bhkUnaryAction::SaveBinary(arStream);
+    if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
+        bhkStream::Endian(rInfo.m_positionInRbLocal);
+        bhkStream::Endian(rInfo.m_mousePositionInWorld);
+        ENDIAN(rInfo.m_springDamping, false);
+        ENDIAN(rInfo.m_springElasticity, false);
+        ENDIAN(rInfo.m_maxRelativeForce, false);
+        ENDIAN(rInfo.m_objectDamping, false);
+    }
+}
+
+void bhkMouseSpringAction::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bhkUnaryAction::GetViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(bhkMouseSpringAction::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* pString = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, pString);
+    hkMouseSpringActionCinfo arInfo;
+    CopyCinfo(arInfo);
+    char* ViewerString_7 = NiGetViewerString("Damping", arInfo.m_springDamping);
+    uint32_t v9 = apStrings->m_usSize;
+    uint32_t v10 = apStrings->m_usMaxSize;
+    pString = ViewerString_7;
+    if (v9 >= v10) {
+        apStrings->SetSize(v9 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v9, pString);
+    char* v11 = NiGetViewerString("Elasticity", arInfo.m_springElasticity);
+    uint32_t v12 = apStrings->m_usSize;
+    uint32_t v13 = apStrings->m_usMaxSize;
+    pString = v11;
+    if (v12 >= v13) {
+        apStrings->SetSize(v12 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v12, pString);
+    char* v14 = NiGetViewerString("Object Damping", arInfo.m_objectDamping);
+    uint32_t v15 = apStrings->m_usSize;
+    uint32_t v16 = apStrings->m_usMaxSize;
+    pString = v14;
+    if (v15 >= v16) {
+        apStrings->SetSize(v15 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v15, pString);
+    char* v17 = NiGetViewerString("Max Force", arInfo.m_maxRelativeForce);
+    uint32_t v18 = apStrings->m_usSize;
+    uint32_t v19 = apStrings->m_usMaxSize;
+    pString = v17;
+    if (v18 >= v19) {
+        apStrings->SetSize(v18 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v18, pString);
+}
+
+// Releases a creation info this action made, under the Havok heap context.
+void bhkMouseSpringAction::KillCinfo(bool abCreated) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    if (abCreated) {
+        delete static_cast<hkMouseSpringActionCinfo*>(pInfo);
+        pInfo = nullptr;
+    }
+}
+
+uint32_t bhkMouseSpringAction::QCinfoSize() const {
+    return 0x40;
+}
+
+// Builds the wrapped hkpMouseSpringAction in the Havok heap context: a block from the heap allocator with its size word
+// set, the full constructor with the creation info's two positions (each converted with bhkVector4::ToHK into a
+// 16-byte-aligned local), damping, elasticity, object damping and body and no callbacks, then its force limit,
+// SethkObject, the constructor's reference dropped and PostInit.
+void bhkMouseSpringAction::Init(const hkSerializableCinfo& arInfo) {
+    const hkMouseSpringActionCinfo& cinfo = static_cast<const hkMouseSpringActionCinfo&>(arInfo);
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    hkpMouseSpringAction* pAction = static_cast<hkpMouseSpringAction*>(
+        hkMemoryRouter::getInstance().heap().blockAlloc(sizeof(hkpMouseSpringAction))
+    );
+    pAction->m_memSizeAndFlags = sizeof(hkpMouseSpringAction);
+    hkVector4 kMousePositionInWorld;
+    cinfo.m_mousePositionInWorld.ToHK(kMousePositionInWorld);
+    hkVector4 kPositionInRbLocal;
+    cinfo.m_positionInRbLocal.ToHK(kPositionInRbLocal);
+    pAction = ::new (pAction) hkpMouseSpringAction(
+        kPositionInRbLocal,
+        kMousePositionInWorld,
+        cinfo.m_springDamping,
+        cinfo.m_springElasticity,
+        cinfo.m_objectDamping,
+        cinfo.m_body,
+        nullptr
+    );
+    pAction->setMaxRelativeForce(cinfo.m_maxRelativeForce);
+    bhkSerializable* pSerializable = this;
+    pSerializable->SethkObject(pAction);
+    pAction->removeReference();
+    pSerializable->PostInit(arInfo);
+}
+
+hkSerializableCinfo& bhkMouseSpringAction::CreateCinfo(bool& arCreated) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bool bCreated = pInfo == nullptr;
+    arCreated = bCreated;
+    if (bCreated) {
+        hkMouseSpringActionCinfo* pCinfo = new hkMouseSpringActionCinfo;
+        pInfo = pCinfo;
+        if (phkObject != nullptr) {
+            CopyCinfo(*pCinfo);
+        }
+    }
+    return *pInfo;
+}
+
+hkpEntity* bhkMouseSpringAction::GetEntity() {
+    hkpMouseSpringAction* pMouseSpringAction = **this;
+    if (pMouseSpringAction) {
+        return static_cast<hkpEntity*>(pMouseSpringAction->GetEntity());
+    }
+
+    return nullptr;
+}
+
+// Copies the unary action's fields, then the wrapped action's damping, elasticity and object damping through null-safe
+// getters (0 when this or the wrapped object is null). Then, with a wrapped action, its two positions and its force
+// limit; without one, both vectors are zeroed and the limit is 0.
+void bhkMouseSpringAction::CopyCinfo(hkMouseSpringActionCinfo& arInfo) {
+    bhkUnaryAction::CopyCinfo(arInfo);
+    arInfo.m_springDamping = GetDamping();
+    arInfo.m_springElasticity = GetElasticity();
+    arInfo.m_objectDamping = GetObjectDamping();
+    hkpMouseSpringAction* pAction = **this;
+    if (pAction) {
+        arInfo.m_positionInRbLocal = pAction->m_positionInRbLocal;
+        arInfo.m_mousePositionInWorld = pAction->m_mousePositionInWorld;
+        arInfo.m_maxRelativeForce = pAction->m_maxRelativeForce;
+    }
+    else {
+        arInfo.m_positionInRbLocal.setZero4();
+        arInfo.m_mousePositionInWorld.setZero4();
+        arInfo.m_maxRelativeForce = 0.0f;
+    }
+}
+
+bhkWorldObject* bhkMouseSpringAction::GetWorldObject() {
+    hkpRigidBody* entity = static_cast<hkpRigidBody*>(GetEntity());
+    return bhkEntity::Getbhk(entity);
+}
+
+NiObject* bhkMouseSpringAction::CreateObject() {
+    return new bhkMouseSpringAction;
+}

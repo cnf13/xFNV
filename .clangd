@@ -1,0 +1,9 @@
+# Vendored libraries (external/), build trees and the worktrees under .omp/ are not background-indexed or linted: they
+# are large, and nobody edits them here.
+If:
+  PathMatch: [external/.*, build.*/.*, cmake-build-.*/.*, \.omp/.*]
+Index:
+  Background: Skip
+Diagnostics:
+  ClangTidy:
+    Remove: '*'

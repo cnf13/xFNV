@@ -1,0 +1,39 @@
+#include "Fallout Shared/Pathfinding/NavMeshPtr.h"
+
+#include "BSCore/BSSimpleArray.h"
+#include "Fallout Shared/Pathfinding/NavMesh.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
+
+NavMeshPtr::NavMeshPtr() : NiPointer<NavMesh>(nullptr) {}
+
+NavMeshPtr::NavMeshPtr(NavMesh* apNavMesh) : NiPointer<NavMesh>(apNavMesh) {}
+
+NavMeshPtr::~NavMeshPtr() {}
+
+void NavMeshPtr::DecRefCount() {
+    if (m_pObject) {
+        static_cast<NiRefObject*>(m_pObject)->DecRefCount();
+    }
+}
+
+bool NavMeshPtr::operator!=(const NavMeshPtr& ptr) const {
+    return m_pObject != ptr.m_pObject;
+}
+
+bool NavMeshPtr::operator==(const NavMeshPtr& ptr) const {
+    return m_pObject == ptr.m_pObject;
+}
+
+NavMeshPtr::operator NavMesh*() const {
+    return m_pObject;
+}
+
+NavMeshPtr NavMeshPtr::MakeNavMeshPtr(NavMesh* apNavMesh) {
+    return NavMeshPtr(apNavMesh);
+}
+
+void NavMeshPtr::MakeNavMeshPtr(NavMeshPtr& arPtr, NavMesh* apNavMesh) {
+    NavMeshPtr apMemory(apNavMesh);
+    arPtr = apMemory;
+}

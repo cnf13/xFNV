@@ -1,0 +1,81 @@
+#pragma once
+
+#include "Fallout Shared/Package.h"
+
+// The steps a package procedure runs, in order; PROCEDURE_DONE ends a procedure's list.
+enum PROCEDURE : int32_t {
+    PROCEDURE_NONE = -1,
+    PROCEDURE_TRAVEL = 0x0,
+    PROCEDURE_WANDER = 0x1,
+    PROCEDURE_ACTIVATE = 0x2,
+    PROCEDURE_ACQUIRE = 0x3,
+    PROCEDURE_SLEEP = 0x4,
+    PROCEDURE_EAT = 0x5,
+    PROCEDURE_FOLLOW = 0x6,
+    PROCEDURE_ESCORT = 0x7,
+    PROCEDURE_ALARM = 0x8,
+    PROCEDURE_COMBAT = 0x9,
+    PROCEDURE_FLEE = 0xA,
+    PROCEDURE_YIELD = 0xB,
+    PROCEDURE_DIALOGUE = 0xC,
+    PROCEDURE_WAIT = 0xD,
+    PROCEDURE_TRAVEL_TARGET = 0xE,
+    PROCEDURE_PURSUE = 0xF,
+    PROCEDURE_GREET = 0x10,
+    PROCEDURE_CREATE_FOLLOW = 0x11,
+    PROCEDURE_OBSERVE_COMBAT = 0x12,
+    PROCEDURE_OBSERVE_DIALOGUE = 0x13,
+    PROCEDURE_GREET_DEAD = 0x14,
+    PROCEDURE_WARN = 0x15,
+    PROCEDURE_GET_UP = 0x16,
+    PROCEDURE_MOUNT_HORSE = 0x17,
+    PROCEDURE_DISMOUNT_HORSE = 0x18,
+    PROCEDURE_DO_NOTHING = 0x19,
+    PROCEDURE_NOTIFY = 0x1A,
+    PROCEDURE_ACCOMPANY = 0x1B,
+    PROCEDURE_USE_ITEM_AT = 0x1C,
+    PROCEDURE_FEED = 0x1D,
+    PROCEDURE_AMBUSH_WAIT = 0x1E,
+    PROCEDURE_SURFACE = 0x1F,
+    PROCEDURE_WAIT_FOR_SPELL = 0x20,
+    PROCEDURE_CHOOSE_CAST = 0x21,
+    PROCEDURE_FLEE_NON_COMBAT = 0x22,
+    PROCEDURE_REMOVE_WORN_ITEMS = 0x23,
+    PROCEDURE_SEARCH = 0x24,
+    PROCEDURE_CLEAR_MOUNT_POSITION = 0x25,
+    PROCEDURE_SUMMON_CREATURE_DEFEND = 0x26,
+    PROCEDURE_AVOID_RADIATION = 0x27,
+    PROCEDURE_UNEQUIP_ARMOR = 0x28,
+    PROCEDURE_TAKE_BACK_ITEM = 0x29,
+    PROCEDURE_SANDBOX = 0x2A,
+    PROCEDURE_USE_IDLE_MARKER = 0x2B,
+    PROCEDURE_PATROL = 0x2C,
+    PROCEDURE_EXPLOSION_REACTION = 0x2D,
+    PROCEDURE_GRENADE_MINE_PICKUP_THROW = 0x2E,
+    PROCEDURE_GUARD = 0x2F,
+    PROCEDURE_ALERT_SEARCH = 0x30,
+    PROCEDURE_DIALOGUE_ACTIVATE = 0x31,
+    PROCEDURE_USE_WEAPON = 0x32,
+    PROCEDURE_MOVEMENT_BLOCKED = 0x33,
+    PROCEDURE_CANNIBAL_FEED = 0x34,
+    PROCEDURE_BACK_UP = 0x35,
+    PROCEDURE_DONE = 0x36,
+    PROCEDURE_COUNT = 0x36,
+};
+
+using ProcedureActionTable = PROCEDURE* [49];
+
+// The step lists of the package procedures.
+class Procedure {
+public:
+    static int32_t GetProcedureCount(PACKAGE_PROCEDURE_TYPE aetype);
+
+    // The steps of each procedure type, indexed by PACKAGE_PROCEDURE_TYPE (49 types, as GetProcedureCount checks), each
+    // list ending in PROCEDURE_DONE.
+    static ProcedureActionTable Action;
+};
+
+// The number of parameters each procedure type holds (indexed by the procedure type).
+using ProcedureCountTable = int8_t[49];
+inline ProcedureCountTable ProcedureCount{2, 3, 3, 3, 4, 4, 3, 4, 5, 3, 5, 5, 2, 3, 2, 2, 2, 3, 3, 2, 3, 2, 4, 3, 2,
+                                          2, 4, 2, 4, 2, 3, 2, 2, 3, 2, 2, 2, 3, 2, 3, 3, 2, 3, 3, 4, 2, 2, 2, 2};

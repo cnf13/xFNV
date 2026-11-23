@@ -1,0 +1,9 @@
+zlib 1.4, vendored for the programs; src/SDK/ZLIB/zlib121 is the exe's 1.2.1.
+
+Source: https://zlib.net/zlib-1.4.tar.gz (also https://github.com/madler/zlib/releases/tag/v1.4)
+sha256: 02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584 (checked against the hash zlib.net publishes)
+
+Kept from the tarball, unchanged: the library sources adler32, compress, crc32, deflate, inffast, inflate, inftrees,
+trees, uncompr and zutil (.c), their headers (crc32.h, deflate.h, inffast.h, inffixed.h, inflate.h, inftrees.h,
+trees.h, zutil.h, and gzguts.h, which zutil.c includes), zlib.h, zconf.h and LICENSE. Left out: the gz* and infback
+sources, examples, tests, contrib and build files. CMake builds them as xfnv_zlib (CMakeLists.txt).

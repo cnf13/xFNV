@@ -1,0 +1,59 @@
+#include "Fallout Shared/Pathfinding/NavMeshArray.h"
+
+#include "BSCore/MemoryManager.h"
+#include "Fallout/Misc/GarbageCollector.h"
+
+NavMeshArray::~NavMeshArray() {
+    AddToGarbageCollector();
+}
+
+// The callee destroys the by-value apNavMesh where it returns, so the body does not release it itself.
+uint32_t NavMeshArray::AddNavMesh(NavMeshPtr apNavMesh) {
+    return NavMeshes.Add(apNavMesh);
+}
+
+// As AddNavMesh, the by-value apNavMesh is destroyed where the function returns; GetNavMeshIndex's by-value copy is
+// destroyed by GetNavMeshIndex.
+void NavMeshArray::RemoveNavMesh(NavMeshPtr apNavMesh) {
+    uint32_t uiIndex = GetNavMeshIndex(apNavMesh);
+    if (uiIndex != 0xFFFFFFFF) {
+        RemoveNavMeshByIndex(uiIndex);
+    }
+}
+
+uint32_t NavMeshArray::GetNavMeshIndex(NavMeshPtr apNavMesh) {
+    for (uint32_t uiIndex = 0; uiIndex < NavMeshes.iSize; ++uiIndex) {
+        if (NavMeshes.GetAt(uiIndex) == apNavMesh) {
+            return uiIndex;
+        }
+    }
+    return 0xFFFFFFFF;
+}
+
+uint32_t NavMeshArray::GetNavMeshCount() {
+    return NavMeshes.iSize;
+}
+
+NavMeshPtr NavMeshArray::GetNavMeshByIndex(uint32_t aiNavMeshIndex) {
+    if (aiNavMeshIndex < NavMeshes.iSize) {
+        return NavMeshes.GetAt(aiNavMeshIndex);
+    }
+    return NavMeshPtr::MakeNavMeshPtr(nullptr);
+}
+
+void NavMeshArray::AddToGarbageCollector() {
+    for (NavMeshPtr& spNavMesh : NavMeshes) {
+        GarbageCollector::Add(spNavMesh);
+    }
+    NavMeshes.Clear(true);
+}
+
+void NavMeshArray::RemoveNavMeshByIndex(uint32_t aiNavMeshIndex) {
+    NavMeshes.GetAt(aiNavMeshIndex)->pParentCell = nullptr;
+    GarbageCollector::Add(NavMeshes.GetAt(aiNavMeshIndex));
+    NavMeshes.Remove(aiNavMeshIndex, true);
+}
+
+void NavMeshArray::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}

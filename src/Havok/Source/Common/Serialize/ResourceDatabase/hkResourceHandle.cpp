@@ -1,0 +1,491 @@
+#include "Havok/Source/Common/Serialize/ResourceDatabase/hkResourceHandle.h"
+
+#include "BSCore/MemoryManager.h"
+#include "Havok/Source/Animation/Animation/Rig/hkaBone.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/String/hkString.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringBuf.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
+#include "Havok/Source/Common/Base/Container/StringMap/hkCachedHashMap.h"
+#include "Havok/Source/Common/Base/Container/StringMap/hkStringMap.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Object/hkBaseObject.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Reflection/hkClass.h"
+#include "Havok/Source/Common/Base/Reflection/hkClassMember.h"
+#include "Havok/Source/Common/Base/Reflection/hkClassMemberAccessor.h"
+#include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
+#include "Havok/Source/Common/Base/System/Error/hkError.h"
+#include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
+#include "Havok/Source/Common/Base/System/Io/Writer/hkStreamWriter.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Base/Types/hkRefVariant.h"
+#include "Havok/Source/Common/Base/Types/hkResult.h"
+
+// The reflected types' hkTypeInfo records: constant .data (no initialiser): the type name, the finish and cleanup
+// functions, no vtable, the RTTI type descriptor and the size.
+hkTypeInfo hkMemoryResourceHandleExternalLinkTypeInfo = {
+    "hkMemoryResourceHandleExternalLink",
+    finishLoadedObjecthkMemoryResourceHandleExternalLink,
+    cleanupLoadedObjecthkMemoryResourceHandleExternalLink,
+    nullptr,
+    &typeid(hkMemoryResourceHandle::ExternalLink),
+    sizeof(hkMemoryResourceHandle::ExternalLink)
+};
+
+hkResourceMap::~hkResourceMap() {}
+
+void hkResourceMap::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+hkResourceBase::Type hkResourceHandle::getType() const {
+    return TYPE_RESOURCE;
+}
+
+// The links are collected in a local hkArray and walked from the last one. A link whose target
+// the map knows is resolved when the member's class is the target's class or one of its bases: the target is stored
+// through the member's accessor and the link removed, both through the vtable. A target that is the handle's own object
+// ends the walk.
+void hkResourceHandle::tryToResolveLinks(hkResourceMap& map) {
+    hkArray<hkResourceHandle::Link> links;
+    getExternalLinks(links);
+    for (int32_t i = links.m_size - 1; i >= 0; --i) {
+        hkResourceHandle::Link& rLink = links.m_data[i];
+        const hkClass* pTargetClass;
+        void* pTarget = map.findObjectByName(rLink.m_externalId, &pTargetClass);
+        if (!pTarget) {
+            continue;
+        }
+        const hkClassMember& rMember = rLink.m_memberAccessor.getClassMember();
+        const hkClass* pMemberClass = rMember.getClass();
+        if (pMemberClass->isSuperClass(*pTargetClass).m_bool || pTargetClass == pMemberClass) {
+            if (pTarget == getObject()) {
+                break;
+            }
+            rLink.m_memberAccessor.asPointer(0) = pTarget;
+            removeExternalLink(rMember.m_name);
+        }
+        else {
+            char buf[512];
+            hkErrStream kStream(buf, 512);
+            const char* pcMemberClassName = pMemberClass->getName();
+            const char* pcTargetClassName = pTargetClass->getName();
+            kStream << "Class mismatch, cannot resolve link: " << pcTargetClassName << " != " << pcMemberClassName;
+            hkError::s_instance->message(
+                hkError::MESSAGE_WARNING,
+                static_cast<int32_t>(0xF034ED21),
+                buf,
+                ".\\ResourceDatabase\\hkResourceHandle.cpp",
+                178
+            );
+        }
+    }
+}
+
+hkResourceHandle::~hkResourceHandle() {}
+
+hkMemoryResourceHandle::hkMemoryResourceHandle() {}
+
+// The destructor only destroys the members: the links, the name and the variant's reference.
+hkMemoryResourceHandle::~hkMemoryResourceHandle() {}
+
+const char* hkMemoryResourceHandle::getName(hkStringBuf& buffer) const {
+    const char* pcName = m_name.cString();
+    if (!pcName) {
+        return "null";
+    }
+    return pcName;
+}
+
+void hkMemoryResourceHandle::setName(const char* name) {
+    m_name = name;
+}
+
+void* hkMemoryResourceHandle::getObject() const {
+    return m_variant.m_pntr;
+}
+
+const hkClass* hkMemoryResourceHandle::getClass() const {
+    return m_variant.getClass();
+}
+
+void hkMemoryResourceHandle::setObject(void* object, const hkClass* klass) {
+    m_variant.set(object, klass);
+}
+
+void hkMemoryResourceHandle::addExternalLink(const char* memberName, const char* externalId) {
+    hkArray<hkMemoryResourceHandle::ExternalLink, hkContainerHeapAllocator>* p_m_references = &m_references;
+    hkMemoryRouter* Instance = &hkMemoryRouter::getInstance();
+    if (p_m_references->m_size == p_m_references->getCapacity()) {
+        hkArrayUtil::_reserveMore(*Instance->m_heap, p_m_references, sizeof(hkMemoryResourceHandle::ExternalLink));
+    }
+    int32_t m_size = p_m_references->m_size;
+    hkStringPtr* p_m_memberName = &p_m_references->m_data[m_size].m_memberName;
+    if (p_m_memberName) {
+        ::new (&p_m_references->m_data[m_size].m_memberName) hkStringPtr;
+        ::new (p_m_memberName + 1) hkStringPtr;
+    }
+    int32_t v7 = p_m_references->m_size;
+    hkStringPtr* v8 = &p_m_references->m_data[v7].m_memberName;
+    p_m_references->m_size = v7 + 1;
+    *v8 = memberName;
+    *(v8 + 1) = externalId;
+}
+
+// The first link of memberName is destroyed and the last link moved into its slot.
+void hkMemoryResourceHandle::removeExternalLink(const char* memberName) {
+    for (int32_t i = 0; i < m_references.m_size; ++i) {
+        if (hkString::strCmp(m_references.m_data[i].m_memberName.cString(), memberName) == 0) {
+            m_references.removeAt(i);
+            return;
+        }
+    }
+}
+
+// One link per stored reference: the member path ("a.b.c") is walked through the struct members from the object's
+// class, and a reference whose member is missing (or whose path crosses a non-struct member) is dropped with a
+// warning.
+void hkMemoryResourceHandle::getExternalLinks(hkArray<hkResourceHandle::Link>& linksOut) {
+    linksOut.m_size = 0;
+    linksOut.reserve(m_references.getSize());
+    char acMemberName[512];
+    char acMessage[512];
+    for (int32_t i = 0; i < m_references.m_size; ++i) {
+        Link* pLink = linksOut.expandByUnchecked(1);
+        const char* pcName = m_references.m_data[i].m_memberName.cString();
+        void* pObject = m_variant.m_pntr;
+        const hkClass* pClass = m_variant.getClass();
+        const char* pcDot = hkString::strChr(pcName, '.');
+        bool bPathFound = true;
+        while (pcDot) {
+            int32_t iLength = static_cast<int32_t>(pcDot - pcName);
+            hkString::memCpy(acMemberName, pcName, iLength);
+            acMemberName[iLength] = 0;
+            pcName += iLength + 1;
+            const hkClassMember* pMember = pClass->getMemberByName(acMemberName);
+            if (!pMember) {
+                bPathFound = false;
+                break;
+            }
+            if (pMember->m_type.m_storage != hkClassMember::TYPE_STRUCT) {
+                alignas(hkErrStream) uint8_t aStream[sizeof(hkErrStream)];
+                hkErrStream* pStream = ::new (aStream) hkErrStream(acMessage, 512);
+                *pStream << "Member is not of type struct : " << acMemberName;
+                hkError::s_instance->message(
+                    hkError::MESSAGE_WARNING,
+                    static_cast<int32_t>(0xF032EDFE),
+                    acMessage,
+                    ".\\ResourceDatabase\\hkResourceHandle.cpp",
+                    0x80
+                );
+                pStream->~hkErrStream();
+                bPathFound = false;
+                break;
+            }
+            pClass = pMember->getClass();
+            pObject = static_cast<char*>(pObject) + pMember->m_offset;
+            pcDot = hkString::strChr(pcName, '.');
+        }
+        if (bPathFound) {
+            const hkClassMember* pMember = pClass->getMemberByName(pcName);
+            if (pMember) {
+                pLink->m_memberName = pcName;
+                pLink->m_memberAccessor = hkClassMemberAccessor(pObject, pMember);
+                pLink->m_externalId = m_references.m_data[i].m_externalId.cString();
+                continue;
+            }
+        }
+        linksOut.m_size--;
+        alignas(hkErrStream) uint8_t aStream[sizeof(hkErrStream)];
+        hkErrStream* pStream = ::new (aStream) hkErrStream(acMessage, 512);
+        *pStream << "Cannot find member : " << pcName;
+        hkError::s_instance->message(
+            hkError::MESSAGE_WARNING,
+            static_cast<int32_t>(0xF032EDF1),
+            acMessage,
+            ".\\ResourceDatabase\\hkResourceHandle.cpp",
+            0x92
+        );
+        pStream->~hkErrStream();
+    }
+}
+
+void hkMemoryResourceHandle::clearExternalLinks() {
+    hkMemoryResourceHandle::ExternalLink*
+        m_data = static_cast<hkArrayBase<hkMemoryResourceHandle::ExternalLink>&>(m_references).begin();
+    if (m_references.m_size > 0) {
+        uint32_t m_size = m_references.m_size;
+        do {
+            m_data->m_externalId.~hkStringPtr();
+            m_data->m_memberName.~hkStringPtr();
+            ++m_data;
+            --m_size;
+        }
+        while (m_size);
+    }
+    m_references.m_size = 0;
+}
+
+hkResourceBase::Type hkResourceContainer::getType() const {
+    return TYPE_RESOURCE;
+}
+
+// The handles are collected in a local hkArray; each handle's tryToResolveLinks is called
+// through the vtable with the map. The size compare is signed and the size is reloaded after every call.
+void hkResourceContainer::tryToResolveLinks(hkResourceMap& map) {
+    hkArray<hkResourceHandle*> handles;
+    findAllResourceRecursively(handles);
+    for (hkResourceHandle* pHandle : handles) {
+        pHandle->tryToResolveLinks(map);
+    }
+}
+
+hkResourceContainer::~hkResourceContainer() {}
+
+void hkResourceContainer::findAllResourceRecursively(
+    hkArray<hkResourceHandle*, hkContainerHeapAllocator>& resourcesOut
+) {
+    for (hkResourceContainer* i = findContainerByName(nullptr, nullptr); i; i = findContainerByName(nullptr, i)) {
+        i->findAllResourceRecursively(resourcesOut);
+    }
+    for (hkResourceHandle* j = findResourceByName(nullptr, nullptr, nullptr); j;
+         j = findResourceByName(nullptr, nullptr, j)) {
+        resourcesOut.pushBack(j);
+    }
+}
+
+void hkResourceContainer::findAllContainersRecursively(
+    hkArray<hkResourceContainer*, hkContainerHeapAllocator>& resourcesOut
+) {
+    resourcesOut.pushBack(this);
+    for (hkResourceContainer* i = findContainerByName(nullptr, nullptr); i; i = findContainerByName(nullptr, i)) {
+        i->findAllContainersRecursively(resourcesOut);
+    }
+}
+
+void hkResourceContainer::getPath(hkStringBuf& pathOut) {
+    hkResourceContainer* v3 = getParent();
+    if (v3) {
+        v3->getPath(pathOut);
+    }
+    hkStringBuf apMemory;
+    const char* v4 = getName(apMemory);
+    pathOut += "/";
+    pathOut += v4;
+}
+
+hkMemoryResourceContainer::hkMemoryResourceContainer(const char* name) : m_name(name), m_parent(nullptr) {}
+
+// The arrays release the children and handles and free themselves; the name frees itself.
+hkMemoryResourceContainer::~hkMemoryResourceContainer() {}
+
+const char* hkMemoryResourceContainer::getName(hkStringBuf& buffer) const {
+    return m_name.cString();
+}
+
+hkResourceHandle* hkMemoryResourceContainer::createResource(const char* name, void* object, const hkClass* klass) {
+    hkMemoryResourceHandle* v7 = new hkMemoryResourceHandle;
+    v7->setName(name);
+    v7->setObject(object, klass);
+    m_resourceHandles.pushBack(hkRefPtr<hkMemoryResourceHandle>(v7));
+    v7->removeReference();
+    return v7;
+}
+
+// The handle's index is looked up under a reference held for the search, then its reference is released and the handles
+// after it moved down one slot.
+void hkMemoryResourceContainer::destroyResource(hkResourceHandle* resourceHandle) {
+    const int32_t index = m_resourceHandles.indexOf(
+        hkRefPtr<hkMemoryResourceHandle>(static_cast<hkMemoryResourceHandle*>(resourceHandle))
+    );
+    if (index > -1) {
+        m_resourceHandles[index] = nullptr;
+        m_resourceHandles.removeAtAndCopy(index);
+    }
+}
+
+hkResourceHandle* hkMemoryResourceContainer::findResourceByName(
+    const char* objectName,
+    const hkClass* klass,
+    const hkResourceHandle* prevObject
+) const {
+    const hkRefPtr<hkMemoryResourceHandle>* v6;
+    int32_t v5 = 0;
+    do {
+        if (!prevObject) {
+            break;
+        }
+        if (v5 >= m_resourceHandles.m_size) {
+            break;
+        }
+        v6 = &m_resourceHandles.m_data[v5++];
+    }
+    while (*v6 != prevObject);
+    bool v7 = v5 < m_resourceHandles.m_size;
+    int32_t v22 = v5;
+    if (!v7) {
+        return nullptr;
+    }
+    do {
+        const hkClass* v13;
+        const hkClass* v14;
+        hkMemoryResourceHandle* v8 = m_resourceHandles.m_data[v22];
+        if (objectName) {
+            hkStringBuf buffer;
+            const char* v10 = v8->getName(buffer);
+            if (hkString::strCmp(objectName, v10)) {
+                continue;
+            }
+        }
+        if (!klass) {
+            return v8;
+        }
+        v13 = v8->getClass();
+        v14 = v13;
+        if (klass == v13 || klass->isSuperClass(*v13).m_bool) {
+            return v8;
+        }
+        if (objectName) {
+            char buf[512];
+            hkErrStream ostr(buf, 512);
+            const char* Name = v14->getName();
+            const char* v19 = klass->getName();
+            ostr << "Class mismatch, cannot resolve link: " << v19 << " != " << Name;
+            hkError::s_instance
+                ->message(hkError::MESSAGE_WARNING, -0xFCB12DE, buf, ".\\ResourceDatabase\\hkResourceHandle.cpp", 312);
+            return nullptr;
+        }
+    }
+    while (++v22 < m_resourceHandles.m_size);
+    return nullptr;
+}
+
+hkResourceContainer* hkMemoryResourceContainer::createContainer(const char* name) {
+    hkResourceContainer* result = findContainerByName(name, nullptr);
+    if (!result) {
+        hkMemoryResourceContainer* v6 = new hkMemoryResourceContainer(name);
+        m_children.pushBack(hkRefPtr<hkMemoryResourceContainer>(v6));
+        v6->m_parent = this;
+        v6->removeReference();
+        return v6;
+    }
+    return result;
+}
+
+// The container's index is looked up under a reference held for the search, then its reference is released and the
+// last child moved into its slot.
+void hkMemoryResourceContainer::destroyContainer(hkResourceContainer* container2) {
+    const int32_t index = m_children.indexOf(
+        hkRefPtr<hkMemoryResourceContainer>(static_cast<hkMemoryResourceContainer*>(container2))
+    );
+    if (index > -1) {
+        m_children[index] = nullptr;
+        m_children.removeAt(index);
+    }
+}
+
+int32_t hkMemoryResourceContainer::getNumContainers() {
+    return m_children.m_size;
+}
+
+hkResourceContainer* hkMemoryResourceContainer::findContainerByName(
+    const char* containerName,
+    const hkResourceContainer* prevContainer
+) const {
+    const hkRefPtr<hkMemoryResourceContainer>* v5;
+    hkMemoryResourceContainer* v7;
+    int32_t v4 = 0;
+    do {
+        if (!prevContainer) {
+            break;
+        }
+        if (v4 >= m_children.m_size) {
+            break;
+        }
+        v5 = &m_children.m_data[v4++];
+    }
+    while (*v5 != prevContainer);
+    int32_t v6 = v4;
+    if (v4 >= m_children.m_size) {
+        return nullptr;
+    }
+    while (true) {
+        v7 = m_children.m_data[v6];
+        if (!containerName ||
+            !hkString::strCmp(
+                containerName,
+                reinterpret_cast<const char*>(
+                    reinterpret_cast<uintptr_t>(v7->m_name.m_stringAndFlag) & ~static_cast<uintptr_t>(1)
+                )
+            )) {
+            break;
+        }
+        if (++v6 >= m_children.m_size) {
+            return nullptr;
+        }
+    }
+    return v7;
+}
+
+// A new parent that has this container among its ancestors (or is it) would make a cycle: a warning, and nothing moves.
+// Otherwise the container leaves its parent's children (its index is used unchecked) and is appended
+// to the new parent's. The new parent is treated as a memory container.
+hkResult hkMemoryResourceContainer::parentTo(hkResourceContainer* newParent) {
+    for (hkResourceContainer* pAncestor = newParent; pAncestor; pAncestor = pAncestor->getParent()) {
+        if (pAncestor == this) {
+            char buf[512];
+            hkErrStream kStream(buf, 512);
+            kStream << "Cannot parent '" << m_name << "' to '"
+                    << static_cast<hkMemoryResourceContainer*>(newParent)->m_name
+                    << "' as this would create a circular dependency ";
+            hkError::s_instance->message(
+                hkError::MESSAGE_WARNING,
+                static_cast<int32_t>(0xABBA4554),
+                buf,
+                ".\\ResourceDatabase\\hkResourceHandle.cpp",
+                408
+            );
+            return HK_FAILURE;
+        }
+    }
+
+    hkRefPtr<hkMemoryResourceContainer> kKeepAlive(this);
+    const int32_t index = m_parent->m_children.indexOf(hkRefPtr<hkMemoryResourceContainer>(this));
+    m_parent->m_children[index] = nullptr;
+    m_parent->m_children.removeAtAndCopy(index);
+    hkMemoryResourceContainer* pNewParent = static_cast<hkMemoryResourceContainer*>(newParent);
+    pNewParent->m_children.pushBack(hkRefPtr<hkMemoryResourceContainer>(this));
+    m_parent = pNewParent;
+    return HK_SUCCESS;
+}
+
+// Maps every handle of container and its children by its name (getName).
+hkContainerResourceMap::hkContainerResourceMap(hkResourceContainer* container) {
+    hkArray<hkResourceHandle*> handles;
+    container->findAllResourceRecursively(handles);
+    for (hkResourceHandle* pHandle : handles) {
+        hkStringBuf buffer;
+        m_resources.insert(pHandle->getName(buffer), pHandle);
+    }
+}
+
+// Returns the object of the handle with that name and writes its class into klassOut when given; returns null and a
+// null class when no handle has the name.
+void* hkContainerResourceMap::findObjectByName(const char* objectName, const hkClass** klassOut) const {
+    if (klassOut) {
+        *klassOut = nullptr;
+    }
+    hkResourceHandle* pHandle = m_resources.getWithDefault(objectName, nullptr);
+    if (!pHandle) {
+        return nullptr;
+    }
+    if (klassOut) {
+        *klassOut = pHandle->getClass();
+    }
+    return pHandle->getObject();
+}

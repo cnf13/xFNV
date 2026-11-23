@@ -1,0 +1,116 @@
+#pragma once
+
+#include <cstdint>
+
+class Actor;
+
+// The perk entry points: the hooks through which a perk owner's perks adjust a game value.
+class BGSEntryPoint {
+public:
+    // HandleEntryPoint ignores values from ENTRY_POINT_COUNT (0x4A) up.
+    enum ENTRY_POINT : int32_t {
+        CALCULATE_WEAPON_DAMAGE,
+        CALCULATE_CRITICAL_HIT_CHANCE,
+        CALCULATE_CRITICAL_HIT_DAMAGE,
+        CALCULATE_WEAPON_ATTACK_AP_COST,
+        CALCULATE_MINE_EXPLODE_CHANCE,
+        ADJUST_RANGE_PENALTY,
+        ADJUST_LIMB_DAMAGE,
+        CALCULATE_WEAPON_RANGE,
+        CALCULATE_TO_HIT_CHANCE,
+        ADJUST_EXPERIENCE_POINTS,
+        ADJUST_GAINED_SKILL_POINTS,
+        ADJUST_BOOK_SKILL_POINTS,
+        MODIFY_RECOVERED_HEALTH,
+        CALCULATE_INVENTORY_AP_COST,
+        GET_DISPOSITION,
+        GET_SHOULD_ATTACK,
+        GET_SHOULD_ASSIST,
+        CALCULATE_BUY_PRICE,
+        GET_BAD_KARMA,
+        GET_GOOD_KARMA,
+        IGNORE_LOCKED_TERMINAL,
+        ADD_LEVELED_LIST_ON_DEATH,
+        GET_MAX_CARRY_WEIGHT,
+        MODIFY_ADDICTION_CHANCE,
+        MODIFY_ADDICTION_DURATION,
+        MODIFY_POSITIVE_CHEM_DURATION,
+        ADJUST_DRINKING_RADIATION,
+        ACTIVATE,
+        MYSTERIOUS_STRANGER,
+        HAS_PARALYZING_PALM,
+        HACKING_SCIENCE_BONUS,
+        IGNORE_RUNNING_DURING_DETECTION,
+        IGNORE_BROKEN_LOCK,
+        HAS_CONCENTRATED_FIRE,
+        CALCULATE_GUN_SPREAD,
+        PLAYER_KILL_AP_REWARD,
+        MODIFY_ENEMY_CRITICAL_HIT_CHANCE,
+        RELOAD_SPEED_ENTRY,
+        EQUIP_SPEED_ENTRY,
+        ACTION_POINT_REGENERATION_ENTRY,
+        ACTION_POINT_COST_MODIFIER_ENTRY,
+        MISS_FORTUNE_ENTRY,
+        RUN_SPEED_MODIFIER,
+        ATTACK_SPEED_MODIFIER,
+        RADIATION_INGESTIBLE_BONUS,
+        HAS_PIP_HACKER,
+        HAS_MELTDOWN,
+        SEE_ENEMY_HEALTH,
+        HAS_JURY_RIGGING,
+        REDUCE_THREAT_RANGE,
+        REDUCE_THREAT_MODIFIER,
+        HAS_ALWAYS_FAST_TRAVEL,
+        KNOCKDOWN_CHANCE,
+        WEAPON_HANDLING_STRENGTH_BONUS,
+        AIM_MOVEMENT_MODIFIER,
+        HAS_LIGHT_ITEMS_WEIGH_NOTHING,
+        ADJUST_DAMAGE_THRESHOLD_DEFENDER,
+        MODIFY_CHANCE_FOR_AMMO_ITEM,
+        ADJUST_DAMAGE_THRESHOLD_ATTACKER,
+        THROWING_VELOCITY_MODIFIER,
+        CHANCE_FOR_ITEM_ON_FIRE,
+        HAS_UNARMED_FORWARD_POWER_ATTACK,
+        HAS_UNARMED_BACKWARD_POWER_ATTACK,
+        HAS_CROUCHED_POWER_ATTACK,
+        HAS_COUNTER_ATTACK,
+        HAS_UNARMED_LEFT_POWER_ATTACK,
+        HAS_UNARMED_RIGHT_POWER_ATTACK,
+        MODIFY_VATS_HELPER_CHANCE,
+        MODIFY_DAMAGE_TO_ITEMS,
+        HAS_IMPROVED_DETECTION,
+        HAS_IMPROVED_SPOTTING,
+        HAS_ITEM_DETECTION,
+        ADJUST_EXPLOSION_RADIUS,
+        NOT_YET_IMPLEMENTED,
+        ENTRY_POINT_COUNT,
+    };
+
+    // The name of one filter form an entry point takes.
+    struct EntryPointParameter {
+        const char* pParameterName;
+    };
+
+    // The filter forms an entry point takes; the count includes the perk owner.
+    struct EntryPointParameters {
+        uint8_t cCount;
+        EntryPointParameter* pParameters;
+    };
+
+    // One row of the entry point table: the name, the filter forms and the kind of function
+    // (a BGSEntryPointFunction::ENTRY_POINT_FUNCTION_TYPE) it runs.
+    struct EntryPoint {
+        const char* pEntryPointName;
+        EntryPointParameters FilterParameters;
+        uint8_t cFunctionType;
+    };
+
+    using EntryPointTable = EntryPoint[ENTRY_POINT_COUNT];
+
+    // Runs the perk owner's perks for the entry point. The variadic arguments are the entry point's filter forms after
+    // the owner, then its function's arguments (pointers to the values to adjust).
+    static void HandleEntryPoint(ENTRY_POINT aeEntryPoint, Actor* apPerkOwner, ...);
+
+    // The entry point table, by ENTRY_POINT.
+    static EntryPointTable EntryPoints;
+};

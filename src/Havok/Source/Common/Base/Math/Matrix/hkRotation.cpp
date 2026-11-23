@@ -1,0 +1,105 @@
+#include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
+
+#include "Havok/Source/Common/Base/Math/Matrix/hkMatrix3.h"
+#include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "xfnv/Compiler.h"
+
+#include <cmath>
+#include <xmmintrin.h>
+
+hkRotation::hkRotation() {}
+
+// Rebuilds the matrix from its own normalized quaternion.
+void hkRotation::renormalize() {
+    hkQuaternion kQuat;
+    kQuat.setAndNormalize(*this);
+    set(kQuat);
+}
+
+void hkRotation::set(const hkQuaternion& qi) {
+    hkVector4 v8;
+    hkVector4 v11;
+    __m128 m_quad = qi.m_vec.m_quad;
+    __m128 v3 = _mm_add_ps(m_quad, m_quad);
+    float v4 = XFNV_M128_F32(qi.m_vec.m_quad, 0) * XFNV_M128_F32(v3, 0);
+    __m128 v5 = _mm_xor_ps(
+        _mm_mul_ps(_mm_shuffle_ps(m_quad, m_quad, 254), _mm_shuffle_ps(v3, v3, 26)),
+        hkQuadRealNegateXZWMask
+    );
+    XFNV_M128_F32(v5, 0) = XFNV_M128_F32(v5, 0) + 1.0f;
+    __m128 v6 = _mm_mul_ps(_mm_shuffle_ps(v3, v3, 165), _mm_shuffle_ps(qi.m_vec.m_quad, qi.m_vec.m_quad, 65));
+    __m128 v7 = _mm_xor_ps(v6, hkQuadRealNegateYZWMask);
+    v8.m_quad = _mm_sub_ps(v5, v7);
+    XFNV_M128_F32(v7, 0) = v4;
+    __m128 v9 = hkQuadReal1000;
+    m_col0.m_quad = v8.m_quad;
+    __m128 v10 = _mm_sub_ps(_mm_xor_ps(v5, hkQuadRealNegateYZWMask), v7);
+    v11.m_quad = _mm_shuffle_ps(v10, v10, 177);
+    XFNV_M128_F32(v9, 0) = (1.0f - v4) - XFNV_M128_F32(v6, 0);
+    m_col1.m_quad = v11.m_quad;
+    m_col2.m_quad = _mm_shuffle_ps(_mm_movehl_ps(v8.m_quad, v11.m_quad), v9, 141);
+}
+
+// Builds the quaternion of the axis and angle, then writes its rotation.
+void hkRotation::setAxisAngle(const hkVector4& axis, float angle) {
+    hkQuaternion kQuat;
+    kQuat.setAxisAngle(axis, angle);
+    set(kQuat);
+}
+
+// Whether the matrix is valid: the base check's answer.
+hkBool hkRotation::isOk() const {
+    return hkMatrix3::isOk();
+}
+
+hkBool hkRotation::isOrthonormal(float epsilon) const {
+    hkVector4 v3;
+    __m128 v6;
+    __m128 v7;
+    float v10;
+    float v11;
+    float v12;
+    float v13;
+    v3.m_quad = m_col0.m_quad;
+    __m128 v4 = _mm_mul_ps(v3.m_quad, v3.m_quad);
+    float v8 = (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 170), 0) +
+                (XFNV_M128_F32(_mm_shuffle_ps(v4, v4, 85), 0) + XFNV_M128_F32(v4, 0))) -
+        1.0;
+    float v9 = std::fabs(static_cast<double>(v8));
+    if (epsilon < static_cast<double>(v9) ||
+        ((v6 = _mm_mul_ps(m_col1.m_quad, m_col1.m_quad),
+          (v10 = (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 170), 0) +
+                  (XFNV_M128_F32(_mm_shuffle_ps(v6, v6, 85), 0) + XFNV_M128_F32(v6, 0))) -
+               1.0,
+           ((v11 = std::fabs(static_cast<double>(v10))) > static_cast<double>(epsilon)))) ||
+         (v7 = _mm_mul_ps(m_col2.m_quad, m_col2.m_quad),
+          (v12 = (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 170), 0) +
+                  (XFNV_M128_F32(_mm_shuffle_ps(v7, v7, 85), 0) + XFNV_M128_F32(v7, 0))) -
+               1.0,
+           ((v13 = std::fabs(static_cast<double>(v12))) > static_cast<double>(epsilon)))))) {
+        return false;
+    }
+
+    return (_mm_movemask_ps(_mm_cmple_ps(
+                _mm_and_ps(
+                    _mm_sub_ps(
+                        _mm_sub_ps(
+                            _mm_mul_ps(
+                                _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 210),
+                                _mm_shuffle_ps(v3.m_quad, v3.m_quad, 201)
+                            ),
+                            _mm_mul_ps(
+                                _mm_shuffle_ps(m_col1.m_quad, m_col1.m_quad, 201),
+                                _mm_shuffle_ps(v3.m_quad, v3.m_quad, 210)
+                            )
+                        ),
+                        m_col2.m_quad
+                    ),
+                    hkVector4::absMask
+                ),
+                _mm_shuffle_ps(_mm_set_ss(epsilon), _mm_set_ss(epsilon), 0)
+            )) &
+            7) == 7;
+}

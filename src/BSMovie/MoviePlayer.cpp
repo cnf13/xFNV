@@ -1,0 +1,477 @@
+#include "BSMovie/MoviePlayer.h"
+
+#include "BSCore/BSSemaphore.h"
+#include "BSCore/MemoryManager.h"
+#include "BSMain/BSTCaseInsensitiveStringMap.h"
+#include "BSMain/Setting.h"
+#include "BSMain/SettingCollection.h"
+#include "BSMovie/Xenon/MoviePlayer_Xenon.h"
+#include "BSShader/BSShaderManager.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/TESDataHandler.h"
+#include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/Ni2DBuffer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRect.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+#include "SDK/Bink/bink.h"
+#include "SDK/MSVC/mbstring.h"
+#include "SDK/MSVC/stdlib.h"
+#include "SDK/MSVC/string.h"
+
+#include <SDL3/SDL.h>
+
+// This string is passed to Warning.
+using aDefaultTryingTo_t = const char[106];
+static aDefaultTryingTo_t aDefaultTryingTo{
+    "DEFAULT: Trying to pause a movie while another movie is already paused.  This is not currently supported."
+};
+SettingT<INISettingCollection> gs_bPreloadIntroSequence_General("bPreloadIntroSequence:General", true);
+SettingT<INISettingCollection> gs_iPreloadSizeLimit_General("iPreloadSizeLimit:General", 26214400);
+SettingT<INISettingCollection> gs_iIntroSequencePriority_General("iIntroSequencePriority:General", 3);
+
+void BinkFree(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}
+
+void* BinkAlloc(void* apThis, [[maybe_unused]] void* apEdx, uint32_t Size) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    void* result = MemoryManager::Instance().Allocate(Size);
+    return result;
+}
+
+Movie::Movie() {
+    ClearData();
+}
+
+Movie::~Movie() {
+    Stop();
+}
+
+void Movie::Pause() {
+    BinkPause(pBink, 1);
+}
+
+void Movie::Resume() {
+    BinkPause(pBink, 0);
+}
+
+bool Movie::PlayBackground(const char* apFileName, bool abPreloadBink) {
+    ePlayingState = MOVIE_PLAYING_BACKGROUND;
+    bLoading = true;
+    if (LoadBink(apFileName, true, abPreloadBink, false)) {
+        bLoading = false;
+        return true;
+    }
+
+    bLoading = false;
+    return false;
+}
+
+bool Movie::Update(bool abAllowInterruption, bool abLoop, bool abLetterBoxed) {
+    char cFrameSkipped = 0;
+    if (!pMoviePlayer->CheckContinuePlaying(abAllowInterruption)) {
+        return false;
+    }
+    if (!pMoviePlayer->bPAL50) {
+        if (BinkWait(pBink)) {
+            if (ePlayingState != MOVIE_PLAYING_BACKGROUND) {
+                Sleep(1u);
+                return true;
+            }
+        }
+        else {
+            cFrameSkipped = Decompress_frame(pBink, pTextureSet, 0);
+            if (cFrameSkipped) {
+                ++iNumFramesSkipped;
+                InitializationFlow(
+                    "Bink playback: Skipped frame #%i.  Total skipped: %i",
+                    iFrameCount,
+                    iNumFramesSkipped
+                );
+            }
+            BinkNextFrame(pBink);
+            ++iFrameCount;
+        }
+    }
+    // Clears the target to opaque black (D3DCOLOR 0xFF000000), Z to 1.
+    dxDevice->Clear(0, nullptr, D3DCLEAR_TARGET, 0xFF000000u, 1.0f, 0);
+    if (!abLetterBoxed && BSShaderManager::bLetterbox) {
+        // The renderer's back buffer is fetched once per dimension.
+        uint32_t uiWidth = NiRenderer::ms_pkRenderer->GetDefaultBackBuffer()->m_uiWidth;
+        uint32_t uiHeight = NiRenderer::ms_pkRenderer->GetDefaultBackBuffer()->m_uiHeight;
+        D3DVIEWPORT9 kViewport;
+        kViewport.MinZ = 0.0f;
+        kViewport.MaxZ = 1.0f;
+        // Each dimension is converted zero-extended and truncated through a 64-bit integer.
+        kViewport.X = static_cast<uint32_t>(
+            static_cast<int64_t>(static_cast<double>(uiWidth) * BSShaderManager::kFramebufferViewport.m_left)
+        );
+        kViewport.Width = static_cast<uint32_t>(static_cast<int64_t>(
+            (BSShaderManager::kFramebufferViewport.m_right - BSShaderManager::kFramebufferViewport.m_left) *
+            static_cast<double>(uiWidth)
+        ));
+        kViewport.Y = static_cast<uint32_t>(
+            static_cast<int64_t>(static_cast<double>(uiHeight) * BSShaderManager::kFramebufferViewport.m_bottom)
+        );
+        kViewport.Height = static_cast<uint32_t>(static_cast<int64_t>(
+            (BSShaderManager::kFramebufferViewport.m_top - BSShaderManager::kFramebufferViewport.m_bottom) *
+            static_cast<double>(uiHeight)
+        ));
+        dxDevice->SetViewport(&kViewport);
+    }
+    if (!pMoviePlayer->IsRendererInsideFrame()) {
+        dxDevice->BeginScene();
+    }
+    Blit_RAD_3D_image_pow2(pTextureSet, fXCoordOffset, fYCoordOffset, fScale, fScale);
+    if (!pMoviePlayer->IsRendererInsideFrame()) {
+        dxDevice->EndScene();
+    }
+    if (ePlayingState != MOVIE_PLAYING_BACKGROUND) {
+        dxDevice->Present(nullptr, nullptr, nullptr, nullptr);
+    }
+    if (!abLetterBoxed && BSShaderManager::bLetterbox) {
+        uint32_t uiWidth = NiRenderer::ms_pkRenderer->GetDefaultBackBuffer()->m_uiWidth;
+        uint32_t uiHeight = NiRenderer::ms_pkRenderer->GetDefaultBackBuffer()->m_uiHeight;
+        D3DVIEWPORT9 kViewport;
+        kViewport.MinZ = 0.0f;
+        kViewport.MaxZ = 1.0f;
+        kViewport.X = 0;
+        kViewport.Y = 0;
+        kViewport.Width = uiWidth;
+        kViewport.Height = uiHeight;
+        dxDevice->SetViewport(&kViewport);
+    }
+    return iFrameCount < pBink->Frames || abLoop;
+}
+
+MoviePlayer::MoviePlayer()
+  : hMovieLoadingThreadHandle(nullptr), hSequenceThreadHandle(nullptr), pCurrentMovie(nullptr), pPausedMovie(nullptr),
+    pThreadLoadedMovie(nullptr), bUseThreadLoadedMovie(false), bPAL50(false), fpThreadLoadCallback(nullptr),
+    bWaitingForSequenceToEnd(false), bStopSequence(false), bLetterBoxedSequence(false), bSequenceMutesGameAudio(true),
+    bSequencePausesGameAudio(true), iCurrentSequenceThreadPriority(0), OpenBinkSema(), BinkPaths(37u, true) {}
+
+// BinkPaths and OpenBinkSema (its handle closed) are destroyed as members.
+MoviePlayer::~MoviePlayer() {
+    while (pCurrentMovie) {
+        Stop();
+    }
+    DeleteBinkPaths();
+}
+
+bool MoviePlayer::CheckContinuePlaying(bool abAllowInterruption) {
+    // The window's messages, into SDL's event queue; WinMain's loop hands them to WinProc_SDL.
+    SDL_PumpEvents();
+    return !bStopSequence;
+}
+
+void MoviePlayer::PlaySequence(char* apString) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    LockRenderer();
+    size_t Size = std::strlen(apString) + 1;
+    char* pstring = static_cast<char*>(MemoryManager::Instance().Allocate(Size));
+    std::strcpy(pstring, apString);
+    char* pfilename = reinterpret_cast<char*>(
+        _mbstok(reinterpret_cast<uint8_t*>(pstring), reinterpret_cast<const uint8_t*>(","))
+    );
+    bBinkOpenSignaled = false;
+    while (pfilename) {
+        if (!bStopSequence && CheckContinuePlaying(true)) {
+            char* pextension = &pfilename[std::strlen(pfilename) - 3];
+            if (_mbsicmp(reinterpret_cast<const uint8_t*>(pextension), reinterpret_cast<const uint8_t*>("bik"))) {
+                Warning("DEFAULT: Unknown file type on file %s", pfilename);
+            }
+            else {
+                Setting::Info* bPreloadIntroSequence;
+                // The setting's address is never null.
+                bPreloadIntroSequence = &gs_bPreloadIntroSequence_General.uValue;
+                Play(
+                    pfilename,
+                    true,
+                    true,
+                    false,
+                    bPreloadIntroSequence->b,
+                    bLetterBoxedSequence,
+                    false,
+                    bSequenceMutesGameAudio,
+                    bSequencePausesGameAudio
+                );
+            }
+        }
+        pfilename = reinterpret_cast<char*>(_mbstok(nullptr, reinterpret_cast<const uint8_t*>(",")));
+    }
+    MemoryManager::Instance().Deallocate(pstring);
+    bStopSequence = false;
+    if (!bWaitingForSequenceToEnd) {
+        hSequenceThreadHandle = nullptr;
+    }
+    uint32_t CurrentThreadId = GetCurrentThreadId();
+    if (CurrentThreadId != GetMainThreadID() && !bBinkOpenSignaled) {
+        SignalBinkOpen();
+    }
+    UnlockRenderer();
+}
+
+void MoviePlayer::SetThreadLoadedMovie(Movie* apMovie) {
+    pThreadLoadedMovie = apMovie;
+    hMovieLoadingThreadHandle = nullptr;
+    fpThreadLoadCallback();
+    fpThreadLoadCallback = nullptr;
+}
+
+void MoviePlayer::SetSequenceThreadPriority(int32_t aiPriority) {
+    int32_t nPriority;
+    switch (aiPriority) {
+        case 0: {
+            nPriority = -2;
+            break;
+        }
+        case 1: {
+            nPriority = -1;
+            break;
+        }
+        case 2: {
+            nPriority = 0;
+            break;
+        }
+        case 3: {
+            nPriority = 1;
+            break;
+        }
+        case 4: {
+            nPriority = 2;
+            break;
+        }
+        case 5: {
+            nPriority = 15;
+            break;
+        }
+        default: {
+            nPriority = 0;
+            break;
+        }
+    }
+    iCurrentSequenceThreadPriority = aiPriority;
+    // A null handle skips the call; SetThreadPriority would only fail on it.
+    if (hSequenceThreadHandle) {
+        hSequenceThreadHandle->SetPriority(nPriority);
+    }
+}
+
+bool MoviePlayer::GetPlayingSequence() {
+    if (!hSequenceThreadHandle) {
+        return false;
+    }
+    return hSequenceThreadHandle->ExitCode() == BSSystemThread::STILL_ACTIVE;
+}
+
+void MoviePlayer::WaitForSequenceToEnd() {
+    if (hSequenceThreadHandle) {
+        bWaitingForSequenceToEnd = true;
+        hSequenceThreadHandle->Wait();
+        // The finished thread is closed here.
+        delete hSequenceThreadHandle;
+        hSequenceThreadHandle = nullptr;
+        bWaitingForSequenceToEnd = false;
+    }
+}
+
+void MoviePlayer::Stop() {
+    if (pCurrentMovie) {
+        delete pCurrentMovie;
+        pCurrentMovie = nullptr;
+    }
+    Resume();
+}
+
+// Opens apFileName into a new current movie, charging it to MEM_CONTEXT_MOVIEPLAYER; stops the player when Bink can't
+// open it.
+bool MoviePlayer::Open(const char* apFileName, bool abSkipWarning, bool abPreloadBink, bool abForcePreload) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    pCurrentMovie = new Movie;
+    bool bOpened = pCurrentMovie->OpenBink(apFileName, abSkipWarning, abPreloadBink, abForcePreload);
+    if (!bOpened) {
+        Stop();
+    }
+    return bOpened;
+}
+
+bool MoviePlayer::Play(
+    const char* apFileName,
+    bool abAllowInterruption,
+    bool abSkipWarning,
+    bool abLoop,
+    bool abPreloadBink,
+    bool abLetterBoxed,
+    bool abAlreadyOpened,
+    bool abMuteGameAudio,
+    bool abPauseGameMusic
+) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    if (!abAlreadyOpened) {
+        Pause();
+        if (bUseThreadLoadedMovie && pThreadLoadedMovie) {
+            pCurrentMovie = pThreadLoadedMovie;
+            pThreadLoadedMovie = nullptr;
+            bUseThreadLoadedMovie = false;
+        }
+        else {
+            Movie* pMovie;
+            pMovie = new Movie;
+            pCurrentMovie = pMovie;
+        }
+    }
+    bool bfinishedPlaying = pCurrentMovie->Play(
+        apFileName,
+        abAllowInterruption,
+        abSkipWarning,
+        abLoop,
+        abPreloadBink,
+        abLetterBoxed,
+        abMuteGameAudio,
+        abPauseGameMusic,
+        m_fTimeBeforeMovieSkippable
+    );
+    Stop();
+    return bfinishedPlaying;
+}
+
+void MoviePlayer::StopSequence() {
+    bStopSequence = true;
+}
+
+void MoviePlayer::IncreaseSequenceThreadPriority() {
+    if (iCurrentSequenceThreadPriority < 5) {
+        SetSequenceThreadPriority(iCurrentSequenceThreadPriority + 1);
+    }
+}
+
+void MoviePlayer::Resume() {
+    if ((!pCurrentMovie) && pPausedMovie) {
+        pCurrentMovie = pPausedMovie;
+        pPausedMovie = nullptr;
+        pCurrentMovie->Resume();
+    }
+}
+
+// Runs the current movie's next frame, charging it to MEM_CONTEXT_MOVIEPLAYER.
+bool MoviePlayer::Update(bool abAllowInterruption, bool abLoop) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    if (pCurrentMovie && pCurrentMovie->ePlayingState) {
+        return pCurrentMovie->Update(abAllowInterruption, abLoop, false);
+    }
+    return false;
+}
+
+void MoviePlayer::Pause() {
+    if (pCurrentMovie) {
+        if (pPausedMovie) {
+            Warning(aDefaultTryingTo);
+        }
+        pCurrentMovie->Pause();
+        pPausedMovie = pCurrentMovie;
+        pCurrentMovie = nullptr;
+    }
+}
+
+float MoviePlayer::CalculateScale(uint32_t afWidth, uint32_t afHeight, bool abLetterBoxed) {
+    if (abLetterBoxed) {
+        return static_cast<float>(static_cast<double>(GetScreenWidth()) / afWidth);
+    }
+
+    return static_cast<float>(static_cast<double>(GetScreenHeight()) / afHeight);
+}
+
+// The horizontal position the movie is drawn at: half the gap left by the scaled movie in the screen width, plus the
+// screen offset.
+float MoviePlayer::CalculateXOffset(float afScale, uint32_t afWidth, bool abLetterBoxed) {
+    const uint32_t uiOffset = GetScreenOffsetX();
+    if (abLetterBoxed) {
+        return static_cast<float>(uiOffset);
+    }
+    const double dOffset = uiOffset;
+    const uint32_t uiWidth = GetScreenWidth();
+    return static_cast<float>(((uiWidth - static_cast<double>(afWidth) * afScale) / 2.0) + dOffset);
+}
+
+float MoviePlayer::CalculateYOffset(float afScale, uint32_t afHeight, bool abLetterBoxed) {
+    if (abLetterBoxed) {
+        return static_cast<float>((GetScreenHeight() - (static_cast<double>(afHeight) * afScale)) / 2.0);
+    }
+
+    return 0.0f;
+}
+
+void MoviePlayer::WaitForSequenceToBegin() {
+    while (hSequenceThreadHandle && ((!pCurrentMovie) || pCurrentMovie->bLoading)) {
+        Sleep(1u);
+    }
+}
+
+bool MoviePlayer::PlayBackground(const char* apFileName, bool abPreloadBink) {
+    AutoMemContext kMemContext(MEM_CONTEXT_MOVIEPLAYER);
+    Pause();
+    if (bUseThreadLoadedMovie && pThreadLoadedMovie) {
+        pCurrentMovie = pThreadLoadedMovie;
+        pThreadLoadedMovie = nullptr;
+        bUseThreadLoadedMovie = false;
+    }
+    else {
+        pCurrentMovie = new Movie;
+    }
+    uint8_t ucPlaying = pCurrentMovie->PlayBackground(apFileName, abPreloadBink);
+    if (!ucPlaying) {
+        Stop();
+    }
+    return ucPlaying;
+}
+
+// The priority is compared with the setting signed, so the setting's unsigned value is read as int32_t.
+void MoviePlayer::DecreaseSequenceThreadPriority() {
+    Setting::Info* p_uValue;
+    // The setting's address is never null.
+    p_uValue = &gs_iIntroSequencePriority_General.uValue;
+    if (iCurrentSequenceThreadPriority > static_cast<int32_t>(p_uValue->uint)) {
+        SetSequenceThreadPriority(iCurrentSequenceThreadPriority - 1);
+    }
+}
+
+void MoviePlayer::DeleteBinkPaths() {
+    NiTMapItem<const char*, char*>* pFirstItem = nullptr;
+    const char* pFileName;
+    char* pPath;
+    NiTMapItem<const char*, char*>* pPos;
+    for (uint32_t i = 0; i < BinkPaths.m_uiHashSize; ++i) {
+        if (BinkPaths.m_ppkHashTable[i]) {
+            pFirstItem = BinkPaths.m_ppkHashTable[i];
+            break;
+        }
+    }
+    pPos = pFirstItem;
+    while (pPos) {
+        pFileName = nullptr;
+        pPath = nullptr;
+        BinkPaths.GetNext(pPos, pFileName, pPath);
+        MemoryManager::Instance().Deallocate(pPath);
+    }
+    BinkPaths.RemoveAll();
+}
+
+void MoviePlayer::AddBinkPath(const char* apFileName, const char* apPath) {
+    size_t stPathLength = std::strlen(apPath);
+    char* ppathCopy = static_cast<char*>(MemoryManager::Instance().Allocate(stPathLength + 1));
+    strcpy_s(ppathCopy, stPathLength + 1, apPath);
+    BinkPaths.SetAt(apFileName, ppathCopy);
+}
+
+uint32_t MoviePlayer::MovieLoadingThread(void* apFileName) {
+    Movie* pmovie;
+    pmovie = new Movie;
+    pmovie->OpenBink(static_cast<char*>(apFileName), true, true, true);
+    pMoviePlayer->SetThreadLoadedMovie(pmovie);
+    return 0;
+}

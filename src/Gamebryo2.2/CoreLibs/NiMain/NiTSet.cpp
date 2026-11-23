@@ -1,0 +1,10 @@
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
+
+#include "BSCore/MemoryManager.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"

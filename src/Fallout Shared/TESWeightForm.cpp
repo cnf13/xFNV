@@ -1,0 +1,80 @@
+#include "Fallout Shared/TESWeightForm.h"
+
+#include "BSCore/RTTI.h"
+#include "Fallout Shared/BaseFormComponent.h"
+#include "Fallout Shared/Magic/AlchemyItem.h"
+#include "Fallout Shared/Magic/IngredientItem.h"
+#include "Fallout Shared/TESAmmo.h"
+#include "Fallout Shared/TESForm.h"
+#include "Fallout Shared/TESLight.h"
+#include "Fallout Shared/TESObjectARMO.h"
+#include "Fallout Shared/TESObjectBOOK.h"
+#include "Fallout Shared/TESObjectCLOT.h"
+#include "Fallout Shared/TESObjectCONT.h"
+#include "Fallout Shared/TESObjectMISC.h"
+#include "Fallout Shared/TESObjectWEAP.h"
+
+TESWeightForm::TESWeightForm() {
+    TESWeightForm::InitializeDataComponent();
+}
+
+void TESWeightForm::InitializeDataComponent() {
+    fWeight = 0.0f;
+}
+
+void TESWeightForm::CopyComponent(BaseFormComponent* apCopyFC) {
+    TESWeightForm* pCopy = dynamic_cast<TESWeightForm*>(apCopyFC);
+    if (pCopy) {
+        SetFormWeight(pCopy->GetWeight());
+    }
+}
+
+bool TESWeightForm::CompareComponent(BaseFormComponent* apCompareFC) {
+    TESWeightForm* pCompare = dynamic_cast<TESWeightForm*>(apCompareFC);
+    if (!pCompare) {
+        return true;
+    }
+    double dWeight = GetWeight();
+    return dWeight != pCompare->GetWeight();
+}
+
+void TESWeightForm::SetFormWeight(float afWeight) {
+    fWeight = afWeight;
+}
+
+float TESWeightForm::GetFormWeight(TESForm* apForm, bool abIsHardcore) {
+    TESWeightForm* pWeight = nullptr;
+    float fWeightOverride = 0.0f;
+    if (apForm) {
+        switch (apForm->GetFormType()) {
+            case ARMO_ID: pWeight = static_cast<TESObjectARMO*>(apForm); break;
+            case BOOK_ID: pWeight = static_cast<TESObjectBOOK*>(apForm); break;
+            case CLOT_ID: pWeight = static_cast<TESObjectCLOT*>(apForm); break;
+            case CONT_ID: pWeight = static_cast<TESObjectCONT*>(apForm); break;
+            case INGR_ID: pWeight = static_cast<IngredientItem*>(apForm); break;
+            case LIGH_ID: pWeight = static_cast<TESObjectLIGH*>(apForm); break;
+            // All four types use the MISC weight offset.
+            case MISC_ID:
+            case KEYM_ID:
+            case COBJ_ID:
+            case IMOD_ID: pWeight = static_cast<TESObjectMISC*>(apForm); break;
+            case WEAP_ID: pWeight = static_cast<TESObjectWEAP*>(apForm); break;
+            case AMMO_ID:
+                if (abIsHardcore) {
+                    fWeightOverride = static_cast<TESAmmo*>(apForm)->GetWeight();
+                }
+                break;
+            case ALCH_ID: pWeight = static_cast<AlchemyItem*>(apForm); break;
+            default: break;
+        }
+    }
+    // The weight form's value is used only when the override compares ordered-equal to 0.0, so a NaN override is
+    // returned.
+    if (fWeightOverride != 0.0) {
+        return fWeightOverride;
+    }
+    if (pWeight) {
+        return pWeight->GetWeight();
+    }
+    return -1.0f;
+}

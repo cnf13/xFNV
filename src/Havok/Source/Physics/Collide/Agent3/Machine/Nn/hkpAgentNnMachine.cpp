@@ -1,0 +1,915 @@
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnMachine.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/String/hkString.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Common/Base/Types/Geometry/Sphere/hkSphere.h"
+#include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
+#include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
+#include "Havok/Source/Physics/Collide/Agent/ContactMgr/hkpContactMgr.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionAgent.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionQualityInfo.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionData.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionOutput.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnEntry.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnSector.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnTrack.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpLinkedCollidable.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3Input.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3ProcessInput.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgentEntry.h"
+#include "Havok/Source/Physics/Collide/Dispatch/hkpCollisionDispatcher.h"
+#include "Havok/Source/Physics/Collide/Shape/Convex/hkpConvexShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Misc/Transform/hkpTransformShape.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
+
+#include <xmmintrin.h>
+
+// The entry's agent drops its cached time of impact: a time-caching entry also resets its own separating normal
+// (time -1, normal zero) before the agent's invalidate function runs on the agent data after the entry.
+void hkAgentNnMachine_InvalidateTimInAgent(hkpAgentNnEntry* entry, const hkpCollisionInput& input) {
+    hkpAgentData* agentData;
+    switch (entry->m_streamCommand) {
+        case hkAgent3::STREAM_CALL:
+        case hkAgent3::STREAM_CALL_AGENT:
+        case hkAgent3::STREAM_CALL_WITH_TRANSFORM:
+        case hkAgent3::STREAM_CALL_AGENT_WITH_TRANSFORM:
+            agentData = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1;
+            break;
+        case hkAgent3::STREAM_CALL_WITH_TIM:
+        case hkAgent3::STREAM_CALL_WITH_TIM_WITH_TRANSFORM: {
+            hkpAgentNnMachineTimEntry* timEntry = static_cast<hkpAgentNnMachineTimEntry*>(entry);
+            timEntry->m_timeOfSeparatingNormal = -1.0f;
+            timEntry->m_separatingNormal.setZero4();
+            agentData = timEntry + 1;
+            break;
+        }
+        default: return;
+    }
+    hkAgent3::InvalidateTimFunc invalidateTim = input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                                                    .m_invalidateTimFunc;
+    if (invalidateTim) {
+        invalidateTim(entry, agentData, input);
+    }
+}
+
+hkpAgentNnEntry* hkAgentNnMachine_FindAgent(const hkpLinkedCollidable* collA, const hkpLinkedCollidable* collB) {
+    const hkpLinkedCollidable* v2;
+    const hkpLinkedCollidable* v3;
+    if (collA->m_collisionEntries.m_size > collB->m_collisionEntries.m_size) {
+        v2 = collB;
+        v3 = collA;
+    }
+    else {
+        v2 = collA;
+        v3 = collB;
+    }
+    int32_t m_size = v2->m_collisionEntries.m_size;
+    int32_t v5 = 0;
+    if (m_size <= 0) {
+        return nullptr;
+    }
+    hkpLinkedCollidable::CollisionEntry* m_data = v2->m_collisionEntries.m_data;
+    for (hkpLinkedCollidable** i = &m_data->m_partner; *i != v3; i += 2) {
+        if (++v5 >= m_size) {
+            return nullptr;
+        }
+    }
+    return m_data[v5].m_agentEntry;
+}
+
+// Hands out the next HK_AGENT3_AGENT_SIZE-byte entry of the track's last sector, or a fresh sector when that one is
+// full.
+hkpAgentNnEntry* hkAgentNnMachine_AllocateEntry(hkpAgentNnTrack& track) {
+    if (track.m_bytesUsedInLastSector < sizeof(hkpAgentNnSector)) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[track.m_sectors.m_size - 1];
+        // The sector's data is untyped storage that entries are carved out of.
+        hkpAgentNnEntry* entry = reinterpret_cast<hkpAgentNnEntry*>(sector->m_data + track.m_bytesUsedInLastSector);
+        track.m_bytesUsedInLastSector += HK_AGENT3_AGENT_SIZE;
+        return entry;
+    }
+    hkpAgentNnSector* sector = static_cast<hkpAgentNnSector*>(
+        hkMemoryRouter::getInstance().m_heap->blockAlloc(sizeof(hkpAgentNnSector))
+    );
+    track.m_sectors.pushBack(sector);
+    track.m_bytesUsedInLastSector = HK_AGENT3_AGENT_SIZE;
+    // The sector's data starts at offset 0, so the first entry is that data.
+    return reinterpret_cast<hkpAgentNnEntry*>(sector->m_data);
+}
+
+// Copies an entry's whole HK_AGENT3_AGENT_SIZE-byte slab into a freshly allocated one and points both collidables'
+// collision entries at the copy.
+hkpAgentNnEntry* hkAgentNnMachine_CopyAndRelinkAgentEntry(hkpAgentNnTrack& destTrack, hkpAgentNnEntry* entry) {
+    hkpAgentNnEntry* newEntry = hkAgentNnMachine_AllocateEntry(destTrack);
+    // Copies the slab as untyped words, the agent's own data included.
+    uint32_t* dst = reinterpret_cast<uint32_t*>(newEntry);
+    const uint32_t* src = reinterpret_cast<const uint32_t*>(entry);
+    for (int32_t i = 0; i < HK_AGENT3_AGENT_SIZE / 4; ++i) {
+        dst[i] = src[i];
+    }
+    newEntry->m_collidable[0]->m_collisionEntries.m_data[newEntry->m_agentIndexOnCollidable[0]].m_agentEntry = newEntry;
+    newEntry->m_collidable[1]->m_collisionEntries.m_data[newEntry->m_agentIndexOnCollidable[1]].m_agentEntry = newEntry;
+    return newEntry;
+}
+
+// The track's last entry moves into the freed slot, and both collidables learn its new address; a sector left empty
+// goes back to the heap, and the sector array shrinks as hkInplaceArray::optimizeCapacity(4) does.
+void hkAgentNnMachine_InternalDeallocateEntry(hkpAgentNnTrack& track, hkpAgentNnEntry* entry) {
+    hkpAgentNnSector* lastSector = track.m_sectors.m_data[track.m_sectors.m_size - 1];
+    // The SDK's hkAddByteOffset(lastSector->getBegin(), m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE): the sector's
+    // bytes are untyped storage holding the entries.
+    hkpAgentNnEntry* lastEntry = reinterpret_cast<hkpAgentNnEntry*>(
+        &lastSector->m_data[track.m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE]
+    );
+    if (entry != lastEntry) {
+        // Copies the whole HK_AGENT3_AGENT_SIZE-byte slab, the agent's data included.
+        hkString::memCpy4(entry, lastEntry, HK_AGENT3_AGENT_SIZE / 4);
+        // Both indices are read before the first store.
+        uint16_t indexB = entry->m_agentIndexOnCollidable[1];
+        entry->m_collidable[0]->m_collisionEntries.m_data[entry->m_agentIndexOnCollidable[0]].m_agentEntry = entry;
+        entry->m_collidable[1]->m_collisionEntries.m_data[indexB].m_agentEntry = entry;
+    }
+    track.m_bytesUsedInLastSector -= HK_AGENT3_AGENT_SIZE;
+    if (track.m_bytesUsedInLastSector == 0) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[--track.m_sectors.m_size];
+        hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
+        track.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
+    }
+    track.m_sectors.optimizeCapacity(4);
+}
+
+// The agent's destroy function runs for the stream commands that call an agent (agent data after a 0x20-byte padded
+// entry, or a 0x30-byte time-caching one). Then the entry leaves both collidables' agent lists: the last pair moves
+// into its slot, the moved pair's agent learns its new index, and the list's storage shrinks to the next power of two
+// above size + 3 when that is below its capacity. Last the entry's slab goes back to the track.
+void hkAgentNnMachine_DestroyAgent(
+    hkpAgentNnTrack& track,
+    hkpAgentNnEntry* entry,
+    hkpCollisionDispatcher* dispatcher,
+    hkpConstraintOwner& constraintOwner
+) {
+    switch (entry->m_streamCommand) {
+        case hkAgent3::STREAM_CALL:
+        case hkAgent3::STREAM_CALL_AGENT:
+        case hkAgent3::STREAM_CALL_WITH_TRANSFORM:
+        case hkAgent3::STREAM_CALL_AGENT_WITH_TRANSFORM:
+            dispatcher->m_agent3Func[entry->m_agentType].m_destroyFunc(
+                entry,
+                static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1,
+                entry->m_contactMgr,
+                constraintOwner,
+                dispatcher
+            );
+            break;
+        case hkAgent3::STREAM_CALL_WITH_TIM:
+        case hkAgent3::STREAM_CALL_WITH_TIM_WITH_TRANSFORM:
+            dispatcher->m_agent3Func[entry->m_agentType].m_destroyFunc(
+                entry,
+                static_cast<hkpAgentNnMachineTimEntry*>(entry) + 1,
+                entry->m_contactMgr,
+                constraintOwner,
+                dispatcher
+            );
+            break;
+        default: break;
+    }
+
+    for (int32_t i = 0; i < 2; ++i) {
+        hkpLinkedCollidable* collidable = entry->m_collidable[i];
+        int32_t index = entry->m_agentIndexOnCollidable[i];
+        hkArray<hkpLinkedCollidable::CollisionEntry>& entries = collidable->m_collisionEntries;
+        entries.removeAt(index);
+        if (index < entries.m_size) {
+            hkpAgentNnEntry* moved = entries.m_data[index].m_agentEntry;
+            moved->m_agentIndexOnCollidable[moved->m_collidable[0] != collidable] = static_cast<uint16_t>(index);
+        }
+        entries.optimizeCapacity(4);
+    }
+    hkAgentNnMachine_InternalDeallocateEntry(track, entry);
+}
+
+// Switches on the entry's stream command: a padded entry's agent data follows its header, and so does a time-caching
+// entry's. Every other command leaves the entry alone.
+void hkAgentNnMachine_WarpTimeInAgent(
+    hkpAgentNnEntry* entry,
+    float oldTime,
+    float newTime,
+    const hkpCollisionInput& input
+) {
+    switch (entry->m_streamCommand) {
+        case 2:
+        case 6:
+        case 10:
+        case 14: {
+            hkAgent3::WarpTimeFunc warpTimeFunc = input.m_dispatcher->m_agent3Func[entry->m_agentType].m_warpTimeFunc;
+            if (!warpTimeFunc) {
+                return;
+            }
+            warpTimeFunc(entry, static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1, oldTime, newTime, input);
+            return;
+        }
+        case 4:
+        case 12: {
+            hkpAgentNnMachineTimEntry* timEntry = static_cast<hkpAgentNnMachineTimEntry*>(entry);
+            // The separating normal's time is dropped after the compare and the agent is handed oldTime.
+            if (oldTime == timEntry->m_timeOfSeparatingNormal) {
+                timEntry->m_timeOfSeparatingNormal = newTime;
+            }
+            else {
+                timEntry->m_timeOfSeparatingNormal = -1.0f;
+            }
+            hkAgent3::WarpTimeFunc warpTimeFunc = input.m_dispatcher->m_agent3Func[entry->m_agentType].m_warpTimeFunc;
+            if (warpTimeFunc) {
+                warpTimeFunc(entry, timEntry + 1, oldTime, newTime, input);
+            }
+            return;
+        }
+        default: return;
+    }
+}
+
+// Walks down the chain of transform shapes from body: each level gets a new motion state (the parent's with the shape's
+// transform applied) and a new cd body over the child shape, and the flag says a transform was applied. Returns the
+// first body that is not a transform shape. numSlots is deliberately never checked.
+const hkpCdBody* hkAgentMachine_processTransformedShapes(
+    const hkpCdBody* cdBody,
+    hkpCdBody* newCdBodies,
+    hkMotionState* newMotionStates,
+    int32_t numSlots,
+    uint8_t& cdBodyHasTransformFlag
+) {
+    const hkpShape* shape = cdBody->m_shape;
+    if (shape->m_type == HK_SHAPE_TRANSFORM) {
+        do {
+            const hkpTransformShape* transformShape = static_cast<const hkpTransformShape*>(shape);
+            const hkMotionState* parent = cdBody->m_motion.pState;
+            const hkTransform& t = transformShape->m_transform;
+            hkMotionState* ms = newMotionStates;
+            ms->m_transform._setMul(parent->m_transform, t);
+            ms->m_sweptTransform.m_centerOfMass0 = parent->m_sweptTransform.m_centerOfMass0;
+            ms->m_sweptTransform.m_centerOfMass1 = parent->m_sweptTransform.m_centerOfMass1;
+            ms->m_sweptTransform.m_rotation0.setMul(parent->m_sweptTransform.m_rotation0, transformShape->m_rotation);
+            ms->m_sweptTransform.m_rotation1.setMul(parent->m_sweptTransform.m_rotation1, transformShape->m_rotation);
+            // The centre of mass local is taken into the transform shape's space.
+            hkVector4 kOffset;
+            kOffset.setSub4(parent->m_sweptTransform.m_centerOfMassLocal, t.m_translation);
+            ms->m_sweptTransform.m_centerOfMassLocal._setRotatedInverseDir(t.m_rotation, kOffset);
+            ms->m_deltaAngle = parent->m_deltaAngle;
+            ms->m_objectRadius = parent->m_objectRadius;
+            if (newCdBodies) {
+                newCdBodies->m_parent = cdBody;
+                newCdBodies->m_motion.pState = ms;
+            }
+            ++newMotionStates;
+            newCdBodies->m_shape = transformShape->m_childShape.m_childShape;
+            newCdBodies->m_shapeKey = 0;
+            cdBody = newCdBodies;
+            ++newCdBodies;
+            cdBodyHasTransformFlag = hkAgent3::TRANSFORM_FLAG;
+            shape = cdBody->m_shape;
+        }
+        while (shape->m_type == HK_SHAPE_TRANSFORM);
+    }
+    return cdBody;
+}
+
+// The dispatcher is read once up front for the predictive test and the create function, and reloaded from input for the
+// quality table and the quality info. m_collisionQualityInfo is mutable, hence the cast.
+hkpAgentNnEntry* hkAgentNnMachine_CreateAgent(
+    hkpAgentNnTrack& track,
+    hkpLinkedCollidable* collA,
+    const hkpCdBody* firstNonTransformBodyA,
+    hkpLinkedCollidable* collB,
+    const hkpCdBody* firstNonTransformBodyB,
+    uint8_t cdBodyHasTransformFlag,
+    int32_t agentType,
+    const hkpProcessCollisionInput& input,
+    hkpContactMgr* mgr
+) {
+    hkpCollisionDispatcher* dispatcher = input.m_dispatcher;
+    hkpAgentNnEntry* entry = hkAgentNnMachine_AllocateEntry(track);
+    entry->m_collidable[0] = collA;
+    entry->m_contactMgr = mgr;
+    entry->m_collidable[1] = collB;
+    entry->m_agentIndexOnCollidable[0] = static_cast<uint16_t>(collA->m_collisionEntries.m_size);
+    entry->m_agentIndexOnCollidable[1] = static_cast<uint16_t>(collB->m_collisionEntries.m_size);
+
+    hkpLinkedCollidable::CollisionEntry* entryA = &collA->m_collisionEntries.expandOne();
+    hkpLinkedCollidable::CollisionEntry* entryB = &collB->m_collisionEntries.expandOne();
+    entryA->m_agentEntry = entry;
+    entryB->m_agentEntry = entry;
+    entryA->m_partner = collB;
+    entryB->m_partner = collA;
+
+    hkpAgent3Input in3;
+    in3.m_bodyB = firstNonTransformBodyB;
+    in3.m_contactMgr = entry->m_contactMgr;
+    in3.m_overrideBodyA = nullptr;
+    in3.m_bodyA = firstNonTransformBodyA;
+    in3.m_input = &input;
+    in3.m_aTb.setMulInverseMul(*firstNonTransformBodyA->m_motion.pMotion, *firstNonTransformBodyB->m_motion.pMotion);
+
+    int8_t qualityIndex = input.m_dispatcher->m_collisionQualityTable[collA->m_broadPhaseHandle.m_objectQualityType]
+                                                                     [collB->m_broadPhaseHandle.m_objectQualityType];
+    entry->m_collisionQualityIndex = static_cast<uint8_t>(qualityIndex);
+    const_cast<hkpProcessCollisionInput&>(input).m_collisionQualityInfo = &input.m_dispatcher
+                                                                               ->m_collisionQualityInfo[qualityIndex];
+    entry->m_agentType = static_cast<uint8_t>(agentType);
+
+    hkpAgentData* freeMemory;
+    if (dispatcher->m_agent3Func[agentType].m_sepNormalFunc) {
+        hkpAgentNnMachineTimEntry* timEntry = static_cast<hkpAgentNnMachineTimEntry*>(entry);
+        entry->m_streamCommand = cdBodyHasTransformFlag | hkAgent3::STREAM_CALL_WITH_TIM;
+        timEntry->m_timeOfSeparatingNormal = -1.0f;
+        timEntry->m_separatingNormal.m_quad = hkQuadReal{0.0f, 0.0f, 0.0f, 0.0f};
+        freeMemory = timEntry + 1;
+    }
+    else {
+        entry->m_streamCommand = cdBodyHasTransformFlag | hkAgent3::STREAM_CALL;
+        freeMemory = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1;
+    }
+    dispatcher->m_agent3Func[static_cast<uint8_t>(agentType)].m_createFunc(in3, entry, freeMemory);
+    entry->m_size = HK_AGENT3_AGENT_SIZE;
+    return entry;
+}
+
+// Walks the entries of every sector by their sizes, to the end of the sector or, in the last one, to the bytes it uses.
+// The release build keeps the walk and none of its asserts. The sector's bytes are untyped storage holding the entries:
+// an entry is found by its byte offset.
+void hkAgentNnMachine_AssertTrackValidity(hkpAgentNnTrack& track) {
+    const int32_t numSectors = track.m_sectors.m_size;
+    for (int32_t i = 0; i < numSectors;) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[i];
+        i++;
+        hkpAgentNnEntry* entry = sector->getBegin();
+        hkpAgentNnEntry* end = (i == numSectors)
+            ? reinterpret_cast<hkpAgentNnEntry*>(&sector->m_data[track.m_bytesUsedInLastSector])
+            : sector->getEnd();
+        while (entry < end) {
+            entry = reinterpret_cast<hkpAgentNnEntry*>(reinterpret_cast<uint8_t*>(entry) + entry->m_size);
+        }
+    }
+}
+
+void hkAgentNnMachine_GetAgentType(
+    const hkpCdBody* cdBodyA,
+    const hkpCdBody* cdBodyB,
+    const hkpProcessCollisionInput& input,
+    int32_t& agentTypeOut,
+    int32_t& isFlippedOut
+) {
+    int32_t v9;
+    hkpCollisionDispatcher* m_dispatcher = input.m_dispatcher;
+    hkpShapeType m_type = cdBodyA->m_shape->m_type;
+    hkpShapeType v7 = cdBodyB->m_shape->m_type;
+    int32_t v8 = v7 + 32 * m_type;
+    if (input.m_createPredictiveAgents.m_storage) {
+        v9 = m_dispatcher->m_agent3TypesPred[0][v8];
+    }
+    else {
+        v9 = m_dispatcher->m_agent3Types[0][v8];
+    }
+    int32_t v10 = m_dispatcher->m_agent3Func[v9].m_symmetric == hkAgent3::IS_NOT_SYMMETRIC_AND_FLIPPED;
+    if (v9 == 1) {
+        v10 = m_dispatcher->m_agent2Func[m_dispatcher->m_agent2Types[m_type][v7]].m_isFlipped.m_bool != 0;
+    }
+    isFlippedOut = v10;
+    if (v10) {
+        int32_t v12;
+        int32_t v11 = m_type + 32 * v7;
+        if (input.m_createPredictiveAgents.m_storage) {
+            v12 = m_dispatcher->m_agent3TypesPred[0][v11];
+        }
+        else {
+            v12 = m_dispatcher->m_agent3Types[0][v11];
+        }
+        agentTypeOut = v12;
+    }
+    else {
+        agentTypeOut = v9;
+    }
+}
+
+// A transform stream command first moves both bodies into the transform shapes' children (the flag the helper sets is
+// not read here), then the agent's update-filter function runs on the agent data after the entry.
+void hkAgentNnMachine_UpdateShapeCollectionFilter(
+    hkpAgentNnEntry* entry,
+    const hkpCollisionInput& input,
+    hkpConstraintOwner& constraintOwner
+) {
+    hkpCdBody newCdBodiesA[4];
+    hkMotionState newMotionStatesA[4];
+    hkpCdBody newCdBodiesB[4];
+    hkMotionState newMotionStatesB[4];
+    uint32_t command = entry->m_streamCommand;
+    const hkpCdBody* bodyA = entry->m_collidable[0];
+    const hkpCdBody* bodyB = entry->m_collidable[1];
+    hkpAgentData* agentData;
+    while (true) {
+        switch (command) {
+            case hkAgent3::STREAM_CALL:
+            case hkAgent3::STREAM_CALL_AGENT: agentData = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1; break;
+            case hkAgent3::STREAM_CALL_WITH_TIM: agentData = static_cast<hkpAgentNnMachineTimEntry*>(entry) + 1; break;
+            case hkAgent3::STREAM_CALL_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_WITH_TIM_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_AGENT_WITH_TRANSFORM: {
+                uint8_t cdBodyHasTransformFlag;
+                bodyA = hkAgentMachine_processTransformedShapes(
+                    bodyA,
+                    newCdBodiesA,
+                    newMotionStatesA,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                bodyB = hkAgentMachine_processTransformedShapes(
+                    bodyB,
+                    newCdBodiesB,
+                    newMotionStatesB,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                command &= ~static_cast<uint32_t>(hkAgent3::TRANSFORM_FLAG);
+                continue;
+            }
+            default: return;
+        }
+        break;
+    }
+    hkAgent3::UpdateFilterFunc updateFilter = input.m_dispatcher->m_agent3Func[entry->m_agentType].m_updateFilterFunc;
+    if (updateFilter) {
+        updateFilter(entry, agentData, *bodyA, *bodyB, input, entry->m_contactMgr, constraintOwner);
+    }
+}
+
+void hkAgentNnMachine_DestroyTrack(
+    hkpAgentNnTrack& track,
+    hkpCollisionDispatcher* dispatcher,
+    hkpConstraintOwner& constraintOwner
+) {
+    while (track.m_sectors.m_size) {
+        // hkAddByteOffset(lastSector->getBegin(), m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE): the last
+        // HK_AGENT3_AGENT_SIZE-byte agent of the last sector, whose bytes getBegin reinterprets as entries.
+        hkpAgentNnSector* sector = track.m_sectors.m_data[track.m_sectors.m_size - 1];
+        hkpAgentNnEntry* entry = reinterpret_cast<hkpAgentNnEntry*>(
+            &sector->m_data[track.m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE]
+        );
+        hkAgentNnMachine_DestroyAgent(track, entry, dispatcher, constraintOwner);
+    }
+}
+
+// The agent3 inputs are filled field by field, never their padding, nor, for a plain call, m_distAtT1; the agent's
+// process copies the whole struct, so it reads uninitialised bytes. A transform-shape command
+// replaces the bodies by the first non-transform levels and runs again without the flag; a plain call runs the agent
+// with no separating normal; a TIM call first refreshes the entry's separating normal (at the step's start time, or
+// cleared when the quality has no continuous physics), and skips the agent, cleaning up its contact points, while the
+// distance it predicts at the step's end is at least the tolerance; an agent call runs the hkpCollisionAgent behind the
+// entry.
+void hkAgentNnMachine_ProcessAgent(
+    hkpAgentNnEntry* entry,
+    const hkpProcessCollisionInput& input,
+    hkpProcessCollisionOutput& output,
+    hkpContactMgr* mgr
+) {
+    alignas(16) hkpCdBody newCdBodiesA[4];
+    alignas(16) hkpCdBody newCdBodiesB[4];
+    hkMotionState newMotionStatesA[4];
+    hkMotionState newMotionStatesB[4];
+    alignas(16) hkpAgent3ProcessInput in3;
+
+    const hkpCdBody* firstObject = entry->m_collidable[0];
+    const hkpCdBody* secondObject = entry->m_collidable[1];
+    uint8_t command = entry->m_streamCommand;
+    while (true) {
+        switch (command) {
+            case hkAgent3::STREAM_CALL: {
+                in3.m_bodyA = firstObject;
+                in3.m_bodyB = secondObject;
+                in3.m_overrideBodyA = nullptr;
+                in3.m_contactMgr = entry->m_contactMgr;
+                in3.m_input = &input;
+                const hkMotionState* msA = firstObject->m_motion.pState;
+                const hkMotionState* msB = secondObject->m_motion.pState;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
+                in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
+                input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                    .m_processFunc(in3, entry, static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1, nullptr, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_WITH_TIM: {
+                hkpAgentNnMachineTimEntry* timEntry = static_cast<hkpAgentNnMachineTimEntry*>(entry);
+                in3.m_bodyB = secondObject;
+                in3.m_overrideBodyA = nullptr;
+                in3.m_bodyA = firstObject;
+                in3.m_contactMgr = entry->m_contactMgr;
+                in3.m_input = &input;
+                const hkMotionState* msA = firstObject->m_motion.pState;
+                const hkMotionState* msB = secondObject->m_motion.pState;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
+
+                float distAtT1;
+                if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
+                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics) {
+                        // No continuous physics: no separating normal, and the agent always runs.
+                        timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
+                        timEntry->m_separatingNormal.setZero4();
+                        distAtT1 = -HK_REAL_MAX;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
+                        goto processAgent;
+                    }
+                    // The separating normal at the step's start: both bodies at their start transforms.
+                    alignas(16) hkAgentNnMachineBodyTemp bodyTemp;
+                    alignas(16) hkpAgent3Input sepInput;
+                    sepInput.m_overrideBodyA = nullptr;
+                    hkSweptTransformUtil::lerp2(
+                        in3.m_bodyA->m_motion.pState->m_sweptTransform,
+                        input.m_stepInfo.m_startTime,
+                        bodyTemp.m_transA
+                    );
+                    hkSweptTransformUtil::lerp2(
+                        in3.m_bodyB->m_motion.pState->m_sweptTransform,
+                        in3.m_input->m_stepInfo.m_startTime,
+                        bodyTemp.m_transB
+                    );
+                    sepInput.m_contactMgr = in3.m_contactMgr;
+                    sepInput.m_bodyA = &bodyTemp.m_bodyA;
+                    sepInput.m_input = in3.m_input;
+                    sepInput.m_bodyB = &bodyTemp.m_bodyB;
+                    bodyTemp.m_bodyA.m_shape = in3.m_bodyA->m_shape;
+                    bodyTemp.m_bodyA.m_shapeKey = in3.m_bodyA->m_shapeKey;
+                    bodyTemp.m_bodyA.m_motion.pMotion = &bodyTemp.m_transA;
+                    bodyTemp.m_bodyA.m_parent = in3.m_bodyA;
+                    bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
+                    bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
+                    bodyTemp.m_bodyB.m_motion.pMotion = &bodyTemp.m_transB;
+                    bodyTemp.m_bodyB.m_parent = in3.m_bodyB;
+                    sepInput.m_aTb.setMulInverseMul(bodyTemp.m_transA, bodyTemp.m_transB);
+                    input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                        .m_sepNormalFunc(sepInput, entry, timEntry + 1, timEntry->m_separatingNormal);
+                }
+                {
+                    timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
+                    const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
+                    distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
+                    if (distAtT1 >= input.m_tolerance) {
+                        // Still separated at the step's end: the agent does not run.
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
+                        if (entry->m_numContactPoints) {
+                            input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                                .m_cleanupFunc(entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner);
+                        }
+                        return;
+                    }
+                }
+            processAgent:
+                in3.m_distAtT1 = distAtT1;
+                in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
+                input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                    .m_processFunc(in3, entry, timEntry + 1, &timEntry->m_separatingNormal, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_AGENT: {
+                hkpAgentData* agentData = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1;
+                hkpCollisionAgent* agent = *static_cast<hkpCollisionAgent**>(agentData);
+                agent->processCollision(*firstObject, *secondObject, input, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_WITH_TIM_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_AGENT_WITH_TRANSFORM: {
+                uint8_t cdBodyHasTransformFlag;
+                firstObject = hkAgentMachine_processTransformedShapes(
+                    firstObject,
+                    newCdBodiesA,
+                    newMotionStatesA,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                secondObject = hkAgentMachine_processTransformedShapes(
+                    secondObject,
+                    newCdBodiesB,
+                    newMotionStatesB,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                command &= ~hkAgent3::TRANSFORM_FLAG;
+                continue;
+            }
+            default: return;
+        }
+    }
+}
+
+// The appendee's entries move, last first, into the track's free slots until its last sector is full, each relinked to
+// its collidables; a sector the appendee empties goes back to the heap and its sector array shrinks as
+// hkInplaceArray::optimizeCapacity(4) does. The appendee's remaining sectors are then inserted after the track's, the
+// track takes the appendee's fill of its last sector, and the appendee is left empty.
+void hkAgentNnMachine_AppendTrack(hkpAgentNnTrack& track, hkpAgentNnTrack& appendee) {
+    while (track.m_bytesUsedInLastSector != sizeof(hkpAgentNnSector) && appendee.m_sectors.m_size) {
+        hkpAgentNnSector* lastSector = appendee.m_sectors.m_data[appendee.m_sectors.m_size - 1];
+        // The SDK's hkAddByteOffset(lastSector->getBegin(), m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE): the
+        // sector's bytes are untyped storage holding the entries.
+        hkpAgentNnEntry* lastEntry = reinterpret_cast<hkpAgentNnEntry*>(
+            &lastSector->m_data[appendee.m_bytesUsedInLastSector - HK_AGENT3_AGENT_SIZE]
+        );
+        hkAgentNnMachine_CopyAndRelinkAgentEntry(track, lastEntry);
+        appendee.m_bytesUsedInLastSector -= HK_AGENT3_AGENT_SIZE;
+        if (appendee.m_bytesUsedInLastSector == 0) {
+            hkpAgentNnSector* sector = appendee.m_sectors.m_data[--appendee.m_sectors.m_size];
+            hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
+            appendee.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
+        }
+        appendee.m_sectors.optimizeCapacity(4);
+    }
+    if (appendee.m_sectors.m_size) {
+        track.m_sectors._insertAt(
+            *hkMemoryRouter::getInstance().m_heap,
+            track.m_sectors.m_size,
+            appendee.m_sectors.m_data,
+            appendee.m_sectors.m_size
+        );
+        track.m_bytesUsedInLastSector = appendee.m_bytesUsedInLastSector;
+        appendee.m_sectors.m_size = 0;
+        appendee.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
+    }
+}
+
+// Every agent of the track processes its pair through hkAgentNnMachine_InlineProcessAgent, and the pair's contact
+// manager then takes the points the agent wrote. Out of memory ends the walk at once; else the count of skipped agents
+// goes to the "numTim" monitor.
+void hkAgentNnMachine_ProcessTrack(
+    hkpConstraintOwner* owner,
+    hkpAgentNnTrack& agentTrack,
+    const hkpProcessCollisionInput& input
+) {
+    hkpProcessCollisionOutput processOutput(owner);
+    int32_t numTim = 0;
+    for (int32_t sectorIndex = 0; sectorIndex < agentTrack.m_sectors.m_size; sectorIndex++) {
+        hkpAgentNnSector* sector = agentTrack.m_sectors.m_data[sectorIndex];
+        // The sector is untyped bytes the entries are laid out in, one after the other; the last sector ends where its
+        // used bytes do. The entry's address is compared with the end as an unsigned integer, wrap included, also
+        // before the first entry, where a pointer compare would let the compiler test only that the used bytes are
+        // nonzero.
+        hkpAgentNnEntry* entry = reinterpret_cast<hkpAgentNnEntry*>(sector->m_data);
+        const uintptr_t uiEndEntry = sectorIndex + 1 == agentTrack.m_sectors.m_size
+            ? reinterpret_cast<uintptr_t>(sector->m_data) + agentTrack.m_bytesUsedInLastSector
+            : reinterpret_cast<uintptr_t>(sector->m_data) + sizeof(hkpAgentNnSector);
+        for (; reinterpret_cast<uintptr_t>(entry) < uiEndEntry;
+             entry = reinterpret_cast<hkpAgentNnEntry*>(reinterpret_cast<uint8_t*>(entry) + entry->m_size)) {
+            processOutput.reset();
+            _mm_prefetch(reinterpret_cast<const char*>(entry) + 128, _MM_HINT_NTA);
+            hkpLinkedCollidable* collA = entry->m_collidable[0];
+            hkpLinkedCollidable* collB = entry->m_collidable[1];
+            _mm_prefetch(reinterpret_cast<const char*>(entry->m_contactMgr), _MM_HINT_NTA);
+            hkAgentNnMachine_InlineProcessAgent(entry, input, numTim, processOutput);
+            if (hkOutOfMemoryState == hkMemoryAllocator::MEMORY_STATE_OUT_OF_MEMORY) {
+                return;
+            }
+            if (processOutput.m_firstFreeContactPoint.m_storage != processOutput.m_contactPoints) {
+                entry->m_contactMgr->processContact(*collA, *collB, input, processOutput);
+            }
+        }
+    }
+    HK_MONITOR_ADD_VALUE("numTim", static_cast<float>(numTim), HK_MONITOR_TYPE_INT);
+}
+
+// out takes in's bodies at the step's start time. Each body of in gets a copy in bodyTemp (its shape and shape key)
+// whose motion is its swept transform at the input's start time and whose parent is the body itself; out gets those
+// copies, in's input and contact manager, and the transform from A to B at that time.
+void hkAgentNnMachine_initInputAtTime(hkpAgent3Input& in, hkAgentNnMachineBodyTemp& temp, hkpAgent3Input& out) {
+    hkSweptTransformUtil::lerp2(
+        in.m_bodyA->m_motion.pState->m_sweptTransform,
+        in.m_input->m_stepInfo.m_startTime,
+        temp.m_transA
+    );
+    hkSweptTransformUtil::lerp2(
+        in.m_bodyB->m_motion.pState->m_sweptTransform,
+        in.m_input->m_stepInfo.m_startTime,
+        temp.m_transB
+    );
+    out.m_bodyA = &temp.m_bodyA;
+    out.m_bodyB = &temp.m_bodyB;
+    out.m_contactMgr = in.m_contactMgr;
+    out.m_input = in.m_input;
+    temp.m_bodyA.m_shape = in.m_bodyA->m_shape;
+    temp.m_bodyA.m_shapeKey = in.m_bodyA->m_shapeKey;
+    temp.m_bodyB.m_shape = in.m_bodyB->m_shape;
+    temp.m_bodyB.m_shapeKey = in.m_bodyB->m_shapeKey;
+    temp.m_bodyA.m_parent = in.m_bodyA;
+    temp.m_bodyA.m_motion.pMotion = &temp.m_transA;
+    // Tests the second body's address for null before linking it (a placement construction's test).
+    hkpCdBody* bodyB = &temp.m_bodyB;
+    if (bodyB) {
+        bodyB->m_parent = in.m_bodyB;
+        bodyB->m_motion.pMotion = &temp.m_transB;
+    }
+    out.m_aTb.setMulInverseMul(temp.m_transA, temp.m_transB);
+}
+
+// The track's last entry slot goes back. A last sector left empty goes back to the heap and the one before it is full;
+// the sector array then shrinks as hkInplaceArray::optimizeCapacity(4) does.
+void hkAgentNnMachine_DeallocateLastEntry(hkpAgentNnTrack& track) {
+    track.m_bytesUsedInLastSector -= HK_AGENT3_AGENT_SIZE;
+    if (track.m_bytesUsedInLastSector == 0) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[track.m_sectors.m_size - 1];
+        track.m_sectors.m_size--;
+        hkMemoryRouter::getInstance().m_heap->blockFree(sector, sizeof(hkpAgentNnSector));
+        track.m_bytesUsedInLastSector = sizeof(hkpAgentNnSector);
+    }
+    track.m_sectors.optimizeCapacity(4);
+}
+
+// Performs hkAgentNnMachine_ProcessAgent's steps, and a TIM entry whose agent is skipped counts in numTim. The contact
+// manager is read from the entry. As in hkAgentNnMachine_ProcessAgent, in3's padding and, for a plain call, m_distAtT1
+// are never written, and the agent's process copies the whole struct, so uninitialised data is read.
+void hkAgentNnMachine_InlineProcessAgent(
+    hkpAgentNnEntry* entry,
+    const hkpProcessCollisionInput& input,
+    int32_t& numTim,
+    hkpProcessCollisionOutput& output
+) {
+    alignas(16) hkpCdBody newCdBodiesA[4];
+    alignas(16) hkpCdBody newCdBodiesB[4];
+    hkMotionState newMotionStatesA[4];
+    hkMotionState newMotionStatesB[4];
+    alignas(16) hkpAgent3ProcessInput in3;
+
+    const hkpCdBody* firstObject = entry->m_collidable[0];
+    const hkpCdBody* secondObject = entry->m_collidable[1];
+    uint8_t command = entry->m_streamCommand;
+    while (true) {
+        switch (command) {
+            case hkAgent3::STREAM_CALL: {
+                in3.m_bodyA = firstObject;
+                in3.m_bodyB = secondObject;
+                in3.m_overrideBodyA = nullptr;
+                in3.m_contactMgr = entry->m_contactMgr;
+                in3.m_input = &input;
+                const hkMotionState* msA = firstObject->m_motion.pState;
+                const hkMotionState* msB = secondObject->m_motion.pState;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
+                in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
+                input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                    .m_processFunc(in3, entry, static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1, nullptr, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_WITH_TIM: {
+                hkpAgentNnMachineTimEntry* timEntry = static_cast<hkpAgentNnMachineTimEntry*>(entry);
+                in3.m_bodyB = secondObject;
+                in3.m_overrideBodyA = nullptr;
+                in3.m_bodyA = firstObject;
+                in3.m_contactMgr = entry->m_contactMgr;
+                in3.m_input = &input;
+                const hkMotionState* msA = firstObject->m_motion.pState;
+                const hkMotionState* msB = secondObject->m_motion.pState;
+                hkSweptTransformUtil::calcTimInfo(*msA, *msB, input.m_stepInfo.m_deltaTime, in3.m_linearTimInfo);
+
+                float distAtT1;
+                if (input.m_stepInfo.m_startTime != timEntry->m_timeOfSeparatingNormal) {
+                    if (!input.m_collisionQualityInfo->m_useContinuousPhysics) {
+                        // No continuous physics: no separating normal, and the agent always runs.
+                        timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
+                        timEntry->m_separatingNormal.setZero4();
+                        distAtT1 = -HK_REAL_MAX;
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
+                        goto processAgent;
+                    }
+                    // The separating normal at the step's start: both bodies at their start transforms.
+                    alignas(16) hkAgentNnMachineBodyTemp bodyTemp;
+                    alignas(16) hkpAgent3Input sepInput;
+                    sepInput.m_overrideBodyA = nullptr;
+                    hkSweptTransformUtil::lerp2(
+                        in3.m_bodyA->m_motion.pState->m_sweptTransform,
+                        input.m_stepInfo.m_startTime,
+                        bodyTemp.m_transA
+                    );
+                    hkSweptTransformUtil::lerp2(
+                        in3.m_bodyB->m_motion.pState->m_sweptTransform,
+                        in3.m_input->m_stepInfo.m_startTime,
+                        bodyTemp.m_transB
+                    );
+                    sepInput.m_contactMgr = in3.m_contactMgr;
+                    sepInput.m_bodyA = &bodyTemp.m_bodyA;
+                    sepInput.m_input = in3.m_input;
+                    sepInput.m_bodyB = &bodyTemp.m_bodyB;
+                    bodyTemp.m_bodyA.m_shape = in3.m_bodyA->m_shape;
+                    bodyTemp.m_bodyA.m_shapeKey = in3.m_bodyA->m_shapeKey;
+                    bodyTemp.m_bodyA.m_motion.pMotion = &bodyTemp.m_transA;
+                    bodyTemp.m_bodyA.m_parent = in3.m_bodyA;
+                    bodyTemp.m_bodyB.m_shape = in3.m_bodyB->m_shape;
+                    bodyTemp.m_bodyB.m_shapeKey = in3.m_bodyB->m_shapeKey;
+                    bodyTemp.m_bodyB.m_motion.pMotion = &bodyTemp.m_transB;
+                    bodyTemp.m_bodyB.m_parent = in3.m_bodyB;
+                    sepInput.m_aTb.setMulInverseMul(bodyTemp.m_transA, bodyTemp.m_transB);
+                    input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                        .m_sepNormalFunc(sepInput, entry, timEntry + 1, timEntry->m_separatingNormal);
+                }
+                {
+                    timEntry->m_timeOfSeparatingNormal = input.m_stepInfo.m_endTime;
+                    const float fProjected = in3.m_linearTimInfo.dot4xyz1(timEntry->m_separatingNormal);
+                    distAtT1 = XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) - fProjected;
+                    if (distAtT1 >= input.m_tolerance) {
+                        // Still separated at the step's end: the agent does not run, and counts as skipped.
+                        XFNV_M128_F32(timEntry->m_separatingNormal.m_quad, 3) = distAtT1;
+                        if (entry->m_numContactPoints) {
+                            input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                                .m_cleanupFunc(entry, timEntry + 1, in3.m_contactMgr, *output.m_constraintOwner);
+                        }
+                        numTim++;
+                        return;
+                    }
+                }
+            processAgent:
+                in3.m_distAtT1 = distAtT1;
+                in3.m_aTb.setMulInverseMul(msA->m_transform, msB->m_transform);
+                input.m_dispatcher->m_agent3Func[entry->m_agentType]
+                    .m_processFunc(in3, entry, timEntry + 1, &timEntry->m_separatingNormal, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_AGENT: {
+                hkpAgentData* agentData = static_cast<hkpAgentNnMachinePaddedEntry*>(entry) + 1;
+                hkpCollisionAgent* agent = *static_cast<hkpCollisionAgent**>(agentData);
+                agent->processCollision(*firstObject, *secondObject, input, output);
+                return;
+            }
+            case hkAgent3::STREAM_CALL_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_WITH_TIM_WITH_TRANSFORM:
+            case hkAgent3::STREAM_CALL_AGENT_WITH_TRANSFORM: {
+                uint8_t cdBodyHasTransformFlag;
+                firstObject = hkAgentMachine_processTransformedShapes(
+                    firstObject,
+                    newCdBodiesA,
+                    newMotionStatesA,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                secondObject = hkAgentMachine_processTransformedShapes(
+                    secondObject,
+                    newCdBodiesB,
+                    newMotionStatesB,
+                    4,
+                    cdBodyHasTransformFlag
+                );
+                command &= ~hkAgent3::TRANSFORM_FLAG;
+                continue;
+            }
+            default: return;
+        }
+    }
+}
+
+// Checks each sector from its begin to its used size, compared unsigned. The entry is compared as an address into the
+// sectors' untyped storage.
+bool hkAgentNnMachine_IsEntryOnTrack(hkpAgentNnTrack& track, hkpAgentEntry* entry) {
+    const uint8_t* pEntry = reinterpret_cast<const uint8_t*>(entry);
+    for (int32_t i = 0; i < track.m_sectors.m_size; i++) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[i];
+        uint32_t sectorSize = track.getSectorSize(i);
+        if (&sector->m_data[0] <= pEntry && pEntry < &sector->m_data[sectorSize]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// hk4dGskCollideCalcToi's setup of the vertex sweep input, as that body writes it.
+const hkSphere*
+initVertexCollidePointsInput(const hkpAgent3ProcessInput* input, hkp4dGskVertexCollidePointsInput* pointsInput) {
+    const hkpConvexShape* pShapeA = static_cast<const hkpConvexShape*>(input->m_bodyA->m_shape);
+    const hkpConvexShape* pShapeB = static_cast<const hkpConvexShape*>(input->m_bodyB->m_shape);
+    const hkMotionState* pMotionA = input->m_bodyA->m_motion.pState;
+    const hkMotionState* pMotionB = input->m_bodyB->m_motion.pState;
+    pointsInput->m_motionA.m_storage = pMotionA;
+    pointsInput->m_motionB.m_storage = pMotionB;
+    pointsInput->m_radiusSum.m_storage = pShapeB->m_radius + pShapeA->m_radius;
+    pointsInput->m_linearTimInfo = input->m_linearTimInfo;
+    pointsInput->m_stepInfo.m_storage = &input->m_input->m_stepInfo;
+    const int32_t iNumSpheres = pShapeA->getNumCollisionSpheresImpl();
+    pointsInput->m_allocatedNumVertices.m_storage = iNumSpheres;
+    pointsInput->m_numVertices.m_storage = iNumSpheres;
+    void* pBlock = hkAllocateStack<hkVector4>(iNumSpheres, nullptr);
+    pointsInput->m_verticesA.m_storage = static_cast<hkVector4*>(pBlock);
+    // The stack block is untyped memory the spheres are written to and read back as vectors.
+    const hkSphere* pResult = pShapeA->getCollisionSpheresImpl(static_cast<hkSphere*>(pBlock));
+    const float fAccelB = pMotionB->m_objectRadius * XFNV_M128_F32(pointsInput->m_deltaAngles[1].m_quad, 3) *
+        XFNV_M128_F32(pointsInput->m_deltaAngles[1].m_quad, 3);
+    const float fAccelA = pMotionA->m_objectRadius * XFNV_M128_F32(pointsInput->m_deltaAngles[0].m_quad, 3) *
+        XFNV_M128_F32(pointsInput->m_deltaAngles[0].m_quad, 3);
+    pointsInput->m_maxAccel.m_storage = fAccelB + fAccelA;
+    pointsInput->m_invMaxAccel.m_storage = 1.0 / (pointsInput->m_maxAccel.m_storage + 1.1920928955078125e-07);
+    return pResult;
+}

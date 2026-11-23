@@ -1,0 +1,120 @@
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
+
+#include "Havok/Source/Animation/Animation/Ik/FootPlacement/hkaFootPlacementIkSolver.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringBuf.h"
+#include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h"
+#include "xfnv/Compiler.h"
+
+#include <bit>
+#include <xmmintrin.h>
+
+// The midpoint and the result are sums of floats times the double 0.5, stored as floats.
+float hkVector4Util::getFloatToInt16FloorCorrection() {
+    float l = 10.0f;
+    float h = 11.0f;
+    hkVector4 one;
+    one.setAll(1.0f);
+    for (int32_t i = 23; i != 0; --i) {
+        float m = static_cast<float>((static_cast<double>(h) + l) * 0.5);
+        hkVector4 v;
+        v.setAll(m);
+        hkIntUnion64 out;
+        convertToUint16(v, hkVector4Zero, one, out);
+        if (out.u16[0] < 11) {
+            l = m;
+        }
+        else {
+            h = m;
+        }
+    }
+    return static_cast<float>((static_cast<double>(h) + l) * 0.5 - 11.0);
+}
+
+// The midpoint and the result are sums of floats times the double 0.5, stored as floats.
+float hkVector4Util::getFloatToInt32FloorCorrection() {
+    float l = 10.0f;
+    float h = 11.0f;
+    hkVector4 one;
+    one.setAll(1.0f);
+    for (int32_t i = 23; i != 0; --i) {
+        float m = static_cast<float>((static_cast<double>(h) + l) * 0.5);
+        hkVector4 v;
+        v.setAll(m);
+        uint32_t out[4];
+        convertToUint32(v, hkVector4Zero, one, out);
+        if (out[0] < 11) {
+            l = m;
+        }
+        else {
+            h = m;
+        }
+    }
+    return static_cast<float>((static_cast<double>(h) + l) * 0.5 - 11.0);
+}
+
+// KEEP: the body writes no general register, and its callers keep two scratch registers live across the call, which
+// clang does not guarantee: mapPoseLocalSpace uses both after the call, mapPose one.
+void hkVector4Util::normalizeVectors2(hkVector4& arV0, hkVector4& arV1) {
+    __m128 v2 = _mm_mul_ps(arV0.m_quad, arV0.m_quad);
+    float v3 = XFNV_M128_F32(_mm_shuffle_ps(v2, v2, 85), 0) + XFNV_M128_F32(v2, 0);
+    __m128 v4 = _mm_shuffle_ps(v2, v2, 170);
+    XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v4, 0) + v3;
+    __m128 v5 = _mm_mul_ps(arV1.m_quad, arV1.m_quad);
+    float v6 = XFNV_M128_F32(_mm_shuffle_ps(v5, v5, 85), 0) + XFNV_M128_F32(v5, 0);
+    __m128 v7 = _mm_shuffle_ps(v5, v5, 170);
+    XFNV_M128_F32(v7, 0) = XFNV_M128_F32(v7, 0) + v6;
+    __m128 v8 = _mm_shuffle_ps(v4, v4, 0);
+    __m128 v9 = _mm_shuffle_ps(v8, _mm_unpackhi_ps(v8, _mm_shuffle_ps(v7, v7, 0)), 196);
+    __m128 v10 = _mm_rsqrt_ps(v9);
+    __m128 v11 = _mm_mul_ps(
+        _mm_sub_ps(hkQuadReal3333, _mm_mul_ps(_mm_mul_ps(v10, v9), v10)),
+        _mm_mul_ps(v10, hkQuadRealHalf)
+    );
+    arV0.m_quad = _mm_mul_ps(_mm_shuffle_ps(v11, v11, 0), arV0.m_quad);
+    __m128 v12 = _mm_shuffle_ps(v11, v11, 255);
+    arV1.m_quad = _mm_mul_ps(_mm_shuffle_ps(v12, v12, 0), arV1.m_quad);
+}
+
+// Takes each lane's bits 6 to 13 with masks and shifts and merges them into one 32-bit value; w's bits above 13 shift
+// out of it.
+uint32_t hkVector4Util::packQuaternionIntoInt32(const hkVector4& qin) {
+    // The scale (128 / 1.1 in each lane) and the offset added after it (196736.5), so that bits 6 to 13 of each float
+    // hold the component's byte.
+    static hkQuadReal scale{116.36363f, 116.36363f, 116.36363f, 116.36363f};
+    static hkQuadReal offset{196736.5f, 196736.5f, 196736.5f, 196736.5f};
+    hkQuadReal u = _mm_add_ps(_mm_mul_ps(qin.m_quad, scale), offset);
+    uint32_t x = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 0));
+    uint32_t y = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 1));
+    uint32_t z = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 2));
+    uint32_t w = std::bit_cast<uint32_t>(XFNV_M128_F32(u, 3));
+    return ((x >> 6) & 0xFF) | (((y >> 6) & 0xFF) << 8) | (((z >> 6) & 0xFF) << 16) | ((w >> 6) << 24);
+}
+
+// The components are read as floats and passed promoted to double.
+const char* hkVector4Util::toString3(const hkVector4& x, hkStringBuf& s, char separator) {
+    s.printf(
+        "%f%c%f%c%f",
+        XFNV_M128_F32(x.m_quad, 0),
+        separator,
+        XFNV_M128_F32(x.m_quad, 1),
+        separator,
+        XFNV_M128_F32(x.m_quad, 2)
+    );
+    return s.m_string.begin();
+}
+
+const char* hkVector4Util::toString4(const hkVector4& x, hkStringBuf& s, char separator) {
+    s.printf(
+        "%f%c%f%c%f%c%f",
+        XFNV_M128_F32(x.m_quad, 0),
+        separator,
+        XFNV_M128_F32(x.m_quad, 1),
+        separator,
+        XFNV_M128_F32(x.m_quad, 2),
+        separator,
+        XFNV_M128_F32(x.m_quad, 3)
+    );
+    return s.m_string.begin();
+}

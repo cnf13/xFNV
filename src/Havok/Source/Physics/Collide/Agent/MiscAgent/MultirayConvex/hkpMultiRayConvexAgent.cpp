@@ -1,0 +1,398 @@
+#include "Havok/Source/Physics/Collide/Agent/MiscAgent/MultirayConvex/hkpMultiRayConvexAgent.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Common/Base/Object/hkBaseObject.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
+#include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdPoint.h"
+#include "Havok/Source/Physics/Collide/Agent/ContactMgr/hkpContactMgr.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdBodyPairCollector.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpLinearCastCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/Util/Symmetric/hkpSymmetricAgentLinearCast.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionAgent.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionAgentConfig.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCdPoint.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionData.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionOutput.h"
+#include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "Havok/Source/Physics/Collide/Dispatch/hkpCollisionDispatcher.h"
+#include "Havok/Source/Physics/Collide/Query/Collector/PointCollector/hkpSimpleClosestContactCollector.h"
+#include "Havok/Source/Physics/Collide/Shape/Misc/MultiRay/hkpMultiRayShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintOwner.h"
+#include "xfnv/Compiler.h"
+
+#include <xmmintrin.h>
+
+// One contact point info per ray of body A's multi-ray shape, each with no contact point yet.
+hkpMultiRayConvexAgent::hkpMultiRayConvexAgent(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpContactMgr* mgr
+)
+  : hkpIterativeLinearCastAgent(mgr) {
+    const int32_t numRays = static_cast<const hkpMultiRayShape*>(bodyA.m_shape)->m_rays.m_size;
+    m_contactInfo.setSize(numRays);
+    for (int32_t i = 0; i < numRays; ++i) {
+        m_contactInfo.m_data[i].m_contactPointId = 0xFFFF;
+    }
+}
+
+// m_contactInfo frees its buffer in its own destructor.
+hkpMultiRayConvexAgent::~hkpMultiRayConvexAgent() {}
+
+void hkpMultiRayConvexAgent::getPenetrations(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpCdBodyPairCollector& collector
+) {
+    hkpMultiRayConvexAgent::staticGetPenetrations(bodyA, bodyB, input, collector);
+}
+
+void hkpMultiRayConvexAgent::getClosestPoints(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpCdPointCollector& collector
+) {
+    staticGetClosestPoints(bodyA, bodyB, input, collector);
+}
+
+// The closest points with the tolerance grown by the cached path length, through this agent's own getClosestPoints; a
+// hit goes to the start collector when the tolerance is larger than its distance. While the path still moves into the
+// surface the fraction along it is refined, the A body moved there through a copy of its motion state, until a hit
+// stops closing in, the configuration's iterations run out or its early-out distance is reached. The dot products are
+// single precision.
+void hkpMultiRayConvexAgent::linearCast(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpLinearCastCollisionInput& input,
+    hkpCdPointCollector& castCollector,
+    hkpCdPointCollector* startCollector
+) {
+    hkpCollisionInput kInput = input;
+    kInput.m_tolerance += input.m_cachedPathLength;
+
+    hkpSimpleClosestContactCollector kClosest;
+    getClosestPoints(bodyA, bodyB, kInput, kClosest);
+    if (!kClosest.m_hasHit.m_bool) {
+        return;
+    }
+
+    hkpCdPoint kPoint;
+    kPoint.m_contact = kClosest.m_hitPoint;
+    kPoint.m_cdBodyA = &bodyA;
+    kPoint.m_cdBodyB = &bodyB;
+    double fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
+    if ((input.m_tolerance > fDist) && startCollector) {
+        startCollector->addCdPoint(kPoint);
+        fDist = XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3);
+    }
+
+    const hkQuadReal& rPath = input.m_path.m_quad;
+    const __m128 kProduct = _mm_mul_ps(rPath, kPoint.m_contact.m_separatingNormal.m_quad);
+    float fDot = _mm_cvtss_f32(_mm_add_ps(
+        _mm_shuffle_ps(kProduct, kProduct, 0xAA),
+        _mm_add_ps(_mm_shuffle_ps(kProduct, kProduct, 0x55), kProduct)
+    ));
+    double fSum = fDist + fDot;
+    if (fSum > 0.0) {
+        return;
+    }
+    const hkpCollisionAgentConfig* pConfig = input.m_config;
+    if (!(fDot + input.m_maxExtraPenetration < 0.0)) {
+        return;
+    }
+    if (pConfig->m_iterativeLinearCastEarlyOutDistance < fDist) {
+        hkMotionState kMotionState(*bodyA.m_motion.pState);
+        hkpCdBody kBodyA;
+        kBodyA.m_shape = bodyA.m_shape;
+        kBodyA.m_shapeKey = 0xFFFFFFFF;
+        kBodyA.m_motion.pState = &kMotionState;
+        kBodyA.m_parent = &bodyA;
+
+        hkpSimpleClosestContactCollector kSecond;
+        double fFraction = fDist / (fDist - fSum);
+        int32_t iIterations = pConfig->m_iterativeLinearCastMaxIterations - 1;
+        if (iIterations < 0) {
+            castCollector.addCdPoint(kPoint);
+            return;
+        }
+        for (;;) {
+            kSecond.m_earlyOutDistance = HK_REAL_MAX;
+            kSecond.m_hasHit.m_bool = false;
+            XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3) = HK_REAL_MAX;
+            const float fFraction32 = static_cast<float>(fFraction);
+            const hkQuadReal& rState = bodyA.m_motion.pState->m_transform.m_translation.m_quad;
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 0) = fFraction32 * XFNV_M128_F32(rPath, 0) +
+                XFNV_M128_F32(rState, 0);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 1) = fFraction32 * XFNV_M128_F32(rPath, 1) +
+                XFNV_M128_F32(rState, 1);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 2) = fFraction32 * XFNV_M128_F32(rPath, 2) +
+                XFNV_M128_F32(rState, 2);
+            XFNV_M128_F32(kMotionState.m_transform.m_translation.m_quad, 3) = fFraction32 * XFNV_M128_F32(rPath, 3) +
+                XFNV_M128_F32(rState, 3);
+            getClosestPoints(kBodyA, bodyB, kInput, kSecond);
+            if (!kSecond.m_hasHit.m_bool) {
+                return;
+            }
+            kPoint.m_contact.m_position = kSecond.m_hitPoint.m_position;
+            kPoint.m_contact.m_separatingNormal = kSecond.m_hitPoint.m_separatingNormal;
+            XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = fFraction32;
+            const __m128 kNewProduct = _mm_mul_ps(rPath, kSecond.m_hitPoint.m_separatingNormal.m_quad);
+            double fNewDot = _mm_cvtss_f32(_mm_add_ps(
+                _mm_shuffle_ps(kNewProduct, kNewProduct, 0xAA),
+                _mm_add_ps(_mm_shuffle_ps(kNewProduct, kNewProduct, 0x55), kNewProduct)
+            ));
+            if (fNewDot >= 0.0) {
+                return;
+            }
+            const double fNegDot = -fNewDot;
+            const double fNewDist = XFNV_M128_F32(kSecond.m_hitPoint.m_separatingNormal.m_quad, 3);
+            if (fNegDot * fFraction + fNewDist > fNegDot) {
+                return;
+            }
+            if (pConfig->m_iterativeLinearCastEarlyOutDistance >= fNewDist) {
+                castCollector.addCdPoint(kPoint);
+                return;
+            }
+            fFraction = fFraction + fNewDist / fNegDot;
+            if (castCollector.m_earlyOutDistance < fFraction) {
+                return;
+            }
+            if (--iIterations < 0) {
+                castCollector.addCdPoint(kPoint);
+                return;
+            }
+        }
+    }
+    if (fDist <= 0.0) {
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
+        castCollector.addCdPoint(kPoint);
+        return;
+    }
+    if ((fDist - fSum) * castCollector.m_earlyOutDistance >= fDist) {
+        XFNV_M128_F32(kPoint.m_contact.m_separatingNormal.m_quad, 3) = 0.0f;
+        castCollector.addCdPoint(kPoint);
+    }
+}
+
+// Casts every ray of the multi-ray shape (body A) against the convex shape (body B). A ray that hits makes a contact
+// point at the hit in world space, added to the contact manager when the ray has none yet and handed to the output when
+// it has one; a ray that misses removes its contact point. The input's filter fields are set once, before the loop, the
+// output's in every pass. The distance is (fraction - 1.0) unrounded, times the ray's w, plus m_rayPenetrationDistance,
+// computed in double and then stored as a float.
+void hkpMultiRayConvexAgent::processCollision(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpProcessCollisionInput& input,
+    hkpProcessCollisionOutput& result
+) {
+    HK_TIMER_BEGIN("multiRay-cvx", nullptr);
+
+    const hkpMultiRayShape* pMultiRay = static_cast<const hkpMultiRayShape*>(bodyA.m_shape);
+    const hkpShape* pConvex = bodyB.m_shape;
+    hkTransform aTb;
+    aTb.setMulInverseMul(*bodyB.m_motion.pMotion, *bodyA.m_motion.pMotion);
+    const int32_t iNumRays = pMultiRay->m_rays.m_size;
+    hkpShapeRayCastInput rayInput;
+    rayInput.m_filterInfo = 0;
+    rayInput.m_rayShapeCollectionFilter = nullptr;
+    const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
+    for (int32_t i = 0; i < iNumRays; ++i, ++pRay) {
+        hkpShapeRayCastOutput output;
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
+        hkBool bHit = pConvex->castRayImpl(rayInput, output);
+        if (bHit.m_bool) {
+            hkpProcessCdPoint* pPoint = result.m_firstFreeContactPoint.m_storage;
+            hkVector4 hitLocal;
+            hitLocal.setInterpolate4(rayInput.m_from, rayInput.m_to, output.m_hitFraction);
+            pPoint->m_contact.m_position.setTransformedPos(*bodyB.m_motion.pMotion, hitLocal);
+            pPoint->m_contact.m_separatingNormal.setRotatedDir(bodyB.m_motion.pMotion->m_rotation, output.m_normal);
+            XFNV_M128_F32(pPoint->m_contact.m_separatingNormal.m_quad, 3) = static_cast<float>(
+                (static_cast<double>(output.m_hitFraction) - 1.0) * XFNV_M128_F32(pRay->m_start.m_quad, 3) +
+                pMultiRay->m_rayPenetrationDistance
+            );
+            if (m_contactInfo.m_data[i].m_contactPointId == 0xFFFF) {
+                m_contactInfo.m_data[i].m_contactPointId = m_contactMgr->addContactPointImpl(
+                    bodyA,
+                    bodyB,
+                    input,
+                    result,
+                    nullptr,
+                    pPoint->m_contact
+                );
+            }
+            if (m_contactInfo.m_data[i].m_contactPointId != 0xFFFF) {
+                ++result.m_firstFreeContactPoint.m_storage;
+                pPoint->m_contactPointId.m_storage = m_contactInfo.m_data[i].m_contactPointId;
+            }
+        }
+        else {
+            const uint16_t uiContactPointId = m_contactInfo.m_data[i].m_contactPointId;
+            if (uiContactPointId != 0xFFFF) {
+                m_contactMgr->removeContactPointImpl(uiContactPointId, *result.m_constraintOwner.m_storage);
+                m_contactInfo.m_data[i].m_contactPointId = 0xFFFF;
+            }
+        }
+    }
+
+    HK_TIMER_END();
+}
+
+void hkpMultiRayConvexAgent::cleanup(hkpConstraintOwner& constraintOwner) {
+    int32_t m_size = m_contactInfo.m_size;
+    for (int32_t i = 0; i < m_size; ++i) {
+        int32_t m_contactPointId = m_contactInfo.m_data[i].m_contactPointId;
+        if (static_cast<uint16_t>(m_contactPointId) != 0xFFFF) {
+            m_contactMgr->removeContactPointImpl(m_contactPointId, constraintOwner);
+        }
+    }
+    delete this;
+}
+
+// Casts every ray of the multi-ray shape (body A) against the convex shape (body B) and reports the body pair once per
+// ray that hits, until the collector asks to stop. The output's fields and the input's filter fields are set once,
+// before the loop.
+void hkpMultiRayConvexAgent::staticGetPenetrations(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpCdBodyPairCollector& collector
+) {
+    HK_TIMER_BEGIN("multiRay-cnvx-getPen", nullptr);
+
+    const hkpMultiRayShape* pMultiRay = static_cast<const hkpMultiRayShape*>(bodyA.m_shape);
+    const hkpShape* pConvex = bodyB.m_shape;
+    hkTransform aTb;
+    aTb.setMulInverseMul(*bodyB.m_motion.pMotion, *bodyA.m_motion.pMotion);
+    int32_t iNumRays = pMultiRay->m_rays.m_size;
+    const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
+
+    hkpShapeRayCastOutput output;
+    hkpShapeRayCastInput rayInput;
+    rayInput.m_filterInfo = 0;
+    rayInput.m_rayShapeCollectionFilter = nullptr;
+    while (iNumRays != 0) {
+        --iNumRays;
+        if (collector.m_earlyOut.m_bool) {
+            break;
+        }
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
+        hkBool bHit = pConvex->castRayImpl(rayInput, output);
+        if (bHit.m_bool) {
+            collector.addCdBodyPair(bodyA, bodyB);
+        }
+        ++pRay;
+    }
+
+    HK_TIMER_END();
+}
+
+// Casts every ray of the multi-ray shape (body A) against the convex shape (body B) and reports each hit as a contact
+// point in world space whose distance is how far the ray's end lies past the hit, less the shape's penetration
+// distance. The input's filter fields are set once, before the loop. The distance is computed as (fraction - 1.0)
+// unrounded, times the ray's w, plus m_rayPenetrationDistance, in double precision, then stored as a float.
+void hkpMultiRayConvexAgent::staticGetClosestPoints(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpCdPointCollector& collector
+) {
+    HK_TIMER_BEGIN("multiRay-cvx", nullptr);
+
+    const hkpMultiRayShape* pMultiRay = static_cast<const hkpMultiRayShape*>(bodyA.m_shape);
+    const hkpShape* pConvex = bodyB.m_shape;
+    hkTransform aTb;
+    aTb.setMulInverseMul(*bodyB.m_motion.pMotion, *bodyA.m_motion.pMotion);
+    const hkpMultiRayShape::Ray* pRay = pMultiRay->m_rays.m_data;
+    int32_t iNumRays = pMultiRay->m_rays.m_size;
+
+    hkpCdPoint event;
+    event.m_cdBodyA = &bodyA;
+    event.m_cdBodyB = &bodyB;
+    hkpShapeRayCastInput rayInput;
+    rayInput.m_filterInfo = 0;
+    rayInput.m_rayShapeCollectionFilter = nullptr;
+
+    for (; iNumRays > 0; --iNumRays, ++pRay) {
+        hkpShapeRayCastOutput output;
+        rayInput.m_from.setTransformedPos(aTb, pRay->m_start);
+        rayInput.m_to.setTransformedPos(aTb, pRay->m_end);
+
+        hkBool bHit = pConvex->castRayImpl(rayInput, output);
+        if (bHit.m_bool) {
+            const hkTransform& transformB = *bodyB.m_motion.pMotion;
+            const float fFraction = output.m_hitFraction;
+            hkVector4 p;
+            p.setInterpolate4(rayInput.m_from, rayInput.m_to, fFraction);
+            event.m_contact.m_position.setTransformedPos(transformB, p);
+            event.m_contact.m_separatingNormal.setRotatedDir(transformB.m_rotation, output.m_normal);
+            XFNV_M128_F32(event.m_contact.m_separatingNormal.m_quad, 3) = static_cast<float>(
+                (static_cast<double>(fFraction) - 1.0) * XFNV_M128_F32(pRay->m_start.m_quad, 3) +
+                pMultiRay->m_rayPenetrationDistance
+            );
+            collector.addCdPoint(event);
+        }
+    }
+
+    HK_TIMER_END();
+}
+
+hkpCollisionAgent* hkpMultiRayConvexAgent::createMultiRayConvexAgent(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpContactMgr* mgr
+) {
+    return new hkpMultiRayConvexAgent(bodyA, bodyB, input, mgr);
+}
+
+hkpCollisionAgent* hkpMultiRayConvexAgent::createConvexMultiRayAgent(
+    const hkpCdBody& bodyA,
+    const hkpCdBody& bodyB,
+    const hkpCollisionInput& input,
+    hkpContactMgr* mgr
+) {
+    return new hkpSymmetricAgentLinearCast<hkpMultiRayConvexAgent>(bodyA, bodyB, input, mgr);
+}
+
+// Convex against multi-ray (flipped, through the symmetric wrappers) and multi-ray against convex; both are predictive,
+// the linear cast of the direct pair is the iterative agent's. The local AgentFuncs' padding bytes are deliberately
+// left unwritten and are copied by registerCollisionAgent, an uninitialised read the game also does.
+void hkpMultiRayConvexAgent::registerAgent(hkpCollisionDispatcher* dispatcher) {
+    hkpCollisionDispatcher::AgentFuncs f;
+    f.m_createFunc = &hkpMultiRayConvexAgent::createConvexMultiRayAgent;
+    f.m_getPenetrationsFunc = &hkpSymmetricAgentLinearCast<hkpMultiRayConvexAgent>::staticGetPenetrations;
+    f.m_getClosestPointFunc = &hkpSymmetricAgentLinearCast<hkpMultiRayConvexAgent>::staticGetClosestPoints;
+    f.m_linearCastFunc = &hkpSymmetricAgentLinearCast<hkpCapsuleTriangleAgent>::staticLinearCast;
+    f.m_isFlipped.m_bool = 1;
+    f.m_isPredictive.m_bool = 1;
+    dispatcher->registerCollisionAgent(f, HK_SHAPE_CONVEX, HK_SHAPE_MULTI_RAY);
+    f.m_createFunc = &hkpMultiRayConvexAgent::createMultiRayConvexAgent;
+    f.m_getPenetrationsFunc = &hkpMultiRayConvexAgent::staticGetPenetrations;
+    f.m_getClosestPointFunc = &hkpMultiRayConvexAgent::staticGetClosestPoints;
+    f.m_linearCastFunc = &hkpIterativeLinearCastAgent::staticLinearCast;
+    f.m_isFlipped.m_bool = 0;
+    f.m_isPredictive.m_bool = 1;
+    dispatcher->registerCollisionAgent(f, HK_SHAPE_MULTI_RAY, HK_SHAPE_CONVEX);
+}

@@ -1,0 +1,137 @@
+#include "Havok/Source/Common/Visualize/Process/hkStatisticsProcess.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
+#include "Havok/Source/Common/Base/Container/PointerMap/hkPointerMap.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Monitor/MonitorStreamAnalyzer/hkMonitorStreamAnalyzer.h"
+#include "Havok/Source/Common/Base/Monitor/MonitorStreamAnalyzer/hkMonitorStreamFrameInfo.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Common/Base/Object/hkBaseObject.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/System/Io/OArchive/hkOArchive.h"
+#include "Havok/Source/Common/Base/System/Io/Writer/Array/hkArrayStreamWriter.h"
+#include "Havok/Source/Common/Base/System/Stopwatch/hkStopwatch.h"
+#include "Havok/Source/Common/Base/Types/hkTypeTraits.h"
+#include "Havok/Source/Common/Visualize/Serialize/hkDisplaySerializeOStream.h"
+#include "Havok/Source/Common/Visualize/Serialize/hkObjectSerialize.h"
+#include "Havok/Source/Common/Visualize/hkProcess.h"
+#include "Havok/Source/Common/Visualize/hkProcessContext.h"
+
+hkStatisticsProcess::hkStatisticsProcess(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts)
+  : hkProcess(true) {
+    hkMonitorStreamFrameInfo info;
+    info.m_heading = nullptr;
+    info.m_absoluteTimeCounter.m_storage = 0;
+    info.m_indexOfTimer0 = 0;
+    info.m_indexOfTimer1 = 1;
+    info.m_timerFactor0 = 1000.0 / static_cast<double>(hkStopwatch::getTicksPerSecond());
+    info.m_timerFactor1 = 1.0f;
+    hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator> globalFixups;
+    {
+        hkArrayStreamWriter writer(&m_infoBuffer, hkArrayStreamWriter::ARRAY_BORROW);
+        hkStructureLayout destLayout_(hkStructureLayout::MsvcWin32LayoutRules);
+        hkObjectSerialize::writeObject(&writer, destLayout_, 1u, &info, hkMonitorStreamFrameInfoClass, globalFixups);
+    }
+    m_contexts.copyFromArray(hkContainerHeapAllocator().get(&m_contexts), contexts, hkTypeIsPod());
+}
+
+hkStatisticsProcess::~hkStatisticsProcess() {}
+
+int32_t hkStatisticsProcess::getProcessTag() {
+    return hkStatisticsProcess::m_tag;
+}
+
+// Sends the visual debugger the monitor streams of the first context that has any (else the calling thread's stream),
+// after m_infoBuffer and the map of their timer names, serialized into m_strBuffer.
+void hkStatisticsProcess::step(float frameTimeInMs) {
+    if (!m_outStream) {
+        return;
+    }
+    using globalFixups_t = hkArray<hkObjectSerialize::GlobalFixup, hkContainerHeapAllocator>;
+    using ptrs_t = hkArray<const char*, hkContainerHeapAllocator>;
+    globalFixups_t globalFixups;
+    ptrs_t startPtrs;
+    ptrs_t endPtrs;
+    const int32_t numContexts = m_contexts.getSize();
+    for (int32_t c = 0; c < numContexts; ++c) {
+        if (m_contexts.m_data[c]->m_monitorStreamBegins.getSize() > 0) {
+            startPtrs = m_contexts.m_data[c]->m_monitorStreamBegins;
+            endPtrs = m_contexts.m_data[c]->m_monitorStreamEnds;
+            break;
+        }
+    }
+    if (startPtrs.getSize() == 0) {
+        hkMonitorStream& stream = hkMonitorStream::getInstance();
+        const char* start = stream.m_start;
+        const char* end = stream.m_end;
+        startPtrs.pushBack(start);
+        endPtrs.pushBack(end);
+    }
+
+    m_strBuffer.setSize(0);
+    int32_t totalMonLen = 0;
+    {
+        using map_t = hkPointerMap<const void*, const char*, hkContainerHeapAllocator>;
+        map_t map;
+        hkMonitorStreamStringMap strMap;
+        for (int32_t si = 0; si < startPtrs.getSize(); ++si) {
+            hkMonitorStreamAnalyzer::extractStringMap(startPtrs.m_data[si], endPtrs.m_data[si], map);
+            totalMonLen += static_cast<int32_t>(endPtrs.m_data[si] - startPtrs.m_data[si]);
+        }
+        for (int32_t it = map.getIterator(); map.isValid(it); it = map.getNext(it)) {
+            hkMonitorStreamStringMap::StringMap& newEntry = strMap.m_map.expandOne();
+            // The key's 32 bits are sign-extended into the 64-bit id.
+            newEntry.m_id = static_cast<hkUint64>(static_cast<int32_t>(map.m_map.m_elem[it].key));
+            newEntry.m_string = map.getValue(it);
+        }
+        {
+            // The writer's destructor runs where the block ends, right after writeObject.
+            hkArrayStreamWriter writer(&m_strBuffer, hkArrayStreamWriter::ARRAY_BORROW);
+            hkStructureLayout destLayout(hkStructureLayout::MsvcWin32LayoutRules);
+            hkObjectSerialize::writeObject(
+                &writer,
+                destLayout,
+                1u,
+                &strMap,
+                hkMonitorStreamStringMapClass,
+                globalFixups
+            );
+        }
+    }
+
+    if (totalMonLen >= 1) {
+        const int32_t strSize = m_strBuffer.getSize();
+        const int32_t infoSize = m_infoBuffer.getSize();
+        const int32_t numStreams = startPtrs.getSize();
+        m_outStream->write32u(infoSize + strSize + 4 * numStreams + totalMonLen + 13);
+        m_outStream->write8u(static_cast<uint8_t>(HK_SEND_STATISTICS_DUMP));
+        m_outStream->write32(infoSize);
+        if (infoSize > 0) {
+            m_outStream->writeRaw(m_infoBuffer.m_data, infoSize);
+        }
+        m_outStream->write32(strSize);
+        if (strSize > 0) {
+            m_outStream->writeRaw(m_strBuffer.m_data, strSize);
+        }
+        m_outStream->write32(numStreams);
+        for (int32_t i = 0; i < numStreams; ++i) {
+            const int32_t len = static_cast<int32_t>(endPtrs.m_data[i] - startPtrs.m_data[i]);
+            m_outStream->write32(len);
+            if (len > 0) {
+                m_outStream->writeRaw(startPtrs.m_data[i], len);
+            }
+        }
+    }
+}
+
+void hkStatisticsProcess::registerProcess() {
+    m_tag = hkProcessFactory::s_instance->registerProcess(getName(), &hkStatisticsProcess::create);
+}
+
+hkProcess* hkStatisticsProcess::create(const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts) {
+    return new hkStatisticsProcess(contexts);
+}

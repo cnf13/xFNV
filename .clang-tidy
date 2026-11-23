@@ -1,0 +1,26 @@
+# Only checks that do not change behaviour, layout, mangling or the decompiled control flow.
+Checks: >
+  -*,
+  modernize-use-nullptr,
+  modernize-use-bool-literals,
+  modernize-redundant-void-arg,
+  modernize-use-using,
+  modernize-deprecated-headers,
+  readability-redundant-casting,
+  readability-redundant-parentheses,
+  readability-redundant-access-specifiers,
+  readability-redundant-control-flow,
+  modernize-use-override,
+  readability-redundant-typename,
+  readability-isolate-declaration,
+  readability-redundant-lambda-parameter-list,
+  readability-redundant-inline-specifier,
+  readability-redundant-nested-if,
+  readability-else-after-return,
+  readability-simplify-boolean-expr
+CheckOptions:
+  # De Morgan rewrites produce `!a != b` on overloaded operator!= and obscure the decompiled tests.
+  readability-simplify-boolean-expr.SimplifyDeMorgan: false
+HeaderFilterRegex: '.*/src/.*'
+ExcludeHeaderFilterRegex: '.*/(src/SDK|external)/.*'
+FormatStyle: file

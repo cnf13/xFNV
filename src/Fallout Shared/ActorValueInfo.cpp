@@ -1,0 +1,12 @@
+#include "Fallout Shared/ActorValueInfo.h"
+
+#include "Fallout Shared/ActorValue.h"
+
+uint32_t ActorValueInfo::GetActorValueFormID(ActorValue::Index aiWhich) {
+    ActorValue::Section eSection = ActorValue::GetSection(aiWhich);
+    // each section occupies a block of 100 form IDs starting at 1000
+    int32_t iResult = 100 * eSection + 1000;
+    // The whole of aiWhich is passed on to ToArrayIndex.
+    iResult += ActorValue::ToArrayIndex(eSection, aiWhich);
+    return iResult;
+}

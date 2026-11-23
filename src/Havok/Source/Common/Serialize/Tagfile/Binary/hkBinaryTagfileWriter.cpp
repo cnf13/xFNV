@@ -1,0 +1,528 @@
+#include "Havok/Source/Common/Serialize/Tagfile/Binary/hkBinaryTagfileWriter.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/PointerMap/hkMap.h"
+#include "Havok/Source/Common/Base/Container/String/hkString.h"
+#include "Havok/Source/Common/Base/Container/StringMap/hkCachedHashMap.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/System/Io/OArchive/hkOArchive.h"
+#include "Havok/Source/Common/Base/System/Io/Writer/hkStreamWriter.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Serialize/Data/hkDataArray.h"
+#include "Havok/Source/Common/Serialize/Data/hkDataObject.h"
+#include "Havok/Source/Common/Serialize/Data/hkDataObjectImpl.h"
+#include "Havok/Source/Common/Serialize/Tagfile/Binary/hkBinaryTagfileCommon.h"
+#include "Havok/Source/Common/Serialize/Tagfile/hkTagfileWriter.h"
+
+// The ObjectDetails each object scanObject meets for the first time starts from: not written, no remember tag, no flags
+// yet, one reference, a null handle. It is copied into the new m_details element.
+static Writer::ObjectDetails s_newObjectDetails{0, -1, -1, 1};
+
+hkResult hkBinaryTagfileWriter::save(
+    const hkDataObject& obj,
+    hkStreamWriter* stream,
+    hkTagfileWriter::AddDataObjectListener* userListener
+) const {
+    Writer v5(stream, userListener);
+    v5.m_oa.write32(-0x354FF2E2);
+    v5.m_oa.write32(-0x2FEE0532);
+    v5.writeInt(1);
+    v5.writeInt(0);
+    v5.scanObject(obj, 0);
+    v5.writeObject(obj);
+    stream->flush();
+    return HK_SUCCESS;
+}
+
+// The flags are grown to a multiple of 8, all false, before the size is set to numMembers.
+Writer::MemberWriteFlags::MemberWriteFlags(int32_t numMembers) {
+    const int32_t iPadded = (numMembers + 7) & ~7;
+    m_flags.setSize(iPadded);
+    for (int32_t i = 0; i < iPadded; ++i) {
+        m_flags.m_data[i] = false;
+    }
+    m_flags.setSize(numMembers);
+}
+
+void Writer::MemberWriteFlags::toBytes(uint8_t* out) {
+    hkBool* v11;
+    int32_t m_size = m_flags.m_size;
+    m_flags.setSize((m_size + 7) & ~7, hkBool(false));
+    for (int32_t v9 = 0; v9 < m_flags.m_size; *out++ = v11[0].m_bool |
+             2 *
+                 (v11[1].m_bool |
+                  2 *
+                      (v11[2].m_bool |
+                       2 *
+                           (v11[3].m_bool |
+                            2 * (v11[4].m_bool | 2 * (v11[5].m_bool | 2 * (v11[6].m_bool | 2 * v11[7].m_bool))))))) {
+        v11 = &m_flags.m_data[v9];
+        v9 += 8;
+    }
+    m_flags.setSize(m_size);
+}
+
+void Writer::MemberWriteFlags::fromBytes(const uint8_t* inb, int32_t n) {
+    int32_t m_size = m_flags.m_size;
+    m_flags.setSize((m_size + 7) & ~7, hkBool(false));
+    int32_t v10 = 0;
+    int32_t v11 = 0;
+    if (n > 0) {
+        do {
+            uint8_t v12 = inb[v11];
+            m_flags.m_data[v10].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 1].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 2].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 3].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 4].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 5].m_bool = v12 & 1;
+            v12 >>= 1;
+            m_flags.m_data[v10 + 6].m_bool = v12 & 1;
+            m_flags.m_data[v10 + 7].m_bool = (v12 & 2) != 0;
+            ++v11;
+            v10 += 8;
+        }
+        while (v11 < n);
+    }
+    m_flags.setSize(m_size);
+}
+
+Writer::ListenerCache::ListenerCache(hkTagfileWriter::AddDataObjectListener* listener) : m_listener(listener) {}
+
+Writer::ListenerCache::~ListenerCache() {
+    for (hkDataObject* pObject : m_cachedObjects) {
+        delete pObject;
+    }
+}
+
+hkDataObject Writer::ListenerCache::getCachedDataObject(const hkDataObject& h) const {
+    if (!m_listener || h.isNull()) {
+        return h;
+    }
+    int32_t v4 = m_indexFromHandle.getWithDefault(h.getHandle(), -1);
+    if (v4 == -1) {
+        return h;
+    }
+
+    return hkDataObject(m_cachedObjects.m_data[v4]->m_impl);
+}
+
+// The listener's answer is built in a plain local and destroyed with hkDataObject's destructor on both paths.
+hkDataObject Writer::ListenerCache::callListenerAndCache(const hkDataObject& h) {
+    if (m_listener && !h.isNull()) {
+        hkDataObject::Handle handle = h.getHandle();
+        const int32_t index = m_indexFromHandle.getWithDefault(handle, -1);
+        if (index != -1) {
+            return hkDataObject(m_cachedObjects.m_data[index]->m_impl);
+        }
+        hkDataObject obj = m_listener->addDataObjectCallback(h);
+        if (obj != h) {
+            m_indexFromHandle.insert(*hkMemoryRouter::getInstance().m_heap, handle, m_cachedObjects.m_size);
+            m_cachedObjects.pushBack(new hkDataObject(obj));
+            return obj;
+        }
+    }
+    return h;
+}
+
+// "" is entered as index 0 of the class and string maps; their keys are the strings' addresses (hkUlong words, hence
+// the pointer-to-integer reinterpret_casts).
+Writer::Writer(hkStreamWriter* stream, hkTagfileWriter::AddDataObjectListener* listener)
+  : m_oa(stream, hkBool(false)), m_writtenStrings(0u), m_doneClasses(0u), m_currentTag(0), m_listenerCache(listener) {
+    m_doneClasses.insert(reinterpret_cast<hkUlong>(""), 0);
+    m_writtenStrings.insert(reinterpret_cast<hkUlong>(""), 0);
+}
+
+// A tuple writes its items; an array its size, then, for an array of structs whose member has no class of its own, the
+// index of the array's class, then its items; any other value by its basic type.
+void Writer::writeBinaryValue(const hkDataObject::Value& value, const hkDataClass::MemberInfo& minfo) {
+    if (value.getType() & hkDataObject::TYPE_TUPLE) {
+        hkDataArray array = value.asArray();
+        _writeArrayItems(array, array.getSize());
+        return;
+    }
+    if (value.getType() & hkDataObject::TYPE_ARRAY) {
+        hkDataArray array = value.asArray();
+        const int32_t numItems = array.getSize();
+        writeInt(numItems);
+        if (array.getType() == hkDataObject::TYPE_STRUCT && minfo.m_class == nullptr) {
+            hkDataClass klass = array.getClass();
+            // The untyped string map keys a name by its address (hkUlong); its value is the class index writeClass
+            // stored, read back as an int and sign-extended.
+            writeInt(static_cast<int32_t>(m_doneClasses.getWithDefault(reinterpret_cast<hkUlong>(klass.getName()), 0)));
+        }
+        _writeArrayItems(array, numItems);
+        return;
+    }
+    switch (value.getType()) {
+        case hkDataObject::TYPE_BYTE: m_oa.write8u(value.asInt()); return;
+        case hkDataObject::TYPE_INT: writeInt(value.asInt()); return;
+        case hkDataObject::TYPE_REAL: m_oa.writeFloat32(value.asReal()); return;
+        case hkDataObject::TYPE_VEC_4:
+        case hkDataObject::TYPE_VEC_12:
+        case hkDataObject::TYPE_VEC_16: {
+            // TYPE_VEC_4, 12 and 16 are 4, 6 and 7: 4 * type - 12 is the number of reals.
+            const int32_t numReals = 4 * value.getType() - 12;
+            m_oa.writeArrayFloat32(value.asVec(numReals), numReals);
+            return;
+        }
+        case hkDataObject::TYPE_OBJECT:
+        case hkDataObject::TYPE_STRUCT: {
+            writeObject(value.asObject());
+            return;
+        }
+        case hkDataObject::TYPE_CSTRING: writeString(value.asString()); return;
+        default: return;
+    }
+}
+
+// The SDK's writeInt: i zigzag-encoded (doubled, negatives as -2i + 1) as a varint, 7 bits a byte, lowest first, the
+// high bit set on every byte but the last.
+void Writer::writeInt(int64_t i) {
+    uint64_t u = i < 0 ? (((uint64_t{0} - static_cast<uint64_t>(i)) << 1) | 1) : (static_cast<uint64_t>(i) << 1);
+    uint8_t b = static_cast<uint8_t>(u & 0x7f);
+    u >>= 7;
+    while (u != 0) {
+        m_oa.write8u(b | 0x80);
+        b = static_cast<uint8_t>(u & 0x7f);
+        u >>= 7;
+    }
+    // The last byte is passed with i's bits 8-31 in the upper bytes.
+    m_oa.write8u(static_cast<int32_t>((static_cast<uint32_t>(i) & 0xFFFFFF00u) | b));
+}
+
+// The SDK's writeString: null as -1; a string written before as minus its 1-based index; else its length and bytes,
+// then its index recorded. The map's keys are the strings' addresses (hkUlong words, hence the pointer-to-integer
+// reinterpret_casts).
+void Writer::writeString(const char* s) {
+    if (!s) {
+        writeInt(-1);
+        return;
+    }
+    const int32_t prev = static_cast<int32_t>(
+        m_writtenStrings.getWithDefault(reinterpret_cast<hkUlong>(s), static_cast<hkUlong>(-1))
+    );
+    if (prev == -1) {
+        const int32_t len = hkString::strLen(s);
+        writeInt(len);
+        m_oa.writeRaw(s, len);
+        m_writtenStrings.insert(reinterpret_cast<hkUlong>(s), static_cast<hkUlong>(m_writtenStrings.getSize() + 1));
+    }
+    else {
+        writeInt(-prev);
+    }
+}
+
+// Writes klass's parent first, then klass once (its name, version, parent's index and declared members), then the
+// classes of its members; returns klass's index in m_doneClasses, 0 for a null class. The map's keys are the class
+// names' addresses (hkUlong words, hence the pointer-to-integer reinterpret_casts). The member array is an
+// hkArray<MemberInfo>::Temp of numMembers default members.
+int32_t Writer::writeClass(const hkDataClass& klass) {
+    if (klass.isNull()) {
+        return 0;
+    }
+    int32_t prev = static_cast<int32_t>(
+        m_doneClasses.getWithDefault(reinterpret_cast<hkUlong>(klass.getName()), static_cast<hkUlong>(-1))
+    );
+    if (prev >= 0) {
+        return prev;
+    }
+    const int32_t parentIndex = writeClass(klass.getParent());
+    // Writing the parent may have written klass.
+    prev = static_cast<int32_t>(
+        m_doneClasses.getWithDefault(reinterpret_cast<hkUlong>(klass.getName()), static_cast<hkUlong>(-1))
+    );
+    if (prev != -1) {
+        return prev;
+    }
+    const int32_t classIndex = m_doneClasses.getSize();
+    m_doneClasses.insert(reinterpret_cast<hkUlong>(klass.getName()), static_cast<hkUlong>(classIndex));
+    const int32_t numMembers = klass.getNumDeclaredMembers();
+
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> minfo(numMembers);
+    klass.getAllDeclaredMemberInfo(minfo);
+
+    writeInt(hkBinaryTagfile::TAG_METADATA);
+    writeString(klass.getName());
+    writeInt(klass.getVersion());
+    writeInt(parentIndex);
+    writeInt(numMembers);
+    for (int32_t i = 0; i < numMembers; ++i) {
+        const hkDataClass::MemberInfo& mi = minfo.m_data[i];
+        writeString(mi.m_name);
+        writeInt(mi.m_type);
+        if (mi.m_type & hkDataObject::TYPE_TUPLE) {
+            writeInt(minfo.m_data[i].m_tupleCount);
+        }
+        const int32_t basicType = mi.m_type & hkDataObject::TYPE_MASK_BASIC_TYPES;
+        if (basicType == hkDataObject::TYPE_STRUCT || basicType == hkDataObject::TYPE_OBJECT) {
+            if (mi.m_class) {
+                // The SDK's hkDataClass(const_cast<hkDataClassImpl*>(mi.m_class)): the constructor takes a non-const
+                // implementation.
+                hkDataClass memberClass(const_cast<hkDataClassImpl*>(mi.m_class));
+                writeString(memberClass.getName());
+            }
+            else {
+                writeInt(-1);
+            }
+        }
+    }
+    for (int32_t i = 0; i < numMembers; ++i) {
+        if (minfo.m_data[i].m_class) {
+            // As above: the SDK's const_cast for hkDataClass's constructor.
+            hkDataClass memberClass(const_cast<hkDataClassImpl*>(minfo.m_data[i].m_class));
+            writeClass(memberClass);
+        }
+    }
+
+    return classIndex;
+}
+
+// Takes the object the listener cache gives for objIn; a null one is skipped, one met before gets one more reference.
+// Else (skipDetails zero) it is filed in m_detailIndexFromObject and m_details; its class is written, and each member
+// worth writing gets its flag and, for an object, a struct or an array of them, its objects scanned in turn (an array
+// of structs through each object member of the struct). With skipDetails zero the flags go to m_bitfieldBuf, where the
+// object's details point.
+void Writer::scanObject(const hkDataObject& objIn, int32_t skipDetails) {
+    hkDataObject obj = m_listenerCache.callListenerAndCache(objIn);
+    if (obj.isNull()) {
+        return;
+    }
+    int32_t detailIndex = m_detailIndexFromObject.getWithDefault(obj.getHandle(), -1);
+    if (detailIndex != -1) {
+        m_details.m_data[detailIndex].refCount += 1;
+        return;
+    }
+    if (skipDetails == 0) {
+        detailIndex = m_detailIndexFromObject.m_numElems &
+            hkMapBase<hkDataObject::Handle, int32_t, Writer::HandleOps>::NUM_ELEMS_MASK;
+        hkDataObject::Handle key = obj.getHandle();
+        m_detailIndexFromObject.insert(*hkMemoryRouter::getInstance().m_heap, key, detailIndex);
+        m_details.expandOne() = s_newObjectDetails;
+        m_details.back().handle = obj.getHandle();
+    }
+    alignas(8) hkDataClass klass = obj.getClass();
+    writeClass(klass);
+    Writer::MemberWriteFlags flags(klass.getNumMembers());
+    for (int32_t it = obj.getMemberIterator(); obj.isValid(it); it = obj.getNextMember(it)) {
+        hkDataObject::Value value = obj.getMemberValue(it);
+        if (!worthWriting(value)) {
+            continue;
+        }
+        flags.m_flags.m_data[klass.getMemberIndexByName(obj.getMemberName(it))].m_bool = 1;
+        const int32_t basicType = value.getType() & hkDataObject::TYPE_MASK_BASIC_TYPES;
+        if (basicType != hkDataObject::TYPE_OBJECT && basicType != hkDataObject::TYPE_STRUCT) {
+            continue;
+        }
+        switch (value.getType()) {
+            case hkDataObject::TYPE_OBJECT:
+            case hkDataObject::TYPE_STRUCT: {
+                scanObject(value.asObject(), 0);
+                break;
+            }
+            case hkDataObject::TYPE_ARRAY_STRUCT:
+            case hkDataObject::TYPE_TUPLE_STRUCT: {
+                hkDataClass structClass = value.asArray().getClass();
+                writeClass(structClass);
+                for (int32_t i = 0; i < structClass.getNumMembers(); ++i) {
+                    hkDataClass::MemberInfo minfo;
+                    structClass.getMemberInfo(i, minfo);
+                    if (minfo.m_type != hkDataObject::TYPE_OBJECT) {
+                        continue;
+                    }
+                    hkDataArray objects = value.asArray().swizzleObjectMember(minfo.m_name);
+                    const int32_t numObjects = objects.getSize();
+                    for (int32_t j = 0; j < numObjects; ++j) {
+                        scanObject(objects.access(j).asObject(), 0);
+                    }
+                }
+                break;
+            }
+            case hkDataObject::TYPE_ARRAY_OBJECT:
+            case hkDataObject::TYPE_TUPLE_OBJECT: {
+                const int32_t numObjects = value.asArray().getSize();
+                for (int32_t j = 0; j < numObjects; ++j) {
+                    scanObject(value.asArray().access(j).asObject(), 0);
+                }
+                break;
+            }
+            default: break;
+        }
+    }
+    if (skipDetails == 0) {
+        m_details.m_data[detailIndex].bitfieldStartIndex = m_bitfieldBuf.m_size;
+        const int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
+        flags.toBytes(m_bitfieldBuf._expandBy(*hkMemoryRouter::getInstance().m_temp, numBytes));
+    }
+}
+
+// Writes numItems items of arr by its element type: a tuple's items as arrays (recursively), numbers, vectors (a
+// vector-4 array as 3 or 4 reals: 4 when any w is not 0), objects, strings, and a struct array member by member: first
+// the bits of the members that hold a value worth writing, then those members' arrays.
+void Writer::_writeArrayItems(const hkDataArray& arr, int32_t numItems) {
+    if ((arr.getType() & hkDataObject::TYPE_TUPLE) != 0) {
+        for (int32_t i = 0; i < numItems; ++i) {
+            hkDataArray tuple = arr.access(i).asArray();
+            _writeArrayItems(tuple, tuple.getSize());
+        }
+        return;
+    }
+    switch (arr.getType()) {
+        case hkDataObject::TYPE_BYTE: {
+            for (int32_t i = 0; i < numItems; ++i) {
+                m_oa.write8u(arr.access(i).asInt());
+            }
+            return;
+        }
+        case hkDataObject::TYPE_INT: {
+            for (int32_t i = 0; i < numItems; ++i) {
+                writeInt(arr.access(i).asInt());
+            }
+            return;
+        }
+        case hkDataObject::TYPE_REAL: {
+            for (int32_t i = 0; i < numItems; ++i) {
+                float f = arr.access(i).asReal();
+                m_oa.writeFloat32(f);
+            }
+            return;
+        }
+        case hkDataObject::TYPE_VEC_4: {
+            // Three reals per item, four when any item's w is not 0 (a NaN counts as not 0).
+            int32_t numReals = 3;
+            for (int32_t i = 0; i < numItems; ++i) {
+                if (0.0f != arr.access(i).asVec(4)[3]) {
+                    numReals = 4;
+                    break;
+                }
+            }
+            writeInt(numReals);
+            for (int32_t i = 0; i < numItems; ++i) {
+                m_oa.writeArrayFloat32(arr.access(i).asVec(4), numReals);
+            }
+            return;
+        }
+        case hkDataObject::TYPE_VEC_12:
+        case hkDataObject::TYPE_VEC_16: {
+            // 12 or 16 reals: the type is read again.
+            int32_t numReals = 4 * (arr.getType() - hkDataObject::TYPE_REAL);
+            for (int32_t i = 0; i < numItems; ++i) {
+                m_oa.writeArrayFloat32(arr.access(i).asVec(numReals), numReals);
+            }
+            return;
+        }
+        case hkDataObject::TYPE_STRUCT: {
+            int32_t numMembers = arr.getClass().getNumMembers();
+
+            using minfo_t = hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator>;
+            alignas(8) minfo_t minfo(numMembers);
+            arr.getClass().getAllMemberInfo(minfo);
+
+            alignas(8) Writer::MemberWriteFlags flags(numMembers);
+            // A member is written when any item's value in it is worth writing.
+            for (int32_t i = 0; i < numMembers; ++i) {
+                if (minfo.m_data[i].m_type != hkDataObject::TYPE_VOID) {
+                    hkDataArray member = arr.swizzleObjectMember(minfo.m_data[i].m_name);
+                    for (int32_t j = 0; j < member.getSize(); ++j) {
+                        if (worthWriting(member.access(j))) {
+                            flags.m_flags.m_data[i].m_bool = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            {
+                using bytes_t = hkArray<uint8_t, hkContainerTempAllocator>;
+                bytes_t bytes;
+                int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
+                bytes.setSize(numBytes);
+                flags.toBytes(bytes.m_data);
+                m_oa.writeRaw(bytes.m_data, bytes.m_size);
+            }
+
+            for (int32_t i = 0; i < numMembers; ++i) {
+                if (flags.m_flags.m_data[i].m_bool) {
+                    _writeArrayItems(arr.swizzleObjectMember(minfo.m_data[i].m_name), numItems);
+                }
+            }
+            return;
+        }
+        case hkDataObject::TYPE_OBJECT: {
+            for (int32_t i = 0; i < numItems; ++i) {
+                writeObject(arr.access(i).asObject());
+            }
+            return;
+        }
+        case hkDataObject::TYPE_CSTRING: {
+            for (int32_t i = 0; i < numItems; ++i) {
+                writeString(arr.access(i).asString());
+            }
+            return;
+        }
+        default: return;
+    }
+}
+
+// Writes the object the listener cache gives for objIn; a null one is TAG_OBJECT_NULL, one remembered before
+// TAG_OBJECT_BACKREF and its tag. Else its class is written, then TAG_OBJECT (TAG_OBJECT_REMEMBER with a new tag when
+// it is referenced more than once), the class's index, the member flags scanObject left in m_bitfieldBuf and the values
+// of the members they mark.
+void Writer::writeObject(const hkDataObject& objIn) {
+    hkDataObject obj = m_listenerCache.getCachedDataObject(objIn);
+    if (obj.isNull()) {
+        writeInt(hkBinaryTagfile::TAG_OBJECT_NULL);
+        return;
+    }
+    const int32_t detailIndex = m_detailIndexFromObject.getWithDefault(obj.getHandle(), -1);
+    ObjectDetails* pDetails = &m_details.m_data[detailIndex];
+    if (pDetails->rememberTag >= 0) {
+        writeInt(hkBinaryTagfile::TAG_OBJECT_BACKREF);
+        writeInt(pDetails->rememberTag);
+        return;
+    }
+    hkDataClass klass = obj.getClass();
+    const int32_t classIndex = writeClass(klass);
+    if (pDetails->refCount > 1) {
+        writeInt(hkBinaryTagfile::TAG_OBJECT_REMEMBER);
+        pDetails->rememberTag = m_currentTag;
+        m_currentTag += 1;
+    }
+    else {
+        writeInt(hkBinaryTagfile::TAG_OBJECT);
+    }
+    pDetails->wasWritten = 1;
+    writeInt(classIndex);
+    const int32_t numMembers = klass.getNumMembers();
+    Writer::MemberWriteFlags flags(numMembers);
+
+    {
+        // The object's flag bytes, an array over m_bitfieldBuf's storage that does not own it.
+        const int32_t numBytes = ((flags.m_flags.m_size + 7) & ~7) / 8;
+        hkArray<uint8_t, hkContainerTempAllocator> bits(
+            &m_bitfieldBuf.m_data[pDetails->bitfieldStartIndex],
+            numBytes,
+            numBytes
+        );
+        m_oa.writeRaw(bits.m_data, bits.m_size);
+        flags.fromBytes(bits.m_data, bits.m_size);
+    }
+
+    hkArray<hkDataClass::MemberInfo, hkContainerTempAllocator> minfo(numMembers);
+    klass.getAllMemberInfo(minfo);
+
+    for (int32_t i = 0; i < numMembers; ++i) {
+        if (flags.m_flags.m_data[i].m_bool) {
+            // Calls the const operator[] on the cached object.
+            writeBinaryValue(static_cast<const hkDataObject&>(obj).access(minfo.m_data[i].m_name), minfo.m_data[i]);
+        }
+    }
+}

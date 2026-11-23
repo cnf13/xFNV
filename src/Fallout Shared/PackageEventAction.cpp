@@ -1,0 +1,283 @@
+#include "Fallout Shared/PackageEventAction.h"
+
+#include "BSCore/BSSimpleArray.h"
+#include "BSCore/BSSimpleList.h"
+#include "BSCore/BSStringT.h"
+#include "BSCore/MemoryManager.h"
+#include "BSCore/RTTI.h"
+#include "BSMain/MessageHandler.h"
+#include "BSMain/SettingCollection.h"
+#include "Fallout Shared/ActorValueOwner.h"
+#include "Fallout Shared/Animation.h"
+#include "Fallout Shared/BGSBodyPart.h"
+#include "Fallout Shared/BGSNote.h"
+#include "Fallout Shared/BGSQuestObjective.h"
+#include "Fallout Shared/BipedAnim.h"
+#include "Fallout Shared/CombatFormulas.h"
+#include "Fallout Shared/ContainerItemExtra.h"
+#include "Fallout Shared/ExtraDataList.h"
+#include "Fallout Shared/ExtraDataObjects.h"
+#include "Fallout Shared/FOScriptFunctions.h"
+#include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/InventoryChanges.h"
+#include "Fallout Shared/Package.h"
+#include "Fallout Shared/Pathfinding/PathingRequest.h"
+#include "Fallout Shared/SCRIPT_REFERENCED_OBJECT.h"
+#include "Fallout Shared/Script.h"
+#include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Sky/Sky.h"
+#include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESActorBaseData.h"
+#include "Fallout Shared/TESBipedModelForm.h"
+#include "Fallout Shared/TESConditionFunctions.h"
+#include "Fallout Shared/TESContainer.h"
+#include "Fallout Shared/TESDataHandler.h"
+#include "Fallout Shared/TESEnchantableForm.h"
+#include "Fallout Shared/TESFile.h"
+#include "Fallout Shared/TESForm.h"
+#include "Fallout Shared/TESFullName.h"
+#include "Fallout Shared/TESIdleForm.h"
+#include "Fallout Shared/TESIdleManager.h"
+#include "Fallout Shared/TESModel.h"
+#include "Fallout Shared/TESObjectCELL.h"
+#include "Fallout Shared/TESObjectREFR.h"
+#include "Fallout Shared/TESQuestTarget.h"
+#include "Fallout Shared/TESRaceForm.h"
+#include "Fallout Shared/TESSaveLoadGame.h"
+#include "Fallout Shared/TESScript.h"
+#include "Fallout Shared/TESScriptCompiler.h"
+#include "Fallout Shared/TESScriptFunctions.h"
+#include "Fallout Shared/TESScriptVariable.h"
+#include "Fallout Shared/TESTexture.h"
+#include "Fallout Shared/TESTopic.h"
+#include "Fallout/AI/Actor.h"
+#include "Fallout/AI/BaseProcess.h"
+#include "Fallout/AI/Combat/CombatGroup.h"
+#include "Fallout/AI/Combat/CombatThreatMap.h"
+#include "Fallout/AI/MiddleHighProcess.h"
+#include "Fallout/AI/MobileObject.h"
+#include "Fallout/AI/PlayerCharacter.h"
+#include "Fallout/AI/ProcessLists.h"
+#include "Fallout/Audio/FalloutRadio.h"
+#include "Fallout/Dialogue/DialogueResponse.h"
+#include "Fallout/Interface/Interface.h"
+#include "Fallout/Interface/InterfaceManager.h"
+#include "Fallout/Interface/Menus/LoadingMenu.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
+#include "Fallout/Misc/SaveLoad/BGSSaveLoadManager.h"
+#include "Fallout/Misc/TaskQueueInterface.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "SDK/MSVC/rtti.h"
+#include "xfnv/Compiler.h"
+
+#include <cstdint>
+
+PackageEventAction::PackageEventAction() : pIdle(nullptr), pResultScript(nullptr), pTopic(nullptr), eType(PEAT_BEGIN) {}
+
+// Clears the idle and topic and deletes the result script.
+PackageEventAction::~PackageEventAction() {
+    pIdle = nullptr;
+    pTopic = nullptr;
+    delete pResultScript;
+}
+
+void PackageEventAction::Copy(PackageEventAction* apCopy) {
+    pIdle = apCopy->pIdle;
+    pTopic = apCopy->pTopic;
+    SetType(apCopy->eType);
+    if (apCopy->pResultScript) {
+        if (!pResultScript) {
+            pResultScript = new Script;
+            pResultScript->SetTemporary();
+        }
+        pResultScript->CopyResultScript(apCopy->pResultScript);
+    }
+    else {
+        if (pResultScript) {
+            delete pResultScript;
+        }
+        pResultScript = nullptr;
+    }
+}
+
+void PackageEventAction::Load(TESFile* apFile) {
+    // The local variable the last SLSD chunk created; the SCVR chunks that follow fill its
+    // name.
+    static ScriptVariable* pLastVariable;
+    pIdle = nullptr;
+    pTopic = nullptr;
+    if (pResultScript) {
+        delete pResultScript;
+        pResultScript = nullptr;
+    }
+    Script* pScript = new Script;
+    pResultScript = pScript;
+    bool bDone = false;
+    while (true) {
+        uint32_t uiChunk = apFile->GetTESChunk();
+        switch (uiChunk) {
+            case SCHR_ID:
+                apFile->GetChunkData(pResultScript->GetHeader(), 0);
+                if (apFile->QEndian()) {
+                    pResultScript->GetHeader()->Endian();
+                }
+                break;
+            case SCVR_ID:
+            case SLSD_ID:
+                // The chunk is read again: an SLSD chunk makes the variable, a SCVR one names it.
+                if (apFile->GetTESChunk() == SLSD_ID) {
+                    ScriptVariable* pVariable = new ScriptVariable;
+                    pLastVariable = pVariable;
+                    pVariable->Load(apFile);
+                    pResultScript->GetVariableList()->AddTail(pVariable);
+                }
+                else if (pLastVariable) {
+                    // A 16-byte aligned stack buffer of the chunk's size.
+                    char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(apFile->GetChunkSize()));
+                    apFile->GetChunkData(pBuffer, 0x200);
+                    pLastVariable->cName.Set(pBuffer, 0);
+                }
+                break;
+            case SCRO_ID: {
+                Script::RefVariable* pRef = new Script::RefVariable;
+                uint32_t uiFormID = 0;
+                apFile->GetChunkData<uint32_t>(uiFormID);
+                // The chunk holds a form ID that stands in for the form.
+                pRef->form = reinterpret_cast<TESForm*>(static_cast<uintptr_t>(uiFormID));
+                pResultScript->GetReferencedObjectList()->AddTail(pRef);
+                break;
+            }
+            case SCDA_ID: {
+                uint32_t uiSize = apFile->GetChunkSize();
+                // A 16-byte aligned stack buffer of the chunk's size.
+                char* pBuffer = static_cast<char*>(XFNV_ALLOCA16(uiSize));
+                ourMemset(pBuffer, 0, uiSize);
+                apFile->GetChunkData(pBuffer, 0);
+                pResultScript->SetCompileData(uiSize, pBuffer);
+                break;
+            }
+            case SCRV_ID: {
+                Script::RefVariable* pRef = new Script::RefVariable;
+                uint32_t uiVariableID = 0;
+                apFile->GetChunkData<uint32_t>(uiVariableID);
+                pRef->varIdx = uiVariableID;
+                pResultScript->GetReferencedObjectList()->AddTail(pRef);
+                break;
+            }
+            case INAM_ID: {
+                uint32_t uiIdleID = 0;
+                apFile->GetChunkData<uint32_t>(uiIdleID);
+                // The chunk holds a form ID that stands in for the idle.
+                pIdle = reinterpret_cast<TESIdleForm*>(static_cast<uintptr_t>(uiIdleID));
+                break;
+            }
+            case TNAM_ID: {
+                uint32_t uiTopicID = 0;
+                apFile->GetChunkData<uint32_t>(uiTopicID);
+                // The chunk holds a form ID that stands in for the topic; it ends the action's chunks.
+                pTopic = reinterpret_cast<TESTopic*>(static_cast<uintptr_t>(uiTopicID));
+                bDone = true;
+                break;
+            }
+        }
+        if (bDone) {
+            break;
+        }
+        apFile->NextChunk();
+    }
+    pResultScript->SetInitialized(false);
+    if (!pResultScript->GetCompiledData()) {
+        delete pResultScript;
+        pResultScript = nullptr;
+    }
+}
+
+void PackageEventAction::InitItem(TESForm* apOwner) {
+    uint32_t tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->QIdle()));
+    TESFile* pFile = apOwner->GetFile(-1);
+    TESForm::AddCompileIndex(tempint, pFile);
+    TESForm* pForm = TESForm::GetFormByNumericID(tempint);
+    TESIdleForm* pidle = dynamic_cast<TESIdleForm*>(pForm);
+    if (pidle) {
+        pIdle = pidle;
+    }
+    else if (tempint) {
+        if (apOwner->GetFormEditorIDLength()) {
+            const char* pEditorID = apOwner->GetFormEditorID();
+            Warning("MASTERFILE: Unable to find Idle (%08X) on owner object \"%s\".", tempint, pEditorID);
+        }
+        else {
+            int32_t iID = apOwner->iFormID;
+            Warning("MASTERFILE: Unable to find Idle (%08X) on owner object (%08X).", tempint, iID);
+        }
+        pIdle = nullptr;
+    }
+    tempint = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this->QTopic()));
+    pFile = apOwner->GetFile(-1);
+    TESForm::AddCompileIndex(tempint, pFile);
+    pForm = TESForm::GetFormByNumericID(tempint);
+    TESTopic* ptopic = dynamic_cast<TESTopic*>(pForm);
+    if (ptopic) {
+        pTopic = ptopic;
+    }
+    else if (tempint) {
+        if (apOwner->GetFormEditorIDLength()) {
+            const char* pEditorID = apOwner->GetFormEditorID();
+            Warning("MASTERFILE: Unable to find Topic (%08X) on owner object \"%s\".", tempint, pEditorID);
+        }
+        else {
+            int32_t iID = apOwner->iFormID;
+            Warning("MASTERFILE: Unable to find Topic (%08X) on owner object (%08X).", tempint, iID);
+        }
+        pTopic = nullptr;
+    }
+    if (pResultScript) {
+        int32_t iprevwarnings = MessageHandler::QWarningCount();
+        MessageHandler::IncDisableWarningCount(true);
+        MessageHandler::SetWarningCount(0);
+        pResultScript->SetTemporary();
+        pResultScript->InitItem(apOwner);
+        pResultScript->m_header.bIsQuestScript = false;
+        MessageHandler::IncDisableWarningCount(false);
+        int32_t iwarnings = MessageHandler::QWarningCount();
+        MessageHandler::SetWarningCount(iprevwarnings);
+        if (iwarnings) {
+            int32_t iID = apOwner->iFormID;
+            Warning(
+                "MASTERFILE: Errors were encountered during InitItem for result script on eventaction for package "
+                "'%s' (%08X)\n\nSee Warnings file for more information.",
+                apOwner->GetFormEditorID(),
+                iID
+            );
+        }
+    }
+}
+
+void PackageEventAction::Save(CHUNK_ID aeChunk) {
+    TESForm::AddChunk(aeChunk);
+    uint32_t uiIdleID = pIdle ? pIdle->TESForm::GetFormID() : 0;
+    TESForm::AddChunk(INAM_ID, uiIdleID);
+    uint32_t uiTopicID = pTopic ? pTopic->TESForm::GetFormID() : 0;
+    if (pResultScript) {
+        pResultScript->SaveResultScript();
+    }
+    TESForm::AddChunk(TNAM_ID, uiTopicID);
+}
+
+bool PackageEventAction::Compare(PackageEventAction* apCompare) {
+    if (this->QIdle() != apCompare->pIdle) {
+        return true;
+    }
+    if (this->QTopic() != apCompare->pTopic) {
+        return true;
+    }
+    if (!pResultScript && !apCompare->pResultScript) {
+        return false;
+    }
+    if (!pResultScript || !apCompare->pResultScript) {
+        return true;
+    }
+    return pResultScript->CompareResultScripts(apCompare->pResultScript);
+}

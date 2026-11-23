@@ -1,0 +1,182 @@
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysDragModifier.h"
+
+#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiParticleInfo.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysData.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifier.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
+
+#include <cmath>
+#include <limits>
+
+NiRTTI NiPSysDragModifier::ms_RTTI("NiPSysDragModifier", &NiPSysModifier::ms_RTTI);
+
+NiPSysDragModifier::NiPSysDragModifier()
+  : m_pkDragObj(nullptr), m_kDragAxis(NiPoint3::UNIT_X), m_fPercentage(0.05f),
+    m_fRange(std::numeric_limits<float>::max()), m_fFalloff(std::numeric_limits<float>::max()) {}
+
+NiPSysDragModifier::~NiPSysDragModifier() {}
+
+NiObject* NiPSysDragModifier::CreateClone(NiCloningProcess& kCloning) {
+    NiPSysDragModifier* v4;
+    v4 = new NiPSysDragModifier;
+    NiPSysModifier::CopyMembers(v4, kCloning);
+    v4->m_kDragAxis = m_kDragAxis;
+    v4->m_fPercentage = m_fPercentage;
+    v4->m_fRange = m_fRange;
+    v4->m_fFalloff = m_fFalloff;
+    return v4;
+}
+
+void NiPSysDragModifier::LoadBinary(NiStream& kStream) {
+    NiPSysModifier::LoadBinary(kStream);
+
+    kStream.ReadLinkID();
+    m_kDragAxis.LoadBinary(kStream);
+    NiStreamLoadBinary(kStream, m_fPercentage);
+    NiStreamLoadBinary(kStream, m_fRange);
+    NiStreamLoadBinary(kStream, m_fFalloff);
+}
+
+void NiPSysDragModifier::LinkObject(NiStream& kStream) {
+    NiPSysModifier::LinkObject(kStream);
+
+    m_pkDragObj = static_cast<NiAVObject*>(kStream.GetObjectFromLinkID());
+}
+
+bool NiPSysDragModifier::RegisterStreamables(NiStream& kStream) {
+    return NiPSysModifier::RegisterStreamables(kStream);
+}
+
+void NiPSysDragModifier::SaveBinary(NiStream& kStream) {
+    NiPSysModifier::SaveBinary(kStream);
+
+    kStream.SaveLinkID(m_pkDragObj);
+    m_kDragAxis.SaveBinary(kStream);
+    NiStreamSaveBinary(kStream, m_fPercentage);
+    NiStreamSaveBinary(kStream, m_fRange);
+    NiStreamSaveBinary(kStream, m_fFalloff);
+}
+
+bool NiPSysDragModifier::IsEqual(NiObject* pkObject) {
+    if (!NiPSysModifier::IsEqual(pkObject)) {
+        return false;
+    }
+
+    NiPSysDragModifier* pkOther = static_cast<NiPSysDragModifier*>(pkObject);
+    if ((m_pkDragObj && !pkOther->m_pkDragObj) || (!m_pkDragObj && pkOther->m_pkDragObj)) {
+        return false;
+    }
+    if (m_pkDragObj && pkOther->m_pkDragObj && !m_pkDragObj->IsEqual(pkOther->m_pkDragObj)) {
+        return false;
+    }
+    if (pkOther->m_kDragAxis != m_kDragAxis) {
+        return false;
+    }
+    if (pkOther->m_fPercentage != m_fPercentage) {
+        return false;
+    }
+    if (pkOther->m_fRange != m_fRange) {
+        return false;
+    }
+    if (pkOther->m_fFalloff != m_fFalloff) {
+        return false;
+    }
+    return true;
+}
+
+void NiPSysDragModifier::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
+    NiPSysModifier::GetViewerStrings(pkStrings);
+
+    pkStrings->Add(NiGetViewerString(NiPSysDragModifier::ms_RTTI.GetName()));
+    pkStrings->Add(
+        NiGetViewerString("Drag Object", m_pkDragObj ? static_cast<const char*>(m_pkDragObj->m_kName) : "None")
+    );
+    pkStrings->Add(m_kDragAxis.GetViewerString("Drag Axis"));
+    pkStrings->Add(NiGetViewerString("Percentage", m_fPercentage));
+    pkStrings->Add(NiGetViewerString("Range", m_fRange));
+    pkStrings->Add(NiGetViewerString("RangeFalloff", m_fFalloff));
+}
+
+void NiPSysDragModifier::ProcessClone(NiCloningProcess& kCloning) {
+    NiPSysModifier::ProcessClone(kCloning);
+
+    NiObject* pkObject = nullptr;
+    kCloning.m_pkCloneMap->GetAt(this, pkObject);
+    NiPSysDragModifier* pkClone = static_cast<NiPSysDragModifier*>(pkObject);
+    if (m_pkDragObj) {
+        if (kCloning.m_pkCloneMap->GetAt(m_pkDragObj, pkObject)) {
+            pkClone->m_pkDragObj = static_cast<NiAVObject*>(pkObject);
+        }
+        else {
+            pkClone->m_pkDragObj = m_pkDragObj;
+        }
+    }
+}
+
+// Takes away the part of each velocity along the drag axis: the percentage per 1/30 s step, fading linearly to none
+// between the range and the falloff distance from the drag object. A step product above 1 removes the whole part. Each
+// NiPoint3 component is rounded to float where it is stored.
+void NiPSysDragModifier::Update(float fTime, NiPSysData* pkData) {
+    // a NaN percentage does nothing
+    if (!(m_fPercentage > 0.0f)) {
+        return;
+    }
+    if (!pkData->m_usActive || !m_pkDragObj) {
+        return;
+    }
+
+    // The drag object's transform in the particle system's space.
+    NiTransform kDragXform = m_pkDragObj->m_kWorld;
+    NiTransform kSystemXform = m_pkTarget->m_kWorld;
+    NiTransform kInvSystemXform;
+    kSystemXform.Invert(kInvSystemXform);
+    NiTransform kTrans = kInvSystemXform * kDragXform;
+
+    NiPoint3 kDir = kTrans.m_Rotate * m_kDragAxis;
+    kDir.Unitize();
+    float fDirSqrLength = kDir.SqrLength();
+    float fFalloffWidth = m_fFalloff - m_fRange;
+
+    for (uint16_t i = 0; i < pkData->m_usActive; i++) {
+        NiPoint3 kDiff = pkData->m_pkVertex[i] - kTrans.m_Translate;
+        NiParticleInfo* pkInfo = &pkData->m_pkParticleInfo[i];
+        float fSqrDist = kDiff.SqrLength();
+        float fDist = std::sqrt(fSqrDist);
+        float fPercentage = m_fPercentage;
+        float fSteps = (fTime - pkInfo->m_fLastUpdate) / 0.03333330154418945;
+
+        // a NaN distance gets the full percentage
+        if (m_fRange < fDist) {
+            if (m_fFalloff <= fDist) {
+                continue;
+            }
+            float fBeyondRange = fDist - m_fRange;
+            fPercentage = (1.0f - fBeyondRange / fFalloffWidth) * fPercentage;
+        }
+
+        NiPoint3& kVelocity = pkInfo->m_kVelocity;
+        float fDot = kVelocity.Dot(kDir);
+        float fScale;
+        if (fSteps * fPercentage > 1.0) {
+            fScale = -fDot / fDirSqrLength;
+        }
+        else {
+            fScale = fSteps * -fPercentage * (fDot / fDirSqrLength);
+        }
+        kVelocity += kDir * fScale;
+    }
+}
+
+NiObject* NiPSysDragModifier::CreateObject() {
+    return new NiPSysDragModifier;
+}

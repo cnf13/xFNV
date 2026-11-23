@@ -1,0 +1,243 @@
+#include "BSSystem/Win32/BSWin32TaskletManager.h"
+
+#include "BSCore/BSSemaphore.h"
+#include "BSCore/MemoryManager.h"
+#include "BSSystem/BSTaskletData.h"
+#include "BSSystem/BSTaskletGroupData.h"
+#include "BSSystem/BSTaskletManager.h"
+#include "BSSystem/Win32/BSWin32TaskletData.h"
+#include "BSSystem/Win32/BSWin32TaskletGroupData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+
+#include <limits>
+
+// The workers start suspended (CREATE_SUSPENDED, 4); the init thread resumes them once InstanceSema is signalled.
+BSWin32TaskletManager::BSWin32TaskletManager(uint32_t auiNumThreads)
+  : hInitThreadHandle(nullptr), uiNumThreads(auiNumThreads <= 6 ? auiNumThreads : 6), uiNumThreadsCreated(0),
+    bTerminated(false), kStartSemaphore(0, std::numeric_limits<int32_t>::max()) {
+    InitializeCriticalSection(&kQueueLock);
+    for (BSWin32TaskletData*& pHead : pQueueHead) {
+        pHead = nullptr;
+    }
+    for (uint32_t i = 0; i < 6; ++i) {
+        hThreadHandles[i] = nullptr;
+        uiThreadIDs[i] = 0;
+    }
+    // The start routines take the manager as the thread's void* parameter; ThreadProc's result is the thread's exit
+    // code. A thread that cannot start throws (std::system_error) where CreateThread returns null.
+    for (uint32_t i = 0; i < uiNumThreads; ++i) {
+        hThreadHandles[i] = new BSSystemThread(&BSWin32TaskletManager::ThreadProc, this, true);
+        uiThreadIDs[i] = hThreadHandles[i]->Id();
+        ++uiNumThreadsCreated;
+    }
+    bAvailable = uiNumThreadsCreated != 0;
+    if (bAvailable) {
+        hInitThreadHandle = new BSSystemThread(&BSWin32TaskletManager::ThreadInitProc, this, false);
+    }
+}
+
+// kStartSemaphore's and the base's InstanceSema destructors close their handles.
+BSWin32TaskletManager::~BSWin32TaskletManager() {
+    DeleteCriticalSection(&kQueueLock);
+}
+
+void BSWin32TaskletManager::ShutdownAllTasks() {
+    bTerminated = true;
+    if (bSignaled) {
+        for (uint32_t i = 0; i < uiNumThreadsCreated; ++i) {
+            kStartSemaphore.hSemaphore->Release();
+            InterlockedIncrementInt32(&kStartSemaphore.iCount);
+        }
+        // WaitForMultipleObjects(all, INFINITE) on the threads.
+        for (uint32_t i = 0; i < uiNumThreadsCreated; ++i) {
+            hThreadHandles[i]->Wait();
+        }
+    }
+    for (uint32_t j = 0; j < uiNumThreadsCreated; ++j) {
+        delete hThreadHandles[j];
+        hThreadHandles[j] = nullptr;
+    }
+    delete hInitThreadHandle;
+    hInitThreadHandle = nullptr;
+}
+
+// Whether the thread is one of the six workers.
+bool BSWin32TaskletManager::IsTaskletThread(uint32_t auiThreadID) {
+    for (uint32_t uiThreadID : uiThreadIDs) {
+        if (uiThreadID == auiThreadID) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BSWin32TaskletManager::CreateTaskGroupData(BSTaskletGroupData*& arpGroupData) {
+    BSWin32TaskletGroupData* pData = new BSWin32TaskletGroupData;
+    arpGroupData = pData;
+    return pData != nullptr;
+}
+
+// The PC group data is a BSWin32TaskletGroupData: its lock, semaphore and flags are read.
+bool BSWin32TaskletManager::OpenTaskGroupData(BSTaskletGroupData* apGroupData) {
+    BSWin32TaskletGroupData* pGroupData = static_cast<BSWin32TaskletGroupData*>(apGroupData);
+    bool bResult;
+    EnterCriticalSection(&pGroupData->GroupDataLock);
+    if (pGroupData->bAttached) {
+        bResult = false;
+    }
+    else {
+        pGroupData->kCompletionSemaphore.hSemaphore->Wait(0);
+        bResult = true;
+        pGroupData->bAttached = bResult;
+        pGroupData->bComplete = false;
+        pGroupData->bAllowTaskAttach = true;
+        pGroupData->bCancelled = false;
+        pGroupData->uiAttached = 0;
+        pGroupData->uiCompleted = 0;
+    }
+    LeaveCriticalSection(&pGroupData->GroupDataLock);
+    return bResult;
+}
+
+// The PC group and task data are BSWin32TaskletGroupData and BSWin32TaskletData.
+bool BSWin32TaskletManager::AttachTaskData(
+    BSTaskletGroupData* apGroupData,
+    BSTaskletData* apTaskData,
+    bool abLastTask
+) {
+    BSWin32TaskletGroupData* pGroupData = static_cast<BSWin32TaskletGroupData*>(apGroupData);
+    BSWin32TaskletData* pTaskData = static_cast<BSWin32TaskletData*>(apTaskData);
+    bool bResult;
+    EnterCriticalSection(&pGroupData->GroupDataLock);
+    // TaskDataLock is taken with InterlockedCompareExchange, as in BSWin32TaskletData::Destruct.
+    if (InterlockedCompareExchange32(reinterpret_cast<int32_t*>(&pTaskData->TaskDataLock), 1, 0)) {
+        bResult = false;
+    }
+    else {
+        bResult = pGroupData->bAttached && pGroupData->bAllowTaskAttach && !pTaskData->pGroupData;
+        if (bResult) {
+            pTaskData->pGroupData = pGroupData;
+            pTaskData->bYielding = false;
+            if (abLastTask) {
+                pGroupData->bAllowTaskAttach = false;
+            }
+            bResult = QueueTaskData(pTaskData);
+            ++pGroupData->uiAttached;
+        }
+        else {
+            pTaskData->TaskDataLock = 0;
+        }
+    }
+    LeaveCriticalSection(&pGroupData->GroupDataLock);
+    return bResult;
+}
+
+// The PC group data is a BSWin32TaskletGroupData.
+bool BSWin32TaskletManager::CloseTaskGroupData(BSTaskletGroupData* apGroupData) {
+    BSWin32TaskletGroupData* pGroupData = static_cast<BSWin32TaskletGroupData*>(apGroupData);
+    bool bResult;
+    EnterCriticalSection(&pGroupData->GroupDataLock);
+    if (pGroupData->bAttached) {
+        pGroupData->bAllowTaskAttach = false;
+        bResult = true;
+    }
+    else {
+        bResult = false;
+    }
+    LeaveCriticalSection(&pGroupData->GroupDataLock);
+    return bResult;
+}
+
+void BSWin32TaskletManager::DestroyTaskGroupData(BSTaskletGroupData* apGroupData) {
+    if (apGroupData) {
+        delete apGroupData;
+    }
+}
+
+void BSWin32TaskletManager::ProcessQueue() {
+    while (!bTerminated) {
+        BSWin32TaskletData* pTaskletData = nullptr;
+        BSWin32TaskletGroupData* pGroupData = nullptr;
+        kStartSemaphore.hSemaphore->Wait();
+        InterlockedDecrementInt32(&kStartSemaphore.iCount);
+        if (!bTerminated) {
+            EnterCriticalSection(&kQueueLock);
+            uint32_t uiPriority = 0;
+            BSWin32TaskletData** pQueueHead = this->pQueueHead;
+            while (uiPriority < 64) {
+                pTaskletData = *pQueueHead;
+                if (*pQueueHead) {
+                    *pQueueHead = pTaskletData->pLink;
+                    pGroupData = pTaskletData->pGroupData;
+                    break;
+                }
+                ++uiPriority;
+                ++pQueueHead;
+            }
+            LeaveCriticalSection(&kQueueLock);
+            if (pTaskletData &&
+                pGroupData &&
+                (!pGroupData->bCancelled && (!pTaskletData->bRunOnStartup || pTaskletData->OnStartup()))) {
+                pTaskletData->bRunOnStartup = false;
+                pTaskletData->Process();
+            }
+
+            if (pTaskletData && pGroupData) {
+                if (!pTaskletData->bYielding || pGroupData->bCancelled) {
+                    pTaskletData->OnComplete();
+                    pTaskletData->pGroupData = nullptr;
+                    pTaskletData->TaskDataLock = 0;
+                    pGroupData->CompleteTask();
+                }
+                else {
+                    QueueTaskData(pTaskletData);
+                }
+            }
+        }
+        Sleep(0);
+    }
+}
+
+char BSWin32TaskletManager::QueueTaskData(BSWin32TaskletData* arData) {
+    if (!arData->pGroupData) {
+        return 0;
+    }
+    EnterCriticalSection(&kQueueLock);
+    uint32_t uiPriority = arData->pGroupData->uiPriority;
+    if (uiPriority >= 64) {
+        uiPriority = 63;
+    }
+    if (!pQueueHead[uiPriority]) {
+        ppQueueTail[uiPriority] = &pQueueHead[uiPriority];
+    }
+    *ppQueueTail[uiPriority] = arData;
+    ppQueueTail[uiPriority] = &arData->pLink;
+    arData->pLink = nullptr;
+    arData->bYielding = false;
+    LeaveCriticalSection(&kQueueLock);
+    kStartSemaphore.hSemaphore->Release();
+    InterlockedIncrementInt32(&kStartSemaphore.iCount);
+    return 1;
+}
+
+void BSWin32TaskletManager::Threads() {
+    for (uint32_t i = 0; i < uiNumThreadsCreated; ++i) {
+        hThreadHandles[i]->Resume();
+    }
+}
+
+uint32_t BSWin32TaskletManager::ThreadInitProc(void* apData) {
+    BSWin32TaskletManager* apThis = static_cast<BSWin32TaskletManager*>(apData);
+    apThis->InstanceSema.hSemaphore->Wait();
+    InterlockedDecrementInt32(&apThis->InstanceSema.iCount);
+    apThis->Threads();
+    return 0;
+}
+
+uint32_t BSWin32TaskletManager::ThreadProc(void* apData) {
+    BSWin32TaskletManager* apThis = static_cast<BSWin32TaskletManager*>(apData);
+    apThis->OnStartup();
+    apThis->ProcessQueue();
+    apThis->OnExit();
+    return 0;
+}

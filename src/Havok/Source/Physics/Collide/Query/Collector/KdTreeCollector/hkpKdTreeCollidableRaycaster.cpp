@@ -1,0 +1,182 @@
+#include "Havok/Source/Physics/Collide/Query/Collector/KdTreeCollector/hkpKdTreeCollidableRaycaster.h"
+
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeAabbCastUtils.h"
+#include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeBundleCastCollector.h"
+#include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeCastCollector.h"
+#include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeUtils.h"
+#include "Havok/Source/Common/Internal/KdTree/hkKdTree.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
+#include "Havok/Source/Physics/Collide/Filter/hkpRayCollidableFilter.h"
+#include "Havok/Source/Physics/Collide/Filter/hkpRayShapeCollectionFilter.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastInput.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayBundleCastInput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastCollectorOutput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastOutput.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "xfnv/Compiler.h"
+
+#include <xmmintrin.h>
+
+hkKdTreeCollidableRayBundleCaster::hkKdTreeCollidableRayBundleCaster()
+  : m_input(nullptr), m_filter(nullptr), m_collectionFilter(nullptr), m_output(nullptr) {}
+
+hkKdTreeCollidableRayBundleCaster::~hkKdTreeCollidableRayBundleCaster() {}
+
+// KEEP: on a hit, the copy into m_output[i] takes the bundle output's m_pad words, which neither this function (it
+// writes m_hitFraction, m_extraInfo, m_shapeKeys[0] and m_shapeKeyIndex) nor a shape's castRayBundleImpl writes:
+// uninitialised stack bytes reach the caller's output.
+// The SDK's addMidPhaseHit for a bundle of four rays: the primitive is a collidable. The rays m_filter rejects (or
+// mask leaves out) get a negative filter lane; the four rays are taken into the collidable's space, transposed and
+// cast against its shape at once, and each ray's hit closer than its output's is copied there with the collidable
+// and the normal turned back to world space.
+void hkKdTreeCollidableRayBundleCaster::addMidPhaseHit(hkPrimitiveId primId, const hkVector4Comparison& mask) {
+    // The kd tree keeps each collidable's address as an untyped hkPrimitiveId (hkUlong); the SDK casts it back here.
+    hkpCollidable* collidable = reinterpret_cast<hkpCollidable*>(primId);
+    const hkpShape* shape = collidable->m_shape;
+    if (!shape) {
+        return;
+    }
+    const hkTransform& transform = *collidable->m_motion.pMotion;
+    hkQuadReal filterLanes;
+    if (m_filter) {
+        alignas(16) float afLanes[4];
+        for (int32_t i = 0; i < 4; ++i) {
+            if ((_mm_movemask_ps(mask.m_mask) & axisMaskBits[i]) &&
+                m_filter->isCollisionEnabled(m_input[i], *collidable).m_bool) {
+                afLanes[i] = 1.0f;
+            }
+            else {
+                afLanes[i] = -1.0f;
+            }
+        }
+        filterLanes = _mm_load_ps(afLanes);
+    }
+    else {
+        filterLanes = _mm_set1_ps(1.0f);
+    }
+    hkVector4Comparison activeMask;
+    activeMask.m_mask = _mm_cmple_ps(_mm_setzero_ps(), filterLanes);
+    const hkpWorldRayCastInput* input = m_input;
+    hkVector4 from[4];
+    hkVector4 to[4];
+    for (int32_t i = 0; i < 4; ++i) {
+        from[i].setTransformedInversePos(transform, input[i].m_from);
+        to[i].setTransformedInversePos(transform, input[i].m_to);
+    }
+    hkpShapeRayBundleCastInput bundleInput;
+    hkQuadReal from0 = from[0].m_quad;
+    hkQuadReal from1 = from[1].m_quad;
+    hkQuadReal from2 = from[2].m_quad;
+    hkQuadReal from3 = from[3].m_quad;
+    _MM_TRANSPOSE4_PS(from0, from1, from2, from3);
+    bundleInput.m_from[0].m_quad = from0;
+    bundleInput.m_from[1].m_quad = from1;
+    bundleInput.m_from[2].m_quad = from2;
+    hkQuadReal to0 = to[0].m_quad;
+    hkQuadReal to1 = to[1].m_quad;
+    hkQuadReal to2 = to[2].m_quad;
+    hkQuadReal to3 = to[3].m_quad;
+    _MM_TRANSPOSE4_PS(to0, to1, to2, to3);
+    bundleInput.m_to[0].m_quad = to0;
+    bundleInput.m_to[1].m_quad = to1;
+    bundleInput.m_to[2].m_quad = to2;
+    bundleInput.m_filterInfo = input->m_filterInfo;
+    bundleInput.m_rayShapeCollectionFilter = m_collectionFilter;
+    hkpShapeRayBundleCastOutput bundleOutput;
+    // The lanes the shape hit go unused.
+    shape->castRayBundleImpl(bundleInput, bundleOutput, activeMask);
+    for (int32_t i = 0; i < 4; ++i) {
+        const hkpShapeRayCastOutput& rayOutput = bundleOutput.m_outputs[i];
+        if (rayOutput.m_hitFraction < 1.0f && m_output[i].m_hitFraction > rayOutput.m_hitFraction) {
+            hkpWorldRayCastOutput& result = m_output[i];
+            static_cast<hkpShapeRayCastOutput&>(result) = rayOutput;
+            m_output[i].m_rootCollidable = collidable;
+            m_output[i].m_normal.setRotatedDir(transform.m_rotation, rayOutput.m_normal);
+        }
+    }
+}
+
+void hkKdTreeCollidableRayBundleCaster::getHitFractions(hkVector4& hitFractions) const {
+    hkpWorldRayCastOutput* m_output = this->m_output;
+    XFNV_M128_F32(hitFractions.m_quad, 0) = m_output->m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 1) = m_output[1].m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 2) = m_output[2].m_hitFraction;
+    XFNV_M128_F32(hitFractions.m_quad, 3) = m_output[3].m_hitFraction;
+}
+
+void hkKdTreeCollidableRayBundleCaster::operator delete(void* apMemory) {
+    if (apMemory) {
+        hkMemoryRouter::getInstance().heap().blockFree(apMemory, sizeof(hkKdTreeCollidableRayBundleCaster));
+    }
+}
+
+hkpKdTreeCollidableRaycaster::~hkpKdTreeCollidableRaycaster() {}
+
+// The SDK's addMidPhaseHit: the primitive is a collidable. Unless it has no shape or m_filter rejects it, the ray is
+// taken into the collidable's space and cast against its shape: into m_collector when there is one (no hit is
+// reported back), else into m_output, whose hit then gets the collidable and its normal turned back to world space.
+hkBool hkpKdTreeCollidableRaycaster::addMidPhaseHit(hkPrimitiveId primitiveId) {
+    // The kd tree keeps each collidable's address as an untyped hkPrimitiveId (hkUlong); the SDK casts it back here.
+    hkpCollidable* collidable = reinterpret_cast<hkpCollidable*>(primitiveId);
+    const hkpShape* shape = collidable->m_shape;
+    if (!shape || (m_filter && !m_filter->isCollisionEnabled(*m_input, *collidable).m_bool)) {
+        return false;
+    }
+    const hkTransform& transform = *collidable->m_motion.pMotion;
+    const hkpWorldRayCastInput* input = m_input;
+    hkpShapeRayCastInput shapeInput;
+    shapeInput.m_from.setTransformedInversePos(transform, input->m_from);
+    shapeInput.m_to.setTransformedInversePos(transform, input->m_to);
+    shapeInput.m_filterInfo = input->m_filterInfo;
+    shapeInput.m_rayShapeCollectionFilter = m_collectionFilter;
+    if (m_collector) {
+        shape->castRayWithCollectorImpl(shapeInput, *collidable, *m_collector);
+        return false;
+    }
+    if (!shape->castRay(shapeInput, *m_output).m_bool) {
+        return false;
+    }
+    m_output->m_rootCollidable = collidable;
+    hkpWorldRayCastOutput* output = m_output;
+    output->m_normal.setRotatedDir(transform.m_rotation, output->m_normal);
+    return true;
+}
+
+hkBool hkpKdTreeCollidableRaycaster::hasHit() {
+    return m_output->m_rootCollidable != nullptr;
+}
+
+float hkpKdTreeCollidableRaycaster::getHitFraction() {
+    return m_output->m_hitFraction;
+}
+
+// The SDK's castRayIterative: this caster collects one ray's hits into output while the kd tree utility walks the
+// tree from input's start to its end; the result is whether output has a hit (hasHit, called through the vtable).
+hkBool hkpKdTreeCollidableRaycaster::castRayIterative(
+    const hkKdTree* tree,
+    const hkpWorldRayCastInput& input,
+    hkpWorldRayCastOutput& output
+) {
+    HK_TIMER_BEGIN("KdTreeCastRayIter", nullptr);
+    m_input = &input;
+    m_output = &output;
+    hkKdTreeUtils::castRayIterative(tree, input.m_from, input.m_to, this);
+    hkKdTreeCastCollector* pCollector = this;
+    hkBool result = pCollector->hasHit();
+    HK_TIMER_END();
+    return result;
+}
+
+void hkpKdTreeCollidableRaycaster::operator delete(void* apMemory) {
+    if (apMemory) {
+        hkMemoryRouter::getInstance().heap().blockFree(apMemory, sizeof(hkpKdTreeCollidableRaycaster));
+    }
+}

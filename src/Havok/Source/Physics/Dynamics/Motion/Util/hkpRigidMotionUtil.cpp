@@ -1,0 +1,519 @@
+#include "Havok/Source/Physics/Dynamics/Motion/Util/hkpRigidMotionUtil.h"
+
+#include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/SweptTransform/hkSweptTransformUtil.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
+#include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "Havok/Source/Physics/ConstraintSolver/Accumulator/hkpVelocityAccumulator.h"
+#include "Havok/Source/Physics/ConstraintSolver/Solve/hkpSolverInfo.h"
+#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "xfnv/Compiler.h"
+
+#include <limits>
+#include <xmmintrin.h>
+
+float calcVelocityForDeactivation(const hkpMotion& motion, float objectRadius) {
+    const float linVelSqrd = motion.getLinearVelocity().lengthSquared3();
+    const float angVelSqrd = motion.getAngularVelocity().lengthSquared3();
+    return objectRadius * objectRadius * angVelSqrd + linVelSqrd;
+}
+
+// The SDK's final deactivation test of an island's motions: false as soon as one motion's estimated movement, a
+// quarter of its squared linear speed plus its squared angular speed times its radius (at most 1) squared, less 0.01,
+// exceeds the squared distance of the reference position its larger inactive-frame count selects. info is unused.
+bool hkRigidMotionUtilCanDeactivateFinal(
+    const hkStepInfo& info,
+    hkpMotion* const* motions,
+    int32_t numMotions,
+    int32_t motionOffset
+) {
+    for (int32_t i = numMotions - 1; i >= 0; motions++, i--) {
+        // Each element points motionOffset raw bytes before its motion (an entity's embedded motion).
+        hkpMotion* motion = hkAddByteOffset(motions[0], motionOffset);
+        float fRadius = motion->m_motionState.m_objectRadius;
+        if (fRadius > 1.0f) {
+            fRadius = 1.0f;
+        }
+        const hkQuadReal lin = _mm_mul_ps(motion->m_linearVelocity.m_quad, motion->m_linearVelocity.m_quad);
+        float fLinSqrd = _mm_cvtss_f32(
+            _mm_add_ps(_mm_shuffle_ps(lin, lin, 0xaa), _mm_add_ps(_mm_shuffle_ps(lin, lin, 0x55), lin))
+        );
+        const hkQuadReal ang = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
+        float fAngSqrd = _mm_cvtss_f32(
+            _mm_add_ps(_mm_shuffle_ps(ang, ang, 0xaa), _mm_add_ps(_mm_shuffle_ps(ang, ang, 0x55), ang))
+        );
+        const double dRadius = fRadius;
+        float fVelSqrd = dRadius * dRadius * fAngSqrd + fLinSqrd;
+        float fEstimate = fVelSqrd * 0.25 - 0.010000000298023226;
+        const int32_t iSelect = motion->getNumInactiveFrames(0) > motion->getNumInactiveFrames(1) ? 0 : 1;
+        if (motion->m_deactivationRefPosition[iSelect](3) < fEstimate) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// The SDK's step, for each motion that is not fixed: velocities with a NaN or a lane at or above 1e6 in x, y or z are
+// both reset, the linear velocity is clipped to the motion's maximum, the centre of mass moves over info's step, the
+// rotation turns by the angular step (clipped to the maximum angular velocity times the step, at most 0.9 radians,
+// with the angular velocity scaled to match), and the transform is rebuilt from the new swept transform.
+void hkRigidMotionUtilStep(
+    const hkStepInfo& info,
+    hkpMotion* const* motions,
+    int32_t numMotions,
+    int32_t motionOffset
+) {
+    for (int32_t i = numMotions - 1; i >= 0; motions++, i--) {
+        // Each element points motionOffset raw bytes before its motion (an entity's embedded motion).
+        hkpMotion* motion = hkAddByteOffset(motions[0], motionOffset);
+        if (motion->getType() == hkpMotion::MOTION_FIXED) {
+            continue;
+        }
+        hkSweptTransformUtil::_stepMotionState(
+            info,
+            motion->m_linearVelocity,
+            motion->m_angularVelocity,
+            motion->m_motionState
+        );
+    }
+}
+
+// The SDK's accumulator build, one accumulator per motion (motion type 1, dynamic, and unknown types leave theirs
+// untouched): damping on the velocities of every motion but keyframed and fixed ones, then the accumulator: box
+// inertia (and invalid, thin box) gets its inertia frame as the transpose of the motion's rotation and its angular
+// velocity in that frame; sphere and character motions keep identity frames; keyframed motions get infinite masses
+// (zero inverse); fixed motions an all-zero accumulator. Returns the accumulator after the last one.
+hkpVelocityAccumulator* hkRigidMotionUtilApplyForcesAndBuildAccumulators(
+    const hkStepInfo& info,
+    hkpMotion* const* motions,
+    int32_t numMotions,
+    int32_t motionOffset,
+    hkpVelocityAccumulator* accumulatorsOut
+) {
+    for (int32_t i = numMotions - 1; i >= 0; motions++, accumulatorsOut++, i--) {
+        // Each element points motionOffset raw bytes before its motion (an entity's embedded motion).
+        hkpMotion* motion = hkAddByteOffset(motions[0], motionOffset);
+        hkMotionState& ms = motion->m_motionState;
+        hkSweptTransform& st = ms.m_sweptTransform;
+        switch (motion->getType()) {
+            case hkpMotion::MOTION_INVALID:
+            case hkpMotion::MOTION_BOX_INERTIA:
+            case hkpMotion::MOTION_THIN_BOX_INERTIA: {
+                // Damping: each velocity times 1 - damping * dt, rounded to float and at least 0 (a NaN is kept).
+                float fLinDampStore = 1.0f - ms.m_linearDamping * info.m_deltaTime;
+                float fLinDamp = fLinDampStore;
+                if (fLinDamp < 0.0f) {
+                    fLinDamp = 0.0f;
+                }
+                motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fLinDamp), motion->m_linearVelocity.m_quad);
+                float fAngDampStore = 1.0f - info.m_deltaTime * ms.m_angularDamping;
+                float fAngDamp = fAngDampStore;
+                if (fAngDamp < 0.0f) {
+                    fAngDamp = 0.0f;
+                }
+                motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fAngDamp), motion->m_angularVelocity.m_quad);
+
+                accumulatorsOut->m_scratch123.setTranspose(ms.m_transform.m_rotation);
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_RIGID_BODY;
+                accumulatorsOut->m_invMasses = motion->m_inertiaAndMassInv;
+                accumulatorsOut->m_linearVel = motion->m_linearVelocity;
+                {
+                    float fT = st.getInterpolationValue(info.m_startTime);
+                    accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
+                }
+                {
+                    // The angular velocity in the inertia frame, (y * col1 + x * col0) + z * col2.
+                    accumulatorsOut->m_angularVel.setRotatedDir(
+                        accumulatorsOut->m_scratch123,
+                        motion->m_angularVelocity
+                    );
+                }
+                accumulatorsOut->m_deactivationClass = ms.m_deactivationClass;
+                accumulatorsOut->m_gravityFactor = motion->m_gravityFactor;
+                break;
+            }
+            case hkpMotion::MOTION_SPHERE_INERTIA:
+            case hkpMotion::MOTION_CHARACTER: {
+                accumulatorsOut->m_type = motion->getType() == hkpMotion::MOTION_CHARACTER
+                    ? hkpVelocityAccumulator::HK_NO_GRAVITY_RIGID_BODY
+                    : hkpVelocityAccumulator::HK_RIGID_BODY;
+                // Damping, as above.
+                float fLinDampStore = 1.0f - ms.m_linearDamping * info.m_deltaTime;
+                float fLinDamp = fLinDampStore;
+                if (fLinDamp < 0.0f) {
+                    fLinDamp = 0.0f;
+                }
+                motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fLinDamp), motion->m_linearVelocity.m_quad);
+                float fAngDampStore = 1.0f - info.m_deltaTime * ms.m_angularDamping;
+                float fAngDamp = fAngDampStore;
+                if (fAngDamp < 0.0f) {
+                    fAngDamp = 0.0f;
+                }
+                motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(fAngDamp), motion->m_angularVelocity.m_quad);
+
+                accumulatorsOut->m_invMasses = motion->m_inertiaAndMassInv;
+                {
+                    float fT = st.getInterpolationValue(info.m_startTime);
+                    accumulatorsOut->m_scratch0.setInterpolate4(st.m_centerOfMass0, st.m_centerOfMass1, fT);
+                }
+                accumulatorsOut->m_angularVel = motion->m_angularVelocity;
+                accumulatorsOut->m_linearVel = motion->m_linearVelocity;
+                accumulatorsOut->m_scratch123.setIdentity();
+                accumulatorsOut->m_deactivationClass = ms.m_deactivationClass;
+                accumulatorsOut->m_gravityFactor = motion->m_gravityFactor;
+                break;
+            }
+            case hkpMotion::MOTION_KEYFRAMED: {
+                // No damping; infinite masses, the centre of mass at the step's end, an identity frame. The
+                // deactivation class is left as it was.
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
+                accumulatorsOut->m_invMasses.setZero4();
+                accumulatorsOut->m_scratch0 = st.m_centerOfMass1;
+                accumulatorsOut->m_angularVel = motion->m_angularVelocity;
+                accumulatorsOut->m_linearVel = motion->m_linearVelocity;
+                accumulatorsOut->m_scratch123.setIdentity();
+                accumulatorsOut->m_gravityFactor = motion->m_gravityFactor;
+                break;
+            }
+            case hkpMotion::MOTION_FIXED: {
+                // All zero but the type; the deactivation class is left as it was.
+                accumulatorsOut->m_gravityFactor = 0.0f;
+                accumulatorsOut->m_type = hkpVelocityAccumulator::HK_KEYFRAMED_RIGID_BODY;
+                accumulatorsOut->m_invMasses.setZero4();
+                accumulatorsOut->m_linearVel.setZero4();
+                accumulatorsOut->m_angularVel.setZero4();
+                accumulatorsOut->m_scratch0.setZero4();
+                accumulatorsOut->m_scratch123.m_col0.setZero4();
+                accumulatorsOut->m_scratch123.m_col1.setZero4();
+                accumulatorsOut->m_scratch123.m_col2.setZero4();
+                break;
+            }
+            default: break;
+        }
+    }
+    return accumulatorsOut;
+}
+
+// For each motion that is not fixed: gravity (deltaVel times the motion's gravity factor; not for keyframed and
+// character motions) and damping (not for keyframed motions) on the velocities, a step of the motion state (as
+// hkRigidMotionUtilStep), and the deactivation check every fourth step. A thin box keeps its angular momentum over the
+// step and has its velocities clipped after it. Returns the fewest frames any of the motions has been inactive
+// (0x7FFFFFFF when none counts).
+int32_t hkRigidMotionUtilApplyForcesAndStep(
+    const hkpSolverInfo& solverInfo,
+    const hkStepInfo& stepInfo,
+    const hkVector4& deltaVel,
+    hkpMotion* const* motions,
+    int32_t numMotions,
+    int32_t motionOffset
+) {
+    int32_t numInactiveFrames = std::numeric_limits<int32_t>::max();
+    for (int32_t i = numMotions - 1; i >= 0; motions++, i--) {
+        // Each element points motionOffset raw bytes before its motion (an entity's embedded motion).
+        hkpMotion* motion = hkAddByteOffset(motions[0], motionOffset);
+        const float gravityFactor = motion->m_gravityFactor;
+        const hkpMotion::MotionType type = motion->getType();
+        if (type == hkpMotion::MOTION_FIXED) {
+            continue;
+        }
+        hkMotionState& ms = motion->m_motionState;
+        hkSweptTransform& st = ms.m_sweptTransform;
+
+        if (type != hkpMotion::MOTION_KEYFRAMED) {
+            if (type != hkpMotion::MOTION_CHARACTER) {
+                motion->m_linearVelocity.m_quad = _mm_add_ps(
+                    _mm_mul_ps(_mm_set1_ps(gravityFactor), deltaVel.m_quad),
+                    motion->m_linearVelocity.m_quad
+                );
+            }
+            // Damping: each velocity scaled by 1 - damping * dt, at least 0.
+            const float fDeltaTime = stepInfo.m_deltaTime;
+            float linDamp = 1.0f - ms.m_linearDamping * fDeltaTime;
+            if (linDamp < 0.0f) {
+                linDamp = 0.0f;
+            }
+            motion->m_linearVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(linDamp), motion->m_linearVelocity.m_quad);
+            float angDamp = 1.0f - fDeltaTime * ms.m_angularDamping;
+            if (angDamp < 0.0f) {
+                angDamp = 0.0f;
+            }
+            motion->m_angularVelocity.m_quad = _mm_mul_ps(_mm_set1_ps(angDamp), motion->m_angularVelocity.m_quad);
+        }
+
+        // A thin box's world angular momentum: the angular velocity in body space times the inertia (the refined
+        // reciprocal of the inverse inertia), rotated back.
+        hkVector4 angularMomentum;
+        if (type == hkpMotion::MOTION_THIN_BOX_INERTIA) {
+            hkVector4 localAngVel;
+            localAngVel.setRotatedInverseDir(ms.m_transform.m_rotation, motion->m_angularVelocity);
+            hkVector4 inertia;
+            inertia.setReciprocal4(motion->m_inertiaAndMassInv);
+            localAngVel.m_quad = _mm_mul_ps(inertia.m_quad, localAngVel.m_quad);
+            angularMomentum.setRotatedDir(ms.m_transform.m_rotation, localAngVel);
+        }
+
+        hkSweptTransformUtil::_stepMotionState(stepInfo, motion->m_linearVelocity, motion->m_angularVelocity, ms);
+
+        if (type == hkpMotion::MOTION_THIN_BOX_INERTIA) {
+            // The angular velocity again from the kept momentum, under the new rotation.
+            hkVector4 localMomentum;
+            localMomentum.setRotatedInverseDir(ms.m_transform.m_rotation, angularMomentum);
+            localMomentum.m_quad = _mm_mul_ps(localMomentum.m_quad, motion->m_inertiaAndMassInv.m_quad);
+            motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, localMomentum);
+
+            hkSweptTransformUtil::_clipVelocities(ms, motion->m_linearVelocity, motion->m_angularVelocity);
+        }
+
+        // The deactivation check, every fourth step: the counter's 16th step checks the slow reference (index 1)
+        // and restarts the counter, the other checks the fast one (index 0); a counter that wraps stays at 0xFF.
+        const int32_t counter = motion->m_deactivationIntegrateCounter + 1;
+        motion->m_deactivationIntegrateCounter = static_cast<uint8_t>(counter);
+        if ((counter & 3) == 0) {
+            if (counter == 256) {
+                motion->m_deactivationIntegrateCounter = 0xFF;
+            }
+            else {
+                int32_t j = 0;
+                if ((counter & 15) == 0) {
+                    motion->m_deactivationIntegrateCounter = 0;
+                    j = 1;
+                }
+                // The reference position's w keeps the largest squared velocity seen, the angular part weighted
+                // by the object radius (at most 1) squared.
+                float radius = ms.m_objectRadius;
+                if (radius > 1.0f) {
+                    radius = 1.0f;
+                }
+                const hkQuadReal linSq = _mm_mul_ps(motion->m_linearVelocity.m_quad, motion->m_linearVelocity.m_quad);
+                const float linVelSqrd = XFNV_M128_F32(linSq, 2) +
+                    static_cast<float>(XFNV_M128_F32(linSq, 1) + XFNV_M128_F32(linSq, 0));
+                const hkQuadReal angSq = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
+                const float angVelSqrd = XFNV_M128_F32(angSq, 2) +
+                    static_cast<float>(XFNV_M128_F32(angSq, 1) + XFNV_M128_F32(angSq, 0));
+                const float velSqrd = radius * radius * angVelSqrd + linVelSqrd;
+                float maxVelSqrd = motion->m_deactivationRefPosition[j](3);
+                if (!(velSqrd < maxVelSqrd)) {
+                    maxVelSqrd = velSqrd;
+                }
+                motion->m_deactivationRefPosition[j](3) = maxVelSqrd;
+
+                // Moved too far from the reference position, or turned too far from the reference orientation:
+                // the inactive count restarts and the references are taken anew. Else the count goes up.
+                const hkpSolverInfo::DeactivationInfo& di = solverInfo.m_deactivationInfo[ms.m_deactivationClass];
+                const hkQuadReal d = _mm_sub_ps(motion->m_deactivationRefPosition[j].m_quad, st.m_centerOfMass1.m_quad);
+                const hkQuadReal dSq = _mm_mul_ps(d, d);
+                const float distSqrd = XFNV_M128_F32(dSq, 2) +
+                    static_cast<float>(XFNV_M128_F32(dSq, 1) + XFNV_M128_F32(dSq, 0));
+                bool bReset = di.m_maxDistSqrd[j] < distSqrd;
+                if (!bReset) {
+                    hkVector4 refRotation;
+                    hkVector4Util::unpackInt32IntoQuaternion(motion->m_deactivationRefOrientation[j], refRotation);
+                    // The squared 4-lane distance to the current rotation, summed as hkVector4::horizontalAdd4.
+                    const hkQuadReal r = _mm_sub_ps(refRotation.m_quad, st.m_rotation1.m_vec.m_quad);
+                    const hkQuadReal rSq = _mm_mul_ps(r, r);
+                    const hkQuadReal sum0 = _mm_add_ps(_mm_shuffle_ps(rSq, rSq, 0x4E), rSq);
+                    const hkQuadReal sum1 = _mm_add_ps(_mm_shuffle_ps(sum0, sum0, 0xB1), sum0);
+                    const float rotDistSqrd = XFNV_M128_F32(sum1, 0);
+                    const float maxRotSqrd = di.m_maxRotSqrd[j];
+                    bReset = maxRotSqrd < rotDistSqrd;
+                }
+                uint16_t& numFrames = motion->m_deactivationNumInactiveFrames[j];
+                const int32_t frames = numFrames & 0x7F;
+                const int32_t selectBits = ((solverInfo.m_deactivationNumInactiveFramesSelectFlag[j] << 7) | frames)
+                    << 7;
+                if (bReset) {
+                    numFrames = static_cast<uint16_t>(selectBits);
+                    motion->m_deactivationRefPosition[j].m_quad = _mm_and_ps(
+                        st.m_centerOfMass1.m_quad,
+                        hkVector4::zeroElementMasks[3]
+                    );
+                    motion->m_deactivationRefOrientation[j] = hkVector4Util::packQuaternionIntoInt32(
+                        st.m_rotation1.m_vec
+                    );
+                }
+                else {
+                    numFrames = static_cast<uint16_t>(selectBits | (frames - (frames >> 6) + 1));
+                }
+            }
+        }
+
+        int32_t frames = motion->m_deactivationNumInactiveFrames[1] & 0x7F;
+        const int32_t frames0 = motion->m_deactivationNumInactiveFrames[0] & 0x7F;
+        if (frames0 > frames) {
+            frames = frames0;
+        }
+        if (numInactiveFrames >= frames) {
+            numInactiveFrames = frames;
+        }
+    }
+    return numInactiveFrames;
+}
+
+// For each motion: the accumulator's velocities (a box's angular velocity rotated to world space; a keyframed motion
+// keeps its own), the step of the motion state with the accumulator's summed velocities (not for fixed and dynamic
+// motions), the velocities clipped to their maxima, and the deactivation check every fourth step. A thin box keeps its
+// angular momentum over the step. Returns the fewest frames any of the motions has been inactive (0x7FFFFFFF when none
+// counts).
+int32_t hkRigidMotionUtilApplyAccumulators(
+    const hkpSolverInfo& solverInfo,
+    const hkStepInfo& info,
+    const hkpVelocityAccumulator* accumulators,
+    hkpMotion* const* motions,
+    int32_t numMotions,
+    int32_t motionOffset
+) {
+    int32_t numInactiveFrames = std::numeric_limits<int32_t>::max();
+    for (int32_t i = numMotions - 1; i >= 0; motions++, accumulators++, i--) {
+        // Each element points motionOffset raw bytes before its motion (an entity's embedded motion).
+        hkpMotion* motion = hkAddByteOffset(motions[0], motionOffset);
+        hkMotionState& ms = motion->m_motionState;
+        hkSweptTransform& st = ms.m_sweptTransform;
+
+        // The velocities the step integrates: the accumulator's sums (scratch0 and the first scratch column).
+        hkVector4 angularMomentum;
+        hkVector4 sumLinVel;
+        hkVector4 sumAngVel;
+        bool bStep = true;
+        switch (motion->getType()) {
+            case hkpMotion::MOTION_INVALID:
+            case hkpMotion::MOTION_THIN_BOX_INERTIA: {
+                // The world angular momentum: the body-space angular velocity times the inertia (the refined
+                // reciprocal of the inverse inertia), rotated to world space.
+                hkVector4 inertia;
+                inertia.setReciprocal4(motion->m_inertiaAndMassInv);
+                hkVector4 localAngVel = accumulators->m_angularVel;
+                localAngVel.m_quad = _mm_mul_ps(inertia.m_quad, localAngVel.m_quad);
+                angularMomentum.setRotatedDir(ms.m_transform.m_rotation, localAngVel);
+            }
+                [[fallthrough]];
+            case hkpMotion::MOTION_BOX_INERTIA: {
+                motion->m_linearVelocity = accumulators->m_linearVel;
+                // The accumulator's angular velocity is in body space: rotated as (y * col1 + x * col0) + z * col2.
+                motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, accumulators->m_angularVel);
+                sumLinVel = accumulators->m_scratch0;
+                sumAngVel.setRotatedDir(ms.m_transform.m_rotation, accumulators->m_scratch123.m_col0);
+                break;
+            }
+            case hkpMotion::MOTION_SPHERE_INERTIA:
+            case hkpMotion::MOTION_CHARACTER:
+                motion->m_linearVelocity = accumulators->m_linearVel;
+                motion->m_angularVelocity = accumulators->m_angularVel;
+                sumLinVel = accumulators->m_scratch0;
+                sumAngVel = accumulators->m_scratch123.m_col0;
+                break;
+            case hkpMotion::MOTION_KEYFRAMED:
+                sumLinVel = motion->m_linearVelocity;
+                sumAngVel = motion->m_angularVelocity;
+                break;
+            default: bStep = false; break;
+        }
+
+        if (bStep) {
+            hkSweptTransformUtil::_stepMotionState(info, sumLinVel, sumAngVel, ms);
+        }
+
+        if (motion->getType() == hkpMotion::MOTION_THIN_BOX_INERTIA) {
+            // The angular velocity again from the kept momentum, under the new rotation.
+            motion->m_linearVelocity = accumulators->m_linearVel;
+            hkVector4 localMomentum;
+            localMomentum.setRotatedInverseDir(ms.m_transform.m_rotation, angularMomentum);
+            localMomentum.m_quad = _mm_mul_ps(localMomentum.m_quad, motion->m_inertiaAndMassInv.m_quad);
+            motion->m_angularVelocity.setRotatedDir(ms.m_transform.m_rotation, localMomentum);
+        }
+
+        hkSweptTransformUtil::_clipVelocities(ms, motion->m_linearVelocity, motion->m_angularVelocity);
+
+        // The deactivation check, every fourth step: the counter's 16th step checks the slow reference (index 1)
+        // and restarts the counter, the other checks the fast one (index 0); a counter that wraps stays at 0xFF.
+        const int32_t counter = motion->m_deactivationIntegrateCounter + 1;
+        motion->m_deactivationIntegrateCounter = static_cast<uint8_t>(counter);
+        bool bCheck = false;
+        int32_t j = 0;
+        if ((counter & 3) == 0) {
+            if ((counter & 15) != 0) {
+                bCheck = true;
+            }
+            else if (counter == 256) {
+                motion->m_deactivationIntegrateCounter = 0xFF;
+            }
+            else {
+                motion->m_deactivationIntegrateCounter = 0;
+                j = 1;
+                bCheck = true;
+            }
+        }
+        if (bCheck) {
+            // The reference position's w keeps the largest squared velocity seen, the angular part weighted by the
+            // object radius (at most 1) squared.
+            float radius = ms.m_objectRadius;
+            if (radius > 1.0) {
+                radius = 1.0f;
+            }
+            const double dRadius = radius;
+            const hkQuadReal linSq = _mm_mul_ps(motion->m_linearVelocity.m_quad, motion->m_linearVelocity.m_quad);
+            const float linVelSqrd = _mm_cvtss_f32(
+                _mm_add_ps(_mm_shuffle_ps(linSq, linSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(linSq, linSq, 0x55), linSq))
+            );
+            const hkQuadReal angSq = _mm_mul_ps(motion->m_angularVelocity.m_quad, motion->m_angularVelocity.m_quad);
+            const float angVelSqrd = _mm_cvtss_f32(
+                _mm_add_ps(_mm_shuffle_ps(angSq, angSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(angSq, angSq, 0x55), angSq))
+            );
+            float velSqrd = dRadius * dRadius * angVelSqrd + linVelSqrd;
+            float maxVelSqrd = motion->m_deactivationRefPosition[j](3);
+            const float fVel = velSqrd;
+            const float fMax = maxVelSqrd;
+            float fRefVel = fVel < fMax ? fMax : fVel;
+            motion->m_deactivationRefPosition[j](3) = fRefVel;
+
+            // Moved too far from the reference position, or turned too far from the reference orientation: the
+            // inactive count restarts and the references are taken anew. Else the count goes up.
+            const hkpSolverInfo::DeactivationInfo& di = solverInfo.m_deactivationInfo[ms.m_deactivationClass];
+            const hkQuadReal d = _mm_sub_ps(motion->m_deactivationRefPosition[j].m_quad, st.m_centerOfMass1.m_quad);
+            const hkQuadReal dSq = _mm_mul_ps(d, d);
+            const float distSqrd = _mm_cvtss_f32(
+                _mm_add_ps(_mm_shuffle_ps(dSq, dSq, 0xaa), _mm_add_ps(_mm_shuffle_ps(dSq, dSq, 0x55), dSq))
+            );
+            bool bReset = di.m_maxDistSqrd[j] < distSqrd;
+            if (!bReset) {
+                hkVector4 refRotation;
+                hkVector4Util::unpackInt32IntoQuaternion(motion->m_deactivationRefOrientation[j], refRotation);
+                // The squared 4-lane distance to the current rotation, summed as hkVector4::horizontalAdd4.
+                const hkQuadReal r = _mm_sub_ps(refRotation.m_quad, st.m_rotation1.m_vec.m_quad);
+                const hkQuadReal rSq = _mm_mul_ps(r, r);
+                const hkQuadReal sum0 = _mm_add_ps(_mm_shuffle_ps(rSq, rSq, 0x4E), rSq);
+                const hkQuadReal sum1 = _mm_add_ps(_mm_shuffle_ps(sum0, sum0, 0xB1), sum0);
+                const float rotDistSqrd = _mm_cvtss_f32(sum1);
+                const float maxRotSqrd = di.m_maxRotSqrd[j];
+                bReset = maxRotSqrd < rotDistSqrd;
+            }
+            uint16_t& numFrames = motion->m_deactivationNumInactiveFrames[j];
+            const int32_t frames = numFrames & 0x7F;
+            const int32_t selectBits = ((solverInfo.m_deactivationNumInactiveFramesSelectFlag[j] << 7) | frames) << 7;
+            if (bReset) {
+                numFrames = static_cast<uint16_t>(selectBits);
+                motion->m_deactivationRefPosition[j].m_quad = _mm_and_ps(
+                    st.m_centerOfMass1.m_quad,
+                    hkVector4::zeroElementMasks[3]
+                );
+                motion->m_deactivationRefOrientation[j] = hkVector4Util::packQuaternionIntoInt32(st.m_rotation1.m_vec);
+            }
+            else {
+                numFrames = static_cast<uint16_t>(selectBits | (frames - (frames >> 6) + 1));
+            }
+        }
+
+        int32_t frames = motion->m_deactivationNumInactiveFrames[1] & 0x7F;
+        const int32_t frames0 = motion->m_deactivationNumInactiveFrames[0] & 0x7F;
+        if (frames0 > frames) {
+            frames = frames0;
+        }
+        if (numInactiveFrames >= frames) {
+            numInactiveFrames = frames;
+        }
+    }
+    return numInactiveFrames;
+}

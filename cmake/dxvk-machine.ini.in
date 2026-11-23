@@ -1,0 +1,19 @@
+# Meson's machine file for external/dxvk, written by cmake/Dxvk.cmake from this build's toolchain.
+# touch: DXVK's stand-in for the resource compiler off Windows; CMake's own, which every host has.
+# The SPIR-V headers are the copy DXVK's shader compiler carries.
+[binaries]
+c = '@CMAKE_C_COMPILER@'
+cpp = '@CMAKE_CXX_COMPILER@'
+ar = '@CMAKE_AR@'
+glslang = '@XFNV_GLSLANG@'
+touch = ['@CMAKE_COMMAND@', '-E', 'touch']
+
+[built-in options]
+c_args = [@XFNV_DXVK_TARGET_ARGS@]
+cpp_args = [@XFNV_DXVK_TARGET_ARGS@'-I@XFNV_DXVK_SOURCE@/subprojects/dxbc-spirv/submodules/spirv_headers/include']
+c_link_args = [@XFNV_DXVK_TARGET_ARGS@]
+cpp_link_args = [@XFNV_DXVK_TARGET_ARGS@]
+pkg_config_path = '@XFNV_DXVK_BUILD@-config'
+cmake_prefix_path = '@CMAKE_BINARY_DIR@/sdl3'
+
+@XFNV_DXVK_HOST_MACHINE@

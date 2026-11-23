@@ -1,0 +1,357 @@
+#include "Gamebryo2.2/CoreLibs/NiMain/NiSourceCubeMap.h"
+
+#include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiImageConverter.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiPath.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiSearchPath.h"
+#include "SDK/MSVC/string.h"
+
+#include <cstring>
+
+NiRTTI NiSourceCubeMap::ms_RTTI("NiSourceCubeMap", &NiSourceTexture::ms_RTTI);
+
+NiSourceCubeMap::NiSourceCubeMap() : m_eFace(FACE_POS_X) {}
+
+NiSourceCubeMap::~NiSourceCubeMap() {
+    m_spSrcPixelData = nullptr;
+}
+
+// KEEP: niread: the pixel layout is read into a stack slot nothing initialised and the mipmap and alpha formats into
+// slots holding freed filename pointers, then stored into the format preferences, so a short read (malformed data)
+// leaves those values there, which src cannot express; porting.md's unwritten-slot exception covers GetChunkData
+// only. Files from 10.3.0.6 on are plain source textures; older ones name six face files, loaded when the flag is
+// set, and link six face pixel data (LinkObject). The base call goes directly to NiTexture::LoadBinary, which only
+// forwards to NiObjectNET's.
+void NiSourceCubeMap::LoadBinary(NiStream& kStream) {
+    if (kStream.GetFileVersion() >= NiStream::GetVersion(10, 3, 0, 6)) {
+        NiSourceTexture::LoadBinary(kStream);
+        return;
+    }
+    NiTexture::LoadBinary(kStream);
+    NiIncRefCount(this);
+    uint8_t bLoadFromFiles = 0;
+    NiStreamLoadBinary(kStream, bLoadFromFiles);
+    char* apcFilename[FACE_NUM] = {};
+    for (char*& pcFilename : apcFilename) {
+        kStream.LoadCString(pcFilename);
+    }
+    kStream.SetNumberOfLinkIDs(FACE_NUM);
+    for (uint32_t ui = 0; ui < FACE_NUM; ++ui) {
+        kStream.ReadLinkID();
+    }
+    if (bLoadFromFiles) {
+        LoadFromFiles(
+            apcFilename[FACE_POS_X],
+            apcFilename[FACE_NEG_X],
+            apcFilename[FACE_POS_Y],
+            apcFilename[FACE_NEG_Y],
+            apcFilename[FACE_POS_Z],
+            apcFilename[FACE_NEG_Z],
+            *kStream.m_pkSearchPath
+        );
+    }
+    for (char* pcFilename : apcFilename) {
+        _NiFree(pcFilename);
+    }
+    uint32_t uiPixelLayout;
+    NiStreamLoadBinary(kStream, uiPixelLayout);
+    m_kFormatPrefs.m_ePixelLayout = static_cast<NiTexture::FormatPrefs::PixelLayout>(uiPixelLayout);
+    uint32_t uiMipMapped;
+    NiStreamLoadBinary(kStream, uiMipMapped);
+    m_kFormatPrefs.m_eMipMapped = static_cast<NiTexture::FormatPrefs::MipFlag>(uiMipMapped);
+    uint32_t uiAlphaFmt;
+    NiStreamLoadBinary(kStream, uiAlphaFmt);
+    m_kFormatPrefs.m_eAlphaFmt = static_cast<NiTexture::FormatPrefs::AlphaFormat>(uiAlphaFmt);
+    uint8_t bStatic = m_bStatic;
+    NiStreamLoadBinary(kStream, bStatic);
+    m_bStatic = bStatic != 0;
+    NiDecRefCount(this);
+}
+
+// Files before 10.3.0.6 link six face pixel data, from which the cube map's own is built when it has none yet.
+void NiSourceCubeMap::LinkObject(NiStream& kStream) {
+    if (kStream.GetFileVersion() >= NiStream::GetVersion(10, 3, 0, 6)) {
+        NiSourceTexture::LinkObject(kStream);
+        return;
+    }
+    NiTexture::LinkObject(kStream);
+    NiPointer<NiPixelData> aspRaw[FACE_NUM];
+    if (kStream.GetNumberOfLinkIDs() == FACE_NUM) {
+        for (NiPointer<NiPixelData>& spRaw : aspRaw) {
+            spRaw = static_cast<NiPixelData*>(kStream.GetObjectFromLinkID());
+        }
+    }
+    if (!m_spSrcPixelData.m_pObject) {
+        LoadFromPixelData(
+            aspRaw[FACE_POS_X].m_pObject,
+            aspRaw[FACE_NEG_X].m_pObject,
+            aspRaw[FACE_POS_Y].m_pObject,
+            aspRaw[FACE_NEG_Y].m_pObject,
+            aspRaw[FACE_POS_Z].m_pObject,
+            aspRaw[FACE_NEG_Z].m_pObject
+        );
+    }
+}
+
+bool NiSourceCubeMap::RegisterStreamables(NiStream& kStream) {
+    return NiSourceTexture::RegisterStreamables(kStream);
+}
+
+void NiSourceCubeMap::SaveBinary(NiStream& kStream) {
+    NiSourceTexture::SaveBinary(kStream);
+}
+
+// Equal when the source textures are and the format preferences and the static flag match.
+bool NiSourceCubeMap::IsEqual(NiObject* pkObject) {
+    if (!NiSourceTexture::IsEqual(pkObject)) {
+        return false;
+    }
+    NiSourceCubeMap* pkCubeMap = static_cast<NiSourceCubeMap*>(pkObject);
+    return m_kFormatPrefs.m_ePixelLayout == pkCubeMap->m_kFormatPrefs.m_ePixelLayout &&
+        m_kFormatPrefs.m_eMipMapped == pkCubeMap->m_kFormatPrefs.m_eMipMapped &&
+        m_kFormatPrefs.m_eAlphaFmt == pkCubeMap->m_kFormatPrefs.m_eAlphaFmt &&
+        m_bStatic == pkCubeMap->m_bStatic;
+}
+
+void NiSourceCubeMap::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
+    NiSourceTexture::GetViewerStrings(pkStrings);
+    pkStrings->Add(NiGetViewerString(ms_RTTI.GetName()));
+}
+
+// Reads the platform file's pixel data through the image converter (from the open file, if any) when none is held.
+void NiSourceCubeMap::LoadPixelDataFromFile() {
+    if (m_spSrcPixelData.m_pObject || m_kPlatformFilename.GetHandle() == NiGlobalStringTable::NULL_STRING) {
+        return;
+    }
+    NiImageConverter* pkConverter = NiImageConverter::GetImageConverter();
+    m_spSrcPixelData.SetNew(pkConverter->ReadImageFile(m_kPlatformFilename, nullptr, m_pFile));
+    m_pFile = nullptr;
+}
+
+// Has the renderer (declared on the platform renderer) build the cube map's data, then drops the open file either way;
+// false only when a renderer exists and fails.
+bool NiSourceCubeMap::CreateRendererData() {
+    NiRenderer* pkRenderer = NiRenderer::ms_pkRenderer;
+    if (pkRenderer && !static_cast<NiDX9Renderer*>(pkRenderer)->CreateSourceCubeMapRendererData(this)) {
+        if (m_pFile) {
+            delete m_pFile;
+            m_pFile = nullptr;
+        }
+        return false;
+    }
+    if (m_pFile) {
+        delete m_pFile;
+        m_pFile = nullptr;
+    }
+    return true;
+}
+
+// Reads the six faces through kPath into one cube-map pixel data. A face that cannot be read returns without loading
+// anything; the local pointers release their references on the way out.
+void NiSourceCubeMap::LoadFromFiles(
+    const char* pcPosXFilename,
+    const char* pcNegXFilename,
+    const char* pcPosYFilename,
+    const char* pcNegYFilename,
+    const char* pcPosZFilename,
+    const char* pcNegZFilename,
+    NiSearchPath& kPath
+) {
+    const char* apcNames[FACE_NUM] =
+        {pcPosXFilename, pcNegXFilename, pcPosYFilename, pcNegYFilename, pcPosZFilename, pcNegZFilename};
+    NiPointer<NiPixelData> aspFaceSrcPixelDatas[FACE_NUM];
+    NiImageConverter* pkConverter = NiImageConverter::GetImageConverter();
+    char acFile[260];
+    for (uint32_t i = 0; i < FACE_NUM; ++i) {
+        const char* pcName = apcNames[i];
+        size_t stLength = strlen(pcName);
+        char* pcCopy = static_cast<char*>(_NiMalloc(stLength + 1));
+        strcpy_s(pcCopy, stLength + 1, pcName);
+        NiPath::Standardize(pcCopy);
+        char* pcPlatformName = NiImageConverter::ConvertFilenameToPlatformSpecific(pcCopy);
+        kPath.SetFilePath(pcPlatformName);
+        kPath.Reset();
+        while (kPath.GetNextSearchPath(acFile, sizeof(acFile))) {
+            if (NiFile::Access(acFile, NiFile::READ_ONLY)) {
+                aspFaceSrcPixelDatas[i] = pkConverter->ReadImageFile(acFile, nullptr, nullptr);
+                _NiFree(pcPlatformName);
+                _NiFree(pcCopy);
+                break;
+            }
+        }
+        if (!aspFaceSrcPixelDatas[i]) {
+            return;
+        }
+    }
+    LoadFromPixelData(
+        aspFaceSrcPixelDatas[0],
+        aspFaceSrcPixelDatas[1],
+        aspFaceSrcPixelDatas[2],
+        aspFaceSrcPixelDatas[3],
+        aspFaceSrcPixelDatas[4],
+        aspFaceSrcPixelDatas[5]
+    );
+}
+
+// Builds one six-face pixel data in the format of the +X face and copies every mipmap level of each face into it.
+void NiSourceCubeMap::LoadFromPixelData(
+    NiPixelData* pkPosXRaw,
+    NiPixelData* pkNegXRaw,
+    NiPixelData* pkPosYRaw,
+    NiPixelData* pkNegYRaw,
+    NiPixelData* pkPosZRaw,
+    NiPixelData* pkNegZRaw
+) {
+    NiPixelData* pkCubeData = new NiPixelData(
+        *pkPosXRaw->m_puiWidth,
+        *pkPosXRaw->m_puiHeight,
+        pkPosXRaw->m_kPixelFormat,
+        pkPosXRaw->m_uiMipmapLevels,
+        FACE_NUM
+    );
+    m_spSrcPixelData = pkCubeData;
+
+    NiPointer<NiPixelData> aspRaw[FACE_NUM];
+    aspRaw[FACE_POS_X] = pkPosXRaw;
+    aspRaw[FACE_NEG_X] = pkNegXRaw;
+    aspRaw[FACE_POS_Y] = pkPosYRaw;
+    aspRaw[FACE_NEG_Y] = pkNegYRaw;
+    aspRaw[FACE_POS_Z] = pkPosZRaw;
+    aspRaw[FACE_NEG_Z] = pkNegZRaw;
+
+    for (uint32_t i = 0; i < FACE_NUM; ++i) {
+        NiPixelData* pkRaw = aspRaw[i].m_pObject;
+        for (uint32_t j = 0; j < pkRaw->m_uiMipmapLevels; ++j) {
+            NiPixelData* pkDest = m_spSrcPixelData.m_pObject;
+            uint32_t uiSize = pkRaw->m_puiOffsetInBytes[j + 1] - pkRaw->m_puiOffsetInBytes[j];
+            rt::memcpy(
+                pkDest->m_pucPixels + pkDest->m_puiOffsetInBytes[j] +
+                    i * pkDest->m_puiOffsetInBytes[pkDest->m_uiMipmapLevels],
+                pkRaw->m_pucPixels + pkRaw->m_puiOffsetInBytes[j],
+                uiSize
+            );
+        }
+    }
+}
+
+// Builds a cube map from the six named files, then hands it to the renderer; a face that fails to load only makes
+// the cube map empty, which the renderer may still accept. The search path is destroyed on both ways out.
+NiSourceCubeMap* NiSourceCubeMap::Create(
+    const char* pcPosXFilename,
+    const char* pcNegXFilename,
+    const char* pcPosYFilename,
+    const char* pcNegYFilename,
+    const char* pcPosZFilename,
+    const char* pcNegZFilename,
+    NiRenderer* apkRenderer,
+    const NiFixedString& kName,
+    NiTexture::FormatPrefs& kPrefs
+) {
+    NiSourceCubeMap* pkTexture = new NiSourceCubeMap;
+    pkTexture->m_kFormatPrefs = kPrefs;
+    alignas(4) uint8_t aucPath[sizeof(NiSearchPath)];
+    NiSearchPath* pkPath = ::new (aucPath) NiSearchPath;
+    pkTexture->LoadFromFiles(
+        pcPosXFilename,
+        pcNegXFilename,
+        pcPosYFilename,
+        pcNegYFilename,
+        pcPosZFilename,
+        pcNegZFilename,
+        *pkPath
+    );
+    if (pkTexture->m_eFace) {
+        pkTexture->m_eFace = FACE_POS_X;
+    }
+    if (!apkRenderer ||
+        (pkTexture->m_spSrcPixelData.m_pObject &&
+         static_cast<NiDX9Renderer*>(apkRenderer)->CreateSourceCubeMapRendererData(pkTexture))) {
+        pkPath->~NiSearchPath();
+        return pkTexture;
+    }
+    delete pkTexture;
+    pkPath->~NiSearchPath();
+    return nullptr;
+}
+
+// A cube map named kFilename in the kPrefs format; with preloading on, its pixel data is read and the renderer builds
+// its data, the map being deleted and null returned when that fails.
+NiSourceCubeMap* NiSourceCubeMap::Create_(
+    const NiFixedString* kFilename,
+    NiDX9Renderer* pkRenderer,
+    const NiTexture::FormatPrefs* kPrefs
+) {
+    NiSourceCubeMap* pkCubeMap = new NiSourceCubeMap;
+    pkCubeMap->m_kFormatPrefs = *kPrefs;
+    const char* pcHandle = kFilename->GetHandle();
+    NiFixedString* pkFilename = &pkCubeMap->m_kFilename;
+    if (pkCubeMap->m_kFilename.GetHandle() != kFilename->GetHandle()) {
+        NiGlobalStringTable::AcquireHandle(pcHandle);
+        NiGlobalStringTable::ReleaseHandle(pkFilename->GetHandle());
+        pkFilename->m_kHandle = pcHandle;
+    }
+    NiStandardizeFilePath(pkCubeMap->m_kFilename);
+    NiImageConverter::ConvertFilenameToPlatformSpecific(pkCubeMap->m_kFilename, pkCubeMap->m_kPlatformFilename);
+    if (pkCubeMap->m_eFace) {
+        pkCubeMap->m_eFace = FACE_POS_X;
+    }
+    if (!NiSourceTexture::ms_bPreload) {
+        return pkCubeMap;
+    }
+    pkCubeMap->LoadPixelDataFromFile();
+    if (!pkRenderer || pkRenderer->CreateSourceCubeMapRendererData(pkCubeMap)) {
+        return pkCubeMap;
+    }
+    delete pkCubeMap;
+    return nullptr;
+}
+
+NiObject* NiSourceCubeMap::CreateObject() {
+    return new NiSourceCubeMap;
+}
+
+// As Create_, from the already open file pkFile, whose pixel data is always read.
+NiSourceCubeMap* NiSourceCubeMap::CreateTexture(
+    NiFixedString* kFilename,
+    NiFile* pkFile,
+    NiDX9Renderer* pkRenderer,
+    NiTexture::FormatPrefs* kPrefs
+) {
+    NiSourceCubeMap* pkCubeMap = new NiSourceCubeMap;
+    pkCubeMap->m_kFormatPrefs = *kPrefs;
+    const char* pcHandle = kFilename->GetHandle();
+    NiFixedString* pkFilename = &pkCubeMap->m_kFilename;
+    if (pkCubeMap->m_kFilename.GetHandle() != kFilename->GetHandle()) {
+        NiGlobalStringTable::AcquireHandle(pcHandle);
+        NiGlobalStringTable::ReleaseHandle(pkFilename->GetHandle());
+        pkFilename->m_kHandle = pcHandle;
+    }
+    NiStandardizeFilePath(pkCubeMap->m_kFilename);
+    NiImageConverter::ConvertFilenameToPlatformSpecific(pkCubeMap->m_kFilename, pkCubeMap->m_kPlatformFilename);
+    if (pkCubeMap->m_eFace) {
+        pkCubeMap->m_eFace = FACE_POS_X;
+    }
+    pkCubeMap->m_pFile = pkFile;
+    pkCubeMap->LoadPixelDataFromFile();
+    if (!pkRenderer || pkRenderer->CreateSourceCubeMapRendererData(pkCubeMap)) {
+        return pkCubeMap;
+    }
+    delete pkCubeMap;
+    return nullptr;
+}

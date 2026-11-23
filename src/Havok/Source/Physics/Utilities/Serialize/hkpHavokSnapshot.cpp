@@ -1,0 +1,212 @@
+#include "Havok/Source/Physics/Utilities/Serialize/hkpHavokSnapshot.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Object/hkBaseObject.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Reflection/Registry/hkClassNameRegistry.h"
+#include "Havok/Source/Common/Base/Reflection/hkClass.h"
+#include "Havok/Source/Common/Base/System/Io/Reader/hkStreamReader.h"
+#include "Havok/Source/Common/Base/System/Io/Writer/hkStreamWriter.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Base/Types/hkRefVariant.h"
+#include "Havok/Source/Common/Serialize/Resource/hkResource.h"
+#include "Havok/Source/Common/Serialize/Util/hkRootLevelContainer.h"
+#include "Havok/Source/Common/Serialize/Util/hkSerializeUtil.h"
+#include "Havok/Source/Common/Serialize/Util/hkStructureLayout.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/ExtendedMeshShape/hkpExtendedMeshShapeClass.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/StorageExtendedMesh/hkpStorageExtendedMeshShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/StorageExtendedMesh/hkpStorageExtendedMeshShapeClass.h"
+#include "Havok/Source/Physics/Collide/Shape/Deprecated/Mesh/hkpMeshShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Deprecated/StorageMesh/hkpStorageMeshShape.h"
+#include "Havok/Source/Physics/Collide/Shape/HeightField/SampledHeightField/hkpSampledHeightFieldShape.h"
+#include "Havok/Source/Physics/Collide/Shape/HeightField/StorageSampledHeightField/hkpStorageSampledHeightFieldShape.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
+#include "Havok/Source/Physics/Utilities/Serialize/hkpPhysicsData.h"
+
+// Deletes the objects addObjectCallback created; the array goes with its member.
+hkpHavokSnapshot::ConvertListener::~ConvertListener() {
+    for (hkReferencedObject* pObject : m_objects) {
+        if (pObject) {
+            delete pObject;
+        }
+    }
+}
+
+// A mesh becomes an hkpStorageMeshShape (and goes on to the next test), an extended mesh an
+// hkpStorageExtendedMeshShape, a user-type sampled heightfield an hkpStorageSampledHeightFieldShape, each new object
+// kept in m_objects; the world's fixed rigid body is dropped.
+void hkpHavokSnapshot::ConvertListener::addObjectCallback(const void*& p, const hkClass*& k) {
+    if (hkpMeshShapeClass.isSuperClass(*k).m_bool && k != &hkpStorageMeshShapeClass) {
+        const hkpMeshShape* mesh = static_cast<const hkpMeshShape*>(p);
+        hkpStorageMeshShape* pStorage = new hkpStorageMeshShape(mesh);
+        m_objects.pushBack(pStorage);
+        p = pStorage;
+        k = &hkpStorageMeshShapeClass;
+    }
+    if (hkpExtendedMeshShapeClass.isSuperClass(*k).m_bool && k != &hkpStorageExtendedMeshShapeClass) {
+        const hkpExtendedMeshShape* mesh = static_cast<const hkpExtendedMeshShape*>(p);
+        hkpStorageExtendedMeshShape* pStorage = new hkpStorageExtendedMeshShape(mesh);
+        m_objects.pushBack(pStorage);
+        p = pStorage;
+        k = &hkpStorageExtendedMeshShapeClass;
+        return;
+    }
+    if (hkpSampledHeightFieldShapeClass.isSuperClass(*k).m_bool) {
+        const hkpSampledHeightFieldShape* hf = static_cast<const hkpSampledHeightFieldShape*>(p);
+        if (hf->m_heightfieldType.m_storage == hkpSampledHeightFieldShape::HEIGHTFIELD_USER) {
+            hkpStorageSampledHeightFieldShape* pStorage = new hkpStorageSampledHeightFieldShape(hf);
+            m_objects.pushBack(pStorage);
+            p = pStorage;
+            k = &hkpStorageSampledHeightFieldShapeClass;
+        }
+        return;
+    }
+    if (hkpRigidBodyClass.isSuperClass(*k).m_bool) {
+        const hkpRigidBody* rb = static_cast<const hkpRigidBody*>(p);
+        if (rb->m_world && rb->m_world->m_fixedRigidBody == rb) {
+            p = nullptr;
+            k = nullptr;
+        }
+    }
+}
+
+// The world save: a physics data populated from the world, saved under the root level.
+hkBool hkpHavokSnapshot::save(
+    const hkpWorld* apWorld,
+    hkStreamWriter* apWriter,
+    hkBool abBinaryFormat,
+    const hkStructureLayout::LayoutRules* apTargetLayout,
+    int32_t abSaveContactPoints
+) {
+    if (!apWorld || !apWriter) {
+        return 0;
+    }
+    char cResult;
+    {
+        hkpPhysicsData kData;
+        kData.populateFromWorld(apWorld, abSaveContactPoints);
+        cResult = hkpHavokSnapshot::save(&kData, apWriter, abBinaryFormat, apTargetLayout).m_bool;
+    }
+    return cResult;
+}
+
+hkBool hkpHavokSnapshot::save(
+    const void* apData,
+    const hkClass& arDataClass,
+    hkStreamWriter* apWriter,
+    hkBool abBinaryFormat,
+    [[maybe_unused]] const hkStructureLayout::LayoutRules* apTargetLayout,
+    hkPackfileWriter::AddObjectListener* apUserListener
+) {
+    hkpHavokSnapshot::ConvertListener kDefaultConvertListener;
+    hkPackfileWriter::AddObjectListener* pListener = apUserListener;
+    if (!apUserListener) {
+        pListener = &kDefaultConvertListener;
+    }
+    // Tests the hkBool's byte and passes it on zero-extended.
+    hkBool result;
+    result
+        .m_bool = hkSerializeUtil::saveTagfile(apData, arDataClass, apWriter, abBinaryFormat.m_bool != 0, pListener) ==
+        HK_SUCCESS;
+    return result;
+}
+
+hkBool hkpHavokSnapshot::saveUnderRootLevel(
+    const void* apData,
+    const hkClass& arDataClass,
+    hkStreamWriter* apWriter,
+    hkBool abBinaryFormat,
+    const hkStructureLayout::LayoutRules* apTargetLayout
+) {
+    using NamedVariant = hkRootLevelContainer::NamedVariant;
+    hkRootLevelContainer kContainer;
+    hkArray<NamedVariant>& rVariants = kContainer.m_namedVariants;
+    rVariants.m_data = nullptr;
+    rVariants.m_size = 0;
+    rVariants.m_capacityAndFlags = hkArrayBase<NamedVariant>::DONT_DEALLOCATE_FLAG;
+    NamedVariant& rVariant = rVariants.expandOne();
+    rVariant.set(arDataClass.getName(), const_cast<void*>(apData), &arDataClass);
+    hkBool result = hkpHavokSnapshot::save(
+        &kContainer,
+        hkRootLevelContainerClass,
+        apWriter,
+        abBinaryFormat,
+        apTargetLayout,
+        nullptr
+    );
+    return result;
+}
+
+hkBool hkpHavokSnapshot::save(
+    const hkpPhysicsData* apData,
+    hkStreamWriter* apWriter,
+    hkBool abBinaryFormat,
+    const hkStructureLayout::LayoutRules* apTargetLayout
+) {
+    return hkpHavokSnapshot::saveUnderRootLevel(apData, hkpPhysicsDataClass, apWriter, abBinaryFormat, apTargetLayout);
+}
+
+// The physics data of a snapshot: the root container's first hkpPhysicsData, else the object named "SnapshotSave"
+// or "hkpPhysicsData". The resource goes to allocatedData only when one is found.
+hkpPhysicsData* hkpHavokSnapshot::load(hkStreamReader* reader, hkResource** allocatedData) {
+    if (!reader || !allocatedData) {
+        return nullptr;
+    }
+    hkResource* pResource = hkSerializeUtil::load(reader, nullptr, nullptr);
+    if (!pResource) {
+        return nullptr;
+    }
+    hkRootLevelContainer* pContainer = pResource->getContents<hkRootLevelContainer>();
+    if (!pContainer) {
+        return nullptr;
+    }
+    hkpPhysicsData* pData = static_cast<hkpPhysicsData*>(
+        pContainer->findObjectByType(hkpPhysicsDataClass.getName(), nullptr)
+    );
+    if (!pData) {
+        const char* apcNames[] = {"SnapshotSave", "hkpPhysicsData", nullptr};
+        int32_t i = 0;
+        const char* pcName = apcNames[0];
+        do {
+            pData = static_cast<hkpPhysicsData*>(pContainer->findObjectByName(pcName, nullptr));
+            if (pData) {
+                break;
+            }
+            pcName = apcNames[++i];
+        }
+        while (pcName);
+        if (!pData) {
+            return nullptr;
+        }
+    }
+    *allocatedData = pResource;
+    return pData;
+}
+
+hkRootLevelContainer::NamedVariant::NamedVariant(const char* name, void* object, const hkClass* klass)
+  : m_name(), m_className(), m_variant() {
+    m_name = name;
+    m_variant.set(object, klass);
+    m_className = m_variant.getClass() ? m_variant.getClass()->getName() : nullptr;
+}
+
+// Natively: NamedVariant(const char*, const hkVariant&) below.
+hkRootLevelContainer::NamedVariant::NamedVariant(const char* name, const hkVariant& v)
+  : m_name(), m_className(), m_variant(v.m_object, v.m_class) {
+    m_name = name;
+    m_className = m_variant.getClass() ? m_variant.getClass()->getName() : nullptr;
+}
+
+// m_variant stays as loaded.
+hkRootLevelContainer::NamedVariant::NamedVariant(hkFinishLoadedObjectFlag flag) : m_name(flag), m_className(flag) {}
+
+const hkClass& hkRootLevelContainer::NamedVariant::staticClass() {
+    return hkRootLevelContainerNamedVariantClass;
+}

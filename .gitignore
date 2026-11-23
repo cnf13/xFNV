@@ -1,0 +1,19 @@
+# inputs that are not ours to commit: the game, the exe, the IDA database and its exports. No trailing slash: an
+# agent worktree holds these three as symlinks to the main checkout's (harness/worktree.sh), and a rule ending in `/`
+# matches directories only, so `git add -A` there would commit the links; merging such a commit makes git delete the
+# main checkout's ignored directory to put the link in its place.
+/game
+/resources
+# the isolated runtime (Wine prefix, run tree, venv, tools, outputs) and builds
+/env
+/build/
+/build-*/
+__pycache__/
+
+.idea/
+.gitattributes
+.vscode/
+.omp/
+/WATCHDOG.yml
+/FOLLOWUPS.md
+/AGENTS.md

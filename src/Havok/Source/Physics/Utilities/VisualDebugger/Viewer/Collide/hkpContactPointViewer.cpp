@@ -1,0 +1,183 @@
+#include "Havok/Source/Physics/Utilities/VisualDebugger/Viewer/Collide/hkpContactPointViewer.h"
+
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
+#include "Havok/Source/Common/Visualize/hkDebugDisplayHandler.h"
+#include "Havok/Source/Common/Visualize/hkProcessContext.h"
+#include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnEntry.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnSector.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpAgentNnTrack.h"
+#include "Havok/Source/Physics/ConstraintSolver/Constraint/Contact/hkpContactPointProperties.h"
+#include "Havok/Source/Physics/Dynamics/Collide/hkpSimpleConstraintContactMgr.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/hkConstraintInternal.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
+#include "Havok/Source/Physics/Dynamics/World/Listener/hkpWorldPostSimulationListener.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpSimulationIsland.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
+#include "Havok/Source/Physics/Utilities/VisualDebugger/Viewer/Dynamics/hkpWorldViewerBase.h"
+#include "Havok/Source/Physics/Utilities/VisualDebugger/hkpPhysicsContext.h"
+
+static void displayArrow(
+    hkDebugDisplayHandler* handler,
+    const hkVector4& from,
+    int32_t color,
+    int32_t id,
+    int32_t tag,
+    const hkVector4& dir
+);
+
+// The arrow as hkDebugDisplay::displayArrow draws it but with one head plane: the line from from to from + dir, then
+// two head lines from that tip to the point 0.85 of the way along, offset by +-0.15 of dir's length along a unit
+// perpendicular. Both paths end the timer.
+static void displayArrow(
+    hkDebugDisplayHandler* handler,
+    const hkVector4& from,
+    int32_t color,
+    int32_t id,
+    int32_t tag,
+    const hkVector4& dir
+) {
+    HK_TIMER_BEGIN("hkContactPointViewer_displayArrow", nullptr);
+    const __m128 kDir = dir.m_quad;
+    const __m128 kDirSquares = _mm_mul_ps(kDir, kDir);
+    const __m128 kDirLengthSquared = _mm_add_ss(
+        _mm_shuffle_ps(kDirSquares, kDirSquares, 0xAA),
+        _mm_add_ss(_mm_shuffle_ps(kDirSquares, kDirSquares, 0x55), kDirSquares)
+    );
+    if (_mm_cvtss_f32(kDirLengthSquared) < HK_REAL_EPSILON) {
+        HK_TIMER_END();
+        return;
+    }
+
+    hkVector4 to;
+    to.m_quad = _mm_add_ps(from.m_quad, kDir);
+
+    hkVector4 ort;
+    hkVector4Util::calculatePerpendicularVector(dir, ort);
+
+    ort.normalize3();
+    ort.mul4(dir.length3());
+
+    hkVector4 kP;
+    kP.setInterpolate4(from, to, hkSimdReal(0.85f));
+
+    hkVector4 p1;
+    p1.setAddMul4(kP, ort, hkSimdReal(0.14999998f));
+    hkVector4 p2;
+    p2.setAddMul4(kP, ort, hkSimdReal(-0.14999998f));
+
+    handler->displayLine(from, to, color, id, tag);
+    handler->displayLine(to, p1, color, id, tag);
+    handler->displayLine(to, p2, color, id, tag);
+    HK_TIMER_END();
+}
+
+hkpContactPointViewer::hkpContactPointViewer(
+    const hkArray<hkProcessContext*, hkContainerHeapAllocator>& contexts,
+    int32_t color
+)
+  : hkpWorldViewerBase(contexts), hkpWorldPostSimulationListener(), m_limit(0.0f), m_color(color) {}
+
+// Removes the viewer from the context's worlds.
+hkpContactPointViewer::~hkpContactPointViewer() {
+    for (int32_t i = 0; m_context && i < m_context->m_worlds.m_size; ++i) {
+        hkpContactPointViewer::worldRemovedCallback(m_context->m_worlds.m_data[i]);
+    }
+}
+
+void hkpContactPointViewer::init() {
+    hkpPhysicsContext* m_context = this->m_context;
+    for (int32_t i = 0; m_context; ++i) {
+        if (i >= m_context->m_worlds.m_size) {
+            break;
+        }
+        worldAddedCallback(m_context->m_worlds.m_data[i]);
+        m_context = this->m_context;
+    }
+}
+
+// Draws the contact points of the islands the derived viewer picks. The timer name is deliberately the active viewer's.
+void hkpContactPointViewer::postSimulationCallback(hkpWorld* world) {
+    HK_TIMER_BEGIN("hkpActiveContactPointViewer::postSimulationCallback", this);
+    const hkArray<hkpSimulationIsland*>& islands = getIslands(world);
+    for (hkpSimulationIsland* island : islands) {
+        drawAllContactPointsInIsland(island);
+    }
+    HK_TIMER_END();
+}
+
+void hkpContactPointViewer::worldAddedCallback(hkpWorld* w) {
+    if (this == nullptr) {
+        w->addWorldPostSimulationListener(nullptr);
+    }
+    else {
+        w->addWorldPostSimulationListener(this);
+    }
+}
+
+void hkpContactPointViewer::worldRemovedCallback(hkpWorld* w) {
+    if (this == nullptr) {
+        w->removeWorldPostSimulationListener(nullptr);
+    }
+    else {
+        w->removeWorldPostSimulationListener(this);
+    }
+}
+
+void hkpContactPointViewer::drawAllContactPointsInIsland(const hkpSimulationIsland* island) {
+    HK_TIMER_BEGIN("hkpContactPointViewer::drawAllContactPointsInIsland", this);
+
+    // HK_FOR_ALL_AGENT_ENTRIES_BEGIN/END, written out: every entry of each sector, the last sector ending at the bytes
+    // it uses. A sector is an untyped byte buffer the entries are packed into, each entry's size stepping to the next,
+    // so its bytes are cast to the entry. The entry's address is compared with the end unsigned, wrap included, also
+    // before the first entry.
+    const hkpAgentNnTrack& track = island->m_agentTrack;
+    for (int32_t sectorIndex = 0; sectorIndex < track.m_sectors.m_size;) {
+        hkpAgentNnSector* sector = track.m_sectors.m_data[sectorIndex++];
+        hkpAgentNnEntry* entry = sector->getBegin();
+        const uintptr_t entryEnd = (sectorIndex == track.m_sectors.m_size)
+            ? reinterpret_cast<uintptr_t>(sector->m_data) + track.m_bytesUsedInLastSector
+            : reinterpret_cast<uintptr_t>(sector->m_data) + sizeof(hkpAgentNnSector);
+        for (; reinterpret_cast<uintptr_t>(entry) < entryEnd;
+             entry = reinterpret_cast<hkpAgentNnEntry*>(reinterpret_cast<uint8_t*>(entry) + entry->m_size)) {
+            hkpDynamicsContactMgr* manager = static_cast<hkpDynamicsContactMgr*>(entry->m_contactMgr);
+            if (manager->getType() != hkpContactMgr::TYPE_SIMPLE_CONSTRAINT_CONTACT_MGR) {
+                continue;
+            }
+
+            // The SDK's hkLocalArray<hkContactPointId> contactPoints(HK_MAX_CONTACT_POINT).
+            hkLocalArray<uint16_t> contactPoints(256);
+            manager->getAllContactPointIds(contactPoints);
+
+            for (uint16_t contactPointId : contactPoints) {
+                hkContactPoint* cp = manager->getContactPoint(contactPointId);
+                hkpContactPointProperties* properties = manager->getContactPointProperties(contactPointId);
+                // Drawn unless below the limit: an unordered compare draws too.
+                if (!(m_limit > properties->m_impulseApplied)) {
+                    const hkpEntity* masterEntity = static_cast<hkpSimpleConstraintContactMgr*>(manager)
+                                                        ->m_constraint.getMasterEntity();
+                    // The id is an int display id: the low 32 bits of the collidable's address.
+                    const int32_t id = static_cast<int32_t>(reinterpret_cast<hkUlong>(masterEntity->getCollidable()));
+                    displayArrow(
+                        m_displayHandler,
+                        cp->m_position,
+                        m_color,
+                        id,
+                        getProcessTag(),
+                        cp->m_separatingNormal
+                    );
+                }
+            }
+        }
+    }
+
+    HK_TIMER_END();
+}

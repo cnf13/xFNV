@@ -1,0 +1,354 @@
+#include "BSHavok/bhkRigidBodyT.h"
+
+#include "BSCore/BSSimpleList.h"
+#include "BSCore/MemoryManager.h"
+#include "BSHavok/bhkConstraint.h"
+#include "BSHavok/bhkConvert.h"
+#include "BSHavok/bhkEntity.h"
+#include "BSHavok/bhkRefObject.h"
+#include "BSHavok/bhkRigidBody.h"
+#include "BSHavok/bhkRigidBodyCinfo.h"
+#include "BSHavok/bhkSerializable.h"
+#include "BSHavok/bhkShape.h"
+#include "BSHavok/bhkWorldObject.h"
+#include "BSMain/BSCloningProcess.h"
+#include "Fallout Shared/TES.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
+#include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
+#include "Havok/Source/Physics/Collide/Agent3/Machine/Nn/hkpLinkedCollidable.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "xfnv/Compiler.h"
+
+#include <xmmintrin.h>
+
+NiRTTI bhkRigidBodyT::ms_RTTI("bhkRigidBodyT", &bhkRigidBody::ms_RTTI);
+
+bhkRigidBodyT::bhkRigidBodyT() {
+    iFlags = 0;
+    ++iCount;
+}
+
+// Takes over apBody's Havok body, keeping its shape's wrapper referenced while it moves.
+bhkRigidBodyT::bhkRigidBodyT(bhkRigidBody* apBody) {
+    ++iCount;
+    hkpRigidBody* prb = static_cast<hkpRigidBody*>(apBody->phkObject);
+    prb->addReference();
+    hkpRigidBody* phkBody = static_cast<hkpRigidBody*>(apBody->phkObject);
+    const hkpShape* pShape;
+    bhkShape* pUserData = nullptr;
+    if (phkBody && (pShape = phkBody->m_collidable.m_shape) != nullptr) {
+        pUserData = pShape->m_userData;
+        if (pUserData) {
+            NiIncRefCount(pUserData);
+        }
+    }
+    apBody->SethkObject(nullptr);
+    bhkSerializable::SethkObject(prb);
+    NiDecRefCount(pUserData);
+    prb->removeReference();
+}
+
+bhkRigidBodyT::~bhkRigidBodyT() {
+    bhkRigidBody::Kill();
+    --iCount;
+}
+
+// Charges the thread's allocations to Havok's heap context, holds the clone critical section, switches the Havok
+// assertions off around the copy and builds the clone the way CreateObject does.
+NiObject* bhkRigidBodyT::CreateClone(NiCloningProcess& arCloneData) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bhkSerializable::CloneCritLock();
+    SetHavokAssertState(false);
+    bhkRigidBodyT* pClone = new bhkRigidBodyT;
+    CopyMembers(pClone, arCloneData);
+    SetHavokAssertState(true);
+    bhkSerializable::CloneCritUnlock();
+    return pClone;
+}
+
+void bhkRigidBodyT::LoadBinary(NiStream& arStream) {
+    NiStream* pStream = &arStream;
+    bhkRigidBody::LoadBinary(*pStream);
+    bool bCreated;
+    CreateCinfo(bCreated);
+}
+
+// Writes the body's local offset into the creation info's position and rotation, saves through the base class and then
+// drops the info. CreateCinfo and KillCinfo are virtual calls.
+void bhkRigidBodyT::SaveBinary(NiStream& arStream) {
+    bool bCreated;
+    bhkRigidBodyCinfo* pCinfo = &static_cast<bhkRigidBodyCinfo&>(CreateCinfo(bCreated));
+    pCinfo->hk.m_position = kLocalPos;
+    pCinfo->hk.m_rotation.m_vec = kLocalRot.m_vec;
+    bhkRigidBody::SaveBinary(arStream);
+    KillCinfo(bCreated);
+}
+
+void bhkRigidBodyT::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
+    NiPoint3 pos;
+    NiQuaternion rot;
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    bhkRigidBody::GetViewerStrings(apStrings);
+    char* ViewerString = NiGetViewerString(bhkRigidBodyT::ms_RTTI.GetName());
+    uint32_t m_usSize = apStrings->m_usSize;
+    uint32_t m_usMaxSize = apStrings->m_usMaxSize;
+    char* v19 = ViewerString;
+    if (m_usSize >= m_usMaxSize) {
+        apStrings->SetSize(m_usSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(m_usSize, v19);
+    rot.m_fX = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 0);
+    rot.m_fY = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 1);
+    rot.m_fZ = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 2);
+    rot.m_fW = XFNV_M128_F32(kLocalRot.m_vec.m_quad, 3);
+    HK2NI(pos, kLocalPos);
+    char* v9 = rot.GetViewerString("Local Rot");
+    uint32_t v10 = apStrings->m_usSize;
+    uint32_t v11 = apStrings->m_usMaxSize;
+    v19 = v9;
+    if (v10 >= v11) {
+        apStrings->SetSize(v10 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v10, v19);
+    char* v12 = pos.GetViewerString("Local Pos");
+    uint32_t v13 = apStrings->m_usSize;
+    uint32_t v14 = apStrings->m_usMaxSize;
+    v19 = v12;
+    if (v13 >= v14) {
+        apStrings->SetSize(v13 + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(v13, v19);
+}
+
+// Takes the local offset from the creation info, resets the info's position and rotation to zero and identity, moves
+// the body there through the base class and finishes through bhkSerializable. The info is written through a const_cast
+// of its const reference.
+void bhkRigidBodyT::PostInit(const hkSerializableCinfo& arInfo) {
+    const bhkRigidBodyCinfo& rCinfo = static_cast<const bhkRigidBodyCinfo&>(arInfo);
+    bhkRigidBodyCinfo& rTempCinfo = const_cast<bhkRigidBodyCinfo&>(rCinfo);
+    kLocalPos = rCinfo.hk.m_position;
+    kLocalRot = rCinfo.hk.m_rotation;
+    rTempCinfo.hk.m_position = hkVector4::getZero();
+    rTempCinfo.hk.m_rotation.setIdentity();
+    bhkRigidBody::SetPosition(rTempCinfo.hk.m_position);
+    bhkRigidBody::SetRotation(rTempCinfo.hk.m_rotation);
+    bhkSerializable::PostInit(arInfo);
+}
+
+// The display geometry goes under a node named after the class: apNode itself when it has no name, else a new node
+// attached to it and updated at time 0, or a new parentless node without apNode. The node is placed at the local offset
+// converted to game units, then the base builds the geometry.
+NiAVObject* bhkRigidBodyT::CreateDisplayGeometry(NiNode* apNode) {
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    NiNode* pNode = nullptr;
+    if (apNode) {
+        if (!apNode->m_kName.GetHandle()) {
+            pNode = apNode;
+        }
+        else {
+            pNode = new NiNode(0);
+            apNode->AttachChild(pNode, true);
+            NiUpdateData kUpdateData;
+            kUpdateData.fTime = 0.0f;
+            kUpdateData.bUpdateControllers = false;
+            kUpdateData.bParallelUpdate = false;
+            kUpdateData.bFoundParticles = false;
+            kUpdateData.bFoundMorphController = false;
+            kUpdateData.bSceneGraphChange = false;
+            pNode->Update(kUpdateData);
+        }
+    }
+    else {
+        pNode = new NiNode(0);
+    }
+    pNode->SetName(NiFixedString("bhkRigidBodyT"));
+    hkRotation kRotation;
+    kRotation.set(kLocalRot);
+    hkVector4 kPosition;
+    kPosition.m_quad = kLocalPos.m_quad;
+    NiMatrix3 kNiRotation;
+    HK2NI(kNiRotation, kRotation);
+    alignas(16) NiPoint3 kNiPosition;
+    HK2NI(kNiPosition, kPosition);
+    pNode->m_kLocal.m_Rotate = kNiRotation;
+    pNode->m_kLocal.m_Translate = kNiPosition;
+    NiAVObject* pResult = bhkRigidBody::CreateDisplayGeometry(pNode);
+    return pResult;
+}
+
+hkVector4& bhkRigidBodyT::GetPosition(hkVector4& arPos) {
+    if (this && phkObject) {
+        hkQuaternion hkq;
+        GetRotation(hkq);
+        __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
+        __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
+        XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v4, 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0));
+        __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
+        __m128 v8 = _mm_add_ps(
+            _mm_mul_ps(
+                _mm_sub_ps(
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 210),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 201)
+                    ),
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 201),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 210)
+                    )
+                ),
+                v5
+            ),
+            _mm_add_ps(
+                _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v5, v5), hkQuadRealMinusHalf), kLocalPos.m_quad),
+                _mm_mul_ps(_mm_shuffle_ps(v4, v4, 0), hkq.m_vec.m_quad)
+            )
+        );
+        bhkRigidBody::GetPosition(arPos);
+        arPos.m_quad = _mm_sub_ps(arPos.m_quad, _mm_add_ps(v8, v8));
+        return arPos;
+    }
+
+    arPos.m_quad = hkVector4Zero.m_quad;
+    return arPos;
+}
+
+hkQuaternion& bhkRigidBodyT::GetRotation(hkQuaternion& arRot) {
+    hkQuaternion hkr;
+    bhkRigidBody::GetRotation(hkr);
+    arRot.setMulInverse(hkr, kLocalRot);
+    return arRot;
+}
+
+void bhkRigidBodyT::SetPosition(const hkVector4& arPos) {
+    if ((this) && phkObject) {
+        hkQuaternion hkq;
+        hkVector4 hkp;
+        GetRotation(hkq);
+        __m128 v3 = _mm_mul_ps(kLocalPos.m_quad, hkq.m_vec.m_quad);
+        __m128 v4 = _mm_shuffle_ps(v3, v3, 170);
+        XFNV_M128_F32(v4, 0) = XFNV_M128_F32(v4, 0) +
+            (XFNV_M128_F32(_mm_shuffle_ps(v3, v3, 85), 0) + XFNV_M128_F32(v3, 0));
+        __m128 v5 = _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 255);
+        __m128 v6 = _mm_add_ps(
+            _mm_mul_ps(
+                _mm_sub_ps(
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 210),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 201)
+                    ),
+                    _mm_mul_ps(
+                        _mm_shuffle_ps(kLocalPos.m_quad, kLocalPos.m_quad, 201),
+                        _mm_shuffle_ps(hkq.m_vec.m_quad, hkq.m_vec.m_quad, 210)
+                    )
+                ),
+                v5
+            ),
+            _mm_add_ps(
+                _mm_mul_ps(_mm_add_ps(_mm_mul_ps(v5, v5), hkQuadRealMinusHalf), kLocalPos.m_quad),
+                _mm_mul_ps(_mm_shuffle_ps(v4, v4, 0), hkq.m_vec.m_quad)
+            )
+        );
+        hkp.m_quad = _mm_add_ps(_mm_add_ps(v6, v6), arPos.m_quad);
+        bhkRigidBody::SetPosition(hkp);
+    }
+}
+
+// Sets the Havok body's rotation to arRot times the local rotation.
+void bhkRigidBodyT::SetRotation(const hkQuaternion& arRot) {
+    hkQuaternion hkq;
+    hkq.setMul(arRot, kLocalRot);
+    bhkRigidBody::SetRotation(hkq);
+}
+
+// Sets the Havok body's position to arPos plus the local translation rotated by arRot, and its rotation to arRot times
+// the local rotation, normalized.
+void bhkRigidBodyT::SetPosRot(const hkVector4& arPos, const hkQuaternion& arRot) {
+    hkQuaternion hkq;
+    hkVector4 hkp;
+    hkp.setRotatedDir(arRot, kLocalPos);
+    hkp.add4(arPos);
+    hkq.setMul(arRot, kLocalRot);
+    hkq.normalize();
+    bhkRigidBody::SetPosRot(hkp, hkq);
+}
+
+// The base body's center of mass, moved back out of the body frame by the local position rotated into it.
+hkVector4& bhkRigidBodyT::GetCenterOfMassInWorld(hkVector4& arCOM) {
+    bhkRigidBody::GetCenterOfMassInWorld(arCOM);
+    if (this) {
+        hkpRigidBody* pBody = static_cast<hkpRigidBody*>(phkObject);
+        if (pBody) {
+            hkVector4 kOffset;
+            kOffset.setMul3(pBody->m_motion.m_motionState.m_transform.m_rotation, kLocalPos);
+            XFNV_M128_F32(arCOM.m_quad, 0) = XFNV_M128_F32(arCOM.m_quad, 0) - XFNV_M128_F32(kOffset.m_quad, 0);
+            XFNV_M128_F32(arCOM.m_quad, 1) = XFNV_M128_F32(arCOM.m_quad, 1) - XFNV_M128_F32(kOffset.m_quad, 1);
+            XFNV_M128_F32(arCOM.m_quad, 2) = XFNV_M128_F32(arCOM.m_quad, 2) - XFNV_M128_F32(kOffset.m_quad, 2);
+            XFNV_M128_F32(arCOM.m_quad, 3) = XFNV_M128_F32(arCOM.m_quad, 3) - XFNV_M128_F32(kOffset.m_quad, 3);
+        }
+    }
+    return arCOM;
+}
+
+hkTransform& bhkRigidBodyT::GetTransform(hkTransform& arTrans) {
+    hkQuaternion hkrot;
+    GetPosition(arTrans.m_translation);
+    GetRotation(hkrot);
+    arTrans.m_rotation.set(hkrot);
+    return arTrans;
+}
+
+// Copies the local rotation and translation into the creation info, scales the translation by the clone's scale when it
+// is not 1, then copies through the base class. The clone process is always a BSCloningProcess here; its Scale.x is
+// compared with 1.0.
+void bhkRigidBodyT::CopyMembers(bhkSerializable* pDest, NiCloningProcess& arCloneData) {
+    bool bCreated;
+    bhkRigidBodyCinfo& rCinfo = static_cast<bhkRigidBodyCinfo&>(CreateCinfo(bCreated));
+    rCinfo.hk.m_rotation = kLocalRot;
+    rCinfo.hk.m_position = kLocalPos;
+    float fScale = static_cast<BSCloningProcess&>(arCloneData).Scale.x;
+    if (1.0f != fScale) {
+        __m128 kScale = _mm_set_ss(fScale);
+        rCinfo.hk.m_position.m_quad = _mm_mul_ps(_mm_shuffle_ps(kScale, kScale, 0), rCinfo.hk.m_position.m_quad);
+    }
+    bhkRigidBody::CopyMembers(pDest, arCloneData);
+}
+
+const hkVector4& bhkRigidBodyT::GetLocalPos() {
+    return kLocalPos;
+}
+
+const hkQuaternion& bhkRigidBodyT::GetLocalRot() {
+    return kLocalRot;
+}
+
+NiObject* bhkRigidBodyT::CreateObject() {
+    return new bhkRigidBodyT;
+}
+
+void* bhkRigidBodyT::operator new(size_t aSize) {
+    return MemoryManager::Instance().Allocate(aSize);
+}
+
+void bhkRigidBodyT::operator delete(void* apMemory) {
+    if (apMemory) {
+        MemoryManager::Instance().Deallocate(apMemory);
+    }
+}

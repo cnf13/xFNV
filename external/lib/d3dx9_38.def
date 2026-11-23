@@ -1,0 +1,27 @@
+LIBRARY d3dx9_38.dll
+EXPORTS
+D3DXAssembleShader@28
+D3DXAssembleShaderFromFileA@24
+D3DXCompileShader@40
+D3DXCompileShaderFromFileA@36
+D3DXCreateBuffer@8
+D3DXCreateCubeTextureFromFileInMemory@16
+D3DXCreateTextureFromFileInMemory@16
+D3DXCreateVolumeTextureFromFileInMemory@16
+D3DXGetImageInfoFromFileInMemory@12
+D3DXGetPixelShaderProfile@4
+D3DXGetShaderConstantTable@8
+D3DXGetVertexShaderProfile@4
+D3DXLoadSurfaceFromSurface@32
+D3DXMatrixInverse@12
+D3DXMatrixMultiply@12
+D3DXMatrixMultiplyTranspose@12
+D3DXMatrixRotationYawPitchRoll@16
+D3DXMatrixTranspose@8
+D3DXPlaneNormalize@8
+D3DXPlaneTransform@12
+D3DXSaveTextureToFileA@16
+D3DXVec3Normalize@8
+D3DXVec3TransformCoord@12
+D3DXVec3TransformNormal@12
+D3DXVec4Transform@12

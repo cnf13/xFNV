@@ -1,0 +1,99 @@
+#include "Havok/Source/Physics/Utilities/Dynamics/SaveContactPoints/hkpPhysicsSystemWithContacts.h"
+
+#include "BSCore/RTTI.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
+#include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
+#include "Havok/Source/Common/Base/Reflection/hkClass.h"
+#include "Havok/Source/Common/Base/Reflection/hkClassMember.h"
+#include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Physics/Dynamics/Action/hkpAction.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpPhysicsSystem.h"
+#include "Havok/Source/Physics/Utilities/Dynamics/SaveContactPoints/hkpSerializedAgentNnEntry.h"
+#include "Havok/Source/Physics/Utilities/Dynamics/SaveContactPoints/hkpSerializedAgentNnEntryClass.h"
+
+static void cleanupLoadedObjecthkpPhysicsSystemWithContacts(void* p);
+
+// The member table of hkpPhysicsSystemWithContacts's class record, as the Havok SDK's class file has it.
+using hkpPhysicsSystemWithContactsClass_MembersArray = const hkClassMember[1];
+static hkpPhysicsSystemWithContactsClass_MembersArray hkpPhysicsSystemWithContactsClass_Members{
+    {"contacts",
+     &hkpSerializedAgentNnEntryClass,
+     nullptr,
+     {hkClassMember::TYPE_ARRAY},
+     {hkClassMember::TYPE_POINTER},
+     0,
+     {0},
+     0x44,
+     nullptr}
+};
+hkClass hkpPhysicsSystemWithContactsClass(
+    "hkpPhysicsSystemWithContacts",
+    &hkpPhysicsSystemClass,
+    80,
+    nullptr,
+    0,
+    nullptr,
+    0,
+    hkpPhysicsSystemWithContactsClass_Members,
+    1,
+    nullptr,
+    nullptr,
+    0,
+    0
+);
+hkTypeInfo hkpPhysicsSystemWithContactsTypeInfo = {
+    "hkpPhysicsSystemWithContacts",
+    finishLoadedObjecthkpPhysicsSystemWithContacts,
+    cleanupLoadedObjecthkpPhysicsSystemWithContacts,
+    getVtablehkpPhysicsSystemWithContacts(),
+    &typeid(hkpPhysicsSystemWithContacts),
+    sizeof(hkpPhysicsSystemWithContacts)
+};
+
+static void cleanupLoadedObjecthkpPhysicsSystemWithContacts(void* p) {
+    static_cast<hkpPhysicsSystemWithContacts*>(p)->~hkpPhysicsSystemWithContacts();
+}
+
+// Each saved contact loses its reference; the array's storage goes with m_contacts.
+hkpPhysicsSystemWithContacts::~hkpPhysicsSystemWithContacts() {
+    for (hkpSerializedAgentNnEntry* pContact : m_contacts) {
+        pContact->removeReference();
+    }
+}
+
+hkpPhysicsSystem* hkpPhysicsSystemWithContacts::clone() const {
+    return nullptr;
+}
+
+void hkpPhysicsSystemWithContacts::addContact(hkpSerializedAgentNnEntry* c) {
+    if (c) {
+        c->addReference();
+        m_contacts.pushBack(c);
+    }
+}
+
+void hkpPhysicsSystemWithContacts::removeContact(int32_t i) {
+    m_contacts.m_data[i]->removeReference();
+    uint32_t result = --m_contacts.m_size;
+    if (result != static_cast<uint32_t>(i)) {
+        m_contacts.m_data[i] = m_contacts.m_data[result];
+    }
+}
+
+// The base copy, then m_contacts copied as plain pointers (no references added).
+void hkpPhysicsSystemWithContacts::copy(const hkpPhysicsSystemWithContacts& toCopy) {
+    hkpPhysicsSystem::copy(toCopy);
+    m_contacts = toCopy.m_contacts;
+}
+
+const hkClass& hkpPhysicsSystemWithContacts::staticClass() {
+    return hkpPhysicsSystemWithContactsClass;
+}
