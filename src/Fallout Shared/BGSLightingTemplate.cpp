@@ -1,6 +1,6 @@
 #include "Fallout Shared/BGSLightingTemplate.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
@@ -108,14 +108,14 @@ float BGSLightingTemplate::GetDataFogPower() {
 // Swaps every 4-byte field of a record read from a big-endian file, in field order; the interior offset is left
 // alone.
 void INTERIOR_DATA::Endian() {
-    ENDIAN(iAmbient, false);
-    ENDIAN(iDirectional, false);
-    ENDIAN(iFog, false);
-    ENDIAN(fFogNear, false);
-    ENDIAN(fFogFar, false);
-    ENDIAN(iDirectionalXY, false);
-    ENDIAN(iDirectionalZ, false);
-    ENDIAN(fDirectionalFade, false);
-    ENDIAN(fClipDist, false);
-    ENDIAN(fFogPower, false);
+    BSEndian(iAmbient, false);
+    BSEndian(iDirectional, false);
+    BSEndian(iFog, false);
+    BSEndian(fFogNear, false);
+    BSEndian(fFogFar, false);
+    BSEndian(iDirectionalXY, false);
+    BSEndian(iDirectionalZ, false);
+    BSEndian(fDirectionalFade, false);
+    BSEndian(fClipDist, false);
+    BSEndian(fFogPower, false);
 }

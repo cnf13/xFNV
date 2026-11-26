@@ -3,6 +3,7 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSpinLock.h"
 #include "BSMain/Setting.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
@@ -17,6 +18,7 @@ class InterfaceManager;
 class Menu;
 class MobileObject;
 class Model;
+class NiCamera;
 class NiNode;
 class TESModel;
 class TESObjectREFR;
@@ -28,11 +30,13 @@ class TileMenu;
 
 enum RaceSexMenuContext : int32_t;
 
-char GetIsMapMenuFogOfWar();
 int32_t BSMAX_2(int32_t aiA, char acB);
 void ModalMessageMenuCallback();
-// Passes abFogOfWar on to SetMapMenuFogOfWar when the interface manager is up and online.
-void ToggleMapFogOfWar(bool abFogOfWar);
+// The 4:3 per-screen aspect ratio the Eyefinity frustum uses. Typed double so callers round the result into their
+// float local, rather than assume a float return is already rounded.
+double GetEyefinityScreenAspect();
+// Scales the camera's frustum for Eyefinity displays.
+void HandleEyeFinityFOVScale(NiCamera* apCamera, float afScale);
 
 // The interface layer's global entry points: every menu, the console and the pip-boy hang off the one
 // InterfaceManager. Everything here is static; the class carries only static state of its own.
@@ -237,9 +241,9 @@ public:
     // The inventory menu's page number.
     static char GetInventoryPageNumber();
     // The pip-boy tab last shown, -1 before the interface's first init; the result is
-    // InterfaceManager::GetLastPipboyTab's.
-    static int32_t GetLastPipboyTab();
-    // The container menu's mode: GetContainerMenuMode's result.
+    // InterfaceManager::GetCurrentMainMenu's.
+    static int32_t GetCurrentMainMenu();
+    // The container menu's mode: ContainerMenu::GetContainerMode's result.
     static uint32_t GetContainerMode();
     static void ForceReload();
     static void UpdateActorValue(ActorValue::Index aeWhich);
@@ -490,7 +494,7 @@ public:
     // The debug text overlay and the console.
     static bool IsDebugTextVisible();
     static bool IsConsoleVisible();
-    static TESObjectREFR* GetConsoleSelection();
+    static TESObjectREFR* GetPickREFR();
 
     // The tile the crosshair is over, and the reference the interface last activated.
     static Tile* GetCursorTile();
@@ -607,6 +611,38 @@ public:
     static char GetMagicPageNumber();
     static char GetMapPageNumber();
     static void SetSurgeryCursorPos(int32_t aiXPos, int32_t aiYPos);
+    // Opens the level up menu once the interface manager exists and has been initialised.
+    static void CreateLevelUpMenu();
+    // Opens the character generation menu once the interface manager exists and has been initialised (Instance is
+    // called twice).
+    static void
+    CreateCharGenMenu(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAddValues, bool abShowTaggedSkills);
+    // Flips the full-help flag on the interface singleton when the menus are shown.
+    static void ToggleFullHelp();
+    // Whether the full help is on and the menus are shown.
+    static bool GetFullHelp();
+    static TESObjectREFR* GetTelekinesisREFR();
+    // Calls HUDMainMenu::SetTargetType(apRef, false) once the player has 3D.
+    static void SetCrosshairTargetType(TESObjectREFR* apRef);
+    static bool GetFogOfWarEnabled();
+    // Passes abFogOfWar on to MapMenu::SetFogOfWar when the interface manager is up and online.
+    static void SetFogOfWarEnabled(bool abFogOfWar);
+    // Opens the barter menu for apRef when the menus are shown.
+    static void CreateBarterMenu(TESObjectREFR* apRef, int32_t aiMode);
+    // The reference the open dialogue menu talks to, or null without one.
+    static TESObjectREFR* InDialogWith();
+    static bool UpdateSleeping();
+    // Opens the lock pick menu when the menus are shown. The script commands pass null as the first argument.
+    static void CreateLockPickMenu(TESObjectREFR* apRef, int32_t aiLockLevel, bool abFlag);
+    // Reverts the interface manager and closes the menus.
+    static void Revert(BGSLoadGameBuffer* apLoadGameBuffer);
+    // True when the menu's tiles scale by the resolution ratio: its tile menu's id is &pipboymenu; (0x70) or its
+    // class is &RaceSexMenu; (0x40C), &HackingMenu; (0x41F) or &ComputersMenu; (0x421). False without a tile menu.
+    static bool IsRenderedMenu(Menu* apMenu);
+    // Fills the item data tile apTile (its last 13 children are the stat rows) with apItem's stats; also used by the
+    // barter and container menus.
+    static void PopulateItemStatsDisplay(ItemChange* apItem, Tile* apTile);
+    static bool IsPipboyClosed();
     static NiNode* GetDebugTextRoot();
     static void ReleaseModelFile(const char* apFilename);
     static void DrawSurgeryMenu3D();
@@ -618,7 +654,7 @@ public:
     static void Free();
     static void CreateRecipeMenu(TESObjectREFR* apVendor, TESForm* pCategory);
     static InterfaceManager*
-    SetQueuedPipboyTab(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, int32_t aiMenuToSet);
+    SetPipboyPickResults(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, int32_t aiMenuToSet);
     static void MessageMenuYesToAll();
     static TESObjectREFR* GetActivateREFR();
     static void CloseSleepMenu();
@@ -626,7 +662,7 @@ public:
     // Closes every support menu by removing its tile from the menus root. Every caller
     // pushes abExceptSubtitleMenu (0); the PC body never reads it.
     static void CloseAllSupportMenus(bool abExceptSubtitleMenu);
-    static void SaveGameTES();
+    static void SaveGame();
     static bool ContainerIsRecipe();
     static bool ContainerIsBarter();
     static void SetDragDroppingState(int32_t abSetTo);

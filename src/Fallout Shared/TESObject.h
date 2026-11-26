@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
+#include "BSMain/NiShortPoint3.h"
 #include "Fallout Shared/TESForm.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
@@ -12,31 +14,6 @@ class TESBoundObject;
 class TESObjectCELL;
 class TESObjectList;
 class TESWaterForm;
-
-// A short integer 3-vector, used for object bounds.
-struct NiNPShortPoint3 {
-    // The BOUND_DATA constructor leaves the points unset; a user constructor removes the implicit default.
-    NiNPShortPoint3() = default;
-    // Callers pass whole ints, and the constructor reads only their low words.
-    NiNPShortPoint3(int32_t aiX, int32_t aiY, int32_t aiZ);
-
-    float GetFloatX() const;
-    float GetFloatY() const;
-    float GetFloatZ() const;
-    float Length() const;
-    // Acts as binary operator-, kept as a named member so that callers get the returned result pointer. Writes the
-    // component-wise difference this - arPoint to apResult and returns apResult.
-    NiNPShortPoint3* CalculateRelativeBounds(NiNPShortPoint3* apResult, const NiNPShortPoint3& arPoint) const;
-    NiNPShortPoint3& operator=(const NiNPShortPoint3& arPt);
-
-    static const NiNPShortPoint3& GetZERO();
-
-    int16_t x;
-    int16_t y;
-    int16_t z;
-
-    static NiNPShortPoint3 ZERO;
-};
 
 // A form that lives in an object list (the base of everything placeable).
 class TESObject : public TESForm {
@@ -200,11 +177,6 @@ public:
     TESObjectCELL* pOwner;
 };
 
-inline NiNPShortPoint3 NiNPShortPoint3::ZERO{};
-
 // The number of scaled models TESBoundObject::Clone3D added to the model loader.
 inline int32_t iNumScaledModelsAdded;
 inline int32_t iNumScaledModelsCloned;
-
-// The guard of NiNPShortPoint3::GetZERO's function-local static ZERO.
-inline int32_t ZERO_guard;

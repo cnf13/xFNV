@@ -61,3 +61,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline const NiPoint3& BSMultiBoundAABB::QCenter() const {
+    return Center;
+}

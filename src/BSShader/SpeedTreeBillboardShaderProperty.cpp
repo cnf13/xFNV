@@ -2,7 +2,7 @@
 
 #include "BSShader/BSShaderPPLightingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 

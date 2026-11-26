@@ -4,8 +4,9 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSTextureData.h"
+#include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSBatchRenderer.h"
 #include "BSShader/BSDistantTreeShaderProperty.h"
 #include "BSShader/BSFadeNode.h"
@@ -60,11 +61,6 @@
 #include "BSSystem/BSFile.h"
 #include "BSSystem/FileFinder.h"
 #include "Fallout Shared/GlobalFunc.h"
-#include "Fallout Shared/Renderer.h"
-#include "Fallout Shared/TESDataHandler.h"
-#include "Fallout Shared/eBool.h"
-#include "Fallout/Interface/Interface.h"
-#include "Fallout/Misc/Calendar.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DRenderState.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9RenderState.h"
@@ -77,7 +73,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRect.h"
@@ -89,6 +84,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"
 
@@ -96,8 +92,8 @@
 
 // The game settings this file defines, with their IDs and default values, in the game's initialization order.
 SettingT<INISettingCollection> bDo30VFog("bDo30VFog:Display", true);
-SettingT<INISettingCollection> gs_bImageSpaceEffects_Display("bImageSpaceEffects:Display", true);
-SettingT<RendererSettingCollection> gs_iMaxAnisotropy_Display("iMaxAnisotropy:Display", 8);
+SettingT<INISettingCollection> bImageSpace("bImageSpaceEffects:Display", true);
+SettingT<RendererSettingCollection> iMaxAnisotropy("iMaxAnisotropy:Display", 8);
 SettingT<INISettingCollection> bDoTestHDR("bDoTestHDR:Display", false);
 BSShaderManager BSShaderManager::Instance;
 NiPointer<NiDX9Renderer> BSShaderManager::pRenderer;
@@ -306,7 +302,7 @@ void BSShaderManager::Initialize() {
         BSBatchRenderer::uiLastPass = 0;
         MTRenderingSystem::Instance.CreateThreads();
         BSRenderState::Setup();
-        NiRenderer::iMaxAnisotropy = gs_iMaxAnisotropy_Display.uValue.i;
+        NiRenderer::iMaxAnisotropy = iMaxAnisotropy.uValue.i;
         spShadowAccumulators = new NiPointer<BSShaderAccumulator>[iMaxShadowMapAccumulators];
         for (uint32_t i = 0; i < iMaxShadowMapAccumulators; ++i) {
             BSShaderAccumulator* pAccumulator = new BSShaderAccumulator(99, 1, 759);
@@ -946,11 +942,11 @@ void BSShaderManager::SetShaderVersion(
 
     if (BSShaderManager::b30VFog && (BSShaderManager::b30Shaders && bDo30VFog.uValue.b)) {
         BSShaderManager::b30VFog = true;
-        BSShaderManager::bImageSpaceEffects = gs_bImageSpaceEffects_Display.uValue.b;
+        BSShaderManager::bImageSpaceEffects = bImageSpace.uValue.b;
     }
     else {
         BSShaderManager::b30VFog = false;
-        BSShaderManager::bImageSpaceEffects = gs_bImageSpaceEffects_Display.uValue.b;
+        BSShaderManager::bImageSpaceEffects = bImageSpace.uValue.b;
     }
 }
 
@@ -4848,34 +4844,6 @@ void BSShaderManager::SetIsLiteBrite(bool abLiteBrite) {
     BSShaderManager::bLiteBrite = abLiteBrite;
 }
 
-double BSShaderManager::CalculateTime(int32_t iDelta) {
-    switch (iDelta) {
-        case 3: {
-            return appTimer.GetSeconds();
-        }
-        case 2: {
-            if (Interface::IsInMenuMode()) {
-                return 0.0;
-            }
-
-            return static_cast<float>(appTimer.BSTimer::GetTime() / 1000.0);
-        }
-        case 1: {
-            if (!Interface::IsInMenuMode()) {
-                return appTimer.GetSeconds();
-            }
-            return 0.0;
-        }
-        default: {
-            if (iDelta) {
-                return 0.0;
-            }
-
-            return static_cast<float>((appCalendar.GetHour() * 60.0) * 60.0);
-        }
-    }
-}
-
 NiTexture* BSShaderManager::GetSceneDepthTexture() {
     return BSShaderManager::pImageSpaceManager->DepthTexture.GetTexture();
 }
@@ -4931,7 +4899,7 @@ BSShaderAccumulator* BSShaderManager::GetNextAvailableShadowMapAccumulator() {
 // (one still referenced elsewhere gets a leak message that is dropped) and the TEX% tag go too; the renderer, the main
 // camera and the shadow accumulators always do. The shadow accumulator array is freed, but its pointer is deliberately
 // left as it was.
-void BSShaderManager::Free(eBool abFinal) {
+void BSShaderManager::Free(bool abFinal) {
     if (abFinal) {
         TallGrassShaderProperty::ClearStaticMaps();
         DistantLODShaderProperty::ClearStaticMaps();
@@ -4996,28 +4964,6 @@ void BSShaderManager::Free(eBool abFinal) {
     delete[] spShadowAccumulators;
 }
 
-void BSShaderManager::Shutdown(eBool abFinal) {
-    Free(abFinal);
-    if (abFinal && Renderer::spRenderer.m_pObject && (Renderer::spRenderer->m_uiRefCount != 1)) {
-        TESDataHandler::RegisterError();
-        if (Renderer::spRenderer->m_uiRefCount == 2) {
-            Warning(
-                "SHADERS: There is 1 object with a smart pointer to the renderer we are trying to "
-                "release."
-            );
-        }
-        else {
-            Warning(
-                "SHADERS: There are %d objects with smart pointers to the renderer we are trying to "
-                "release.",
-                Renderer::spRenderer->m_uiRefCount - 1
-            );
-        }
-    }
-
-    Renderer::spRenderer = static_cast<NiDX9Renderer*>(nullptr);
-}
-
 // Loads the shader package apFileName: a 12-byte header (version 100, the shader count, the size of the rest), then
 // the rest into pShaderBuffer, hashing each entry (a 0x100-byte name, a size, the data) by its name. True when the
 // data was read whole.
@@ -5055,3 +5001,5 @@ bool ShaderBuffer::Run(const char* apFileName) {
     delete pFile;
     return bResult;
 }
+
+NiColor BSShaderManager::kBackgroundColor(NiColor::BLACK);

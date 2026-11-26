@@ -1,18 +1,9 @@
 #include "BSCore/BSString.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "xfnv/Compiler.h"
-
-void SettingCollection::SetFileName(const char* apFileName) {
-    if (apFileName) {
-        BSstrcpy(pSettingFile, 260, apFileName);
-    }
-    else {
-        pSettingFile[0] = 0;
-    }
-}
 
 // Reads rSetting's value from the DATA chunk of the next chunk of the open file: an int or float directly, a string
 // through a buffer of the chunk's size.
@@ -37,4 +28,48 @@ bool GameSettingCollection::ReadSetting(Setting& rSetting) {
         }
     }
     return bResult;
+}
+
+uint32_t GameSettingCollection::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
+    char* element = NiGetViewerString("GameSettings");
+    apStringsA->Add(element);
+    uint32_t I = SettingCollectionMap::GetViewerStrings(apStringsA);
+    char* ViewerString_6 = NiGetViewerString("Total GameSettings", I);
+    apStringsA->Add(ViewerString_6);
+    return I;
+}
+
+bool GameSettingCollection::WriteSetting(Setting& arSetting) {
+    return false;
+}
+
+bool GameSettingCollection::Open(bool abWrite) {
+    return (pHandle != nullptr);
+}
+
+bool GameSettingCollection::Close() {
+    pHandle = nullptr;
+    return true;
+}
+
+bool GameSettingCollection::ReadSetting(TESFile* apFile, const char* apKey) {
+    bool bres = false;
+    SetFileHandle(apFile);
+    Setting* psetting = GetPtr(apKey);
+    if (psetting) {
+        bres = ReadSetting(*psetting);
+    }
+    Close();
+    return bres;
+}
+
+bool GameSettingCollection::GetSetting(const char* apKey, Setting** appSetting) {
+    return Settings.GetAt(apKey, *appSetting);
+}
+
+Setting* GameSettingCollection::GetPtr(const char* apID) {
+    Setting* appSetting;
+    appSetting = nullptr;
+    GetSetting(apID, &appSetting);
+    return appSetting;
 }

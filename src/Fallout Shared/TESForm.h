@@ -4,6 +4,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "Fallout Shared/BaseFormComponent.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"

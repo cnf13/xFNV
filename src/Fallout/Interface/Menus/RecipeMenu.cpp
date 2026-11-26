@@ -566,7 +566,7 @@ void RecipeMenu::PopulateItemStatsDisplay(TESForm* apCurrItem, Tile* apDisplayTi
     }
     char acEffects[256];
     if (pEffects && pEffects->GetItem()) {
-        pEffects->GetEffectsString(acEffects, 0x100);
+        pEffects->BuildMenuString(acEffects, 0x100);
         if (BSstrlen(acEffects) > 0) {
             pTiles[6]->Set(iValueTrait, acEffects, true);
             uiVisible |= 0x40;

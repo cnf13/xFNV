@@ -17,3 +17,11 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline void BeamShaderProperty::SetLength(float afValue) {
+    fLength = afValue;
+}
+
+inline void BeamShaderProperty::SetAlpha(float afValue) {
+    fAlpha = afValue;
+}

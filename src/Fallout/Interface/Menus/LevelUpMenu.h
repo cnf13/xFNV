@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"
@@ -47,8 +48,6 @@ public:
     static int32_t GetClassStatic();
     // Opens the level up menu and returns its tile.
     static Tile* Create();
-    // The body Create calls once the interface is up.
-    static Tile* CreateMenu();
     static void SetPerkAlphaIfRequirementsNotMet(Tile* apTile, BGSPerk* apPerk);
     // The reset button's traversal of the perks list: deselects apTile and reapplies the perk effects.
     static void ResetPerksFunc(Tile* apTile, BGSPerk* apPerk);

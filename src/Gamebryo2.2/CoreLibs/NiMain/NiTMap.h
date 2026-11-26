@@ -22,12 +22,14 @@ class NavMesh;
 class NavMeshInfo;
 class NiNode;
 class ReferenceObstacleArray;
+class Setting;
 class TESActorBase;
 class TESFile;
 class TESForm;
 class TESGlobal;
 class TESObjectCELL;
 class TESObjectREFR;
+struct VertexDist;
 
 template <class T, uint32_t uiGrowStep>
 class BSSimpleArray;

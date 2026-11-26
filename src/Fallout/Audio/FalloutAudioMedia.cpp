@@ -7,6 +7,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkThreadMemoryRouter.h"
 #include "BSMain/Setting.h"
 #include "BSMovie/CAsyncStream.h"
@@ -959,10 +960,6 @@ uint32_t FalloutAudioMedia::ThreadProc(FalloutAudioMedia::MediaThreadInfo* input
         delete pAsyncStream;
     }
     return 0;
-}
-
-int32_t BSAudio::IsSynchTimerPaused() {
-    return SynchTimer.IsPaused();
 }
 
 FAMThread::FAMThread() : m_event(new BSSystemEvent(false, false)), m_param{}, m_state(1) {

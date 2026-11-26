@@ -1782,7 +1782,6 @@ public:
 // it, an enemy one any non-neutral one, a friend one only an ally one.
 FIGHT_REACTION
 UpdateFightReaction(FIGHT_REACTION aeCurrentFightReaction, TESFaction* apFaction1, TESFaction* apFaction2);
-bool Cmd_GetIgnoreFriendlyHits(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
 bool IsActorOfFaction(TESObjectREFR* apRef, TESForm* apOwnership, Actor* pactor);
 bool IsActorOfFactionList(BSSimpleList<FACTION_RANK*>* pList, Actor* pActor, const char* debugReason);
 
@@ -1843,7 +1842,7 @@ inline pLimbEnumNames_t pLimbEnumNames{
     "DismemberedLimb14 Weapon"
 };
 
-extern SettingT<INIPrefSettingCollection> gs_bTrueIronSights_GamePlay;
+extern SettingT<INIPrefSettingCollection> bTrueIronSights;
 
 // The bone list the dismemberment code walks: how many nodes it holds and the nodes.
 inline uint32_t uiLimbCount;

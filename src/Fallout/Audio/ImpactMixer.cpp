@@ -54,27 +54,28 @@
 
 NiPoint3 ImpactMixer::lastloc;
 SettingT<INISettingCollection> ImpactMixer::iCollisionSoundTimeDelta("iCollisionSoundTimeDelta:Audio", 333);
-SettingT<INISettingCollection> gs_fWoodMediumMassMin_Audio("fWoodMediumMassMin:Audio", 7.0f);
-SettingT<INISettingCollection> gs_fWoodLargeMassMin_Audio("fWoodLargeMassMin:Audio", 15.0f);
-SettingT<INISettingCollection> gs_fStoneMediumMassMin_Audio("fStoneMediumMassMin:Audio", 5.0f);
-SettingT<INISettingCollection> gs_fStoneLargeMassMin_Audio("fStoneLargeMassMin:Audio", 30.0f);
-SettingT<INISettingCollection> gs_fEarthMediumMassMin_Audio("fEarthMediumMassMin:Audio", 5.0f);
-SettingT<INISettingCollection> gs_fEarthLargeMassMin_Audio("fEarthLargeMassMin:Audio", 30.0f);
-SettingT<INISettingCollection> gs_fSkinMediumMassMin_Audio("fSkinMediumMassMin:Audio", 5.0f);
-SettingT<INISettingCollection> gs_fSkinLargeMassMin_Audio("fSkinLargeMassMin:Audio", 30.0f);
+SettingT<INISettingCollection> ImpactMixer::fWoodMediumMass("fWoodMediumMassMin:Audio", 7.0f);
+SettingT<INISettingCollection> ImpactMixer::fWoodLargeMass("fWoodLargeMassMin:Audio", 15.0f);
+SettingT<INISettingCollection> ImpactMixer::fStoneMediumMass("fStoneMediumMassMin:Audio", 5.0f);
+SettingT<INISettingCollection> ImpactMixer::fStoneLargeMass("fStoneLargeMassMin:Audio", 30.0f);
+SettingT<INISettingCollection> ImpactMixer::fEarthMediumMass("fEarthMediumMassMin:Audio", 5.0f);
+SettingT<INISettingCollection> ImpactMixer::fEarthLargeMass("fEarthLargeMassMin:Audio", 30.0f);
+SettingT<INISettingCollection> ImpactMixer::fSkinMediumMass("fSkinMediumMassMin:Audio", 5.0f);
+SettingT<INISettingCollection> ImpactMixer::fSkinLargeMass("fSkinLargeMassMin:Audio", 30.0f);
 SettingT<INISettingCollection> ImpactMixer::fChainMediumMass("fChainMediumMassMin:Audio", 5.0f);
 SettingT<INISettingCollection> ImpactMixer::fChainLargeMass("fChainLargeMassMin:Audio", 30.0f);
-SettingT<INISettingCollection> gs_fMetalMediumMassMin_Audio("fMetalMediumMassMin:Audio", 8.0f);
-SettingT<INISettingCollection> gs_fMetalLargeMassMin_Audio("fMetalLargeMassMin:Audio", 25.0f);
+SettingT<INISettingCollection> ImpactMixer::fMetalMediumMass("fMetalMediumMassMin:Audio", 8.0f);
+SettingT<INISettingCollection> ImpactMixer::fMetalLargeMass("fMetalLargeMassMin:Audio", 25.0f);
 SettingT<INISettingCollection> ImpactMixer::fGlassMediumMass("fGlassMediumMassMin:Audio", 8.0f);
 SettingT<INISettingCollection> ImpactMixer::fGlassLargeMass("fGlassLargeMassMin:Audio", 25.0f);
 SettingT<INISettingCollection> ImpactMixer::fMedWpnWeight("fMediumWeaponWeightMin:Audio", 8.0f);
 SettingT<INISettingCollection> ImpactMixer::fLargeWpnWeight("fLargeWeaponWeightMin:Audio", 25.0f);
 SettingT<INISettingCollection> ImpactMixer::fMedWpnSpeed("fMediumWeaponSpeedMax:Audio", 1.1f);
 SettingT<INISettingCollection> ImpactMixer::fLargeWpnSpeed("fLargeWeaponSpeedMax:Audio", 0.95f);
-SettingT<INISettingCollection> gs_fCollisionSoundHeavyThreshold_Audio("fCollisionSoundHeavyThreshold:Audio", 100.0f);
-SettingT<INISettingCollection> gs_fPlayerFootVolume_Audio("fPlayerFootVolume:Audio", 0.9f);
-SettingT<INISettingCollection> gs_fMaxFootstepDistance_Audio("fMaxFootstepDistance:Audio", 1100.0f);
+SettingT<INISettingCollection>
+    ImpactMixer::fCollisionSoundHeavyThreshold("fCollisionSoundHeavyThreshold:Audio", 100.0f);
+SettingT<INISettingCollection> ImpactMixer::fPlayerFootVolume("fPlayerFootVolume:Audio", 0.9f);
+SettingT<INISettingCollection> ImpactMixer::fMaxFootstepDistance("fMaxFootstepDistance:Audio", 1100.0f);
 SettingT<INISettingCollection> ImpactMixer::iMaxImpactSoundCount("iMaxImpactSoundCount:Audio", 32);
 ImpactMixer::ImpactTimeMap ImpactMixer::pImpactMap;
 ImpactMixer::GunshotHandleArray ImpactMixer::GunshotHandles;
@@ -82,7 +83,7 @@ ImpactMixer::GunshotHandleArray ImpactMixer::GunshotHandles;
 // Location is built by NiPoint3's default constructor; the rest is deliberately left unset.
 ImpactMixer::COLLISION_SOUND::COLLISION_SOUND() {}
 
-void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
+void ImpactMixer::PlayJump(TESObjectREFR* apRef, int32_t aiFootType) {
     AutoMemContext kContext(
         MEM_CONTEXT_AUDIO,
         true,
@@ -98,7 +99,7 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
     TESSound* pSound = nullptr;
     TESSound* pArmorSound = nullptr;
     char bUse2DSound = 0;
-    float fMaxFootstepDistance = gs_fMaxFootstepDistance_Audio.Float();
+    float fMaxFootstepDistance = ImpactMixer::fMaxFootstepDistance.Float();
     if (Main::GetSceneIsComplex()) {
         fMaxFootstepDistance = fMaxFootstepDistance / 2.0;
     }
@@ -218,14 +219,14 @@ void ImpactMixer::PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType) {
                     const char* pcFilename = pSound->GetFilename();
                     BSAudio* pAudio = &BSAudio::QInstance();
                     kSound = pAudio->GetSoundHandleByFilename(pcFilename, uiAudioFlags, pSound);
-                    kSound.SetVolume(gs_fPlayerFootVolume_Audio.Float());
+                    kSound.SetVolume(ImpactMixer::fPlayerFootVolume.Float());
                     kSound.Play(false);
                 }
                 if (pArmorSound) {
                     const char* pcFilename = pArmorSound->GetFilename();
                     BSAudio* pAudio = &BSAudio::QInstance();
                     th_s = pAudio->GetSoundHandleByFilename(pcFilename, uiAudioFlags, pArmorSound);
-                    th_s.SetVolume(gs_fPlayerFootVolume_Audio.Float());
+                    th_s.SetVolume(ImpactMixer::fPlayerFootVolume.Float());
                     th_s.Play(false);
                 }
             }
@@ -303,10 +304,10 @@ void ImpactMixer::PlayGunshot(
         if (pPlayer->GetParentCell() &&
             pPlayer->GetParentCell()->GetInterior() &&
             !pPlayer->GetParentCell()->GetFakeExterior()) {
-            fModNV = gs_fWeaponInteriorNearVolumeMod.Float();
-            fModFV = gs_fWeaponInteriorFarVolumeMod.Float();
-            fModNA = gs_fWeaponInteriorNearAttenuationMod.Float();
-            fModFA = gs_fWeaponInteriorFarAttenuationMod.Float();
+            fModNV = FalloutAudio::fWeaponInteriorNearVolumeMod.Float();
+            fModFV = FalloutAudio::fWeaponInteriorFarVolumeMod.Float();
+            fModNA = FalloutAudio::fWeaponInteriorNearAttenuationMod.Float();
+            fModFA = FalloutAudio::fWeaponInteriorFarAttenuationMod.Float();
         }
 
         if (abPlayer) {
@@ -723,7 +724,7 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
     TESSound* infoGround = nullptr;
     TESSound* infoShoe = nullptr;
     bool b1stPersonPlayerFoot = false;
-    float ftestDistance = gs_fMaxFootstepDistance_Audio.Float();
+    float ftestDistance = ImpactMixer::fMaxFootstepDistance.Float();
     if (Main::GetSceneIsComplex()) {
         ftestDistance = ftestDistance / 2.0;
     }
@@ -857,13 +858,13 @@ void ImpactMixer::PlayFootstep(TESObjectREFR* apRef, int32_t aiFootType) {
                 if (infoGround) {
                     const char* pcFilename = infoGround->GetFilename();
                     SoundHand = BSAudio::QInstance().GetSoundHandleByFilename(pcFilename, iflags, infoGround);
-                    SoundHand.SetVolume(gs_fPlayerFootVolume_Audio.Float());
+                    SoundHand.SetVolume(ImpactMixer::fPlayerFootVolume.Float());
                     SoundHand.Play(false);
                 }
                 if (infoShoe) {
                     const char* pcFilename = infoShoe->GetFilename();
                     SoundHand2 = BSAudio::QInstance().GetSoundHandleByFilename(pcFilename, iflags, infoShoe);
-                    SoundHand2.SetVolume(gs_fPlayerFootVolume_Audio.Float());
+                    SoundHand2.SetVolume(ImpactMixer::fPlayerFootVolume.Float());
                     SoundHand2.Play(false);
                 }
             }
@@ -949,8 +950,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
         case 0:
         case 15: {
             if (!(afMass < 9.999999747378752e-05)) {
-                if (!(gs_fStoneMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fStoneLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fStoneMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fStoneLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("CStoneLarge");
                     }
                     else {
@@ -967,7 +968,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 1: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYGenericClothH");
             }
             else {
@@ -976,8 +977,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 2: {
-            if (!(gs_fEarthMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                if (!(gs_fEarthLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+            if (!(ImpactMixer::fEarthMediumMass.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fEarthLargeMass.Float() > static_cast<double>(afMass))) {
                     info = pDataHandler->GetSound("CEarthLarge");
                 }
                 else {
@@ -1018,10 +1019,10 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 5: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 if (!(afMass < 9.999999747378752e-05)) {
-                    if (!(gs_fMetalMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                        if (!(gs_fMetalLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fMetalMediumMass.Float() > static_cast<double>(afMass))) {
+                        if (!(ImpactMixer::fMetalLargeMass.Float() > static_cast<double>(afMass))) {
                             info = pDataHandler->GetSound("PHYGenericMetalLargeH");
                         }
                         else {
@@ -1038,8 +1039,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             }
             else {
                 if (!(afMass < 9.999999747378752e-05)) {
-                    if (!(gs_fMetalMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                        if (!(gs_fMetalLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fMetalMediumMass.Float() > static_cast<double>(afMass))) {
+                        if (!(ImpactMixer::fMetalLargeMass.Float() > static_cast<double>(afMass))) {
                             info = pDataHandler->GetSound("PHYGenericMetalLargeL");
                         }
                         else {
@@ -1061,9 +1062,9 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 7: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
-                if (!(gs_fSkinMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fSkinLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
+                if (!(ImpactMixer::fSkinMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fSkinLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("PHYSkinLargeH");
                     }
                     else {
@@ -1075,8 +1076,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
                 }
             }
             else {
-                if (!(gs_fSkinMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fSkinLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fSkinMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fSkinLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("PHYSkinLargeL");
                     }
                     else {
@@ -1103,8 +1104,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
         }
         case 9: {
             if (!(afMass < 9.999999747378752e-05)) {
-                if (!(gs_fWoodMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fWoodLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fWoodMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fWoodLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("CWoodLarge");
                     }
                     else {
@@ -1142,8 +1143,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
         }
         case 16: {
             if (!(afMass < 9.999999747378752e-05)) {
-                if (!(gs_fMetalMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fMetalLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fMetalMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fMetalLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("PHYGenericMetalHollowLarge");
                     }
                     else {
@@ -1161,8 +1162,8 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
         }
         case 17: {
             if (!(afMass < 9.999999747378752e-05)) {
-                if (!(gs_fMetalMediumMassMin_Audio.Float() > static_cast<double>(afMass))) {
-                    if (!(gs_fMetalLargeMassMin_Audio.Float() > static_cast<double>(afMass))) {
+                if (!(ImpactMixer::fMetalMediumMass.Float() > static_cast<double>(afMass))) {
+                    if (!(ImpactMixer::fMetalLargeMass.Float() > static_cast<double>(afMass))) {
                         info = pDataHandler->GetSound("PHYGenericMetalSheetLarge");
                     }
                     else {
@@ -1183,7 +1184,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 20: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYVehicleMetalBodyH");
             }
             else {
@@ -1192,7 +1193,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 21: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYVehicleMetalSolidH");
             }
             else {
@@ -1201,7 +1202,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 22: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYVehicleMetalHollowH");
             }
             else {
@@ -1210,7 +1211,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 23: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYBarrelH");
             }
             else {
@@ -1219,7 +1220,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 24: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYBottleH");
             }
             else {
@@ -1228,7 +1229,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 25: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYCanSodaH");
             }
             else {
@@ -1237,7 +1238,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 26: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYWeaponPistolH");
             }
             else {
@@ -1246,7 +1247,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 27: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYWeaponRifleH");
             }
             else {
@@ -1255,7 +1256,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 28: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYShoppingCartH");
             }
             else {
@@ -1264,7 +1265,7 @@ TESSound* ImpactMixer::GetSoundForType(int32_t aiType, float afMass, float afVel
             break;
         }
         case 29: {
-            if (!(gs_fCollisionSoundHeavyThreshold_Audio.Float() > static_cast<double>(afVelocity))) {
+            if (!(ImpactMixer::fCollisionSoundHeavyThreshold.Float() > static_cast<double>(afVelocity))) {
                 info = pDataHandler->GetSound("PHYLunchboxH");
             }
             else {

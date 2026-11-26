@@ -77,7 +77,3 @@ public:
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkpSimpleShapePhantomCollisionDetailTypeInfo;
 
-namespace hkAlgorithm {
-    // The collision details' sort by their collidable's broad-phase id; defined in hkpSimpleShapePhantom.cpp.
-    int32_t quickSort(hkpSimpleShapePhantom::CollisionDetail* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess);
-} // namespace hkAlgorithm

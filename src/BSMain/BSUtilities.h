@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 
 class NiAVObject;
@@ -65,3 +66,50 @@ public:
     static inline PersonalPathBuffer pPersonalPath{};
     static inline LocalAppDataPathBuffer pLocalAppDataPath{};
 };
+
+// The value on the line through (y1, x1) and (y2, x2) at value: x1 + (value - y1) / (y2 - y1) * (x2 - x1), rounded
+// to float.
+inline float FLerp(float x1, float x2, float y1, float y2, float value) {
+    float fResult = (value - y1) / (y2 - y1) * (x2 - x1) + x1;
+    return fResult;
+}
+
+inline double fFloor(float afValue) {
+    return static_cast<int32_t>(afValue);
+}
+
+// The game's floor of a float: the truncation fFloor gives, less 1 when aIn lies below it, with the result rounded to
+// float. Not the CRT's floor.
+inline float FloatFloor(float aIn) {
+    float fFloored = fFloor(aIn);
+    if (aIn - fFloored >= 0.0) {
+        return fFloored;
+    }
+
+    return fFloored - 1.0;
+}
+
+inline float FloatCeil(float aIn) {
+    float fFloored = fFloor(aIn);
+    if (!(fFloored - aIn >= 0.0)) {
+        return fFloored + 1.0;
+    }
+
+    return fFloored;
+}
+
+inline bool FloatEQ(float aX, float aY, float afPrecision) {
+    if (afPrecision < 0.0) {
+        return false;
+    }
+    if (!(aY < static_cast<double>(aX))) {
+        return afPrecision > (aY - aX);
+    }
+    return afPrecision > (aX - aY);
+}
+
+// The float rounded to an integer in the FPU's current rounding mode.
+// Rounds in the current floating-point rounding mode, not by truncation.
+inline int32_t FloatToInt(float someFloat) {
+    return NiFastFloatToInt(someFloat);
+}

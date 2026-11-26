@@ -2,6 +2,7 @@
 
 #include "BSCore/BSPerformanceTimer.h"
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSWorldLocation.h"
 #include "Fallout Shared/Pathfinding/PathingCoverLocation.h"
@@ -517,7 +518,7 @@ extern SettingT<INISettingCollection> fLowPerfPCTargetLOSTimer;
 extern SettingT<INISettingCollection> fLowPerfNPCTargetLOSTimer;
 extern BSPerformanceTimer CombatAIAdvanceSearch;
 
-extern SettingT<GameSettingCollection> gs_fDisarmedPickupWeaponDistanceMult;
+extern SettingT<GameSettingCollection> fPickupWeaponDisarmedDistanceMult;
 
 extern BSPerformanceTimer CombatAI_CombatItemSearch;
 

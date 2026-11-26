@@ -22,7 +22,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Fallout/AI/Actor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
@@ -593,34 +593,6 @@ void LoadedAreaBound::WarpBody(bhkRigidBody* apBody, hkArray<hkpRigidBody*, hkCo
         apBody->SetPosition(warpLoc);
         hkVector4 upVel(0.0f, 0.0f, 0.01f, 0.0f);
         apBody->SetLinearVelocity(upVel);
-    }
-}
-
-void bhkAabbPhantom::GetAabb(hkAabb& arB) {
-    hkpAabbPhantom* pPhantom = **this;
-    if (pPhantom) {
-        MarkRead();
-        arB = pPhantom->m_aabb;
-        UnMarkRead();
-    }
-    else {
-        const hkVector4& rMax = hkVector4::getZero();
-        const hkVector4& rMin = hkVector4::getZero();
-        hkAabb kZeroAabb(rMin, rMax);
-        arB = kZeroAabb;
-    }
-}
-
-hkpAabbPhantom* bhkAabbPhantom::Gethk() {
-    return static_cast<hkpAabbPhantom*>(phkObject);
-}
-
-void bhkWorldObject::SetFlags(uint32_t aiFlags, bool abTF) {
-    if (abTF) {
-        iFlags |= aiFlags;
-    }
-    else {
-        ClearFlags(aiFlags);
     }
 }
 

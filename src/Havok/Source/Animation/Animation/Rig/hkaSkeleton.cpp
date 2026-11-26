@@ -111,3 +111,7 @@ const hkClass& hkaSkeleton::LocalFrameOnBone::staticClass() {
 
 // The arrays release the local frames and free the bone and slot names; the name frees itself.
 hkaSkeleton::~hkaSkeleton() {}
+
+const hkClass& hkaSkeleton::staticClass() {
+    return hkaSkeletonClass;
+}

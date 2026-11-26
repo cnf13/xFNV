@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -192,4 +193,4 @@ extern SettingT<INISettingCollection> fShudderChance;
 extern SettingT<INISettingCollection> fDefaultVertHoldDuration;
 extern SettingT<INISettingCollection> fScreenLightRadius;
 
-extern SettingT<INISettingCollection> gs_sScanlineTexture_InterfaceFX;
+extern SettingT<INISettingCollection> sInterfaceScanlinesTexture;

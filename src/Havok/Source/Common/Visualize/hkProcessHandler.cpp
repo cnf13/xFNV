@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Visualize/hkProcessHandler.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkProcessHandler::~hkProcessHandler() {}
 

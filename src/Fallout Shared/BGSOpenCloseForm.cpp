@@ -8,7 +8,7 @@
 #include "BSHavok/bhkUtilFunctions.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleManager.h"
@@ -425,34 +425,4 @@ NiFixedString& FixedStrings::QOpenString() {
 
 NiFixedString& FixedStrings::QCloseString() {
     return *FixedStrings::Close;
-}
-
-NiControllerSequence* NiControllerManager::GetSequenceByName(const NiFixedString& kName) {
-    NiControllerSequence* pkSequence;
-    if (m_kStringMap.GetAt(kName.GetHandleString(), pkSequence)) {
-        return pkSequence;
-    }
-    return nullptr;
-}
-
-bool NiControllerManager::ActivateSequence(
-    NiControllerSequence* pkSequence,
-    int32_t iPriority,
-    bool bStartOver,
-    float fWeight,
-    float fEaseInTime,
-    NiControllerSequence* pkTimeSyncSeq
-) {
-    // The priority is passed as its low byte, zero-extended.
-    return pkSequence
-        ->Activate(static_cast<uint8_t>(iPriority), bStartOver, fWeight, fEaseInTime, pkTimeSyncSeq, false);
-}
-
-// Returns the result of Deactivate unchanged as a bool rather than an int, deliberately.
-bool NiControllerManager::DeactivateSequence(NiControllerSequence* pkSequence, float fEaseOutTime) {
-    return pkSequence->Deactivate(fEaseOutTime, false);
-}
-
-void NiControllerSequence::SetOffset(float fOffset) {
-    m_fOffset = fOffset;
 }

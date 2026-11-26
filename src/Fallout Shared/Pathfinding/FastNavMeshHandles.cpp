@@ -7,6 +7,6 @@ bool FastNavMeshVertHandle::operator==(const FastNavMeshVertHandle& aNavMeshVert
 }
 
 void FastNavMeshVertHandle::Endian() {
-    ENDIAN(pNavMesh, false);
-    ENDIAN(usVertex, false);
+    BSEndian(pNavMesh, false);
+    BSEndian(usVertex, false);
 }

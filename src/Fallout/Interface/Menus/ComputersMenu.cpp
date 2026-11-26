@@ -7,6 +7,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTStaticFreeList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"

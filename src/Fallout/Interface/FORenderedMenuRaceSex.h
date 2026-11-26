@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Fallout/Interface/FORenderedMenu.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -75,10 +76,10 @@ extern SettingT<INISettingCollection> fRaceSexMenuZoom;
 extern SettingT<INISettingCollection> fRaceSexMenuVPos;
 extern SettingT<INISettingCollection> fRaceSexMenuDistortDuration;
 extern SettingT<INISettingCollection> fRaceSexMenuHPos;
-extern SettingT<INISettingCollection> gs_fDistortHorizontalScale_InterfaceFX;
+extern SettingT<INISettingCollection> fDefaultDistortHorizontalScale;
 
-extern SettingT<INISettingCollection> gs_fDistortDuration_InterfaceFX;
+extern SettingT<INISettingCollection> fDefaultDistortDuration;
 
-extern SettingT<INISettingCollection> gs_iDistortMaxInterval_InterfaceFX;
+extern SettingT<INISettingCollection> iDefaultDistortMaxInterval;
 
-extern SettingT<INISettingCollection> gs_fDistortVerticalScale_InterfaceFX;
+extern SettingT<INISettingCollection> fDefaultDistortVerticalScale;

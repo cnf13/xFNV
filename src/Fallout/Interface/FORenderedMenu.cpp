@@ -4,10 +4,11 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/BSNoise1D.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileImage.h"
@@ -37,7 +38,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -50,6 +50,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <cmath>
@@ -66,7 +67,7 @@ SettingT<INISettingCollection> fDefaultShudderIntensity("fDefaultShudderIntensit
 SettingT<INISettingCollection> fDefaultShudderFrequency("fDefaultShudderFrequency:InterfaceFX", 0.05f);
 SettingT<INISettingCollection> fPulseBrightenIntensity("fPulseBrightenIntensity:InterfaceFX", 0.1f);
 SettingT<INISettingCollection> fPulseRadiusIntensity("fPulseRadiusIntensity:InterfaceFX", 0.02f);
-SettingT<INISettingCollection> gs_fPulseRate_InterfaceFX("fPulseRate:InterfaceFX", 0.00025f);
+SettingT<INISettingCollection> fPulseRate("fPulseRate:InterfaceFX", 0.00025f);
 SettingT<INISettingCollection> fVertHoldChance("fVertHoldChance:InterfaceFX", 0.05f);
 SettingT<INISettingCollection> fShudderChance("fShudderChance:InterfaceFX", 0.2f);
 SettingT<INISettingCollection> fScreenLightBurstModifier("fScreenLightBurstModifier:InterfaceFX", 0.25f);
@@ -77,12 +78,12 @@ SettingT<INISettingCollection> fScreenLightRadius("fScreenLightRadius:InterfaceF
 SettingT<INISettingCollection> fDefaultBlurRadius("fDefaultBlurRadius:InterfaceFX", 0.3f);
 SettingT<INISettingCollection> fDefaultBlurIntensity("fDefaultBlurIntensity:InterfaceFX", 0.2f);
 static SettingT<INISettingCollection> fDefaultScanlineScale("fDefaultScanlineFrequency:InterfaceFX", 100.0f);
-SettingT<INISettingCollection> gs_fDistortVerticalScale_InterfaceFX("fDistortVerticalScale:InterfaceFX", 5.0f);
-SettingT<INISettingCollection> gs_fDistortHorizontalScale_InterfaceFX("fDistortHorizontalScale:InterfaceFX", 1.0f);
-SettingT<INISettingCollection> gs_fDistortDuration_InterfaceFX("fDistortDuration:InterfaceFX", 500.0f);
-SettingT<INISettingCollection> gs_iDistortMaxInterval_InterfaceFX("iDistortMaxInterval:InterfaceFX", 4500);
+SettingT<INISettingCollection> fDefaultDistortVerticalScale("fDistortVerticalScale:InterfaceFX", 5.0f);
+SettingT<INISettingCollection> fDefaultDistortHorizontalScale("fDistortHorizontalScale:InterfaceFX", 1.0f);
+SettingT<INISettingCollection> fDefaultDistortDuration("fDistortDuration:InterfaceFX", 500.0f);
+SettingT<INISettingCollection> iDefaultDistortMaxInterval("iDistortMaxInterval:InterfaceFX", 4500);
 SettingT<INISettingCollection>
-    gs_sScanlineTexture_InterfaceFX("sScanlineTexture:InterfaceFX", "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds");
+    sInterfaceScanlinesTexture("sScanlineTexture:InterfaceFX", "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds");
 
 FORenderedMenu::FORenderedMenu()
   : spScreenTriShape(nullptr), spScreenParent(nullptr), spPartialScreenGeometry(nullptr), spDefaultTex(nullptr),
@@ -93,8 +94,8 @@ FORenderedMenu::FORenderedMenu()
     bMenuOpen(false), bMenuRendering(0), spScanlinesTexture(nullptr), TintColor(0.0f, 0.0f, 0.0f, 0.0f),
     spAccumulator(nullptr) {
     double dTime = static_cast<double>(appTimer.iLastTime);
-    fNextDistortTime = static_cast<double>(rt::rand() % gs_iDistortMaxInterval_InterfaceFX.Int()) + dTime;
-    fDistortDuration = gs_fDistortDuration_InterfaceFX.Float();
+    fNextDistortTime = static_cast<double>(rt::rand() % iDefaultDistortMaxInterval.Int()) + dTime;
+    fDistortDuration = fDefaultDistortDuration.Float();
 }
 
 FORenderedMenu::~FORenderedMenu() {
@@ -296,7 +297,7 @@ void FORenderedMenu::Initialize() {
     SetDefaultTex(pDefaultTex);
     fBlurRadius = fDefaultBlurRadius.Float();
     fBlurIntensity = fDefaultBlurIntensity.Float();
-    BSShaderManager::GetTexture(gs_sScanlineTexture_InterfaceFX.String(), true, spScanlinesTexture, false, false);
+    BSShaderManager::GetTexture(sInterfaceScanlinesTexture.String(), true, spScanlinesTexture, false, false);
     bInitialized = true;
 }
 
@@ -372,7 +373,7 @@ void FORenderedMenu::UpdateShudder(float afTime) {
 }
 
 void FORenderedMenu::UpdatePulse(float afTime) {
-    float fNoiseTime = afTime * gs_fPulseRate_InterfaceFX.Float();
+    float fNoiseTime = afTime * fPulseRate.Float();
     double dNoise = BSNoise1D::Noise(fNoiseTime);
     float fPulse = static_cast<float>(dNoise + dNoise);
     fPulseCurrentBrighten = fPulse * fPulseBrightenIntensity.Float();
@@ -411,10 +412,10 @@ void FORenderedMenu::UpdateLight(float afTime) {
 void FORenderedMenu::UpdateDistort(float afTime) {
     float fDelta = afTime - fDistortStartTime;
     fDistortPosition = fDelta / fDistortDuration;
-    if (fDistortPosition > gs_fDistortVerticalScale_InterfaceFX.Float() + 1.0) {
+    if (fDistortPosition > fDefaultDistortVerticalScale.Float() + 1.0) {
         bDistortActive = false;
         int32_t iRand = rt::rand();
-        fNextDistortTime = static_cast<double>(iRand % gs_iDistortMaxInterval_InterfaceFX.Int()) + afTime;
+        fNextDistortTime = static_cast<double>(iRand % iDefaultDistortMaxInterval.Int()) + afTime;
     }
 }
 
@@ -452,8 +453,8 @@ void FORenderedMenu::DoEffect(
     ImageSpaceEffectInterface::fBlurIntensity = ImageSpaceEffectInterface::fBlurIntensity + fPulseCurrentBrighten;
     ImageSpaceEffectInterface::fBlurRadius = ImageSpaceEffectInterface::fBlurRadius + fPulseCurrentRadius;
     if (bDistortActive) {
-        ImageSpaceEffectInterface::fDistortVerticalScale = gs_fDistortVerticalScale_InterfaceFX.Float();
-        ImageSpaceEffectInterface::fDistortHorizontalScale = gs_fDistortHorizontalScale_InterfaceFX.Float();
+        ImageSpaceEffectInterface::fDistortVerticalScale = fDefaultDistortVerticalScale.Float();
+        ImageSpaceEffectInterface::fDistortHorizontalScale = fDefaultDistortHorizontalScale.Float();
         ImageSpaceEffectInterface::fDistortVerticalPosition = fDistortPosition;
         ImageSpaceEffectInterface::bDistortEverywhere = true;
     }
@@ -766,9 +767,4 @@ void FORenderedMenu::SetNextDistortTime(float afTime) {
 
 void FORenderedMenu::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-void ImageSpaceManager::EnablePartialRender(bool abEnable, NiScreenElements* apPartialScreenGeometry) {
-    bEnablePartialRender = abEnable;
-    spPartialScreenTriShape = apPartialScreenGeometry;
 }

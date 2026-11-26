@@ -1,6 +1,6 @@
 #include "Fallout Shared/TESProduceForm.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/GlobalFunc.h"

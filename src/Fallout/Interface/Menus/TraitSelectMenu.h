@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 
 class TraitSelectMenu : public Menu {

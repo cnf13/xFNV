@@ -3,7 +3,7 @@
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValue.h"
@@ -46,8 +46,8 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadDefines.h"
 #include "Fallout/Misc/TaskQueueInterface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAlphaProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 
 #include <cmath>
@@ -846,7 +846,7 @@ void ActiveEffect::LoadActiveEffectList(
     }
 }
 
-void ActiveEffect::LoadActiveEffectListTES(BSSimpleList<ActiveEffect*>* apActiveEffectList, Actor* apActor) {
+void ActiveEffect::LoadActiveEffectList(BSSimpleList<ActiveEffect*>* apActiveEffectList, Actor* apActor) {
     uint32_t iblockHeader;
     uint16_t icount;
     uint16_t iblockSize = 0;
@@ -890,7 +890,7 @@ void ActiveEffect::LoadActiveEffectListTES(BSSimpleList<ActiveEffect*>* apActive
     apActiveEffectList->RemoveAll();
     pSaveLoadGameOLD->LoadGameDataOLD(&icount, sizeof(icount));
     for (int32_t i = 0; i < icount; ++i) {
-        ActiveEffect* peffect = ActiveEffect::LoadActiveEffectTES(apActor);
+        ActiveEffect* peffect = ActiveEffect::LoadActiveEffect(apActor);
         // The game reads apActor's current AI process here (a trivial accessor) and drops the result.
         if (dynamic_cast<VampirismEffect*>(peffect) && apActor) {}
 
@@ -1163,7 +1163,7 @@ void ActiveEffect::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-ActiveEffect* ActiveEffect::LoadActiveEffectTES(Actor* apActor) {
+ActiveEffect* ActiveEffect::LoadActiveEffect(Actor* apActor) {
     EffectItem* peffect;
     uint8_t ceffectIndex;
     uint32_t ispellID;

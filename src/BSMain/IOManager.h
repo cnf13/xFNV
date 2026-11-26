@@ -75,33 +75,6 @@ public:
 
 NiSmartPointer(IOTask);
 
-// One lock-free queue per task priority.
-template <class T>
-class LockFreePriorityQueue {
-public:
-    LockFreePriorityQueue(uint32_t aiPriorityCount, uint32_t aiMaxThreads, uint32_t aiDeleteBatchSize);
-    // Slot 0: the deleting destructor.
-    virtual ~LockFreePriorityQueue();
-
-    virtual void IncrementCount();
-    virtual void DecrementCount();
-    // The number of queued elements.
-    virtual uint32_t GetCount();
-
-    // Queues the element at aiPriority.
-    void Insert(int32_t aiPriority, T* apTask);
-    // Empties every priority queue.
-    void Clear();
-    bool Pop(T& arData);
-
-    static void operator delete(void* apMemory);
-
-    // The queues, one per priority.
-    LockFreeQueue<T>** pQueues;
-    int32_t iPriorityCount;
-    int32_t iCount;
-};
-
 // The task manager of the background file loads. Only some of its entry points are declared.
 class IOManager : public BSTaskManager<int64_t> {
 public:
@@ -169,6 +142,43 @@ public:
 
 inline IOManager* pIOManager;
 
-extern SettingT<INISettingCollection> gs_iPostProcessMilliseconds_BackgroundLoad;
+extern SettingT<INISettingCollection> iPostProcessMilliseconds;
 
-extern SettingT<INISettingCollection> gs_iPostProcessMillisecondsLoadingQueuedPriority_BackgroundLoad;
+extern SettingT<INISettingCollection> iPostProcessMillisecondsLoadingQueuedPriority;
+
+inline IOTask::IOTask(IO_TASK_PRIORITY aePriority) {
+    SetIOTaskPriority(aePriority);
+}
+
+// The key: file index 3, the next offset, the task's priority and the low 16 bits of the next counter, fetched in the
+// order counter, priority, offset.
+inline void IOTask::GenerateKey() {
+    uint16_t sCounter = GetNextCounter();
+    uint8_t cPriority = GetPriority();
+    uint32_t iOffset = GetNextOffset();
+    SetKey(3, iOffset, cPriority, sCounter);
+}
+
+inline uint8_t IOTask::GetPriority() {
+    return IOTask::GetPriorityFromKey(Key);
+}
+
+inline void IOTask::SetKey(char acFileIndex, uint32_t aiOffset, uint8_t acPriority, uint16_t asCounter) {
+    uint64_t uiPriorityBits = static_cast<uint64_t>(acPriority) << 16;
+    Key = static_cast<int64_t>(
+        (static_cast<uint64_t>(Key) & 0xFFFFFFFF00000000ull) |
+        static_cast<uint64_t>(static_cast<uint32_t>(asCounter | (uiPriorityBits | aiOffset << 24)))
+    );
+    Key = static_cast<int64_t>(
+        (static_cast<uint64_t>(Key) & 0xFFFFFFFFull) |
+        (static_cast<uint64_t>(static_cast<uint32_t>(
+             (static_cast<uint32_t>(uiPriorityBits >> 32) | (static_cast<uint64_t>(aiOffset) >> 8 | acFileIndex << 24))
+         ))
+         << 32)
+    );
+}
+
+inline void IOTask::SetPriority(uint8_t acPriority) {
+    Key = (static_cast<uint64_t>(acPriority) << 16) +
+        ((static_cast<uint64_t>(static_cast<uint32_t>(Key >> 32)) << 32) | static_cast<uint32_t>(Key & 0xFF00FFFFu));
+}

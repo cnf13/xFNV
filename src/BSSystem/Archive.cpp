@@ -14,7 +14,7 @@
 #include "BSSystem/FileFinder.h"
 #include "BSSystem/Win32/BSWin32FileCache.h"
 #include "Fallout Shared/GlobalFunc.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
@@ -2443,8 +2443,4 @@ char ArchiveManager::CloseArchive(Archive* apArchive) {
 
 void ArchiveManager::CleanupArchiveStringsAfterStartup() {
     ;
-}
-
-uint32_t BSstrlen(const char* apString) {
-    return std::strlen(apString);
 }

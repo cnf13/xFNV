@@ -99,8 +99,6 @@ public:
     static SettingT<INISettingCollection> sFileTypeSource;
     static SettingT<INISettingCollection> sFileTypeLip;
     static SettingT<INISettingCollection> sFileTypeLTF;
+    static SettingT<INISettingCollection> sFileTypeGame;
+    static SettingT<GameSettingCollection> iStandardEmotionValue;
 };
-
-extern SettingT<GameSettingCollection> gs_iStandardEmotionValue;
-
-extern SettingT<INISettingCollection> gs_sFileTypeGame_Voice;

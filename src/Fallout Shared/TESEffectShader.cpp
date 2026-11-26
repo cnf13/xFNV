@@ -2,6 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -618,30 +619,6 @@ void TESEffectShader::AnimateTextureEffect(
     }
 }
 
-void ParticleShaderProperty::SetTexture(NiTexture* pTex) {
-    spBaseTexture = pTex;
-}
-
-void ParticleShaderProperty::SetScaleTime2(float aScaleTime) {
-    ScaleTime2 = aScaleTime;
-}
-
-void ParticleShaderProperty::SetVelocity(NiPoint3 aVelocity) {
-    Velocity = aVelocity;
-}
-
-void ParticleShaderProperty::SetAcceleration(NiPoint3 aAcceleration) {
-    Acceleration = aAcceleration;
-}
-
-void ParticleShaderProperty::SetColor1(NiColorA aColor) {
-    Color1 = aColor;
-}
-
-void ParticleShaderProperty::SetColor3(NiColorA aColor) {
-    Color3 = aColor;
-}
-
 EffectShaderData::EffectShaderData() {
     Initialize();
 }
@@ -726,79 +703,79 @@ void EffectShaderData::Initialize() {
 // Swaps every 32-bit field of a DATA chunk read from a big-endian file, in field order. The flags byte and its
 // padding and the addon debris pointer (a form ID at load time, resolved later) are left alone.
 void EffectShaderData::Endian() {
-    ENDIAN(eTextureBlendModeSource, false);
-    ENDIAN(eTextureBlendOperation, false);
-    ENDIAN(eTextureZTestFunction, false);
-    ENDIAN(iFillColor, false);
-    ENDIAN(fFillAlphaFadeInTime, false);
-    ENDIAN(fFillAlphaFullTime, false);
-    ENDIAN(fFillAlphaFadeOutTime, false);
-    ENDIAN(fFillAlphaPersistentPercent, false);
-    ENDIAN(fFillAlphaPulseAmplitude, false);
-    ENDIAN(fFillAlphaPulseFrequency, false);
-    ENDIAN(fFillTextureUAnimSpeed, false);
-    ENDIAN(fFillTextureVAnimSpeed, false);
-    ENDIAN(fEdgeExponentValue, false);
-    ENDIAN(iEdgeColor, false);
-    ENDIAN(fEdgeAlphaFadeInTime, false);
-    ENDIAN(fEdgeAlphaFullTime, false);
-    ENDIAN(fEdgeAlphaFadeOutTime, false);
-    ENDIAN(fEdgeAlphaPersistentPercent, false);
-    ENDIAN(fEdgeAlphaPulseAmplitude, false);
-    ENDIAN(fEdgeAlphaPulseFrequency, false);
-    ENDIAN(fFillAlphaFullPercent, false);
-    ENDIAN(fEdgeAlphaFullPercent, false);
-    ENDIAN(eTextureBlendModeDest, false);
-    ENDIAN(eParticleBlendModeSource, false);
-    ENDIAN(eParticleBlendOperation, false);
-    ENDIAN(eParticleZTestFunction, false);
-    ENDIAN(eParticleBlendModeDest, false);
-    ENDIAN(fParticleFadeInTime, false);
-    ENDIAN(fParticleFullTime, false);
-    ENDIAN(fParticleFadeOutTime, false);
-    ENDIAN(fParticleFull, false);
-    ENDIAN(fParticlePersistent, false);
-    ENDIAN(fParticleLifetime, false);
-    ENDIAN(fParticleLifeVar, false);
-    ENDIAN(fParticleNormalSpeed, false);
-    ENDIAN(fParticleNormalAcc, false);
-    ENDIAN(ParticleVelocity.x, false);
-    ENDIAN(ParticleVelocity.y, false);
-    ENDIAN(ParticleVelocity.z, false);
-    ENDIAN(ParticleAcceleration.x, false);
-    ENDIAN(ParticleAcceleration.y, false);
-    ENDIAN(ParticleAcceleration.z, false);
-    ENDIAN(fParticleScale1, false);
-    ENDIAN(fParticleScale2, false);
-    ENDIAN(fParticleScale1Time, false);
-    ENDIAN(fParticleScale2Time, false);
-    ENDIAN(iParticleColor1, false);
-    ENDIAN(iParticleColor2, false);
-    ENDIAN(iParticleColor3, false);
-    ENDIAN(fParticleColor1Alpha, false);
-    ENDIAN(fParticleColor2Alpha, false);
-    ENDIAN(fParticleColor3Alpha, false);
-    ENDIAN(fParticleColor1Time, false);
-    ENDIAN(fParticleColor2Time, false);
-    ENDIAN(fParticleColor3Time, false);
-    ENDIAN(fParticleNormalSpeedVar, false);
-    ENDIAN(fParticleRotate, false);
-    ENDIAN(fParticleRotateVar, false);
-    ENDIAN(fParticleRotateSpeed, false);
-    ENDIAN(fParticleRotateSpeedVar, false);
-    ENDIAN(fAlphaTestStartTime, false);
-    ENDIAN(fAlphaTestEndTime, false);
-    ENDIAN(fAlphaTestStartValue, false);
-    ENDIAN(fAlphaTestEndValue, false);
-    ENDIAN(fAlphaEdgeWidth, false);
-    ENDIAN(iAlphaEdgeColor, false);
-    ENDIAN(fExplosionSpeed, false);
-    ENDIAN(iParticleTextureCountX, false);
-    ENDIAN(iParticleTextureCountY, false);
-    ENDIAN(fAddOnFadeInTime, false);
-    ENDIAN(fAddOnFadeOutTime, false);
-    ENDIAN(fAddOnScaleStart, false);
-    ENDIAN(fAddOnScaleEnd, false);
-    ENDIAN(fAddOnScaleInTime, false);
-    ENDIAN(fAddOnScaleOutTime, false);
+    BSEndian(eTextureBlendModeSource, false);
+    BSEndian(eTextureBlendOperation, false);
+    BSEndian(eTextureZTestFunction, false);
+    BSEndian(iFillColor, false);
+    BSEndian(fFillAlphaFadeInTime, false);
+    BSEndian(fFillAlphaFullTime, false);
+    BSEndian(fFillAlphaFadeOutTime, false);
+    BSEndian(fFillAlphaPersistentPercent, false);
+    BSEndian(fFillAlphaPulseAmplitude, false);
+    BSEndian(fFillAlphaPulseFrequency, false);
+    BSEndian(fFillTextureUAnimSpeed, false);
+    BSEndian(fFillTextureVAnimSpeed, false);
+    BSEndian(fEdgeExponentValue, false);
+    BSEndian(iEdgeColor, false);
+    BSEndian(fEdgeAlphaFadeInTime, false);
+    BSEndian(fEdgeAlphaFullTime, false);
+    BSEndian(fEdgeAlphaFadeOutTime, false);
+    BSEndian(fEdgeAlphaPersistentPercent, false);
+    BSEndian(fEdgeAlphaPulseAmplitude, false);
+    BSEndian(fEdgeAlphaPulseFrequency, false);
+    BSEndian(fFillAlphaFullPercent, false);
+    BSEndian(fEdgeAlphaFullPercent, false);
+    BSEndian(eTextureBlendModeDest, false);
+    BSEndian(eParticleBlendModeSource, false);
+    BSEndian(eParticleBlendOperation, false);
+    BSEndian(eParticleZTestFunction, false);
+    BSEndian(eParticleBlendModeDest, false);
+    BSEndian(fParticleFadeInTime, false);
+    BSEndian(fParticleFullTime, false);
+    BSEndian(fParticleFadeOutTime, false);
+    BSEndian(fParticleFull, false);
+    BSEndian(fParticlePersistent, false);
+    BSEndian(fParticleLifetime, false);
+    BSEndian(fParticleLifeVar, false);
+    BSEndian(fParticleNormalSpeed, false);
+    BSEndian(fParticleNormalAcc, false);
+    BSEndian(ParticleVelocity.x, false);
+    BSEndian(ParticleVelocity.y, false);
+    BSEndian(ParticleVelocity.z, false);
+    BSEndian(ParticleAcceleration.x, false);
+    BSEndian(ParticleAcceleration.y, false);
+    BSEndian(ParticleAcceleration.z, false);
+    BSEndian(fParticleScale1, false);
+    BSEndian(fParticleScale2, false);
+    BSEndian(fParticleScale1Time, false);
+    BSEndian(fParticleScale2Time, false);
+    BSEndian(iParticleColor1, false);
+    BSEndian(iParticleColor2, false);
+    BSEndian(iParticleColor3, false);
+    BSEndian(fParticleColor1Alpha, false);
+    BSEndian(fParticleColor2Alpha, false);
+    BSEndian(fParticleColor3Alpha, false);
+    BSEndian(fParticleColor1Time, false);
+    BSEndian(fParticleColor2Time, false);
+    BSEndian(fParticleColor3Time, false);
+    BSEndian(fParticleNormalSpeedVar, false);
+    BSEndian(fParticleRotate, false);
+    BSEndian(fParticleRotateVar, false);
+    BSEndian(fParticleRotateSpeed, false);
+    BSEndian(fParticleRotateSpeedVar, false);
+    BSEndian(fAlphaTestStartTime, false);
+    BSEndian(fAlphaTestEndTime, false);
+    BSEndian(fAlphaTestStartValue, false);
+    BSEndian(fAlphaTestEndValue, false);
+    BSEndian(fAlphaEdgeWidth, false);
+    BSEndian(iAlphaEdgeColor, false);
+    BSEndian(fExplosionSpeed, false);
+    BSEndian(iParticleTextureCountX, false);
+    BSEndian(iParticleTextureCountY, false);
+    BSEndian(fAddOnFadeInTime, false);
+    BSEndian(fAddOnFadeOutTime, false);
+    BSEndian(fAddOnScaleStart, false);
+    BSEndian(fAddOnScaleEnd, false);
+    BSEndian(fAddOnScaleInTime, false);
+    BSEndian(fAddOnScaleOutTime, false);
 }

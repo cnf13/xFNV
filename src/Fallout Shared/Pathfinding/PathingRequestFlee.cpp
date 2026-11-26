@@ -4,7 +4,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 PathingRequestFlee::PathingRequestFlee() : PathingRequest(), fMinFleeDistance(0x1p+7f) {}
 

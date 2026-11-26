@@ -702,3 +702,21 @@ public:
 
     static void operator delete(void* apMemory);
 };
+
+inline const char* Tile::GetTypeName() {
+    return "TILE";
+}
+
+inline float Tile::Value::QFloat() {
+    return fValue;
+}
+
+inline bool Tile::GetNeedsNiUpdate() {
+    return bNeedsNiUpdate;
+}
+
+inline void Tile::ClearNeedsUpdate(int32_t aiFlag) {
+    if (uiFlags & aiFlag) {
+        uiFlags ^= aiFlag;
+    }
+}

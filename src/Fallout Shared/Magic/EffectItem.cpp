@@ -3,10 +3,9 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/AudioMarkerData.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -15,6 +14,7 @@
 #include "Fallout Shared/Magic/MagicFormulas.h"
 #include "Fallout Shared/Magic/MagicSystem.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESBipedModelForm.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESFile.h"
@@ -50,33 +50,16 @@ static SettingT<GameSettingCollection> sMagicEffectItemDamage("sMagicEffectItemD
 static SettingT<GameSettingCollection> sMagicEffectItemAbsorb("sMagicEffectItemAbsorb", "Absorb");
 static SettingT<GameSettingCollection> sMagicRangeStrike("sMagicRangeStrike", "Strike");
 
-double fFloor(float afValue) {
-    return static_cast<int32_t>(afValue);
-}
-
-float FloatFloor(float aIn) {
-    float fFloored = fFloor(aIn);
-    if (aIn - fFloored >= 0.0) {
-        return fFloored;
-    }
-
-    return fFloored - 1.0;
-}
-
-MEM_CONTEXT QMemContext() {
-    return MemoryManager::eMemContext;
-}
-
 EffectItemData::EffectItemData()
   : iMagnitude(0), iArea(0), iDuration(0), iRange(MagicSystem::SELF), iActorValue(ActorValue::VALUE_NONE) {}
 
 // Swaps the five dwords read from a big-endian file, in field order.
 void EffectItemData::Endian() {
-    ENDIAN(iMagnitude, false);
-    ENDIAN(iArea, false);
-    ENDIAN(iDuration, false);
-    ENDIAN(iRange, false);
-    ENDIAN(iActorValue, false);
+    BSEndian(iMagnitude, false);
+    BSEndian(iArea, false);
+    BSEndian(iDuration, false);
+    BSEndian(iRange, false);
+    BSEndian(iActorValue, false);
 }
 
 EffectItem::EffectItem(EffectSetting* apEffectSetting) : data(), Conditions() {
@@ -367,106 +350,6 @@ void EffectItem::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-char* ourStrcpy(char* apStrDest, const char* apStrSource) {
-    return std::strcpy(apStrDest, apStrSource);
-}
-
-void* ourMemset(void* apDest, int32_t aiValue, uint32_t aCount) {
-    return std::memset(apDest, aiValue, aCount);
-}
-
-void SetMemContext(MEM_CONTEXT aeContext) {
-    MemoryManager::eMemContext = aeContext;
-}
-
-SettingCollection::SettingCollection() : pHandle(nullptr) {
-    pSettingFile[0] = 0;
-}
-
-bool SettingCollection::WriteSettings() {
-    return pHandle != nullptr;
-}
-
-bool SettingCollection::ReadSettings() {
-    return pHandle != nullptr;
-}
-
-// The settings' viewer strings, one per setting in the collection's map; returns how many were added.
-uint32_t SettingCollectionMap::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 569);
-    uint32_t uiCount = 0;
-    const char* pKey;
-    Setting* pSetting;
-    NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
-    while (pkPos) {
-        Settings.GetNext(pkPos, pKey, pSetting);
-        if (pSetting) {
-            pSetting->GetViewerStrings(apStringsA);
-            ++uiCount;
-        }
-    }
-    return uiCount;
-}
-
-void SettingCollectionMap::Add(Setting* apSetting) {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 539);
-    if (apSetting && apSetting->pKey) {
-        Setting* pExisting;
-        if (Settings.GetAt(apSetting->pKey, pExisting)) {
-            SettingWarning(
-                "DEFAULT: Setting key '%s' already used in map.\nSetting keys must be unique.\n",
-                apSetting->pKey
-            );
-        }
-        else {
-            Settings.SetAt(apSetting->pKey, apSetting);
-        }
-    }
-}
-
-void SettingCollectionMap::Remove(Setting* apSetting) {
-    if (apSetting && apSetting->pKey) {
-        Settings.RemoveAt(apSetting->pKey);
-    }
-}
-
-// Writes every setting of the map through the virtual WriteSetting; true when the store is open and every write
-// succeeded.
-bool SettingCollectionMap::WriteSettings() {
-    bool bResult = SettingCollection::WriteSettings();
-    if (bResult) {
-        const char* pKey;
-        Setting* pSetting;
-        NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
-        while (pkPos) {
-            Settings.GetNext(pkPos, pKey, pSetting);
-            if (pSetting) {
-                bResult &= WriteSetting(*pSetting);
-            }
-        }
-    }
-    return bResult;
-}
-
-// Reads every setting of the map through the virtual ReadSetting, under the game setting memory context; true when the
-// store is open and every read succeeded.
-bool SettingCollectionMap::ReadSettings() {
-    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 632);
-    bool bResult = SettingCollection::ReadSettings();
-    if (bResult) {
-        const char* pKey;
-        Setting* pSetting;
-        NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
-        while (pkPos) {
-            Settings.GetNext(pkPos, pKey, pSetting);
-            if (pSetting) {
-                bResult &= ReadSetting(*pSetting);
-            }
-        }
-    }
-    return bResult;
-}
-
 float EffectSetting::GetBaseCost() {
     return data.fBaseCost;
 }
@@ -477,9 +360,4 @@ BSStringT<char> EffectSetting::GetEffectName() {
 
 ActorValue::Index EffectSetting::GetAssociatedActorValue() {
     return data.eAssociatedActorValue;
-}
-
-char* NiStrcpy(char* pcDest, size_t stDestSize, const char* pcSrc) {
-    strcpy_s(pcDest, stDestSize, pcSrc);
-    return pcDest;
 }

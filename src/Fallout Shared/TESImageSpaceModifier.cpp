@@ -4,13 +4,13 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSUtilities.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/Setting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ImageSpaceManager.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -109,27 +109,27 @@ TESImageSpaceModifier TESImageSpaceModifier::Default;
 // Swaps the fields read from a big-endian file: the duration, every key count, then the rest. The flag bytes and the
 // depth of field mode need no swap.
 void TESImageSpaceModifier::ImageSpaceModifierData::Endian() {
-    ENDIAN(fDuration, false);
+    BSEndian(fDuration, false);
     for (int32_t i = 0; i < NUM_OP_PARAMS; ++i) {
         for (int32_t j = 0; j < IMAOP_COUNT; ++j) {
-            ENDIAN(ppuiKeySize[i][j], false);
+            BSEndian(ppuiKeySize[i][j], false);
         }
     }
-    ENDIAN(uiBlurKeySize, false);
-    ENDIAN(uiDoubleKeySize, false);
-    ENDIAN(uiTintColorKeySize, false);
-    ENDIAN(uiFadeColorKeySize, false);
-    ENDIAN(uiRadialBlurStrengthKeySize, false);
-    ENDIAN(uiRadialBlurRampupKeySize, false);
-    ENDIAN(uiRadialBlurStartKeySize, false);
-    ENDIAN(uiRadialBlurRampDownKeySize, false);
-    ENDIAN(uiRadialBlurDownStartKeySize, false);
-    ENDIAN(RadialBlurCenter.x, false);
-    ENDIAN(RadialBlurCenter.y, false);
-    ENDIAN(uiDepthOfFieldStrengthKeySize, false);
-    ENDIAN(uiDepthOfFieldDistanceKeySize, false);
-    ENDIAN(uiDepthOfFieldRangeKeySize, false);
-    ENDIAN(uiMotionBlurStrengthKeySize, false);
+    BSEndian(uiBlurKeySize, false);
+    BSEndian(uiDoubleKeySize, false);
+    BSEndian(uiTintColorKeySize, false);
+    BSEndian(uiFadeColorKeySize, false);
+    BSEndian(uiRadialBlurStrengthKeySize, false);
+    BSEndian(uiRadialBlurRampupKeySize, false);
+    BSEndian(uiRadialBlurStartKeySize, false);
+    BSEndian(uiRadialBlurRampDownKeySize, false);
+    BSEndian(uiRadialBlurDownStartKeySize, false);
+    BSEndian(RadialBlurCenter.x, false);
+    BSEndian(RadialBlurCenter.y, false);
+    BSEndian(uiDepthOfFieldStrengthKeySize, false);
+    BSEndian(uiDepthOfFieldDistanceKeySize, false);
+    BSEndian(uiDepthOfFieldRangeKeySize, false);
+    BSEndian(uiMotionBlurStrengthKeySize, false);
 }
 
 // The interpolator arrays and members are built with no data.
@@ -375,7 +375,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pBlurFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 BlurInterpolator.ReplaceKeys(pBlurFloatKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -388,7 +388,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pDoubleFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 DoubleInterpolator.ReplaceKeys(pDoubleFloatKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -401,7 +401,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pRadialBlurStrengthFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 RadialBlurStrengthInterpolator
@@ -415,7 +415,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pRadialBlurRampupFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 RadialBlurRampupInterpolator.ReplaceKeys(pRadialBlurRampupFloatKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -428,7 +428,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pRadialBlurStartFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 RadialBlurStartInterpolator.ReplaceKeys(pRadialBlurStartFloatKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -441,7 +441,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pRadialBlurRampDownFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 RadialBlurRampDownInterpolator
@@ -455,7 +455,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pRadialBlurDownStartFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 RadialBlurDownStartInterpolator
@@ -469,7 +469,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pTintColorKey);
                     for (uint32_t i = 0; i < (20 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 TintColorInterpolator.ReplaceKeys(pTintColorKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -482,7 +482,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pFadeColorKey);
                     for (uint32_t i = 0; i < (20 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 FadeColorInterpolator.ReplaceKeys(pFadeColorKey, uiNumKeys, NiAnimationKey::LINKEY);
@@ -495,7 +495,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pDepthOfFieldStrengthFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 DepthOfFieldStrengthInterpolator
@@ -509,7 +509,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pDepthOfFieldDistanceFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 DepthOfFieldDistanceInterpolator
@@ -523,7 +523,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pDepthOfFieldRangeFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 DepthOfFieldRangeInterpolator
@@ -537,7 +537,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pMotionBlurStrengthFloatKey);
                     for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                        ENDIAN(puiDwords[i], false);
+                        BSEndian(puiDwords[i], false);
                     }
                 }
                 MotionBlurStrengthInterpolator
@@ -555,7 +555,7 @@ bool TESImageSpaceModifier::Load(TESFile* apFile) {
                     if (apFile->QEndian()) {
                         uint32_t* puiDwords = reinterpret_cast<uint32_t*>(pppFloatKey[uiIndex][uiOp]);
                         for (uint32_t i = 0; i < (8 * uiNumKeys) >> 2; ++i) {
-                            ENDIAN(puiDwords[i], false);
+                            BSEndian(puiDwords[i], false);
                         }
                     }
                     ppInterpolator[uiIndex][uiOp]
@@ -586,7 +586,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pBlurFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(BNAM_ID, pEndianData, 4 * uiCount);
@@ -598,7 +598,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pDoubleFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(VNAM_ID, pEndianData, 4 * uiCount);
@@ -610,7 +610,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pTintColorKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(TNAM_ID, pEndianData, 4 * uiCount);
@@ -622,7 +622,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pFadeColorKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(NAM3_ID, pEndianData, 4 * uiCount);
@@ -634,7 +634,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pRadialBlurStrengthFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(RNAM_ID, pEndianData, 4 * uiCount);
@@ -646,7 +646,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pRadialBlurRampupFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(SNAM_ID, pEndianData, 4 * uiCount);
@@ -658,7 +658,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pRadialBlurStartFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(UNAM_ID, pEndianData, 4 * uiCount);
@@ -670,7 +670,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pRadialBlurRampDownFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(NAM1_ID, pEndianData, 4 * uiCount);
@@ -682,7 +682,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pRadialBlurDownStartFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(NAM2_ID, pEndianData, 4 * uiCount);
@@ -694,7 +694,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pDepthOfFieldStrengthFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(WNAM_ID, pEndianData, 4 * uiCount);
@@ -706,7 +706,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pDepthOfFieldDistanceFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(XNAM_ID, pEndianData, 4 * uiCount);
@@ -718,7 +718,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pDepthOfFieldRangeFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(YNAM_ID, pEndianData, 4 * uiCount);
@@ -730,7 +730,7 @@ void TESImageSpaceModifier::Save() {
     ourMemcpy(pEndianData, pMotionBlurStrengthFloatKey, sizeof(uint32_t) * uiCount);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN<uint32_t>(pEndianData[i], false);
+            BSEndian<uint32_t>(pEndianData[i], false);
         }
     }
     TESForm::__AddChunkData(NAM4_ID, pEndianData, 4 * uiCount);
@@ -744,7 +744,7 @@ void TESImageSpaceModifier::Save() {
             ourMemcpy(pEndianData, pppFloatKey[i][j], sizeof(uint32_t) * uiCount);
             if (TESForm::QEndianSwapOnSave()) {
                 for (uint32_t iM = 0; iM < uiCount; ++iM) {
-                    ENDIAN<uint32_t>(pEndianData[iM], false);
+                    BSEndian<uint32_t>(pEndianData[iM], false);
                 }
             }
             // The key arrays' chunk IDs are computed: 'DAI' with the key index in the low byte, +0x40 for the second
@@ -1450,55 +1450,4 @@ TESImageSpaceModifier* TESImageSpaceModifier::GetExplosionInFace() {
     TESForm* pForm = TESForm::GetFormByNumericID(358);
     g_explosionInFaceIMOD = dynamic_cast<TESImageSpaceModifier*>(pForm);
     return g_explosionInFaceIMOD;
-}
-
-// Hands the keys to the color data, creating it on first use.
-void NiColorInterpolator::ReplaceKeys(NiColorKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
-    if (uiNumKeys) {
-        if (!m_spColorData) {
-            NiColorData* pkColorData = new NiColorData;
-            m_spColorData = pkColorData;
-        }
-        m_spColorData->ReplaceAnim(pkKeys, uiNumKeys, eType);
-        m_uiLastIdx = 0;
-    }
-    else if (m_spColorData) {
-        m_spColorData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
-    }
-}
-
-NiFloatKey* NiFloatData::GetAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) {
-    uiNumKeys = m_uiNumKeys;
-    eType = m_eType;
-    ucSize = m_ucKeySize;
-    return m_pkKeys;
-}
-
-void NiFloatInterpolator::ReplaceKeys(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
-    if (uiNumKeys) {
-        if (!m_spFloatData) {
-            NiFloatData* pkData = new NiFloatData;
-            m_spFloatData = pkData;
-        }
-        m_spFloatData->ReplaceAnim(pkKeys, uiNumKeys, eType);
-        m_uiLastIdx = 0;
-    }
-    else if (m_spFloatData) {
-        m_spFloatData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
-    }
-}
-
-NiLinColorKey::NiLinColorKey() {}
-
-NiColorA NiColorA::operator*(float fScalar) const {
-    NiColorA kResult = *this;
-    kResult.r *= fScalar;
-    kResult.g *= fScalar;
-    kResult.b *= fScalar;
-    kResult.a *= fScalar;
-    return kResult;
-}
-
-NiColorA operator*(float afScalar, const NiColorA& arColor) {
-    return arColor * afScalar;
 }

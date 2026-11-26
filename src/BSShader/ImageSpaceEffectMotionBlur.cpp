@@ -2,6 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderProperty.h"
 #include "BSShader/ImageSpaceEffect.h"

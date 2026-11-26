@@ -191,10 +191,7 @@ void hkpAabbPhantom::ensureDeterministicOrder() {
     if (!m_orderDirty.m_bool) {
         return;
     }
-    const int32_t iSize = m_overlappingCollidables.m_size;
-    if (iSize > 1) {
-        hkAlgorithm::quickSort(m_overlappingCollidables.m_data, 0, iSize - 1, 0);
-    }
+    hkAlgorithm::quickSort(m_overlappingCollidables.m_data, m_overlappingCollidables.m_size, OrderByUid());
     m_orderDirty.m_bool = 0;
 }
 

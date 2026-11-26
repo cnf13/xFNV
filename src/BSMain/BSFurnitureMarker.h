@@ -72,3 +72,7 @@ public:
     static inline NiFixedString* pTag;
     static NiRTTI ms_RTTI;
 };
+
+inline const NiPoint3& FurnitureMark::QPosition() {
+    return Position;
+}

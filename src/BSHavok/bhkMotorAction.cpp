@@ -1,18 +1,17 @@
 #include "BSHavok/bhkMotorAction.h"
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
-#include "Fallout Shared/GlobalFunc.h"
-#include "Fallout Shared/TESFile.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -55,8 +54,8 @@ void bhkMotorAction::LoadBinary(NiStream& arStream) {
         bool bCreated;
         hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_axis);
-        ENDIAN(rInfo.m_spinRate, false);
-        ENDIAN(rInfo.m_gain, false);
+        BSEndian(rInfo.m_spinRate, false);
+        BSEndian(rInfo.m_gain, false);
     }
 }
 
@@ -67,14 +66,14 @@ void bhkMotorAction::SaveBinary(NiStream& arStream) {
     hkMotorActionCinfo& rInfo = static_cast<hkMotorActionCinfo&>(CreateCinfo(bCreated));
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_axis);
-        ENDIAN(rInfo.m_spinRate, false);
-        ENDIAN(rInfo.m_gain, false);
+        BSEndian(rInfo.m_spinRate, false);
+        BSEndian(rInfo.m_gain, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_axis);
-        ENDIAN(rInfo.m_spinRate, false);
-        ENDIAN(rInfo.m_gain, false);
+        BSEndian(rInfo.m_spinRate, false);
+        BSEndian(rInfo.m_gain, false);
     }
 }
 

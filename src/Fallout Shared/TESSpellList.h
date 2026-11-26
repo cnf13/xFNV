@@ -49,7 +49,7 @@ public:
     // Returns the address of the spell list (spellList).
     BSSimpleList<SpellItem*>* GetSpellList();
     // Saves both lists' form IDs when change flag 0x10 is set. TESActorBase::SaveGame passes its BGSSaveFormBuffer.
-    void SaveGameBGS(BGSSaveFormBuffer* apSaveGameBuffer);
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
     bool HasLeveledSpell(TESLevSpell* apSpell);
 
     BSSimpleList<SpellItem*> spellList;

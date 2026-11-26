@@ -257,3 +257,23 @@ public:
 // NiStreamSaveBinary of one byte: callers pass a byte field's address (such as BSValueNode::m_uFlags), written with
 // size 1.
 void NiStreamSaveByte(NiStream* pkStream, const uint8_t* pucValue);
+
+// Defined in NiStreamMacros.h, which includes this header and which this header includes at its end.
+template <class T>
+void NiStreamSaveBinary(NiStream& arStream, const T& arValue);
+
+inline void NiStream::SaveLinkID(const NiObject* pkObject) {
+    uint32_t uiLinkID = GetLinkIDFromObject(pkObject);
+    NiStreamSaveBinary(*this, uiLinkID);
+}
+
+#include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
+
+inline uint32_t NiStream::GetObjectCount() {
+    return m_kTopObjects.GetSize();
+}
+
+inline NiObject* NiStream::GetObjectAt(uint32_t i) {
+    NiPointer<NiObject>& spObject = m_kTopObjects.GetAt(i);
+    return spObject;
+}

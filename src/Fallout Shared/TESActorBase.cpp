@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESActorBase.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/AiFormulas.h"
@@ -118,7 +118,7 @@ uint16_t TESActorBase::GetSaveSize(uint32_t aiFlags) {
 void TESActorBase::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     TESForm::SaveGame(apSaveGameBuffer);
     TESActorBaseData::SaveGame(apSaveGameBuffer);
-    SaveGameBGS(apSaveGameBuffer);
+    TESSpellList::SaveGame(apSaveGameBuffer);
     TESAttributes::SaveGame(apSaveGameBuffer);
     TESAIForm::SaveGame(apSaveGameBuffer);
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_ACTOR_BASE_FULLNAME)) {
@@ -145,8 +145,8 @@ void TESActorBase::SaveGame(uint32_t aiFlags) {
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 109) {
         TESForm::SaveGame(aiFlags);
     }
-    TESAttributes::SaveGameTES(aiFlags);
-    TESActorBaseData::SaveGameTES(aiFlags);
+    TESAttributes::SaveGame(aiFlags);
+    TESActorBaseData::SaveGame(aiFlags);
     TESSpellList::SaveGame(aiFlags);
     TESAIForm::SaveGame(aiFlags);
     if (aiFlags & 0) {
@@ -261,8 +261,8 @@ void TESActorBase::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 109) {
         TESForm::LoadGame(aiFlags, aiCurrentFlags);
     }
-    TESAttributes::LoadGameTES(aiFlags, aiCurrentFlags);
-    TESActorBaseData::LoadGameTES(aiFlags, aiCurrentFlags);
+    TESAttributes::LoadGame(aiFlags, aiCurrentFlags);
+    TESActorBaseData::LoadGame(aiFlags, aiCurrentFlags);
     TESSpellList::LoadGame(aiFlags, aiCurrentFlags);
     TESAIForm::LoadGame(aiFlags, aiCurrentFlags);
     if (aiFlags & CHANGE_ACTOR_BASE_FULLNAME) {

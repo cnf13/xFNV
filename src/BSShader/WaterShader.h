@@ -89,7 +89,7 @@ public:
     static inline NiColorA kShallowColor{};
     static inline NiColorA kDeepColor{};
     static inline NiColorA kReflectionColor{};
-    // Shader constants after pReflectionColor: only Cmd_ModWaterShader uses them (the reflectivity, opacity and
+    // Shader constants after pReflectionColor: only Script::ModifyWaterShader uses them (the reflectivity, opacity and
     // distortion amounts are pVarAmounts' g, b and a; the fog amount pFogColor's a).
     static inline NiColorA pVarAmounts{};
     static inline NiColorA pFogParam{};
@@ -100,3 +100,19 @@ public:
     static inline NiColorA pDepthFalloff{};
     static inline NiVector4 kNormalOffset{};
 };
+
+inline void WaterShader::SetWaterShaderReflectionTexture(NiTexture* ptexture) {
+    pReflectionTexture = ptexture;
+}
+
+inline void WaterShader::SetWaterShaderNormalMapTexture(NiTexture* ptexture) {
+    pNormalMapTexture = ptexture;
+}
+
+inline void WaterShader::SetWaterShaderDetailTexture(NiTexture* ptexture) {
+    pDetailTexture = ptexture;
+}
+
+inline void WaterShader::SetWaterShaderNoiseMap(NiTexture* ptexture) {
+    pNoiseMap = ptexture;
+}

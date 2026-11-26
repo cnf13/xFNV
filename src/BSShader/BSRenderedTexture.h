@@ -5,6 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 
 class NiRenderedCubeMap;
 
@@ -82,3 +83,43 @@ public:
 };
 
 NiSmartPointer(BSRenderedTexture);
+
+// Returns spTexture[aiTextureID]; a null this reads a temporary null pointer instead and returns null.
+inline NiRenderedTexture* BSRenderedTexture::GetTexture(int32_t aiIndex) {
+    if (!this) {
+        NiPointer<NiRenderedTexture> spTemp;
+        NiRenderedTexture* pTexture = spTemp;
+        return pTexture;
+    }
+    return spTexture[aiIndex];
+}
+
+// Returns true only while the renderer is outside a frame.
+inline bool BSRenderedTexture::QOutsideFrame() {
+    return NiRenderer::GetRenderer()->GetFrameState() == NiRenderer::FRAMESTATE_OUTSIDE_FRAME;
+}
+
+// The width of rendered texture aiIndex through its virtual GetWidth, 0 when it is missing.
+inline uint32_t BSRenderedTexture::GetWidth(int32_t aiIndex) {
+    if (!spTexture[aiIndex]) {
+        return 0;
+    }
+    NiRenderedTexture* pTexture = spTexture[aiIndex];
+    return pTexture->GetWidth();
+}
+
+// The height of rendered texture auiIndex through its virtual GetHeight, 0 when it is missing.
+inline uint32_t BSRenderedTexture::GetHeight(int32_t aiIndex) {
+    if (!spTexture[aiIndex]) {
+        return 0;
+    }
+    NiRenderedTexture* pTexture = spTexture[aiIndex];
+    return pTexture->GetHeight();
+}
+
+// Copies the pre-restore group into the first target group when one exists.
+inline void BSRenderedTexture::UsePreRestoreGroup() {
+    if (spPreRestoreGroup) {
+        spGroup[0] = spPreRestoreGroup;
+    }
+}

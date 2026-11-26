@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSSystem/BSPackedTask.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -154,26 +154,6 @@ public:
 
     static inline TaskQueueInterface* pInstance;
     static inline bool bActive = true;
-};
-
-// A task that the worker threads run once per item of an array: each call gets the array and the next unclaimed index.
-// Only some of the members are declared.
-class BSParallelArrayTask {
-public:
-    // the function the worker threads run on every item
-    using TaskFunc_t = void (*)(void* apData, uint32_t auiIndex);
-
-    BSParallelArrayTask() = default;
-    BSParallelArrayTask(TaskFunc_t apTaskFunc, void* apData, uint32_t aiSize);
-
-    // 0x0
-    TaskFunc_t pTaskFunc;
-    // 0x4
-    void* pData;
-    // 0x8
-    uint32_t iSize;
-    // 0xC the next index a worker claims
-    volatile uint32_t iIndex;
 };
 
 // The game settings TaskQueueInterface.cpp defines.

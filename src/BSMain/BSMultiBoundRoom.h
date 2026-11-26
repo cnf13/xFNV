@@ -81,3 +81,11 @@ public:
 };
 
 NiSmartPointer(BSMultiBoundRoom);
+
+inline NiTPointerList<NiPointer<BSMultiBound>>& BSMultiBoundRoom::QJoinedMultiBoundList() {
+    return kJoinedMultiBoundList;
+}
+
+inline const NiTPointerList<BSOcclusionPlane*>& BSMultiBoundRoom::GetOccluders() const {
+    return lOccluderList;
+}

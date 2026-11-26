@@ -78,3 +78,18 @@ public:
 };
 
 NiSmartPointer(NiSourceTexture);
+
+inline void NiSourceTexture::SetLookNormal() {}
+
+// Always false: cLooked is read and masked with zero.
+inline bool NiSourceTexture::QLookNormal() {
+    return false;
+}
+
+inline void NiSourceTexture::SetUsePreloading(bool bPreload) {
+    NiSourceTexture::ms_bPreload = bPreload;
+}
+
+inline void NiSourceTexture::SetDestroyAppDataFlag(bool bDestroy) {
+    NiSourceTexture::ms_bDestroyAppData = bDestroy;
+}

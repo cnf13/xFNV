@@ -42,3 +42,7 @@ public:
     // Live wrappers of this class, counted by the constructors.
     static inline uint32_t iCount;
 };
+
+inline bhkEntity::bhkEntity() {
+    ++iCount;
+}

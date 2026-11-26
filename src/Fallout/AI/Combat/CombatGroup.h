@@ -1,9 +1,9 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSWorldLocation.h"
-#include "Fallout Shared/eBool.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 #include "Fallout/AI/Combat/CombatTimer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -311,7 +311,7 @@ public:
     // Returns a copy of fSearchStartedTimeStamp.
     CombatTimeStamp GetSearchStartedTimeStamp();
     bool GetTargetLastDetectedLocation(Actor* apTarget, BGSWorldLocation& arLastDetectedLocation);
-    void CreateDebugGeometry(eBool abClear);
+    void CreateDebugGeometry(bool abClear);
 
     static void operator delete(void* apMemory) {
         ourFree(apMemory);

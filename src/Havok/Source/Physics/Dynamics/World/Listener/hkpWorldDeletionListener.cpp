@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Dynamics/World/Listener/hkpWorldDeletionListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkpWorldDeletionListener::~hkpWorldDeletionListener() {}
 

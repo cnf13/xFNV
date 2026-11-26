@@ -50,16 +50,6 @@ TESGlobal* ContainerItemExtra::GetOwnerGlobal() {
 // The whole union, the global pointer's high half included.
 ContainerItemExtra::ContainerItemExtra() : pOwnerForm(nullptr), pOwnerGlobal(nullptr), fHealthMult(1.0f) {}
 
-bool FloatEQ(float aX, float aY, float afPrecision) {
-    if (afPrecision < 0.0) {
-        return false;
-    }
-    if (!(aY < static_cast<double>(aX))) {
-        return afPrecision > (aY - aX);
-    }
-    return afPrecision > (aX - aY);
-}
-
 // An entry is loaded with the owner's raw form ID in pOwnerForm and the global's in the union; resolves both through
 // the form tables. The form ID is fetched before the editor ID, so the two are hoisted in that order.
 void ContainerItemExtra::InitItem(TESForm* apOwner) {
@@ -178,7 +168,7 @@ void ContainerItemExtra::AdjustHealthPercent(float afHealthPerc) {
 }
 
 void CONTAINER_ITEM_EXTRA::Endian() {
-    ENDIAN(iOwnerID, false);
-    ENDIAN(iUnion, false);
-    ENDIAN(fHealthMult, false);
+    BSEndian(iOwnerID, false);
+    BSEndian(iUnion, false);
+    BSEndian(fHealthMult, false);
 }

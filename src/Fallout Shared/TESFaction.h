@@ -7,9 +7,6 @@
 
 class TESReputation;
 
-bool Cmd_GetPCFactionAttack(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_GetPCEnemyofFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-
 // A faction's rank data: the male and female rank titles and the insignia texture.
 class RANK_DATA {
 public:

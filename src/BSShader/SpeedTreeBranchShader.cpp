@@ -19,7 +19,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPropertyState.h"
@@ -45,22 +45,6 @@
 NiRTTI SpeedTreeBranchShader::ms_RTTI("SpeedTreeBranchShader", &ShadowLightShader::ms_RTTI);
 
 SpeedTreeBranchShader::m_kPasses_t SpeedTreeBranchShader::m_kPasses;
-
-void SpeedTreeShader_SetShaderConstants(NiD3DShaderConstantMap* apConstantMap, uint32_t auiCount) {
-    apConstantMap->AddEntry("TreeData", 0x10000007u, 0, auiCount, 1u, "", 16u, 4u, SpeedTreeShader_pShaderData, false);
-    apConstantMap->AddEntry(
-        "WindMatrices",
-        0x10000009u,
-        0,
-        auiCount + 1,
-        16u,
-        "",
-        256u,
-        4u,
-        SpeedTreeShader_pWindMatrices,
-        false
-    );
-}
 
 SpeedTreeBranchShader::SpeedTreeBranchShader(NiDX9ShaderDeclaration* apShaderDecl)
   : ShadowLightShader(apShaderDecl, nullptr, nullptr, nullptr) {
@@ -440,7 +424,7 @@ void SpeedTreeBranchShader::CreateConstantMaps() {
     }
     spDefaultPixelConstantMap = m_spPixelConstantMap;
     spDefaultVertexConstantMap = m_spVertexConstantMap;
-    SpeedTreeShader_SetShaderConstants(m_spVertexConstantMap.m_pObject, 0x2A);
+    SpeedTreeShader::SetShaderConstants(m_spVertexConstantMap.m_pObject, 0x2A);
 }
 
 void SpeedTreeBranchShader::ReloadShaders() {

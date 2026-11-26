@@ -20,7 +20,7 @@
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSSystem/Archive.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -45,25 +45,25 @@
 #include "SDK/MSVC/string.h"
 #include "platform/System.h"
 
-SettingT<INIPrefSettingCollection> gs_fDefaultMasterVolume_Audio("fDefaultMasterVolume:Audio", 1.0f);
-SettingT<INIPrefSettingCollection> gs_fDefaultFootVolume_Audio("fDefaultFootVolume:Audio", 0.5f);
-SettingT<INIPrefSettingCollection> gs_fDefaultVoiceVolume_Audio("fDefaultVoiceVolume:Audio", 0.6f);
-SettingT<INIPrefSettingCollection> gs_fDefaultEffectsVolume_Audio("fDefaultEffectsVolume:Audio", 1.0f);
-SettingT<INIPrefSettingCollection> gs_fDefaultMusicVolume_Audio("fDefaultMusicVolume:Audio", 0.6f);
-SettingT<INIPrefSettingCollection> gs_fDefaultRadioVolume_Audio("fDefaultRadioVolume:Audio", 0.5f);
-SettingT<INISettingCollection> g_bUseAudioDebugInformation_Audio("bUseAudioDebugInformation:Audio", true);
-SettingT<INISettingCollection> gs_fAudioDebugDelay_Audio("fAudioDebugDelay:Audio", 0.0f);
-SettingT<INISettingCollection> gs_fMasterVolumeMult("fMasterVolumeMult:Audio", 1.3f);
+SettingT<INIPrefSettingCollection> fMasterVolumeDefault("fDefaultMasterVolume:Audio", 1.0f);
+SettingT<INIPrefSettingCollection> fFootVolumeDefault("fDefaultFootVolume:Audio", 0.5f);
+SettingT<INIPrefSettingCollection> fVoiceVolumeDefault("fDefaultVoiceVolume:Audio", 0.6f);
+SettingT<INIPrefSettingCollection> fEffectsVolumeDefault("fDefaultEffectsVolume:Audio", 1.0f);
+SettingT<INIPrefSettingCollection> fMusicVolumeDefault("fDefaultMusicVolume:Audio", 0.6f);
+SettingT<INIPrefSettingCollection> fRadioVolumeDefault("fDefaultRadioVolume:Audio", 0.5f);
+SettingT<INISettingCollection> bUseAudioDebugInformation("bUseAudioDebugInformation:Audio", true);
+SettingT<INISettingCollection> fAudioDebugDelay("fAudioDebugDelay:Audio", 0.0f);
+SettingT<INISettingCollection> fMasterVolumeMult("fMasterVolumeMult:Audio", 1.3f);
 SettingT<INISettingCollection> fDialogueFadeDecibels("fDialogueFadeDecibels:Audio", 6.0f);
 SettingT<INISettingCollection> fDialogueFadeSecondsIn("fDialogueFadeSecondsIn:Audio", 2.0f);
 SettingT<INISettingCollection> fDialogueFadeSecondsOut("fDialogueFadeSecondsOut:Audio", 1.0f);
 static SettingT<INISettingCollection> iAttenuationEffectiveSilence("iAttenuationEffectiveSilence:Audio", 9000);
 static SettingT<INISettingCollection> iAttenuationDialogMenuMute("iAttenuationDialogMenuMute:Audio", 3000);
 
-SettingT<INISettingCollection> gs_bEnableAudioCache_Audio("bEnableAudioCache:Audio", true);
-SettingT<INISettingCollection> gs_iAudioCacheSize_Audio("iAudioCacheSize:Audio", 2048);
-SettingT<INISettingCollection> gs_iMaxSizeForCachedSound("iMaxSizeForCachedSound:Audio", 256);
-SettingT<INISettingCollection> gs_iAudioHWThread_Audio("iAudioHWThread:Audio", 2);
+SettingT<INISettingCollection> bEnableAudioCache("bEnableAudioCache:Audio", true);
+SettingT<INISettingCollection> iAudioCacheSize("iAudioCacheSize:Audio", 2048);
+SettingT<INISettingCollection> iMaxSizeForCachedSound("iMaxSizeForCachedSound:Audio", 256);
+SettingT<INISettingCollection> iAudioHWThread("iAudioHWThread:Audio", 2);
 
 int32_t BSAudioManager::AudioStringCompareFn(AudioDebugString* apA, AudioDebugString* apB) {
     if (apA->iSoundID >= apB->iSoundID) {
@@ -179,14 +179,14 @@ void BSAudioManager::Shutdown() {
     }
     StateUpdateMap.RemoveAll_0();
     // The setting's address is never null.
-    bEnableAudioCache = &gs_bEnableAudioCache_Audio.uValue;
+    bEnableAudioCache = &::bEnableAudioCache.uValue;
     bool bCacheWasEnabled = bEnableAudioCache->b;
     // The setting's address is never null.
-    pDisableCache = &gs_bEnableAudioCache_Audio.uValue;
+    pDisableCache = &::bEnableAudioCache.uValue;
     pDisableCache->b = false;
     AddToCache(nullptr);
     // The setting's address is never null.
-    pRestoreCache = &gs_bEnableAudioCache_Audio.uValue;
+    pRestoreCache = &::bEnableAudioCache.uValue;
     pRestoreCache->b = bCacheWasEnabled;
     MemoryManager::Instance().Deallocate(pMutedSoundTypes);
 }
@@ -244,13 +244,13 @@ BSSoundHandle BSAudioManager::GetSoundHandleByNumericID(uint32_t auiFormID, uint
                     BSGameSound::SOUND_FLAG_ENVELOPE_SLOW;
             }
         }
-        return GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
+        return GetSoundHandleByFilename(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
     }
     return BSSoundHandle();
 }
 
 BSSoundHandle
-BSAudioManager::GetSoundHandleByFilePath(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound) {
+BSAudioManager::GetSoundHandleByFilename(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound) {
     if (!BSAudio::pAudioInstance->bAudioEnabled) {
         return BSSoundHandle();
     }
@@ -268,7 +268,7 @@ BSAudioManager::GetSoundHandleByFilePath(const char* apFilename, uint32_t aeType
     pGameSound->iSoundID = uiSoundID;
     Setting::Info* p_uValue;
     // The setting's address is never null.
-    p_uValue = &gs_fAudioDebugDelay_Audio.uValue;
+    p_uValue = &fAudioDebugDelay.uValue;
     // Truncates to a 64-bit integer and keeps the low 32 bits.
     pGameSound->iCleanupDelayInMS = static_cast<uint32_t>(static_cast<int64_t>(p_uValue->f * 1000.0));
     if (BSAudio::pAudioInstance->pListener) {
@@ -447,7 +447,7 @@ void BSAudioManager::StartAudioThread() {
             pUpdateThread->Initialize(BSThread::MEDIUM_STACK_SIZE, "LibAudioUpdate", false);
             dwAudioThreadID = pUpdateThread->m_ThreadID;
             // The setting's address is never null.
-            iAudioHWThread = &gs_iAudioHWThread_Audio.uValue;
+            iAudioHWThread = &::iAudioHWThread.uValue;
             pUpdateThread->SetThreadProcessor(iAudioHWThread->uint);
             pUpdateThread->SetName("LibAudioUpdate");
             pUpdateThread->m_ThreadHandle->SetName("LibAudioUpdate");
@@ -487,7 +487,7 @@ BSSoundHandle BSAudioManager::GetSoundHandleByName(const char* apEditorID, uint3
             }
         }
         if (apFilename[0]) {
-            return GetSoundHandleByFilePath(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
+            return GetSoundHandleByFilename(apFilename, aiTypeFlags, static_cast<TESSound*>(pSettingsContext));
         }
     }
     return BSSoundHandle();
@@ -1059,14 +1059,14 @@ void BSAudioManager::PrecacheSound(char* apFilenameToCache, uint32_t aiFlags, TE
 bool BSAudioManager::IsEnableAudioCache() {
     Setting::Info* p_uValue;
     // The setting's address is never null.
-    p_uValue = &gs_bEnableAudioCache_Audio.uValue;
+    p_uValue = &bEnableAudioCache.uValue;
     return p_uValue->b;
 }
 
 void BSAudioManager::SetCacheEnabled(bool abEnableCache) {
     Setting::Info* p_uValue;
     // The setting's address is never null.
-    p_uValue = &gs_bEnableAudioCache_Audio.uValue;
+    p_uValue = &bEnableAudioCache.uValue;
     p_uValue->b = abEnableCache;
     if (!abEnableCache) {
         AddToCache(nullptr);
@@ -1083,7 +1083,7 @@ void BSAudioManager::SetAudioCacheSizeInK(uint32_t auiNewSize) {
     }
     else {
         // The setting's address is never null.
-        p_uValue = &gs_iAudioCacheSize_Audio.uValue;
+        p_uValue = &iAudioCacheSize.uValue;
         p_uValue->uint = auiNewSize;
     }
 }
@@ -1101,14 +1101,14 @@ bool BSAudioManager::IsValid(uint32_t aiSoundID) {
 uint32_t BSAudioManager::AudioCacheSize() {
     Setting::Info* p_uValue;
     // The setting's address is never null.
-    p_uValue = &gs_iAudioCacheSize_Audio.uValue;
+    p_uValue = &iAudioCacheSize.uValue;
     return p_uValue->uint;
 }
 
 float BSAudioManager::GetCorrectedVolume(float afBaseVolume, uint32_t aiTypeFlags) {
     Setting::Info* pMasterVolumeMult;
     // The setting's address is never null.
-    pMasterVolumeMult = &gs_fMasterVolumeMult.uValue;
+    pMasterVolumeMult = &fMasterVolumeMult.uValue;
     float fScaledVolume = ((fVolumes[0] * fVolumes[6]) * pMasterVolumeMult->f) * afBaseVolume;
     if ((aiTypeFlags & BSGameSound::SOUND_FLAG_MUSIC_B23) != 0) {
         return ((fScaledVolume * fVolumes[4]) * fVolumes[10]);
@@ -1237,22 +1237,22 @@ void BSAudioManager::InitializeAudio() {
     Setting::Info* pFootVolume;
     Setting::Info* pMasterVolume;
     // The setting's address is never null.
-    pMasterVolume = &gs_fDefaultMasterVolume_Audio.uValue;
+    pMasterVolume = &fMasterVolumeDefault.uValue;
     fVolumes[0u] = pMasterVolume->f;
     // The setting's address is never null.
-    pFootVolume = &gs_fDefaultFootVolume_Audio.uValue;
+    pFootVolume = &fFootVolumeDefault.uValue;
     fVolumes[1] = pFootVolume->f;
     // The setting's address is never null.
-    pVoiceVolume = &gs_fDefaultVoiceVolume_Audio.uValue;
+    pVoiceVolume = &fVoiceVolumeDefault.uValue;
     fVolumes[2] = pVoiceVolume->f;
     // The setting's address is never null.
-    pEffectsVolume = &gs_fDefaultEffectsVolume_Audio.uValue;
+    pEffectsVolume = &fEffectsVolumeDefault.uValue;
     fVolumes[3] = pEffectsVolume->f;
     // The setting's address is never null.
-    pMusicVolume = &gs_fDefaultMusicVolume_Audio.uValue;
+    pMusicVolume = &fMusicVolumeDefault.uValue;
     fVolumes[4] = pMusicVolume->f;
     // The setting's address is never null.
-    pRadioVolume = &gs_fDefaultRadioVolume_Audio.uValue;
+    pRadioVolume = &fRadioVolumeDefault.uValue;
     fVolumes[5] = pRadioVolume->f;
     fVolumes[6] = 1.0f;
     fVolumes[7] = 1.0f;
@@ -1284,7 +1284,7 @@ void BSAudioManager::SetVoiceState(uint32_t aiID, BSGameSound* apSound) {
     BSSoundInfo::Data pDebugInfo;
     BSSoundInfo::Data poldDebugInfo;
     // The setting's address is never null.
-    pUseDebugInfo = &g_bUseAudioDebugInformation_Audio.uValue;
+    pUseDebugInfo = &::bUseAudioDebugInformation.uValue;
     bool bUseAudioDebugInformation = pUseDebugInfo->b;
     if (apSound) {
         uint32_t uiDuration = apSound->iDurationInMS;
@@ -1466,7 +1466,7 @@ void BSAudioManager::AddToCache(BSGameSound* apToCache) {
     EnterCriticalSection(&CacheCritSection);
     int32_t count = CachedSoundList.m_uiCount;
     // The setting's address is never null.
-    bEnableAudioCache = &gs_bEnableAudioCache_Audio.uValue;
+    bEnableAudioCache = &::bEnableAudioCache.uValue;
     if (!static_cast<uint8_t>(bEnableAudioCache->b) && count > 0) {
         while (CachedSoundList.m_uiCount) {
             pSoundCopy = CachedSoundList.RemoveHead();
@@ -1477,11 +1477,11 @@ void BSAudioManager::AddToCache(BSGameSound* apToCache) {
     }
     else {
         // The setting's address is never null.
-        pCacheEnabled = &gs_bEnableAudioCache_Audio.uValue;
+        pCacheEnabled = &::bEnableAudioCache.uValue;
         if (static_cast<uint8_t>(pCacheEnabled->b) && apToCache) {
             uint32_t uiSoundSize = apToCache->iSoundSize;
             // The setting's address is never null.
-            uiCacheSize = &gs_iMaxSizeForCachedSound.uValue;
+            uiCacheSize = &iMaxSizeForCachedSound.uValue;
             if (!(uiSoundSize > uiCacheSize->uint << 10 ||
                   (apToCache->iSoundTypeFlags & BSGameSound::SOUND_FLAG_DONT_CACHE) != 0)) {
                 NiTListItem<BSGameSound*>* i = CachedSoundList.m_pkHead;
@@ -1506,7 +1506,7 @@ void BSAudioManager::AddToCache(BSGameSound* apToCache) {
                     for (int32_t iattempts = 0;; ++iattempts) {
                         Setting::Info* pAudioCacheSize;
                         // The setting's address is never null.
-                        pAudioCacheSize = &gs_iAudioCacheSize_Audio.uValue;
+                        pAudioCacheSize = &iAudioCacheSize.uValue;
                         if (iCurrentCachSize <= pAudioCacheSize->uint << 10 || !CachedSoundList.m_uiCount) {
                             break;
                         }

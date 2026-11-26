@@ -3,6 +3,7 @@
 #include "BSCore/BSReadWriteLock.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Magic/EffectItem.h"
 #include "Fallout Shared/Pathfinding/PathingCoverLocation.h"
@@ -31,14 +32,6 @@ SettingT<INISettingCollection> bDebugCombatCoverReservationsText("bDebugCombatCo
 SettingT<INISettingCollection> bDebugCombatCoverSearch("bDebugCombatCoverSearch:Combat", false);
 SettingT<INISettingCollection> bDebugCombatCoverSearchText("bDebugCombatCoverSearchText:Combat", false);
 SettingT<INISettingCollection> bDebugCombatCoverSearch2("bDebugCombatCoverSearch2:Combat", false);
-
-uint8_t BSMIN(uint8_t acA, uint8_t acB) {
-    if (acA >= acB) {
-        return acB;
-    }
-
-    return acA;
-}
 
 CoverReservationInfo::CoverReservationInfo()
   : cSegmentLength(0), cSegmentCount(0), cActorWidth(0), cSegment(0), bHideCover(false), bLeftEdge(false) {}

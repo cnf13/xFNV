@@ -1,6 +1,6 @@
 #include "SpeedTree/LeafInfo.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SpeedTree/CIdvFilename.h"
 #include "SpeedTree/EFileToken.h"
 #include "SpeedTree/FileAccess.h"

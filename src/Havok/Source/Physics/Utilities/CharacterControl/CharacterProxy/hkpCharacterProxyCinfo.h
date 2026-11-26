@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 
 #include <stddef.h>
 
@@ -46,6 +47,16 @@ public:
     int32_t m_maxCastIterations;
     bool m_refreshManifoldInCheckSupport;
 };
+
+inline void* hkpCharacterProxyCinfo::operator new(size_t auiSize) {
+    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(auiSize));
+}
+
+inline void hkpCharacterProxyCinfo::operator delete(void* apMemory) {
+    if (apMemory) {
+        hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkpCharacterProxyCinfo));
+    }
+}
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkpCharacterProxyCinfoTypeInfo;

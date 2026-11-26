@@ -9,7 +9,7 @@
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 
 NiRTTI SceneGraph::ms_RTTI("SceneGraph", &BSSceneGraph::ms_RTTI);

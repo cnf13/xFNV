@@ -1,6 +1,6 @@
 #include "Fallout Shared/BGSImpactData.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/AiFormulas.h"
@@ -18,28 +18,28 @@
 // The decal sizes first, then the impact fields, then the rest of the decal data and the sound level, in the game's
 // order. The flag and parallax pass bytes need no swap.
 void BGSImpactData::OLD_IMPACT_DATA_DATA::Endian() {
-    ENDIAN(fDecalMinWidth, false);
-    ENDIAN(fDecalMaxWidth, false);
-    ENDIAN(fDecalMinHeight, false);
-    ENDIAN(fDecalMaxHeight, false);
-    ENDIAN(fEffectDuration, false);
-    ENDIAN(fParallaxScale, false);
-    ENDIAN(eOrient, false);
-    ENDIAN(fDepth, false);
-    ENDIAN(fShininess, false);
-    ENDIAN(fAngleThreshold, false);
-    ENDIAN(fPlacementRadius, false);
-    ENDIAN(iColor, false);
-    ENDIAN(eSoundLevel, false);
+    BSEndian(fDecalMinWidth, false);
+    BSEndian(fDecalMaxWidth, false);
+    BSEndian(fDecalMinHeight, false);
+    BSEndian(fDecalMaxHeight, false);
+    BSEndian(fEffectDuration, false);
+    BSEndian(fParallaxScale, false);
+    BSEndian(eOrient, false);
+    BSEndian(fDepth, false);
+    BSEndian(fShininess, false);
+    BSEndian(fAngleThreshold, false);
+    BSEndian(fPlacementRadius, false);
+    BSEndian(iColor, false);
+    BSEndian(eSoundLevel, false);
 }
 
 // Swaps the five dwords read from a big-endian file, in field order; the flag bytes need no swap.
 void BGSImpactData::IMPACT_DATA_DATA::Endian() {
-    ENDIAN(fEffectDuration, false);
-    ENDIAN(eOrient, false);
-    ENDIAN(fAngleThreshold, false);
-    ENDIAN(fPlacementRadius, false);
-    ENDIAN(eSoundLevel, false);
+    BSEndian(fEffectDuration, false);
+    BSEndian(eOrient, false);
+    BSEndian(fAngleThreshold, false);
+    BSEndian(fPlacementRadius, false);
+    BSEndian(eSoundLevel, false);
 }
 
 BGSImpactData::BGSImpactData() {

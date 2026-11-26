@@ -1,6 +1,8 @@
 #pragma once
 
+#include "BSCore/BSCoreUtils.h"
 #include "BSCore/BSSimpleList.h"
+#include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSAddonNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
@@ -75,22 +77,6 @@ class TESTopicInfo;
 class TESWaterForm;
 class TESWorldSpace;
 
-// The engine's start-up log, called printf-style. It is an empty function in this build, so its callers pass anything
-// from no argument to a message and its values.
-void InitializationFlow(...);
-// Splits apPath into device, directory, file name and extension, each into a buffer of the given size (a null buffer is
-// skipped).
-int32_t BSsplitpath(
-    const char* apPath,
-    char* apDevice,
-    int32_t aiDeviceLen,
-    char* apDir,
-    int32_t aiDirLen,
-    char* apFile,
-    int32_t aiFileLen,
-    char* apExt,
-    int32_t aiExtLen
-);
 int32_t makepath(char* apPath, uint32_t auiPathLen, char* apDevice, char* apDir, char* apFile, char* apExt);
 
 // The load errors TESDataHandler::DataError reports. 3 is passed when ConstructObjectList fails and 4 when a compiled

@@ -378,4 +378,4 @@ extern SettingT<INISettingCollection> bTaskletActorAnimMovementUpdates;
 extern SettingT<INISettingCollection> bTaskletTempEffectsUpdate;
 inline bool bRadiationExists;
 
-extern SettingT<GameSettingCollection> gs_fRemoveExcessComplexDeadTime;
+extern SettingT<GameSettingCollection> fRemoveExcessDeadComplexTime;

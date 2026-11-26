@@ -3,6 +3,7 @@
 #include "BSHavok/bhkPhantom.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpAabbPhantom.h"
 
 class hkpAabbPhantom;
 
@@ -53,3 +54,32 @@ public:
     // Live wrappers of this class, counted by the constructors.
     static inline uint32_t iCount;
 };
+
+inline void bhkAabbPhantom::GetAabb(hkAabb& arB) {
+    hkpAabbPhantom* pPhantom = **this;
+    if (pPhantom) {
+        MarkRead();
+        arB = pPhantom->m_aabb;
+        UnMarkRead();
+    }
+    else {
+        const hkVector4& rMax = hkVector4::getZero();
+        const hkVector4& rMin = hkVector4::getZero();
+        hkAabb kZeroAabb(rMin, rMax);
+        arB = kZeroAabb;
+    }
+}
+
+inline hkpAabbPhantom* bhkAabbPhantom::Gethk() {
+    return static_cast<hkpAabbPhantom*>(phkObject);
+}
+
+// A box phantom wraps an hkpAabbPhantom; its overlap array's getter is a trivial accessor (this + 0xD0).
+inline hkArray<hkpCollidable*, hkContainerHeapAllocator>* bhkAabbPhantom::GetOverlappingCollidables() {
+    hkpAabbPhantom* pphantom = static_cast<hkpAabbPhantom*>(**this);
+    if (pphantom) {
+        return &pphantom->m_overlappingCollidables;
+    }
+
+    return nullptr;
+}

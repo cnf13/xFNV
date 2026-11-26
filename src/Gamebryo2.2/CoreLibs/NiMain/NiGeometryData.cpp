@@ -1,17 +1,13 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
-#include "Fallout Shared/NiGeometryDataIteratorNiColorA.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiBlendIndices.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiBlendWeights.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiPoint2.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSNiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSPackedAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -1267,4 +1263,8 @@ int32_t NiGeometryData::FloatCompare(const float* pf0, const float* pf1, uint32_
 // Reads all the values in one read, as floats.
 void NiPoint2::LoadBinary(NiStream& stream, NiPoint2* pkValues, uint32_t uiNumValues) {
     NiStreamLoadBinary(stream, reinterpret_cast<float*>(pkValues), uiNumValues * 2);
+}
+
+void NiGeometryData::RendererData::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
 }

@@ -1,9 +1,12 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/ahkpWorld.h"
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkCollisionFilter.h"
+#include "BSHavok/bhkConvert.h"
+#include "BSHavok/bhkEntityListener.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkTaskletManagerCallback.h"
 #include "BSHavok/bhkWorldNS.h"
@@ -13,33 +16,132 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastInput.h"
+#include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpEntityListener.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantomListener.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "SDK/MSVC/ehvec.h"
 
 #include <stdint.h>
 
 class BGSAcousticSpaceListener;
-class bhkEntityListener;
 class bhkMultithreadedSystem;
 class bhkNiCollisionObject;
-class bhkPickData;
-class bhkTrapListener;
 class bhkWaterListener;
 class bhkWorldObject;
+class CFilter;
 class hkpAction;
+class hkpAllRayHitCollector;
+class hkpClosestRayHitCollector;
 class hkpCollidable;
 class hkpConstraintInstance;
 class hkpContactListener;
 class hkpEntity;
-class hkpEntityListener;
 class hkpPhantom;
+class hkpRigidBody;
 class hkpWorldObject;
 class hkVisualDebugger;
 class NiAVObject;
 class NiNode;
 class NiPoint3;
 class TESWaterListener;
+
+// A ray pick: the ray (its end point is calculated from the start and kLength when kLength is not zero), the collision
+// filter, the collectors the hits go to and the result. Not polymorphic.
+class bhkPickData : public hkpWorldRayCastInput, public hkpWorldRayCastOutput {
+public:
+    bhkPickData();
+
+    // The end point of the ray.
+    const hkVector4& GethkTo();
+    // Calculates the end point of the ray from its start point and length.
+    void CalcTo();
+    // Copies arFrom into the ray's start point.
+    void SetFrom(const hkVector4& arFrom);
+    void SetAllCollector(hkpAllRayHitCollector* apCollector);
+    void SetClosestCollector(hkpClosestRayHitCollector* apCollector);
+    bool GetPickFailed();
+    NiAVObject* GetNiAVObject();
+    // The end point of the ray in game units, written to arTo.
+    void GetTo(NiPoint3& arTo);
+    // True when the ray has a length (kLength is not zero within 0.001).
+    bool QLength();
+    // kLength.
+    hkVector4& GethkLength() {
+        return hkLength;
+    }
+    // The ray's start point.
+    hkVector4* GethkFrom();
+    // The projectiles pass their pick cache's name.
+    void SetCache(char* apCache) {
+        pCache = apCache;
+    }
+    // pAllCollector.
+    hkpAllRayHitCollector* GetAllCollector() {
+        return pAllCollector;
+    }
+    // The ray's length vector in game units, written to arLength.
+    void GetLength(NiPoint3& arLength);
+    // Sets the ray's length vector; with a length the end point is calculated from it.
+    void SetLength(const hkVector4& arLength);
+    // Sets the ray's end point and clears its length.
+    void SetTo(const hkVector4& arTo);
+    // Sets the collision filter info of the ray.
+    void SetFilter(CFilter aiFilter);
+    // The rigid body the ray hit, or null.
+    hkpRigidBody* GethkRigidBody();
+    // Sets the ray's start point from a game-unit point.
+    void NiSetFrom(const NiPoint3& arFrom);
+    // Sets the ray's end point from a game-unit point.
+    void NiSetTo(const NiPoint3& arTo);
+    // Writes the ray's hit point, calculated by CalcHitPoint, in game units.
+    void NiCalcHitPoint(NiPoint3& arPoint);
+    // Sets the ray's length vector from a game-unit vector.
+    void NiSetLength(const NiPoint3& arLength);
+    // The ray's hit point in Havok units: the start interpolated towards the end by the hit fraction.
+    void CalcHitPoint(hkVector4& arPoint);
+    // The ray's start point in game units, written to arFrom.
+    void GetFrom(NiPoint3& arFrom);
+    // The ray's filter, built from its filter info into apResult.
+    CFilter* GetFilter(CFilter* apResult);
+
+    hkVector4 hkLength;
+    char* pCache;
+    hkpClosestRayHitCollector* pCloseCollector;
+    hkpAllRayHitCollector* pAllCollector;
+    bool bPickFailed;
+};
+
+inline bhkPickData::bhkPickData()
+  : hkLength(hkVector4::getZero()), pCache(nullptr), pCloseCollector(nullptr), pAllCollector(nullptr),
+    bPickFailed(false) {}
+
+// m_to and kLength are reached by name rather than as neighbours of m_from, as the layout is not the exe's.
+inline void bhkPickData::CalcTo() {
+    if (QLength()) {
+        m_to.setAdd4(m_from, hkLength);
+    }
+}
+
+inline bool bhkPickData::QLength() {
+    return hkLength.equals3(hkVector4::getZero(), 0.001f) == 0;
+}
+
+// An entity listener that also hears about phantoms: the Havok side of a trap trigger.
+class bhkTrapListener : public bhkEntityListener, public hkpPhantomListener {
+public:
+    bhkTrapListener();
+    ~bhkTrapListener() override;
+
+    // DeletingDestruct's free (ourFree); both bases declare one.
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
+};
+
+inline bhkTrapListener::~bhkTrapListener() {}
 
 // The creation info a bhkWorld is built from: the Havok world's cinfo with the serializable tag base after it (at
 // +0xF0, where bhkSerializable::pInfo points).
@@ -430,3 +532,177 @@ extern SettingT<INISettingCollection> iHWThread6;
 namespace HavokWorldProps {
     static const float fGravitySC = 10.0f * -9.8100004196167;
 } // namespace HavokWorldProps
+
+// The Havok world's user data is the bhkWorld that wraps it (bhkWorld::Link sets it).
+inline bhkWorld* bhkWorld::Getbhk(const hkpWorld* apWorld) {
+    if (apWorld) {
+        return const_cast<ahkpWorld*>(static_cast<const ahkpWorld*>(apWorld))->getUserData();
+    }
+    return nullptr;
+}
+
+inline void bhkWorld::AddEntityListener(bhkEntityListener* apListener) {
+    ahkpWorld* pw = **this;
+    if (pw) {
+        MarkForWrite();
+        pw->addEntityListener(apListener);
+        UnMarkForWrite();
+    }
+    pEntityListenerA.pushBack(static_cast<hkpEntityListener*>(apListener));
+}
+
+inline float bhkWorld::QMaxPickTime() {
+    if (bhkWorld::bVatsReplay) {
+        return bhkWorld::fMaxPickTimeVATS;
+    }
+
+    return bhkWorld::fMaxPickTime;
+}
+
+// The threading-check mark is empty in the game's build, so MarkForWrite and UnMarkForWrite compile to one function.
+inline void bhkWorld::MarkForWrite() {
+    ahkpWorld* pw = **this;
+    if (pw) {
+        pw->markForWrite();
+    }
+}
+
+inline void bhkWorld::UnMarkForWrite() {
+    ahkpWorld* pw = **this;
+    if (pw) {
+        pw->unmarkForWrite();
+    }
+}
+
+// The Havok side of the arrow targets: an entity listener that does not implement Update itself (TESArrowTargetListener
+// does).
+class bhkArrowTargetListener : public bhkEntityListener {
+public:
+    bhkArrowTargetListener();
+    ~bhkArrowTargetListener() override;
+
+    static void operator delete(void* apMemory);
+};
+
+inline bhkArrowTargetListener::~bhkArrowTargetListener() {}
+
+inline void bhkArrowTargetListener::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+// The read mark is empty in the game's build: only the Havok world's lookup remains.
+inline void bhkWorld::MarkForRead() {
+    ahkpWorld* pw = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
+    if (pw) {
+        pw->markForRead();
+    }
+}
+
+inline void bhkWorld::UnMarkForRead() {
+    ahkpWorld* pw = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
+    if (pw) {
+        pw->unmarkForRead();
+    }
+}
+
+inline bhkArrowTargetListener::bhkArrowTargetListener() : bhkEntityListener(0) {}
+
+inline void bhkWorld::AddContactListener(hkpContactListener* apListener) {
+    ahkpWorld* pw = **this;
+    if (pw) {
+        MarkForWrite();
+        pw->addContactListener(apListener);
+        UnMarkForWrite();
+    }
+}
+
+// The listener hears entities through the entity listeners and phantoms through its hkpPhantomListener base.
+inline void bhkWorld::AddTrapListener(bhkTrapListener* apListener) {
+    AddEntityListener(apListener);
+    ahkpWorld* pw = **this;
+    if (pw) {
+        MarkForWrite();
+        pw->addPhantomListener(apListener);
+        UnMarkForWrite();
+    }
+    pTrapListener = apListener;
+}
+
+inline bhkTrapListener* bhkWorld::QTrapListener() {
+    return pTrapListener;
+}
+
+// The Havok world's gravity, or zero without a world. The world is looked up before the read mark.
+inline const hkVector4& bhkWorld::GetGravity() {
+    ahkpWorld* pWorld = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
+    MarkForRead();
+    const hkVector4& kGravity = pWorld ? pWorld->getGravity() : hkVector4::getZero();
+    UnMarkForRead();
+    return kGravity;
+}
+
+inline const hkVector4& bhkPickData::GethkTo() {
+    CalcTo();
+    return m_to;
+}
+
+inline void bhkPickData::SetFrom(const hkVector4& arFrom) {
+    m_from = arFrom;
+}
+
+inline void bhkPickData::SetAllCollector(hkpAllRayHitCollector* apCollector) {
+    pAllCollector = apCollector;
+    pCloseCollector = nullptr;
+}
+
+inline void bhkPickData::SetClosestCollector(hkpClosestRayHitCollector* apCollector) {
+    pCloseCollector = apCollector;
+    pAllCollector = nullptr;
+}
+
+inline bool bhkPickData::GetPickFailed() {
+    return bPickFailed;
+}
+
+inline void bhkPickData::SetLength(const hkVector4& arLength) {
+    hkLength = arLength;
+}
+
+inline void bhkPickData::SetTo(const hkVector4& arTo) {
+    SetLength(hkVector4::getZero());
+    m_to = arTo;
+}
+
+inline void bhkPickData::SetFilter(CFilter aiFilter) {
+    m_filterInfo = aiFilter;
+}
+
+inline bhkTrapListener::bhkTrapListener() : bhkEntityListener(0) {}
+
+inline void bhkPickData::GetTo(NiPoint3& arTo) {
+    HK2NI(arTo, GethkTo());
+}
+
+inline hkVector4* bhkPickData::GethkFrom() {
+    return &m_from;
+}
+
+inline void bhkPickData::GetFrom(NiPoint3& arFrom) {
+    HK2NI(arFrom, *GethkFrom());
+}
+
+// The hit point: the ray's start interpolated towards its end by the hit fraction.
+inline void bhkPickData::CalcHitPoint(hkVector4& arPoint) {
+    alignas(16) hkSimdReal kFraction(m_hitFraction);
+    arPoint.setInterpolate4(m_from, m_to, kFraction);
+}
+
+inline void bhkPickData::GetLength(NiPoint3& arLength) {
+    HK2NI(arLength, GethkLength());
+}
+
+// The ray's filter, built from its filter info through CFilter's one-field constructor.
+inline CFilter* bhkPickData::GetFilter(CFilter* apResult) {
+    ::new (apResult) CFilter(m_filterInfo);
+    return apResult;
+}

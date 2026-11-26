@@ -4,7 +4,7 @@
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMovie/Xenon/MoviePlayer_Xenon.h"
 #include "BSShader/BSShaderManager.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -30,9 +30,9 @@ using aDefaultTryingTo_t = const char[106];
 static aDefaultTryingTo_t aDefaultTryingTo{
     "DEFAULT: Trying to pause a movie while another movie is already paused.  This is not currently supported."
 };
-SettingT<INISettingCollection> gs_bPreloadIntroSequence_General("bPreloadIntroSequence:General", true);
-SettingT<INISettingCollection> gs_iPreloadSizeLimit_General("iPreloadSizeLimit:General", 26214400);
-SettingT<INISettingCollection> gs_iIntroSequencePriority_General("iIntroSequencePriority:General", 3);
+SettingT<INISettingCollection> bPreloadIntroSequence("bPreloadIntroSequence:General", true);
+SettingT<INISettingCollection> iPreloadSizeLimit("iPreloadSizeLimit:General", 26214400);
+SettingT<INISettingCollection> iIntroSequencePriority("iIntroSequencePriority:General", 3);
 
 void BinkFree(void* apMemory) {
     MemoryManager::Instance().Deallocate(apMemory);
@@ -188,7 +188,7 @@ void MoviePlayer::PlaySequence(char* apString) {
             else {
                 Setting::Info* bPreloadIntroSequence;
                 // The setting's address is never null.
-                bPreloadIntroSequence = &gs_bPreloadIntroSequence_General.uValue;
+                bPreloadIntroSequence = &::bPreloadIntroSequence.uValue;
                 Play(
                     pfilename,
                     true,
@@ -434,7 +434,7 @@ bool MoviePlayer::PlayBackground(const char* apFileName, bool abPreloadBink) {
 void MoviePlayer::DecreaseSequenceThreadPriority() {
     Setting::Info* p_uValue;
     // The setting's address is never null.
-    p_uValue = &gs_iIntroSequencePriority_General.uValue;
+    p_uValue = &iIntroSequencePriority.uValue;
     if (iCurrentSequenceThreadPriority > static_cast<int32_t>(p_uValue->uint)) {
         SetSequenceThreadPriority(iCurrentSequenceThreadPriority - 1);
     }

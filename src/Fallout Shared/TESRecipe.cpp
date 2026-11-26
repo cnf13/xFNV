@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESRecipe.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/TESCondition.h"
@@ -18,10 +18,10 @@
 #include "xfnv/Compiler.h"
 
 void RECIPE_DATA::Endian() {
-    ENDIAN(ReqSkillId, false);
-    ENDIAN(ReqSkillLevel, false);
-    ENDIAN(CategoryID, false);
-    ENDIAN(SubCategoryID, false);
+    BSEndian(ReqSkillId, false);
+    BSEndian(ReqSkillLevel, false);
+    BSEndian(CategoryID, false);
+    BSEndian(SubCategoryID, false);
 }
 
 TESRecipeComponent::TESRecipeComponent() : Quantity(0) {}

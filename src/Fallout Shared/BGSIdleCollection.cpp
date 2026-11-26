@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSIdleCollection.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -37,7 +37,7 @@ void BGSIdleCollection::Load(TESFile* apFile) {
                             TESFile::WidenFormIDRecords(pIdleArray, cIdleCount, 4, sizeof(TESIdleForm*), {{0, 0}});
                             if (apFile->QEndian()) {
                                 for (int32_t ii = 0; ii < cIdleCount; ++ii) {
-                                    ENDIAN<TESIdleForm*>(pIdleArray[ii], false);
+                                    BSEndian<TESIdleForm*>(pIdleArray[ii], false);
                                 }
                             }
                         }

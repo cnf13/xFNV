@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 
 class TESForm;
 class TESTopic;

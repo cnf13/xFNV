@@ -2,12 +2,16 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSSpinLock.h"
+#include "BSHavok/bhkNiCollisionObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSNiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiCollisionObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTListBase.h"
@@ -228,3 +232,80 @@ public:
     static NiRTTI ms_RTTI;
     static BSSpinLock kPropertyStateLock;
 };
+
+inline void NiAVObject::SetRotate_0(const NiQuaternion& kQuat) {
+    kQuat.ToRotation(m_kLocal.m_Rotate);
+}
+
+inline void NiAVObject::UpdateObjectControllers(NiUpdateData& UpdateData, bool bProperties) {
+    if (bProperties && static_cast<uint8_t>(QHasPropController())) {
+        auto* pkPosition = m_kPropertyList.GetHeadPos();
+        while (pkPosition) {
+            NiPointer<NiProperty>& spProperty = m_kPropertyList.GetNext(pkPosition);
+            NiProperty* pkProperty = spProperty;
+            if (pkProperty && pkProperty->GetControllers()) {
+                pkProperty->Update(UpdateData);
+            }
+        }
+    }
+    for (NiTimeController* pkController = GetControllers(); pkController; pkController = pkController->GetNext()) {
+        pkController->Update(UpdateData);
+    }
+}
+
+inline void NiAVObject::DetachProperty(NiProperty* pkProperty) {
+    NiPointer<NiProperty> spProperty(pkProperty);
+    { NiPointer<NiProperty> spRemoved = m_kPropertyList.Remove(spProperty); }
+}
+
+inline void NiAVObject::SetCollisionObject(NiCollisionObject* pkCollisionObject) {
+    m_spCollisionObject = static_cast<bhkNiCollisionObject*>(pkCollisionObject);
+    if (m_spCollisionObject) {
+        NiCollisionObject* pkCollision = m_spCollisionObject;
+        if (pkCollision->GetSceneGraphObject() != this) {
+            pkCollision = m_spCollisionObject;
+            pkCollision->SetSceneGraphObject(this);
+        }
+    }
+}
+
+inline void NiAVObject::AttachProperty(NiProperty* pkProperty) {
+    if (pkProperty->Type() < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
+        NiPointer<NiProperty> spProperty(pkProperty);
+        m_kPropertyList.AddHead(spProperty);
+    }
+}
+
+// An object without a world bound gets a zeroed BSNiBound (flags 0x100, level 0), set through SetBound.
+inline void NiAVObject::CreateBoundIfNone() {
+    if (m_kWorldBound) {
+        return;
+    }
+    BSNiBound* pkBound = ::new BSNiBound(0x100, 0);
+    SetBound(pkBound);
+    m_kWorldBound->SetCenterAndRadius(NiPoint3::ZERO, 0.0f);
+}
+
+inline float NiAVObject::GetWorldScale() {
+    return m_kWorld.m_fScale;
+}
+
+inline uint32_t NiAVObject::GetNoDecals() {
+    return GetFlag(NiAVObject::NO_DECALS);
+}
+
+inline float NiAVObject::GetScale() {
+    return m_kLocal.m_fScale;
+}
+
+inline uint32_t NiAVObject::GetDisplayObject() {
+    return GetFlag(NiAVObject::DISPLAY_OBJECT);
+}
+
+inline void NiAVObject::DetachAllProperties() {
+    m_kPropertyList.RemoveAll();
+}
+
+inline float NiAVObject::GetWorldBoundRadius() {
+    return GetWorldBound().m_fRadius;
+}

@@ -32,3 +32,5 @@ public:
 
 // The class's reflection record.
 extern hkClass hkStreamWriterClass;
+
+inline hkStreamWriter::hkStreamWriter() {}

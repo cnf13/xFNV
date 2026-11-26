@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
+
 class hkpCollisionEvent;
 struct hkpContactPointAddedEvent;
 class hkpContactPointEvent;
@@ -23,3 +25,11 @@ public:
     // DeletingDestruct's free (ourFree).
     static void operator delete(void* apMemory);
 };
+
+inline hkpContactListener::hkpContactListener() {}
+
+inline void hkpContactListener::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+inline hkpContactListener::~hkpContactListener() {}

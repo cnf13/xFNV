@@ -29,3 +29,8 @@ public:
 
     hkInplaceArray<hkpRootCdPoint, 8> m_hits;
 };
+
+inline void hkpAllCdPointCollector::reset() {
+    m_hits.clear();
+    hkpCdPointCollector::reset();
+}

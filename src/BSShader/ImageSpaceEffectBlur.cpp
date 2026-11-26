@@ -5,7 +5,6 @@
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSTextureManager.h"
 #include "BSShader/ImageSpaceEffect.h"
-#include "BSShader/ImageSpaceEffectFullScreenBlur.h"
 #include "BSShader/ImageSpaceEffectHDR.h"
 #include "BSShader/ImageSpaceEffectParam.h"
 #include "BSShader/ImageSpaceManager.h"

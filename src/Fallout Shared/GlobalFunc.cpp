@@ -7,7 +7,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XControls.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkAction.h"
@@ -128,7 +128,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -155,6 +154,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -185,10 +185,10 @@ namespace bhkConvert {} // namespace bhkConvert
 static NiGeometry* plastSource;
 
 // Four [HAVOK] INI settings of the PC build that no code reads.
-static SettingT<INISettingCollection> gs_fSD_HAVOK("fSD:HAVOK", 0.98f);
-static SettingT<INISettingCollection> gs_fSE_HAVOK("fSE:HAVOK", 0.3f);
-static SettingT<INISettingCollection> gs_fOD_HAVOK("fOD:HAVOK", 0.9f);
-static SettingT<INISettingCollection> gs_fRF_HAVOK("fRF:HAVOK", 1000.0f);
+static SettingT<INISettingCollection> springDamp("fSD:HAVOK", 0.98f);
+static SettingT<INISettingCollection> springElast("fSE:HAVOK", 0.3f);
+static SettingT<INISettingCollection> objectDamp("fOD:HAVOK", 0.9f);
+static SettingT<INISettingCollection> relForce("fRF:HAVOK", 1000.0f);
 
 // The tile code's map from a vertex index to its distance.
 using NiTMapBaseVertexDist = NiTMapBase<DFALL<NiTMapItem<uint32_t, VertexDist>>, uint32_t, VertexDist>;
@@ -215,37 +215,6 @@ float GetZAngleFromVector(const NiPoint3& aDirection) {
     return ClampAngle(4.71238899230957f);
 }
 
-// The larger of two ints: aiB unless aiA is above it. The compare is signed.
-int32_t BSMAX(int32_t aiA, int32_t aiB) {
-    if (aiA <= aiB) {
-        return aiB;
-    }
-
-    return aiA;
-}
-
-int32_t BSAbs(int32_t alValue) {
-    return std::abs(alValue);
-}
-
-const char* BSstristr(const char* apString1, const char* apString2) {
-    int32_t iLen1 = std::strlen(apString1);
-    int32_t iLen2 = std::strlen(apString2);
-    for (int32_t i = 0; i < iLen1 - iLen2 + 1; ++i) {
-        int32_t j;
-        for (j = 0; j < iLen2; ++j) {
-            int32_t iChar = std::tolower(apString1[j + i]);
-            if (iChar != std::tolower(apString2[j])) {
-                break;
-            }
-        }
-        if (j == iLen2) {
-            return &apString1[i];
-        }
-    }
-    return nullptr;
-}
-
 // Wraps afAngle into [0, 2pi) with fmod; a negative angle gets 2pi (a double constant) added first, rounded to a float
 // local. The fmod result is stored over afAngle and returned from there.
 float ClampAngle(float afAngle) {
@@ -257,45 +226,6 @@ float ClampAngle(float afAngle) {
         afAngle = std::fmod(afAngle, 6.2831855f);
     }
     return afAngle;
-}
-
-// Evaluates (value - y1) / (y2 - y1), times (x2 - x1), plus x1, then rounds the result to float.
-float FLerp(float x1, float x2, float y1, float y2, float value) {
-    float fResult = (value - y1) / (y2 - y1) * (x2 - x1) + x1;
-    return fResult;
-}
-
-float BSRoundToNearest(float afVal, float afNearest) {
-    float fQuotient = afVal / afNearest;
-    return static_cast<float>(
-        static_cast<double>(
-            !(fQuotient - static_cast<double>(static_cast<int32_t>(fQuotient)) < 0.5) + static_cast<int32_t>(fQuotient)
-        ) *
-        afNearest
-    );
-}
-
-float RandomFloat0To1() {
-    return BSRandom::GetSingleton()->Float0To1();
-}
-
-float RandomFloatTwoPi() {
-    return BSRandom::GetSingleton()->FloatTwoPi();
-}
-
-int32_t RandomInt(int32_t aiMin, int32_t aiMax) {
-    return static_cast<int32_t>(
-        BSRandom::GetSingleton()->UnsignedInt(static_cast<uint32_t>(aiMin), static_cast<uint32_t>(aiMax))
-    );
-}
-
-void BSClamp(float& aVal, float aMin, float aMax) {
-    if (aMax < static_cast<double>(aVal)) {
-        aVal = aMax;
-    }
-    else if (aMin > static_cast<double>(aVal)) {
-        aVal = aMin;
-    }
 }
 
 float GetAngleDelta(float afStartAngle, float afTargetAngle, float& afOutDir) {
@@ -535,10 +465,6 @@ bool FixNormals(
     plastSource = apSource;
     pMap->~NiTMapVertexDist();
     return bChanged;
-}
-
-uint32_t BSGetTickCount() {
-    return GetTickCount();
 }
 
 int32_t GetCollisionObjectCountInSceneGraph(
@@ -891,10 +817,6 @@ bool HasMorpherController(NiObjectNET* apObj) {
     return false;
 }
 
-hkpWorldObject* hkGetWorldObject(const hkpCollidable* collidable) {
-    return static_cast<hkpWorldObject*>(collidable->getOwner());
-}
-
 bool PickDistance(
     NiPick* apPick,
     const NiPoint3& aOrigin,
@@ -978,26 +900,6 @@ bool ReturnTrue() {
     return true;
 }
 
-float NiATan2(float fNumerator, float fDenominator) {
-    return std::atan2(fNumerator, fDenominator);
-}
-
-hkpPhantom* hkpGetPhantom(const hkpCollidable* collidable) {
-    if (collidable->getType() == 2) {
-        return static_cast<hkpPhantom*>(hkGetWorldObject(collidable));
-    }
-
-    return nullptr;
-}
-
-hkpRigidBody* hkpGetRigidBody(const hkpCollidable* collidable) {
-    if (collidable->getType() == 1) {
-        return static_cast<hkpRigidBody*>(hkGetWorldObject(collidable));
-    }
-
-    return nullptr;
-}
-
 NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol) {
     NiPoint3 kLocation;
     NiAVObject* p3D = nullptr;
@@ -1034,10 +936,6 @@ NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol) {
         }
     }
     return p3D;
-}
-
-void BSmemcpy(void* apDest, int32_t aiDestSize, const void* apSrc, int32_t aiCount) {
-    memcpy_s(apDest, aiDestSize, apSrc, aiCount);
 }
 
 bool SwapPlatformLanguageTexturePath(const char* apInPath, char* apOutPath, uint32_t aiOutPathSize) {
@@ -2347,84 +2245,6 @@ void GetCollisionObjectByIndex(bhkNiCollisionObject* apCollision, bhkWorldNS::Ob
     }
 }
 
-bhkVector4::bhkVector4() {
-    setZero4();
-}
-
-void bhkVector4::set(float afX, float afY, float afZ, float afW) {
-    fX = afX;
-    fY = afY;
-    fZ = afZ;
-    fW = afW;
-}
-
-void bhkVector4::setZero4() {
-    set(0.0f, 0.0f, 0.0f, 0.0f);
-}
-
-void bhkVector4::setAll3(float afVal) {
-    fX = afVal;
-    fY = afVal;
-    fZ = afVal;
-}
-
-hkVector4& bhkVector4::ToHK(hkVector4& arDst) const {
-    arDst.set(fX, fY, fZ, fW);
-    return arDst;
-}
-
-bhkVector4& bhkVector4::NI2HK(const NiPoint3& arSrc) {
-    fX = bhkConvert::fBS2HkScaleSC * arSrc.x;
-    fY = bhkConvert::fBS2HkScaleSC * arSrc.y;
-    fZ = bhkConvert::fBS2HkScaleSC * arSrc.z;
-    fW = 0.0;
-    return *this;
-}
-
-bhkVector4& bhkVector4::operator=(const hkVector4& arSrc) {
-    fX = arSrc.getSimdAt(0);
-    fY = arSrc.getSimdAt(1);
-    fZ = arSrc.getSimdAt(2);
-    fW = arSrc.getSimdAt(3);
-    return *this;
-}
-
-bhkCollisionObject* bhkCollisionObject::Getbhk(const hkpRigidBody* apBody) {
-    bhkNiCollisionObject* pCollisionObject = bhkNiCollisionObject::Getbhk(apBody);
-    return static_cast<bhkCollisionObject*>(
-        NiObject::DynamicCastStatic(&bhkCollisionObject::ms_RTTI, pCollisionObject)
-    );
-}
-
-// bhkVector4's constructor zeroes the vectors.
-hkMouseSpringActionCinfo::hkMouseSpringActionCinfo()
-  : hkUnaryActionCinfo(), m_springDamping(0.5f), m_springElasticity(0.3f), m_maxRelativeForce(250.0f),
-    m_objectDamping(0.95f) {}
-
-// The mass is rounded to a float local and returned from there.
-float bhkRigidBody::GetMass() {
-    hkpRigidBody* pBody = **this;
-    float fMass = pBody ? pBody->getMass() : 0.0f;
-    return fMass;
-}
-
-bhkUnaryAction::bhkUnaryAction() {
-    ++iCount;
-}
-
-bhkUnaryAction::~bhkUnaryAction() {
-    bhkSerializable::Kill();
-    --iCount;
-}
-
-bhkWorldObject* bhkWorldObject::Getbhk(const hkpWorldObject* apObj) {
-    if (apObj) {
-        return apObj->getUserData();
-    }
-
-    return nullptr;
-}
-
 void FixedStrings::InitSDM() {
     FixedStrings::pBip01 = new NiFixedString("Bip01");
     FixedStrings::pBip = new NiFixedString("Bip");
@@ -2639,39 +2459,4 @@ void FixedStrings::KillSDM() {
     if (FixedStrings::pPinnedLimb) {
         delete FixedStrings::pPinnedLimb;
     }
-}
-
-void NiBound::SetCenter(float x, float y, float z) {
-    m_kCenter = NiPoint3(x, y, z);
-}
-
-NiAVObject* NiCollisionObject::GetSceneGraphObject() {
-    return m_pkSceneObject;
-}
-
-float NiASin(float fValue) {
-    if (fValue > -1.0) {
-        if (fValue < 1.0) {
-            return std::asin(fValue);
-        }
-        return NI_HALF_PI;
-    }
-    return -NI_HALF_PI;
-}
-
-NiMatrix3* NiMatrix3::Inverse(NiMatrix3* apResult) const {
-    NiMatrix3 kInverse;
-    if (!Inverse(kInverse)) {
-        kInverse.MakeZero();
-    }
-    *apResult = kInverse;
-    return apResult;
-}
-
-void NiTransform::Invert(NiTransform& kDest) const {
-    kDest.m_Rotate = m_Rotate.Transpose();
-    kDest.m_fScale = 1.0f / m_fScale;
-    NiPoint3 kNegated = -m_Translate;
-    NiPoint3 kRotated = kDest.m_Rotate * kNegated;
-    kDest.m_Translate = kDest.m_fScale * kRotated;
 }

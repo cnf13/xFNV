@@ -67,3 +67,5 @@ struct hkMoppBvTreeShapeCinfo : public hkBvTreeShapeCinfo {
 
 static_assert(offsetof(hkMoppBvTreeShapeCinfo::Serialized, fScale) == 0xC);
 static_assert(sizeof(hkMoppBvTreeShapeCinfo::Serialized) == 0x10);
+
+inline hkMoppBvTreeShapeCinfo::hkMoppBvTreeShapeCinfo() : m_code(nullptr), fScale(1.0f) {}

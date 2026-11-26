@@ -3,7 +3,7 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/ImageSpaceEffect.h"
 #include "BSShader/ImageSpaceManager.h"
 #include "BSShader/ImageSpaceShader.h"
@@ -118,14 +118,4 @@ void FOHUDEffectManager::TriggerShudder(
     ShudderFrequency.y = fFrequencyY;
     fShudderStartTime = static_cast<float>(appTimer.iLastTime);
     ShudderCurrentPosition = NiPoint2::ZERO;
-}
-
-ImageSpaceShaderMenuUnpack::ImageSpaceShaderMenuUnpack() {
-    pTextures.SetSize(2u);
-}
-
-void ImageSpaceShaderMenuUnpack::SetOffset(float afX, float afY) {
-    fOffsetX = afX;
-    fOffsetY = afY;
-    bChangedFlag = true;
 }

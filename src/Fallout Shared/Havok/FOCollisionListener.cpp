@@ -1,4 +1,5 @@
 #include "Fallout Shared/Havok/FOCollisionListener.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include "BSCore/BSSimpleArray.h"
@@ -70,14 +71,6 @@ HavokMaterialType GetMaterialFromCollidable(const hkpCdBody* apCollidable, NiPoi
     }
 
     return bhkUtilFunctions::GetMaterialValue(apCollidable);
-}
-
-bhkContactListener::bhkContactListener() {}
-
-bhkContactListener::~bhkContactListener() {}
-
-void bhkContactListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
 }
 
 FOCollisionListener::ObjectDamageImpactData::ObjectDamageImpactData()
@@ -282,24 +275,4 @@ FOCollisionListener* FOCollisionListener::Instance() {
         return FOCollisionListener::pSingleton;
     }
     return new FOCollisionListener;
-}
-
-BIPED_PART CFilter::GetBipedPart() {
-    return static_cast<BIPED_PART>(GetPart());
-}
-
-float hkContactPointMaterial::getFriction() const {
-    return m_friction;
-}
-
-const hkClass& hkContactPointMaterial::staticClass() {
-    return hkContactPointMaterialClass;
-}
-
-hkpContactListener::hkpContactListener() {}
-
-hkpContactListener::~hkpContactListener() {}
-
-void hkpContactListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
 }

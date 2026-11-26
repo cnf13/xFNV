@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSHavok/bhkCharacterPointCollector.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkSerializable.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Utilities/CharacterControl/CharacterProxy/hkpCharacterProxy.h"
@@ -82,3 +83,13 @@ public:
     static NiRTTI ms_RTTI;
     static inline int32_t iNumObjects;
 };
+
+// This getter is const but GethkWorldRw is not; it is called on the const proxy.
+inline void bhkCharacterProxy::GetLinearVelocity(NiPoint3& arVel) const {
+    hkpCharacterProxy* pProxy = static_cast<hkpCharacterProxy*>(GethkObject());
+    if (pProxy) {
+        const_cast<bhkCharacterProxy*>(this)->bhkCharacterProxy::GethkWorldRw();
+        HK2NI(arVel, pProxy->getLinearVelocity());
+        const_cast<bhkCharacterProxy*>(this)->bhkCharacterProxy::GethkWorldRw();
+    }
+}

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/Setting.h"

@@ -62,3 +62,9 @@ int32_t BSAnimNoteListener::Registered(BSAnimNote::AnimNoteType aeType, IBSAnimN
     }
     return result;
 }
+
+void IBSAnimNoteReceiver::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+IBSAnimNoteReceiver::IBSAnimNoteReceiver() {}

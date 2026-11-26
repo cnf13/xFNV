@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSystemObjects.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
 // A counting semaphore over a system semaphore, with its current and maximum count.
 class NiSemaphore {
@@ -17,3 +18,24 @@ public:
     int32_t m_iMaxCount;
     BSSystemSemaphore* m_hSemaphore;
 };
+
+inline NiSemaphore::NiSemaphore(int32_t aiCount, int32_t aiMaxCount)
+  : m_iCount(aiCount), m_iMaxCount(aiMaxCount), m_hSemaphore(new BSSystemSemaphore(m_iCount, m_iMaxCount)) {}
+
+inline NiSemaphore::~NiSemaphore() {
+    delete m_hSemaphore;
+}
+
+inline int32_t NiSemaphore::Signal() {
+    NiAtomicIncrement(m_iCount);
+    m_hSemaphore->Release();
+    return m_iCount;
+}
+
+inline int32_t NiSemaphore::Wait(uint32_t aiTime) {
+    if (m_hSemaphore->Wait(aiTime) == BSSystemWait::TIMED_OUT) {
+        return 1;
+    }
+
+    return NiAtomicDecrement(m_iCount);
+}

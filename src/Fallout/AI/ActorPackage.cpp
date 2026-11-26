@@ -35,7 +35,7 @@ ActorPackage::~ActorPackage() {
     }
 }
 
-void ActorPackage::InitLoadGameTES(int32_t aiFlags, int32_t aiOldFlags) {
+void ActorPackage::InitLoadGame(int32_t aiFlags, int32_t aiOldFlags) {
     PACKAGE_PROCEDURE_TYPE eProcedureType;
     int32_t iProcedureCount;
     if (pPackage) {
@@ -47,7 +47,7 @@ void ActorPackage::InitLoadGameTES(int32_t aiFlags, int32_t aiOldFlags) {
     }
 }
 
-int32_t ActorPackage::RevertTES(int32_t aiFlags) {
+int32_t ActorPackage::Revert(int32_t aiFlags) {
     return 0;
 }
 
@@ -161,7 +161,7 @@ void ActorPackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
 }
 
-void ActorPackage::InitLoadGameBGS(BGSLoadFormBuffer* apBuffer) {
+void ActorPackage::InitLoadGame(BGSLoadFormBuffer* apBuffer) {
     if (GetFlag(ActorPackage::SAVELOAD_SHARED_PACKAGE)) {
         uint32_t uiPackageID = pSaveLoadGame->GetChangedFormID(
             static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pPackage))
@@ -314,7 +314,7 @@ void ActorPackage::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
 }
 
-void ActorPackage::RevertBGS(BGSLoadFormBuffer* apLoadGameBuffer) {
+void ActorPackage::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     Clear();
 }
 
@@ -328,7 +328,7 @@ uint16_t ActorPackage::GetSaveSize(uint32_t aiFlags) {
 
 // aiFlags is tested against a zero mask, so the branch that rebuilds a created package from the save
 // (IsFormIDCreated, TESSaveLoadGame::CreatePackage) never runs and is left out; aiCurrentFlags is unused.
-void ActorPackage::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
+void ActorPackage::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     uint32_t uiPackageID;
     bool bForcedToZero = pSaveLoadGameOLD->LoadNumericID(&uiPackageID, 4u);
     Clear();

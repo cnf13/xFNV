@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ImageSpaceModifierInstance.h"
@@ -47,40 +48,6 @@ void MakeNewGeomData(NiAVObject* apObject);
 // The printf-style printer to a named file that TestAllCells and TESDataHandler::CheckModels write their reports
 // through. It is empty, as in the shipped game: it reads no argument and returns 0.
 int32_t PrintToFile(const char* apFileName, const char* apFormat, ...);
-// Converts the Havok length afhk to game units.
-float HK2NI(float afhk);
-// Converts the Havok vector arhkV to game units into arNiP and returns it.
-NiPoint3& HK2NI(NiPoint3& arNiP, const hkVector4& arhkV);
-// Converts the Havok vector arhkV to game units into arNiP without the world scale and returns it.
-NiPoint3& HK2NINS(NiPoint3& arNiP, const hkVector4& arhkV);
-// Converts the Havok transform arhkTran into arNiTran and returns it; the scale is left as it
-// was.
-NiTransform& HK2NI(NiTransform& arNiTran, const hkTransform& arhkTran);
-// Converts the game-unit point arNiP to Havok units into arhkV and returns it (the body is in
-// BSHavok/bhkRagdollController.cpp).
-hkVector4& NI2HK(hkVector4& arhkV, const NiPoint3& arNiP);
-// Copies the point arNiP into arhkV without the Havok unit scale and returns arhkV.
-hkVector4& NI2HKNS(hkVector4& arhkV, const NiPoint3& arNiP);
-// Converts the Havok rotation arhkRot into arNiRot and returns it.
-NiMatrix3& HK2NI(NiMatrix3& arNiRot, const hkRotation& arhkRot);
-// Converts the game transform arNiTran to Havok units into arhkTran and returns it.
-hkTransform& NI2HK(hkTransform& arhkTran, const NiTransform& arNiTran);
-// Converts the game rotation arNiRot to Havok units into arhkRot and returns it.
-hkRotation& NI2HK(hkRotation& arhkRot, const NiMatrix3& arNiRot);
-// Converts the game transform arNiQ to Havok units into arhkQ and returns it.
-hkQsTransform& NI2HK(hkQsTransform& arhkQ, const NiTransform& arNiQ);
-// Converts the game-unit length afValue to Havok units.
-float NI2HK(float afValue);
-// Copies the game quaternion arNiQ into arhkQ, component by component, and returns arhkQ.
-inline hkQuaternion& NI2HK(hkQuaternion& arhkQ, const NiQuaternion& arNiQ) {
-    arhkQ.m_vec(0) = arNiQ.m_fX;
-    arhkQ.m_vec(1) = arNiQ.m_fY;
-    arhkQ.m_vec(2) = arNiQ.m_fZ;
-    arhkQ.m_vec(3) = arNiQ.m_fW;
-    return arhkQ;
-}
-// Converts the game rotation arNiQ to a Havok quaternion into arhkQ and returns it.
-hkQuaternion& NI2HKMIGRATION_QUATERNION(hkQuaternion& arhkQ, const NiQuaternion& arNiQ);
 void Init();
 
 // How many times an actor kind has died, kept per base form. Stores the TESActorBase the form ID resolves to
@@ -300,7 +267,7 @@ public:
     void ShowLandBorders(bool abShow);
     bool GetLandNormal(const NiPoint3& aCoord, NiPoint3& aNormal, NiPoint3& aFaceNormal);
     TESObjectCELL* GetExteriorBufferCellByIndex(int32_t aiIndex);
-    // The number of buffered exterior cells, uExteriorCellBuffer.
+    // The number of buffered exterior cells, iExteriorBufferSize.
     uint32_t GetExteriorBufferSize();
     void SetAllowUnusedPurge(bool abAllow);
     // Sets (abFlag false) or clears the skip-normal-maps flag of the land shader of each quad of the grid cell.
@@ -335,8 +302,8 @@ public:
     bool& ShowLoadingMessage(const char* apText);
     void AddDeadCount(TESActorBase* apObject, int16_t ascount);
     uint16_t GetSaveSize();
-    void SaveGameTES();
-    void SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer);
+    void SaveGame();
+    void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
     void LoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
     uint32_t GetUnusedCachedParticleObject(NiAVObject* apModel, NiPointer<NiAVObject>& arInstance);
     void CleanupTemporaryParticleCache();
@@ -370,9 +337,9 @@ public:
     int32_t iCurrentQueuedX;
     int32_t iCurrentQueuedY;
     TESObjectCELL* pInteriorCell;
-    // the buffered interior cells, as many as gs_uInteriorCellBuffer_General
+    // the buffered interior cells, as many as uInterior Cell Buffer:General
     TESObjectCELL** pInteriorBuffer;
-    // the buffered exterior cells, as many as gs_uExteriorCellBuffer_General
+    // the buffered exterior cells, as many as uExterior Cell Buffer:General
     TESObjectCELL** pExteriorBuffer;
     uint32_t iTempInteriorBufferSize;
     uint32_t iTempExteriorBufferSize;
@@ -423,15 +390,15 @@ public:
     static inline LandPassMask
         kLandBlendPassMask{{}, {false, false, true}, {false, true, true, true}, {false, false, true}};
 
-    // The gs_uInteriorCellBuffer_General INI setting: how many interior cells stay buffered.
-    static SettingT<INISettingCollection> uInteriorCellBufferGeneral;
-
     // The game's one TES (the loaded world: the grid of cells around the player, the interior, the worldspace).
     static inline TES* pInstance;
+
+protected:
+    static SettingT<INISettingCollection> bSelectivePurgeUnusedOnFastTravel;
 };
 
-// How many exterior cells stay buffered (gs_uExteriorCellBuffer_General), an INI setting.
-extern SettingT<INISettingCollection> uExteriorCellBuffer;
+// How many exterior cells stay buffered (uExterior Cell Buffer:General), an INI setting.
+extern SettingT<INISettingCollection> iExteriorBufferSize;
 
 // The time the cell animations have run for.
 inline float fCellAppTime;
@@ -474,40 +441,40 @@ inline char bbaseObjectsChecked;
 // GetLandTexture's last texture found; GetLandTexture stores and returns it.
 inline TESLandTexture* pGetLandTexLastTex;
 
-extern SettingT<INISettingCollection> gs_iUpdateType_HAVOK;
+extern SettingT<INISettingCollection> iHavokUpdateType;
 
-extern SettingT<INISettingCollection> gs_iEntityBatchRemoveRate_HAVOK;
+extern SettingT<INISettingCollection> iEntityBatchRemoveRate;
 
-extern SettingT<INISettingCollection> gs_fFadeOutTime_LOD;
+extern SettingT<INISettingCollection> fFadeOutTime;
 
-extern SettingT<GameSettingCollection> gs_fDebrisMaxVelocity;
+extern SettingT<GameSettingCollection> fDebrisMaxVelocity;
 
-extern SettingT<INISettingCollection> gs_bCheckPurgedTextureList_General;
+extern SettingT<INISettingCollection> bCheckPurgedTextureList;
 
-extern SettingT<INISettingCollection> gs_fFadeInThreshold_LOD;
+extern SettingT<INISettingCollection> fFadeInThreshold;
 
-extern SettingT<INISettingCollection> gs_fChaseDeltaMult_HAVOK;
+extern SettingT<INISettingCollection> fChaseDeltaMult;
 
 // Whether changing worldspace frees the buffered cells first.
 extern SettingT<INISettingCollection> bPreemptivelyUnloadCells;
 
-extern SettingT<INISettingCollection> gs_fMoveLimitMass_HAVOK;
+extern SettingT<INISettingCollection> fHavokMoveLimitMass;
 
-extern SettingT<INISettingCollection> gs_fDistanceMultiplier_LOD;
+extern SettingT<INISettingCollection> fDistanceMultiplier;
 
-extern SettingT<INISettingCollection> bAddBipedWhenKeyframed_HAVOK;
+extern SettingT<INISettingCollection> bAddBipedWhenKeyframed;
 
-extern SettingT<GameSettingCollection> gs_fDebrisMinExtent;
+extern SettingT<GameSettingCollection> fDebrisMinExtent;
 
-extern SettingT<INISettingCollection> gs_fFadeInTime_LOD;
+extern SettingT<INISettingCollection> fFadeInTime;
 
-extern SettingT<INISettingCollection> gs_fFadeOutThreshold_LOD;
+extern SettingT<INISettingCollection> fFadeOutThreshold;
 
-extern SettingT<INISettingCollection> gs_fMaxPickTime_HAVOK;
+extern SettingT<INISettingCollection> fMaxPickTime;
 
-extern SettingT<INISettingCollection> gs_bQueueWarnings_General;
+extern SettingT<INISettingCollection> bQueueWarnings;
 
-extern SettingT<INISettingCollection> gs_fMaxPickTimeVATS_HAVOK;
+extern SettingT<INISettingCollection> fMaxPickTimeVATS;
 
 // The cell test's report file name.
 inline const char* TestAllCells_xls = "TestAllCells.xls";
@@ -515,4 +482,4 @@ inline const char* TestAllCells_xls = "TestAllCells.xls";
 // The control value the cell test was started with.
 inline uint32_t TAC_Mode;
 
-extern SettingT<INISettingCollection> gs_iSimType_HAVOK;
+extern SettingT<INISettingCollection> iSimType;

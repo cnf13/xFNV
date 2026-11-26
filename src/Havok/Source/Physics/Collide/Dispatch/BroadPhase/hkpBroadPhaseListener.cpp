@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Collide/Dispatch/BroadPhase/hkpBroadPhaseListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkpBroadPhaseListener::~hkpBroadPhaseListener() {}
 

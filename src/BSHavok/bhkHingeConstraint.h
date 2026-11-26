@@ -1,8 +1,9 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/Hinge/hkpHingeConstraintData.h"
+#include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintData.h"
 
 // The Gamebryo side of a hinge constraint. It adds no fields to bhkConstraint.
 class bhkHingeConstraint : public bhkConstraint {
@@ -51,3 +52,15 @@ public:
     // Scales the pivots of the hinge data apData by afScale.
     static void ApplyScale(float afScale, hkpConstraintData* apInfo);
 };
+
+inline void hkHingeConstraintCinfo::SetInWorldSpace(
+    const hkTransform& arBodyATrans,
+    const hkTransform& arBodyBTrans,
+    const hkVector4& arPivot,
+    const hkVector4& arAxis
+) {
+    hkpHingeConstraintData* pData = static_cast<hkpHingeConstraintData*>(this->pData);
+    if (pData) {
+        pData->setInWorldSpace(arBodyATrans, arBodyBTrans, arPivot, arAxis);
+    }
+}

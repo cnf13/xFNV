@@ -96,6 +96,8 @@ public:
     void SetupConstants(NiGeometry* apGeometry, TallGrassShaderProperty* apTgsProp);
 
     static void SetWindRanges(float afWindMagMin, float afWindMagMax);
+    // Clamps afValue to [0, 1] (NaN gives 0) and stores it as the grass's canopy shadow multiplier.
+    static void SetProjShadowMult(float afValue);
     static BSShader* CreateShader();
 
     NiPointer<NiD3DPass> spPass[44];
@@ -126,3 +128,18 @@ public:
     // stores it.
     static inline float fProjShadowMult = 1.0f;
 };
+
+// NaN is sent to 0.
+inline void TallGrassShader::SetProjShadowMult(float afValue) {
+    float fValue;
+    if (!(afValue >= 0.0)) {
+        fValue = 0.0f;
+    }
+    else if (afValue > 1.0) {
+        fValue = 1.0f;
+    }
+    else {
+        fValue = afValue;
+    }
+    TallGrassShader::fProjShadowMult = fValue;
+}

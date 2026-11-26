@@ -2,6 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/Ni2DBuffer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiDepthStencilBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"

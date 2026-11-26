@@ -2,16 +2,24 @@
 
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTaskManagerThread.h"
 #include "BSMain/IOManager.h"
-#include "Fallout Shared/BSTaskThread.h"
-#include "Fallout Shared/LockFreeMap.h"
+#include "BSMain/ThreadSafeStructures.h"
 #include "Fallout Shared/ModelLoader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"
 
 #include <atomic>
+
+void ThreadSpecificInterfaceManager::Shutdown() {
+    for (uint32_t i = 0; i < uiMaxThreads; ++i) {
+        delete static_cast<LockFreeQueue<NiPointer<IOTask>>::LockFreeQueueInterface*>(pInterfaces[i].pInterface);
+    }
+    MemoryManager::Instance().Deallocate(pInterfaces);
+    TlsFree(uiTLSIndex);
+}
 
 // The thread takes the next table slot (the count is compared unsigned), then gets its interface from the class, stores
 // the interface before its thread id, and sets the thread's TLS value.

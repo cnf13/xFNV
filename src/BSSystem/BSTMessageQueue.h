@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSemaphore.h"
 #include "BSCore/BSTFreeList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSPackedTask.h"
 #include "Fallout Shared/Pathfinding/ActorPathingMessage.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"

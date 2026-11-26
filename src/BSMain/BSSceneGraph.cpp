@@ -8,7 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
@@ -31,10 +31,10 @@ SettingT<INISettingCollection> BSSceneGraph::fPipboy1stPersonFOV("fPipboy1stPers
 
 NiRTTI BSSceneGraph::ms_RTTI("BSSceneGraph", &NiNode::ms_RTTI);
 
-SettingT<INISettingCollection> gs_bAutoViewDistance_Display("bAutoViewDistance:Display", false);
-SettingT<INISettingCollection> gs_iAutoViewLowFrameRate_Display("iAutoViewLowFrameRate:Display", 20);
-SettingT<INISettingCollection> gs_iAutoViewHiFrameRate_Display("iAutoViewHiFrameRate:Display", 40);
-SettingT<INISettingCollection> gs_iAutoViewMinDistance_Display("iAutoViewMinDistance:Display", 2000);
+SettingT<INISettingCollection> bAutoViewDistance("bAutoViewDistance:Display", false);
+SettingT<INISettingCollection> iAutoViewLowFrameRate("iAutoViewLowFrameRate:Display", 20);
+SettingT<INISettingCollection> iAutoViewHiFrameRate("iAutoViewHiFrameRate:Display", 40);
+SettingT<INISettingCollection> iAutoViewMinDistance("iAutoViewMinDistance:Display", 2000);
 
 // Names the root "<apName>Root Node", hangs a camera root node "<apName>Root CameraNode" under it, and takes apCamera
 // as the camera, or builds "<apName>Root Camera" with the full viewport, the scene's axes, the INI's near distance and
@@ -108,29 +108,29 @@ void BSSceneGraph::SetViewDistanceBasedOnFrameRate(float afTime) {
     Setting::Info* bAutoViewDistance;
     NiFrustum frustum;
     // The setting's address is never null.
-    bAutoViewDistance = &gs_bAutoViewDistance_Display.uValue;
+    bAutoViewDistance = &::bAutoViewDistance.uValue;
     if (bAutoViewDistance->b) {
         Setting::Info* iAutoViewHiFrameRate;
         Setting::Info* iAutoViewLowFrameRate;
         static float fCurrentDist = GetFarDistance();
         // The setting's address is never null.
-        iAutoViewLowFrameRate = &gs_iAutoViewLowFrameRate_Display.uValue;
+        iAutoViewLowFrameRate = &::iAutoViewLowFrameRate.uValue;
         // The setting's address is never null.
         if (afTime > 1.0 / static_cast<double>(iAutoViewLowFrameRate->i) ||
-            (iAutoViewHiFrameRate = &gs_iAutoViewHiFrameRate_Display.uValue,
+            (iAutoViewHiFrameRate = &::iAutoViewHiFrameRate.uValue,
              afTime < 1.0 / static_cast<double>(iAutoViewHiFrameRate->i))) {
             Setting::Info* iAutoViewHiFrameRate_1;
             Setting::Info* iAutoViewLowFrameRate_1;
             Setting::Info* iAutoViewMinDistance;
             float fmaxDist = GetFarDistance();
             // The setting's address is never null.
-            iAutoViewMinDistance = &gs_iAutoViewMinDistance_Display.uValue;
+            iAutoViewMinDistance = &::iAutoViewMinDistance.uValue;
             float fminDist = static_cast<float>(iAutoViewMinDistance->i);
             float fcalcDist = fminDist;
             // The setting's address is never null.
-            iAutoViewLowFrameRate_1 = &gs_iAutoViewLowFrameRate_Display.uValue;
+            iAutoViewLowFrameRate_1 = &::iAutoViewLowFrameRate.uValue;
             // The setting's address is never null.
-            iAutoViewHiFrameRate_1 = &gs_iAutoViewHiFrameRate_Display.uValue;
+            iAutoViewHiFrameRate_1 = &::iAutoViewHiFrameRate.uValue;
             float fpercent = (1.0 / afTime - static_cast<double>(iAutoViewLowFrameRate_1->i)) * 1.0 /
                 static_cast<double>(iAutoViewHiFrameRate_1->i);
             if (!(fpercent > 1.0)) {

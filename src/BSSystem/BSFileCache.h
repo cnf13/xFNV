@@ -117,6 +117,10 @@ public:
     void (*pForceFileCacheCallback)(bool);
     volatile FILE_CACHE_STATE eFileCacheState;
     void* hFileCachingThreadHandle;
+
+protected:
+    static inline const char* sEssentialFileCacheList = "";
+    static inline const char* sUnessentialFileCacheList = "";
 };
 
 // Pauses file caching while it lives: the constructor records whether caching was already paused and pauses a running
@@ -131,5 +135,8 @@ public:
     bool bWasPaused;
 };
 
-inline const char* sEssentialFileCacheList = "";
-inline const char* sUnessentialFileCacheList = "";
+inline void BSFileCache::ForcePauseFileCaching() {
+    if (eFileCacheState == FILE_CACHING_IN_PROGRESS || eFileCacheState == FILE_CACHING_PAUSED) {
+        eFileCacheState = FILE_CACHING_FORCE_PAUSED;
+    }
+}

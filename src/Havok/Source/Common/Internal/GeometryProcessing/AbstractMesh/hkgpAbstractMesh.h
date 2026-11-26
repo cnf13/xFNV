@@ -18,8 +18,16 @@ struct hkgpAbstractMeshDefinitions {
     // A list of items of T (derived from BASE) taken from ALLOCATOR.
     template <typename T, typename BASE, typename ALLOCATOR>
     struct List {
-        // The base of every item: the links of the doubly linked list of items (T is derived from the item).
+        // The base of every item: the links of the doubly linked list of items (T is derived from the item). Its
+        // constructors and assignment leave the links alone, so copying an item copies only T's own members; the list
+        // sets the links.
         struct Item : BASE {
+            Item() {}
+            Item(const Item&) {}
+            Item& operator=(const Item&) {
+                return *this;
+            }
+
             T* m_next;
             T* m_prev;
         };
@@ -338,7 +346,6 @@ struct hkgpMeshBase {
     // A mesh vertex: the position, the normal, user data, the reference count and a tag.
     struct Vertex : hkgpAbstractMeshDefinitions::Vertex<Vertex, BaseVertex> {
         Vertex() = default;
-        Vertex(const hkgpMeshBase::Vertex& other);
 
         hkVector4 m_position;
         hkVector4 m_normal;
@@ -349,9 +356,6 @@ struct hkgpMeshBase {
 
     // A mesh triangle: the plane, the part, plane, material and tag ids and the index of its leaf in the triangle tree.
     struct Triangle : hkgpAbstractMeshDefinitions::Triangle<Triangle, BaseTriangle, Vertex*> {
-        Triangle() = default;
-        Triangle(const hkgpMeshBase::Triangle& other);
-
         hkVector4 m_plane;
         int32_t m_partId;
         int32_t m_planeId;

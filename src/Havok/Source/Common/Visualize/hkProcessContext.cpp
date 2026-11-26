@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Visualize/hkProcessContext.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"

@@ -8,6 +8,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
 #include "BSDevices/XPrefSettings.h"
@@ -15,7 +16,7 @@
 #include "BSMain/BSUtilities.h"
 #include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
@@ -42,6 +43,7 @@
 #include "Fallout Shared/MiscStats.h"
 #include "Fallout Shared/Renderer.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
@@ -114,9 +116,9 @@ static uint32_t uitimer0;
 static SettingT<INIPrefSettingCollection> bGamePadRumble("bGamePadRumble:Controls", true);
 
 // The labels and value strings of the options CreateMenuElements builds.
-static SettingT<GameSettingCollection> sMouseSensitivity("sMouseSensitivity", "Mouse Sensitivity");
-static SettingT<GameSettingCollection> sExitGameAffirm("sExitGameAffirm", "Exit Game");
-static SettingT<GameSettingCollection> sActionMapping("sActionMapping", "Action Mapping");
+static SettingT<GameSettingCollection> sMouseSens("sMouseSensitivity", "Mouse Sensitivity");
+static SettingT<GameSettingCollection> sExitGame("sExitGameAffirm", "Exit Game");
+static SettingT<GameSettingCollection> sActnMapping("sActionMapping", "Action Mapping");
 
 // The upper-cased blue and green color names of the HUD and Pip-Boy color options, filled on first use.
 static BSStringT<char> g_strBlue;
@@ -2121,14 +2123,14 @@ void StartMenu::CreateMenuElements() {
     pOption = new Option(static_cast<const char*>(sMainMenu), &StartMenu::ChooseMainMenu, MODE_CFM_QUITP);
     StartMenu::pOptionsA.Add(pOption);
     pOption = new Option(
-        static_cast<const char*>(sExitGameAffirm),
+        static_cast<const char*>(sExitGame),
         &StartMenu::ChooseExitGame,
         MODE_CFM_QUITM | MODE_CFM_QUITP
     );
     StartMenu::pOptionsA.Add(pOption);
     pOption = new Option(static_cast<const char*>(sCancel), &StartMenu::ChooseBack, MODE_CFM_QUITM | MODE_CFM_QUITP);
     StartMenu::pOptionsA.Add(pOption);
-    pOption = new Option(static_cast<const char*>(sActionMapping), &StartMenu::ChooseActionMap, MODE_CONTROLS);
+    pOption = new Option(static_cast<const char*>(sActnMapping), &StartMenu::ChooseActionMap, MODE_CONTROLS);
     StartMenu::pOptionsA.Add(pOption);
     pUserOption = new UserOption(
         static_cast<const char*>(sKillCamMode),
@@ -2447,7 +2449,7 @@ void StartMenu::CreateMenuElements() {
     );
     StartMenu::pUserOptionsA.Add(pUserOption);
     pUserOption = new UserOption(
-        static_cast<const char*>(sMouseSensitivity),
+        static_cast<const char*>(sMouseSens),
         &StartMenu::SetMouseSensitivity,
         MODE_CONTROLS,
         UserOption::UOPT_METER,
@@ -3152,7 +3154,7 @@ void StartMenu::ChooseControls() {
 
 void StartMenu::SetDifficulty(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        int32_t& riDifficulty = gs_iDifficulty_GamePlay.Int();
+        int32_t& riDifficulty = iDifficulty.Int();
         riDifficulty = apUOpt->iVal;
         pPlayer->SetDifficultyLevel(static_cast<GamePlayFormulas::DifficultyLevel>(riDifficulty));
     }
@@ -3164,7 +3166,7 @@ void StartMenu::SetDifficulty(StartMenu::UserOption* apUOpt) {
 
 void StartMenu::SetKillCam(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        int32_t& riKillCam = gs_iKillCamera_GamePlay.Int();
+        int32_t& riKillCam = iKillCamera.Int();
         riKillCam = apUOpt->iVal;
         pPlayer->ToggleKillCamMode(static_cast<KILL_CAM_TYPE>(riKillCam));
     }
@@ -3186,73 +3188,73 @@ void StartMenu::SetHardcore(StartMenu::UserOption* apOption) {
 
 void StartMenu::SetCrosshair(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bCrossHair_GamePlay = apUOpt->iVal == 1;
-        uint32_t uiVisible = gs_bCrossHair_GamePlay;
+        bCrossHair = apUOpt->iVal == 1;
+        uint32_t uiVisible = bCrossHair;
         HUDMainMenu::SetVisibilityFlag(HUDMainMenu::HV_CROSSHAIR, uiVisible);
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bCrossHair_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bCrossHair);
         apUOpt->iDefaultVal = 1;
     }
 }
 
 void StartMenu::SetSaveOnRest(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnRest_GamePlay = apUOpt->iVal == 1;
+        bSaveOnRest = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bSaveOnRest_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bSaveOnRest);
         apUOpt->iDefaultVal = 1;
     }
 }
 
 void StartMenu::SetSaveOnWait(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnWait_GamePlay = apUOpt->iVal == 1;
+        bSaveOnWait = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bSaveOnWait_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bSaveOnWait);
         apUOpt->iDefaultVal = 1;
     }
 }
 
 void StartMenu::SetSaveOnTravel(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bSaveOnTravel_GamePlay = apUOpt->iVal == 1;
+        bSaveOnTravel = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bSaveOnTravel_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bSaveOnTravel);
         apUOpt->iDefaultVal = 1;
     }
 }
 
 void StartMenu::SetDialogSubtitles(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bDialogueSubtitles_GamePlay = apUOpt->iVal == 1;
+        bDialogueSubtitles = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bDialogueSubtitles_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bDialogueSubtitles);
         apUOpt->iDefaultVal = 1;
     }
 }
 
 void StartMenu::SetGeneralSubtitles(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        static_cast<SettingT<INIPrefSettingCollection>*>(&gs_bGeneralSubtitles_Gameplay)
+        static_cast<SettingT<INIPrefSettingCollection>*>(&bGeneralSubtitles)
             ->SettingT<INIPrefSettingCollection>::operator=(apUOpt->iVal == 1);
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bGeneralSubtitles_Gameplay);
+        apUOpt->iVal = static_cast<bool>(bGeneralSubtitles);
         apUOpt->iDefaultVal = 0;
     }
 }
 
 void StartMenu::SetTrueIronSights(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bTrueIronSights_GamePlay = apUOpt->iVal == 1;
+        bTrueIronSights = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bTrueIronSights_GamePlay);
+        apUOpt->iVal = static_cast<bool>(bTrueIronSights);
         apUOpt->iDefaultVal = 1;
     }
 }
@@ -3313,7 +3315,7 @@ void StartMenu::SetBrightness(StartMenu::UserOption* apUOpt) {
         Renderer::SetGamma(fGamma);
     }
     else {
-        double dCurrentGamma = Get_fGamma();
+        double dCurrentGamma = Renderer::GetGamma();
         double dOffset = dCurrentGamma - fGammaMin.Float();
         float fPct = dOffset / (fGammaMax.Float() - fGammaMin.Float());
         float fVal = static_cast<double>(apUOpt->iNumSettings - 1) * fPct;
@@ -3329,7 +3331,7 @@ void StartMenu::SetMasterVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultMasterVolume_Audio = fVolume);
+            float fNewVolume = (fMasterVolumeDefault = fVolume);
             BSAudio::QInstance().SetMasterVolume(fNewVolume);
         }
         else {
@@ -3341,7 +3343,7 @@ void StartMenu::SetMasterVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultMasterVolume_Audio;
+        float fVolume = fMasterVolumeDefault;
         BSAudio::QInstance().SetMasterVolume(fVolume);
     }
 }
@@ -3350,7 +3352,7 @@ void StartMenu::SetFootstepVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultFootVolume_Audio = fVolume);
+            float fNewVolume = (fFootVolumeDefault = fVolume);
             BSAudio::QInstance().SetFootVolume(fNewVolume);
         }
         else {
@@ -3362,7 +3364,7 @@ void StartMenu::SetFootstepVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultFootVolume_Audio;
+        float fVolume = fFootVolumeDefault;
         BSAudio::QInstance().SetFootVolume(fVolume);
     }
 }
@@ -3371,7 +3373,7 @@ void StartMenu::SetMusicVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultMusicVolume_Audio = fVolume);
+            float fNewVolume = (fMusicVolumeDefault = fVolume);
             BSAudio::QInstance().SetMusicVolume(fNewVolume);
         }
         else {
@@ -3383,7 +3385,7 @@ void StartMenu::SetMusicVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultMusicVolume_Audio;
+        float fVolume = fMusicVolumeDefault;
         BSAudio::QInstance().SetMusicVolume(fVolume);
     }
 }
@@ -3392,7 +3394,7 @@ void StartMenu::SetVoiceVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultVoiceVolume_Audio = fVolume);
+            float fNewVolume = (fVoiceVolumeDefault = fVolume);
             BSAudio::QInstance().SetVoiceVolume(fNewVolume);
         }
         else {
@@ -3404,7 +3406,7 @@ void StartMenu::SetVoiceVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultVoiceVolume_Audio;
+        float fVolume = fVoiceVolumeDefault;
         BSAudio::QInstance().SetVoiceVolume(fVolume);
     }
 }
@@ -3413,7 +3415,7 @@ void StartMenu::SetFXVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultEffectsVolume_Audio = fVolume);
+            float fNewVolume = (fEffectsVolumeDefault = fVolume);
             BSAudio::QInstance().SetEffectVolume(fNewVolume);
         }
         else {
@@ -3425,7 +3427,7 @@ void StartMenu::SetFXVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultEffectsVolume_Audio;
+        float fVolume = fEffectsVolumeDefault;
         BSAudio::QInstance().SetEffectVolume(fVolume);
     }
 }
@@ -3434,7 +3436,7 @@ void StartMenu::SetRadioVol(StartMenu::UserOption* apUOpt) {
     if (apUOpt) {
         if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
             float fVolume = static_cast<double>(apUOpt->iVal) / static_cast<double>(apUOpt->iNumSettings - 1);
-            float fNewVolume = (gs_fDefaultRadioVolume_Audio = fVolume);
+            float fNewVolume = (fRadioVolumeDefault = fVolume);
             BSAudio::QInstance().SetRadioVolume(fNewVolume);
         }
         else {
@@ -3446,17 +3448,17 @@ void StartMenu::SetRadioVol(StartMenu::UserOption* apUOpt) {
         }
     }
     else {
-        float fVolume = gs_fDefaultRadioVolume_Audio;
+        float fVolume = fRadioVolumeDefault;
         BSAudio::QInstance().SetRadioVolume(fVolume);
     }
 }
 
 void StartMenu::SetCameraPitch(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
-        gs_bInvertYValues_Controls = apUOpt->iVal == 1;
+        bInvertYValues = apUOpt->iVal == 1;
     }
     else {
-        apUOpt->iVal = static_cast<bool>(gs_bInvertYValues_Controls);
+        apUOpt->iVal = static_cast<bool>(bInvertYValues);
         apUOpt->iDefaultVal = 0;
     }
 }
@@ -3783,10 +3785,6 @@ void SetXboxController(StartMenu::UserOption* apUOpt) {
     }
 }
 
-float Get_fGamma() {
-    return gs_fGamma_Display;
-}
-
 void SetTextureSize(StartMenu::UserOption* apUOpt) {
     if (StartMenu::pMe && StartMenu::pMe->IsFlagSet(StartMenu::FLAG_SAVE_OPTIONS)) {
         Renderer::iTexMipMapSkip = apUOpt->iVal;
@@ -3814,12 +3812,6 @@ void SetActorFade(StartMenu::UserOption* apUOpt) {
         fPct = (fActorLODDefault.Float() - fActorLODMin) / (fActorLODMax - fActorLODMin);
         fVal = static_cast<double>(apUOpt->iNumSettings - 1) * fPct;
         apUOpt->iDefaultVal = static_cast<int32_t>(BSRoundToNearest(fVal, 1.0f));
-    }
-}
-
-void Controls::EnableRumble(bool bTF) {
-    if (Controls::pInstance) {
-        Controls::pInstance->bIsControllerEnabled = bTF;
     }
 }
 

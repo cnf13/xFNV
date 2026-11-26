@@ -19,7 +19,7 @@
 #include "xfnv/Compiler.h"
 
 void IngredientItemData::Endian() {
-    ENDIAN(iCostOverride, false);
+    BSEndian(iCostOverride, false);
 }
 
 IngredientItem::IngredientItem()

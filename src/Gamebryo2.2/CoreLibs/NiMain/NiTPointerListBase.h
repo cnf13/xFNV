@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
-#include "BSShader/BSRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerAllocator.h"

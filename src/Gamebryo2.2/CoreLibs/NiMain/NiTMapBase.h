@@ -1,17 +1,13 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
-#include "BSHavok/bhkPoseArray.h"
-#include "BSHavok/bhkRagdollShareData.h"
-#include "Fallout Shared/GlobalFunc.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Pathfinding/FastNavMeshHandles.h"
-#include "Gamebryo2.2/CoreLibs/NiAnimation/NiSequence.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiShaderLibrary.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTDefaultAllocator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerAllocator.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 #include <stdint.h>
 
@@ -38,6 +34,7 @@ struct NavMeshPOVData;
 class NiNode;
 class NiRenderedCubeMap;
 class NiShader;
+class NiTexture;
 class NiVBChip;
 class ObstacleData;
 class ObstacleTaskData;

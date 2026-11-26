@@ -113,10 +113,3 @@ void MagicLight::Transfer(NiAVObject* apNode) {
         pParent->AttachChild(LightData.spLight.m_pObject, 1);
     }
 }
-
-NiColor& NiColor::operator*=(float fScalar) {
-    r *= fScalar;
-    g *= fScalar;
-    b *= fScalar;
-    return *this;
-}

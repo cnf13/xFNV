@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESObjectARMA.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSAddonNode.h"
 #include "Fallout Shared/BGSBipedModelList.h"
@@ -266,6 +266,6 @@ bool TESObjectARMA::Compare(TESForm* apCompare) {
 
 // The flag and condition bytes need no swap.
 void OBJ_ARMO::Endian() {
-    ENDIAN(sRating, false);
-    ENDIAN(fDamageThreshold, false);
+    BSEndian(sRating, false);
+    BSEndian(fDamageThreshold, false);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 // Where the free list allocator gets its pages from: an interface over the system's memory (or a fixed buffer). Every

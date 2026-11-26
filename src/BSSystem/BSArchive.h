@@ -94,3 +94,8 @@ public:
 
     BSDirectoryEntry* pDirectories;
 };
+
+// iSize without its flag bits.
+inline uint32_t BSFileEntry::Size() {
+    return iSize & 0x3FFFFFFF;
+}

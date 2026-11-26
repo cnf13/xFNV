@@ -2,6 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkUtilFunctions.h"
@@ -32,7 +33,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -51,6 +51,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SpeedTree/SpeedTreeRT.h"
 #include "SpeedTree/WindEngine.h"
@@ -280,29 +281,29 @@ BSTreeNode* BSTreeModel::CreateArt(float afScale) {
 void BSTreeModel::ApplyBaseObject(TESObjectTREE* apTreeObj) {
     NiPointer<NiSourceTexture> spTex(nullptr);
     if (apTreeObj && pSpeedTree && !IsInstance()) {
-        float fTreeForceBranchDimming = SpeedTree::fTreeForceBranchDimming::Get();
+        float fTreeForceBranchDimming = BSTreeManager::GetForceBranchDimming();
         if (fTreeForceBranchDimming < 0.0 || fTreeForceBranchDimming > 1.0) {
             fTreeForceBranchDimming = apTreeObj->GetBranchDimming();
         }
         if (fTreeForceBranchDimming >= 0.0 && fTreeForceBranchDimming <= 1.0) {
             pSpeedTree->SetBranchDimming(fTreeForceBranchDimming);
         }
-        fTreeForceBranchDimming = SpeedTree::fTreeForceLeafDimming::Get();
+        fTreeForceBranchDimming = BSTreeManager::GetForceLeafDimming();
         if (fTreeForceBranchDimming < 0.0 || fTreeForceBranchDimming > 1.0) {
             fTreeForceBranchDimming = apTreeObj->GetLeafDimming();
         }
         if (fTreeForceBranchDimming >= 0.0 && fTreeForceBranchDimming <= 1.0) {
             pSpeedTree->SetLeafDimming(fTreeForceBranchDimming);
         }
-        float fVal = SpeedTree::fTreeForceCS::Get();
+        float fVal = BSTreeManager::GetForceCurveScalar();
         if (fVal < 0.0) {
             fVal = apTreeObj->GetCurveScalar();
         }
         if (fVal >= 0.0) {
             fCurveScalar = fVal;
         }
-        float fMin = SpeedTree::fTreeForceMinBudAngle::Get();
-        float fMax = SpeedTree::fTreeForceMaxBudAngle::Get();
+        float fMin = BSTreeManager::GetForceMinimumBudAngle();
+        float fMax = BSTreeManager::GetForceMaximumBudAngle();
         if (fMin < 0.0 || fMin > 90.0 || fMax < 0.0 || fMax > 90.0 || fMax < static_cast<double>(fMin)) {
             fMin = apTreeObj->GetMinimumLeafAngle();
             fMax = apTreeObj->GetMaximumLeafAngle();
@@ -959,8 +960,8 @@ bool BSTreeModel::InitFromBase(TESObjectTREE* apTreeObj, uint32_t aiSeed) {
         }
         pspeedtree->SetLeafRockingState(true);
         pspeedtree->GetTreeSize(fSize, fSizeVar);
-        float fNewVariance = GameSetting::fTreeSizeConversion::Get() * fSizeVar;
-        float fNewSize = GameSetting::fTreeSizeConversion::Get() * fSize;
+        float fNewVariance = BSTreeManager::GetSizeConversion() * fSizeVar;
+        float fNewSize = BSTreeManager::GetSizeConversion() * fSize;
         pspeedtree->SetTreeSize(fNewSize, fNewVariance);
         pspeedtree->SetWindStrength(0.0f, -1.0f, -1.0f);
         pspeedtree->SetLocalMatrices(0, 4u);
@@ -1007,33 +1008,4 @@ NiAlphaProperty* BSTreeModel::CreateAlphaProperty() {
     pAlpha->SetTestMode(NiAlphaProperty::TEST_GREATER);
     pAlpha->SetTestRef(0x54u);
     return pAlpha;
-}
-
-NiDX9ShaderDeclaration* ShadowLightShader::GetDefaultShaderDecl() {
-    return spShaderDecl;
-}
-
-void STSPData::SetData(D3DXVECTOR4* apWindInfo, uint16_t asVertexCount) {
-    pWindInfo = apWindInfo;
-    sVertexCount = asVertexCount;
-}
-
-float SpeedTree::fTreeForceCS::Get() {
-    return gs_fTreeForceCS_SpeedTree.Float();
-}
-
-float SpeedTree::fTreeForceBranchDimming::Get() {
-    return gs_fTreeForceBranchDimming_SpeedTree.Float();
-}
-
-float SpeedTree::fTreeForceLeafDimming::Get() {
-    return gs_fTreeForceLeafDimming_SpeedTree.Float();
-}
-
-float SpeedTree::fTreeForceMinBudAngle::Get() {
-    return gs_fTreeForceMinBudAngle_SpeedTree.Float();
-}
-
-float SpeedTree::fTreeForceMaxBudAngle::Get() {
-    return gs_fTreeForceMaxBudAngle_SpeedTree.Float();
 }

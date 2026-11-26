@@ -61,13 +61,12 @@ hkBool hkpAllCdPointCollector::hasHit() {
 
 // Sorts the hits by distance (hkpRootCdPoint's operator<) with a quick sort for root points.
 void hkpAllCdPointCollector::sortHits() {
-    int32_t m_size = m_hits.m_size;
-    if (m_size > 1) {
-        hkAlgorithm::quickSortRecursive<hkpRootCdPoint, hkAlgorithm::less<hkpRootCdPoint>>(
-            m_hits.begin(),
-            0,
-            m_size - 1,
-            hkAlgorithm::less<hkpRootCdPoint>()
-        );
+    hkAlgorithm::quickSort(m_hits.begin(), m_hits.m_size);
+}
+
+// HK_DECLARE_CLASS_ALLOCATOR's operator delete: the block goes back to the thread's Havok heap.
+void hkpAllCdPointCollector::operator delete(void* p) {
+    if (p) {
+        hkMemoryRouter::getInstance().heap().blockFree(p, sizeof(hkpAllCdPointCollector));
     }
 }

@@ -4,7 +4,7 @@
 #include "BSShader/BSShaderLightingProperty.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"

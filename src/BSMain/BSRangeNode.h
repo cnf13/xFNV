@@ -39,3 +39,7 @@ public:
     static NiRTTI ms_RTTI;
     static inline VisibilityChangedCallback pVisibilityChangedCB{};
 };
+
+inline void BSRangeNode::SetVisibilityChangedCB(void (*apVisibilityChangedCB)(NiNode*, bool)) {
+    BSRangeNode::pVisibilityChangedCB = apVisibilityChangedCB;
+}

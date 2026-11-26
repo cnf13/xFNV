@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 // strcat_s of pcSrc onto pcDest of stDestSize bytes; returns pcDest.
 char* NiStrcat(char* pcDest, size_t stDestSize, const char* pcSrc);

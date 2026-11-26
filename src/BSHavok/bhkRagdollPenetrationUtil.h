@@ -102,4 +102,8 @@ public:
 
     // The ini setting for the interval between two penetration detections.
     static SettingT<INISettingCollection> fDetectionUpdateTimeSec;
+
+protected:
+    static SettingT<INISettingCollection> fDesiredVel;
+    static SettingT<INISettingCollection> fImpulseLimit;
 };

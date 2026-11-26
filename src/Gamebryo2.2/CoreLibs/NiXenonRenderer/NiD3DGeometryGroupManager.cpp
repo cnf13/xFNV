@@ -3,7 +3,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryGroupManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiScreenTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSkinInstance.h"

@@ -370,3 +370,14 @@ public:
 using MasterArchiveBufferSizeArray = uint32_t[ARCHIVE_TYPE_INDEX_COUNT];
 inline MasterArchiveBufferSizeArray
     MasterArchiveBufferSize{0x10000, 0x10000, 16384, 0x10000, 16384, 16384, 16384, 16384, 16384};
+
+inline int32_t Archive::GetRuntimeID() const {
+    return m_iRuntimeID;
+}
+
+// The group's master archive from the first set, else from the second.
+inline Archive* ArchiveManager::GetMasterArchive(ARCHIVE_TYPE_INDEX aeTypeIndex) {
+    NiPointer<Archive>& spMaster = spMasterArchives[0][aeTypeIndex] ? spMasterArchives[0][aeTypeIndex]
+                                                                    : spMasterArchives[1][aeTypeIndex];
+    return spMaster;
+}

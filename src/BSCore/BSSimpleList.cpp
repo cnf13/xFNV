@@ -2,7 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XGamerProfile.h"
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkCharacterController.h"

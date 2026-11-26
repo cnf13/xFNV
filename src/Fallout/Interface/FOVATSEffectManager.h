@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Fallout Shared/BGSBodyPart.h"
 #include "Fallout Shared/TESBipedModelForm.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -176,16 +177,16 @@ extern SettingT<INISettingCollection> fVATSColorB;
 extern SettingT<INISettingCollection> fVATSColorG;
 extern SettingT<INISettingCollection> fVATSTargetPulseRate;
 
-extern SettingT<INISettingCollection> gs_fScanModeScanlineFrequency_VATS;
+extern SettingT<INISettingCollection> fVATSScanScanlineFrequency;
 
-extern SettingT<INISettingCollection> gs_fDistortDuration_VATS;
+extern SettingT<INISettingCollection> fVATSDistortDuration;
 
-extern SettingT<INISettingCollection> gs_fBlurIntensity_VATS;
+extern SettingT<INISettingCollection> fVATSBlurIntensity;
 
-extern SettingT<INISettingCollection> gs_fBlurRadius_VATS;
+extern SettingT<INISettingCollection> fVATSBlurRadius;
 
-extern SettingT<INISettingCollection> gs_sScanlineTexture_VATS;
+extern SettingT<INISettingCollection> sVATSScanlinesTexture;
 
-extern SettingT<INISettingCollection> gs_fScanlineFrequency_VATS;
+extern SettingT<INISettingCollection> fVATSScanlineFrequency;
 
-extern SettingT<INISettingCollection> gs_fDistortHorizontalScale_VATS;
+extern SettingT<INISettingCollection> fVATSDistortHorizontalScale;

@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSNote.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/AiFormulas.h"
 #include "Fallout Shared/BGSPickupPutdownSounds.h"

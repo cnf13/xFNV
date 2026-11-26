@@ -1,5 +1,6 @@
 #include "SDK/DirectShow/CMemAllocator.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/BSSystemObjects.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMovie/CBaseObject.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
@@ -7,7 +8,6 @@
 #include "SDK/DirectShow/CMediaType.h"
 #include "SDK/DirectShow/CUnknown.h"
 #include "SDK/DirectShow/wxutil.h"
-#include "BSCore/BSSystemObjects.h"
 #include "platform/Memory.h"
 #include <stdint.h>
 

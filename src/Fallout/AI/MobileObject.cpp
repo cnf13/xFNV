@@ -11,6 +11,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -132,15 +133,11 @@ NiPoint3 MobileObject::boundMax;
 SettingT<INISettingCollection> fDBVoiceAttenuationIn2D("fDBVoiceAttenuationIn2D:Audio", 0.0f);
 SettingT<INISettingCollection> bBackgroundLoadLipFiles("bBackgroundLoadLipFiles:BackgroundLoad", false);
 SettingT<INISettingCollection> fQuadrupedPitchMult("fQuadrupedPitchMult:HAVOK", 1.0f);
-SettingT<INISettingCollection> gs_iHavokSkipFrameCountTEST_Havok("iHavokSkipFrameCountTEST:Havok", 0);
+SettingT<INISettingCollection> iHavokSkipFrameCount("iHavokSkipFrameCountTEST:Havok", 0);
 
 int32_t get_iFrameCounter() {
     return Main::iFrameCounter;
 }
-
-// iMoveDirection is deliberately left uninitialised.
-MoveData::MoveData()
-  : fTime(0.0f), Angle(NiPoint3::ZERO), Displacement(NiPoint3::ZERO), fCurrMoveSpeed(0.0f), bVisible(true) {}
 
 // fUpdateTargetTimer is deliberately left uninitialised.
 MobileObject::MobileObject()
@@ -630,9 +627,9 @@ void MobileObject::UpdateSoundCallBack() {
 
             if (pSubtitleItem) {
                 const char* pText = pSubtitleItem->GetCurrentResponse()->cText.String();
-                if ((gs_bGeneralSubtitles_Gameplay.Bool() && pText) ||
+                if ((bGeneralSubtitles.Bool() && pText) ||
                     (IsActor() && static_cast<Actor*>(this)->GetShowSubtitles())) {
-                    if (GetIsFullHelp()) {
+                    if (Interface::GetFullHelp()) {
                         char acSubtitle[0x100];
                         std::sprintf(
                             acSubtitle,
@@ -702,7 +699,7 @@ void MobileObject::UpdateSoundCallBack() {
                         pConversation->GetCurrentItem()->GetCurrentResponse()) {
                         const char* pText = pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String();
                         if (pText &&
-                            (gs_bGeneralSubtitles_Gameplay.Bool() ||
+                            (bGeneralSubtitles.Bool() ||
                              (IsActor() && static_cast<Actor*>(this)->GetShowSubtitles()))) {
                             BSSoundHandle kHandle = GetCurrentAIProcess()->GetSoundHandle(ACTOR_SOUND_HANDLE_VOICE);
                             Interface::ShowSubtitle(
@@ -1095,11 +1092,11 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
         NiPoint3 kAngle = *::new (&kZero) NiPoint3(0.0f, 0.0f, 0.0f);
         pActor->SetAngleOnReference(kAngle);
     }
-    if (gs_iHavokSkipFrameCountTEST_Havok.Int()) {
+    if (iHavokSkipFrameCount.Int()) {
         NiPoint3 kRotatedDelta;
         uint32_t uiFrameCounter = get_iFrameCounter();
         if (iLastFrameCounter != uiFrameCounter) {
-            bSkipHavokThisFrame = uiFrameCounter % (gs_iHavokSkipFrameCountTEST_Havok.Int() + 1) != 0;
+            bSkipHavokThisFrame = uiFrameCounter % (iHavokSkipFrameCount.Int() + 1) != 0;
             iLastFrameCounter = uiFrameCounter;
         }
         if (bSkipHavokThisFrame && pCharController->QSupported()) {
@@ -1143,7 +1140,7 @@ bhkCharacterController* MobileObject::Move(float afDeltaTime, NiPoint3& arDeltaM
          pCheckedActor->IsDead(false) ||
          pCheckedActor->IsDying() ||
          pCheckedActor->IsKnockedOut());
-    if (!(gs_fCharControllerWarpDistSqr_HAVOK.Float() < static_cast<double>(fDistSqr)) ||
+    if (!(bhkCharacterController::fCharControllerWarpDistSqr.Float() < static_cast<double>(fDistSqr)) ||
         pActor->IsProjectile() ||
         bIsImmobile ||
         bIncapacitated ||

@@ -1,4 +1,5 @@
 #include "Fallout/Interface/Menus/StatsMenu.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include "BSAudio/BSAudio.h"
@@ -2070,7 +2071,7 @@ uint8_t StatsMenu::GetCurrentStatsPage() {
     return 0;
 }
 
-void StatsMenu::Close() {
+void StatsMenu::ResetHealingMode() {
     if (StatsMenu::pMe && StatsMenu::pMe->bLimbMode) {
         StatsMenu::pMe->ToggleHealingMode();
     }

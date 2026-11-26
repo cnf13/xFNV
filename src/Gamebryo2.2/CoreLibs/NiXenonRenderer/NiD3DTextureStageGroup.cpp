@@ -2,7 +2,6 @@
 
 #include "BSCore/MemoryManager.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DRenderState.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPool.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
@@ -14,28 +13,6 @@
 
 #include <cstdint>
 #include <xmmintrin.h>
-
-// The element count is taken as an int: a count with the top bit set constructs nothing.
-template <>
-NiD3DTextureStageGroup* NiTNewInterface<NiD3DTextureStageGroup>::Allocate(uint32_t uiNumElements) {
-    void* pMemory = MemoryManager::Instance().Allocate(sizeof(NiD3DTextureStageGroup) * size_t{uiNumElements});
-    if (!pMemory) {
-        return nullptr;
-    }
-    NiD3DTextureStageGroup* pArray = static_cast<NiD3DTextureStageGroup*>(pMemory);
-    NiD3DTextureStageGroup* pElement = pArray;
-    for (int32_t iCount = static_cast<int32_t>(uiNumElements); --iCount >= 0; ++pElement) {
-        ::new (static_cast<void*>(pElement)) NiD3DTextureStageGroup();
-    }
-    return pArray;
-}
-
-template <>
-void NiTNewInterface<NiD3DTextureStageGroup>::Deallocate(NiD3DTextureStageGroup* pArray) {
-    if (pArray) {
-        MemoryManager::Instance().Deallocate(pArray);
-    }
-}
 
 // Not renderer-owned, no counts or iterators, every value and flag cleared.
 NiD3DTextureStageGroup::NiD3DTextureStageGroup()

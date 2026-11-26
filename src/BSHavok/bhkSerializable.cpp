@@ -1,6 +1,7 @@
 #include "BSHavok/bhkSerializable.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSHavok/ahkpWorld.h"
 #include "BSHavok/bhkBallSocketConstraintChain.h"
 #include "BSHavok/bhkConstraint.h"
 #include "BSHavok/bhkConstraintChain.h"
@@ -9,7 +10,7 @@
 #include "BSHavok/bhkOrientHingedBodyAction.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkUnaryAction.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"

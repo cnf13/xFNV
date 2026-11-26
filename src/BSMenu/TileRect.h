@@ -19,3 +19,7 @@ public:
     // Non-zero when the rectangle is a scissor (clip) rectangle.
     uint32_t bIsScissor;
 };
+
+inline const char* TileRect::GetTypeName() {
+    return "RECT";
+}

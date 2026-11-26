@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSAudio/BSSoundHandle.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/ListBox.h"
@@ -16,8 +17,6 @@ class TESObjectREFR;
 class TESTopic;
 class TESTopicInfo;
 
-// The reference the open dialogue menu talks to, or null without one.
-TESObjectREFR* GetDialogMenuParterRef();
 
 // The dialogue menu. Only its statics are declared; its members are not.
 class DialogMenu : public Menu {
@@ -126,4 +125,4 @@ public:
 inline int32_t g_dialogMenu_TraitCurrentValue;
 inline int32_t iStopSpeechStartTime;
 
-extern SettingT<INIPrefSettingCollection> gs_bDialogueSubtitles_GamePlay;
+extern SettingT<INIPrefSettingCollection> bDialogueSubtitles;

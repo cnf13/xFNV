@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/TESChildCell.h"
 #include "Fallout Shared/TESForm.h"
@@ -324,6 +325,10 @@ public:
     static inline int32_t iLANDsinuse;
     static inline BGSTextureSet* pDefTextTexSet;
     static NiPointer<NiTexturingProperty> spTexturingProperty;
+
+protected:
+    static SettingT<INISettingCollection> sDefaultLandDiffuseTexture;
+    static SettingT<INISettingCollection> sDefaultLandNormalTexture;
 };
 
 // The land's loaded 3D data: the mesh, per-vertex arrays, border, height range, per-quadrant texture layers, the
@@ -379,26 +384,22 @@ public:
     bool bTriupper;
 };
 
-extern SettingT<INISettingCollection> gs_iLandBorder1R_Landscape;
+extern SettingT<INISettingCollection> iLandBorder1R;
 
-extern SettingT<INISettingCollection> gs_fLandTextureTilingMult_Landscape;
+extern SettingT<INISettingCollection> fLandTextureTilingMult;
 
-extern SettingT<INISettingCollection> gs_fTexturePctThreshold_Grass;
+extern SettingT<INISettingCollection> fTexturePctThreshold;
 
-extern SettingT<INISettingCollection> gs_iMaxGrassTypesPerTexure_Grass;
+extern SettingT<INISettingCollection> iMaxGrassTypesPerTexture;
 
-extern SettingT<INISettingCollection> gs_sDefaultLandNormalTexture_Landscape;
+extern SettingT<INISettingCollection> iLandBorder1G;
 
-extern SettingT<INISettingCollection> gs_iLandBorder1G_Landscape;
+extern SettingT<INISettingCollection> iLandBorder2B;
 
-extern SettingT<INISettingCollection> gs_iLandBorder2B_Landscape;
+extern SettingT<INISettingCollection> iGrassDensityEvalSize;
 
-extern SettingT<INISettingCollection> gs_iGrassDensityEvalSize_Grass;
+extern SettingT<INISettingCollection> iLandBorder1B;
 
-extern SettingT<INISettingCollection> gs_iLandBorder1B_Landscape;
+extern SettingT<INISettingCollection> iLandBorder2R;
 
-extern SettingT<INISettingCollection> gs_iLandBorder2R_Landscape;
-
-extern SettingT<INISettingCollection> gs_sDefaultLandDiffuseTexture_Landscape;
-
-extern SettingT<INISettingCollection> gs_iLandBorder2G_Landscape;
+extern SettingT<INISettingCollection> iLandBorder2G;

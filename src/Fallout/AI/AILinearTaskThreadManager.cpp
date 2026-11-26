@@ -5,6 +5,7 @@
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleManager.h"
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
@@ -354,40 +355,6 @@ void AILinearTaskThreadManager::AIThread2TaskFunc() {
     ScriptLocals::ClearOptimizations();
     QInstance()->WaitOnThreadStage(AI_THREAD_1, AI_1_POSTRENDERACTIONS);
     QInstance()->WaitOnThreadStage(AI_THREAD_1, AI_1_DONE);
-}
-
-BSLinearTaskThread::BSLinearTaskThread() : bKillThread(false) {}
-
-BSLinearTaskThread::~BSLinearTaskThread() {}
-
-uint32_t BSLinearTaskThread::ThreadProc() {
-    OnStartup();
-    while (!bKillThread) {
-        StartProcessing.Wait();
-        if (bKillThread) {
-            break;
-        }
-        RunLinearTasks();
-        FinishedProcessing.Signal();
-    }
-    OnShutdown();
-    FinishedProcessing.Signal();
-    return 0;
-}
-
-void BSLinearTaskThread::WaitForCompletion() {
-    FinishedProcessing.Wait();
-}
-
-void BSLinearTaskThread::StartProcessingTasks() {
-    StartProcessing.Signal();
-}
-
-// ~BSParallelTaskThreadManager and AILinearTaskThreadManager::DestroyThreads call this before waiting for the thread:
-// it sets bKillThread and wakes the thread.
-void BSLinearTaskThread::Shutdown() {
-    bKillThread = true;
-    StartProcessing.Signal();
 }
 
 AILinearTaskThread::AILinearTaskThread(void (*apfnTaskFunc)()) : pfnTaskFunc(apfnTaskFunc) {}

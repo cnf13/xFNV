@@ -12,7 +12,7 @@
 #include "BSDevices/Controls.h"
 #include "BSMain/BSScissorTriShape.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileImage.h"
@@ -963,9 +963,9 @@ void MapMenu::ZoomMap(bool abZoomIn, float afZoomDelta) {
             float fQuestMarkerSize = (dQuestMarkerMaxSize - fLocalQuestMarkerMinSize.Float()) * fMagnificationRatio +
                 dQuestMarkerMinSize;
             pMapTile->Set(Tile::kTileValue_User1, fQuestMarkerSize, true);
-            double dCursorMinSize = gs_fLocalfPlayerCursorMinSize.Float();
+            double dCursorMinSize = fLocalPlayerCursorMinSize.Float();
             double dCursorMaxSize = fLocalPlayerCursorMaxSize.Float();
-            float fCursorSize = (dCursorMaxSize - gs_fLocalfPlayerCursorMinSize.Float()) * fMagnificationRatio +
+            float fCursorSize = (dCursorMaxSize - fLocalPlayerCursorMinSize.Float()) * fMagnificationRatio +
                 dCursorMinSize;
             pMapTile->Set(Tile::kTileValue_User2, fCursorSize, true);
         }
@@ -986,9 +986,9 @@ void MapMenu::ZoomMap(bool abZoomIn, float afZoomDelta) {
             float fQuestMarkerSize = (dQuestMarkerMaxSize - fWorldQuestMarkerMinSize.Float()) * fMagnificationRatio +
                 dQuestMarkerMinSize;
             pMapTile->Set(Tile::kTileValue_User1, fQuestMarkerSize, true);
-            double dCursorMinSize = gs_fWorldfPlayerCursorMinSize.Float();
+            double dCursorMinSize = fWorldPlayerCursorMinSize.Float();
             double dCursorMaxSize = fWorldPlayerCursorMaxSize.Float();
-            float fCursorSize = (dCursorMaxSize - gs_fWorldfPlayerCursorMinSize.Float()) * fMagnificationRatio +
+            float fCursorSize = (dCursorMaxSize - fWorldPlayerCursorMinSize.Float()) * fMagnificationRatio +
                 dCursorMinSize;
             pMapTile->Set(Tile::kTileValue_User2, fCursorSize, true);
         }
@@ -3318,16 +3318,6 @@ float MapMenu::GetWorldMapMagnification() {
     }
 
     return 1.0;
-}
-
-void Tile::ClearNeedsUpdate(int32_t aiFlag) {
-    if (uiFlags & aiFlag) {
-        uiFlags ^= aiFlag;
-    }
-}
-
-void TileShaderProperty::SetTintColor(const NiColorA& aTintColor) {
-    TintColor = aTintColor;
 }
 
 bool BGSNote::QHasBeenRead() {

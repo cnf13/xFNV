@@ -470,3 +470,15 @@ uint32_t BSFile::WrNoSwap(
 ) {
     return static_cast<BSFile*>(apThis)->WriteF(apBuffer, aiBytes);
 }
+
+// Reads a 16-bit value into arVal and records the byte count.
+BSFile& BSFile::operator>>(int16_t& arVal) {
+    iResult = NiBinaryStream::Read(&arVal, 2u);
+    return *this;
+}
+
+// Reads a 32-bit value into arVal and records the byte count.
+BSFile& BSFile::operator>>(uint32_t& arVal) {
+    iResult = NiBinaryStream::Read(&arVal, 4u);
+    return *this;
+}

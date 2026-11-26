@@ -1,7 +1,7 @@
 #include "Fallout Shared/Expression.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/TESActorBaseData.h"

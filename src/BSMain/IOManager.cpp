@@ -6,19 +6,16 @@
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/BSTaskManagerThread.h"
-#include "BSMain/SettingCollection.h"
-#include "Fallout Shared/BSTaskThread.h"
-#include "Fallout Shared/LockFreeMap.h"
+#include "BSMain/ThreadSafeStructures.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/ModelLoader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/stdlib.h"
 
-SettingT<INISettingCollection> gs_iPostProcessMilliseconds_BackgroundLoad("iPostProcessMilliseconds:BackgroundLoad", 5);
-SettingT<INISettingCollection> gs_iPostProcessMillisecondsLoadingQueuedPriority_BackgroundLoad(
-    "iPostProcessMillisecondsLoadingQueuedPriority:BackgroundLoad",
-    20
-);
+SettingT<INISettingCollection> iPostProcessMilliseconds("iPostProcessMilliseconds:BackgroundLoad", 5);
+SettingT<INISettingCollection>
+    iPostProcessMillisecondsLoadingQueuedPriority("iPostProcessMillisecondsLoadingQueuedPriority:BackgroundLoad", 20);
 static SettingT<INISettingCollection>
     iPostProcessMillisecondsEditor("iPostProcessMillisecondsEditor:BackgroundLoad", 50);
 static SettingT<INISettingCollection>
@@ -303,12 +300,6 @@ LockFreePriorityQueue<T>::~LockFreePriorityQueue() {
     MemoryManager::Instance().Deallocate(pQueues);
 }
 
-// Deleting frees through the engine's heap.
-template <class T>
-void LockFreePriorityQueue<T>::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
 template LockFreePriorityQueue<NiPointer<IOTask>>::LockFreePriorityQueue(
     uint32_t aiPriorityCount,
     uint32_t aiMaxThreads,
@@ -316,49 +307,6 @@ template LockFreePriorityQueue<NiPointer<IOTask>>::LockFreePriorityQueue(
 );
 template LockFreePriorityQueue<NiPointer<IOTask>>::~LockFreePriorityQueue();
 template void LockFreePriorityQueue<NiPointer<IOTask>>::operator delete(void* apMemory);
-
-// Queues the element at aiPriority and counts it.
-template <class T>
-void LockFreePriorityQueue<T>::Insert(int32_t aiPriority, T* apTask) {
-    pQueues[aiPriority]->Push(*apTask);
-    IncrementCount();
-}
-
-// Empties every priority queue. The count is cleared first; the index compare is unsigned.
-template <class T>
-void LockFreePriorityQueue<T>::Clear() {
-    iCount = 0;
-    for (uint32_t i = 0; i < static_cast<uint32_t>(iPriorityCount); ++i) {
-        pQueues[i]->RemoveAll(false);
-    }
-}
-
-template <class T>
-void LockFreePriorityQueue<T>::IncrementCount() {
-    InterlockedIncrementInt32(&iCount);
-}
-
-template <class T>
-void LockFreePriorityQueue<T>::DecrementCount() {
-    InterlockedDecrementInt32(&iCount);
-}
-
-template <class T>
-uint32_t LockFreePriorityQueue<T>::GetCount() {
-    return iCount;
-}
-
-// Takes the first element of the highest priority (the lowest index) that has one.
-template <class T>
-bool LockFreePriorityQueue<T>::Pop(T& arData) {
-    for (uint32_t i = 0; i < static_cast<uint32_t>(iPriorityCount); ++i) {
-        if (pQueues[i]->Pop(arData)) {
-            DecrementCount();
-            return true;
-        }
-    }
-    return false;
-}
 
 template void LockFreePriorityQueue<NiPointer<IOTask>>::Insert(int32_t aiPriority, NiPointer<IOTask>* apTask);
 template void LockFreePriorityQueue<NiPointer<IOTask>>::Clear();
@@ -391,14 +339,13 @@ bool IOManager::UpdateQueue() {
     if (eLoadingQueuedPriority == IO_TASK_PRIORITY_COUNT) {
         Setting::Info* iPostProcessMilliseconds;
         // The setting's address is never null.
-        iPostProcessMilliseconds = &gs_iPostProcessMilliseconds_BackgroundLoad.uValue;
+        iPostProcessMilliseconds = &::iPostProcessMilliseconds.uValue;
         imaxTime = iPostProcessMilliseconds->uint;
     }
     else {
         Setting::Info* iPostProcessMillisecondsLoadingQueuedPriority;
         // The setting's address is never null.
-        iPostProcessMillisecondsLoadingQueuedPriority = &gs_iPostProcessMillisecondsLoadingQueuedPriority_BackgroundLoad
-                                                             .uValue;
+        iPostProcessMillisecondsLoadingQueuedPriority = &::iPostProcessMillisecondsLoadingQueuedPriority.uValue;
         imaxTime = iPostProcessMillisecondsLoadingQueuedPriority->uint;
     }
     llStartTime.QuadPart = BSPrecisionTimer::GetTimer();

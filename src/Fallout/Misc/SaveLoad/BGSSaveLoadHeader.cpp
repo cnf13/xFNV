@@ -1,6 +1,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadHeader.h"
 
 #include "BSCore/BSString.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Renderer.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -12,11 +13,11 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadManager.h"
 #include "Fallout/Misc/ScreenShot.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/string.h"
 
 void BGSSaveLoadHeader::LoadHeaderData(BGSSaveLoadFile* apFile, BGSSaveLoadFileEntry* apFileEntry) {

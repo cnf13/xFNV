@@ -1,19 +1,19 @@
 #include "BSHavok/bhkOrientHingedBodyAction.h"
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "BSHavok/hkOrientHingedBodyAction.h"
-#include "Fallout Shared/TESFile.h"
 #include "Fallout/AI/Combat/CombatPlanner.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -53,8 +53,8 @@ void bhkOrientHingedBodyAction::LoadBinary(NiStream& arStream) {
         hkOrientHingedBodyActionCinfo& cinfo = static_cast<hkOrientHingedBodyActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        ENDIAN(cinfo.fStrength, false);
-        ENDIAN(cinfo.fDamping, false);
+        BSEndian(cinfo.fStrength, false);
+        BSEndian(cinfo.fDamping, false);
     }
 }
 
@@ -66,15 +66,15 @@ void bhkOrientHingedBodyAction::SaveBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        ENDIAN(cinfo.fStrength, false);
-        ENDIAN(cinfo.fDamping, false);
+        BSEndian(cinfo.fStrength, false);
+        BSEndian(cinfo.fDamping, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.HingeAxisLS);
         bhkStream::Endian(cinfo.ForwardLS);
-        ENDIAN(cinfo.fStrength, false);
-        ENDIAN(cinfo.fDamping, false);
+        BSEndian(cinfo.fStrength, false);
+        BSEndian(cinfo.fDamping, false);
     }
 }
 

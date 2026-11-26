@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/PackageData.h"
 #include "Fallout Shared/PackageLocation.h"
@@ -8,7 +8,7 @@
 #include "SDK/MSVC/rtti.h"
 
 void PACK_FOLLOW_DATA::Endian() {
-    ENDIAN(fTriggerRadius, false);
+    BSEndian(fTriggerRadius, false);
 }
 
 void TESFollowPackageData::Copy(TESPackageData* apCopy) {

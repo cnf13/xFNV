@@ -8,7 +8,7 @@
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSHavok/hkEntityCinfo.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

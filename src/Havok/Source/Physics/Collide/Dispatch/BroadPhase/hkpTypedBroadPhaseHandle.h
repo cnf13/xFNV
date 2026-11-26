@@ -38,3 +38,8 @@ public:
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkpTypedBroadPhaseHandleTypeInfo;
+
+// The SDK's form: raw byte arithmetic on the handle's address, where the owner sits m_ownerOffset bytes away.
+inline void* hkpTypedBroadPhaseHandle::getOwner() const {
+    return const_cast<char*>(reinterpret_cast<const char*>(this) + m_ownerOffset);
+}

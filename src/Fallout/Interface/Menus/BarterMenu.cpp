@@ -127,10 +127,6 @@
 #include <cstdint>
 #include <limits>
 
-int32_t BSstrupr(char* apString1, int32_t aiSize) {
-    return _strupr_s(apString1, aiSize);
-}
-
 BarterMenu::BarterMenu()
   : Menu(), iPlayerCaps(0), iVendorCaps(0), fBuyMult(1.0f), fSellMult(1.0f), ePlayerFilterMode(FM_ALL),
     eVendorFilterMode(FM_ALL), eFilterSound(MENU_SOUND_NEXT_PREVIOUS), plbCurrListbox(nullptr), bItemsTraded(false) {
@@ -305,7 +301,7 @@ void BarterMenu::DoEnter(int32_t aiID, Tile* apTarget) {
             }
             BarterMenu::pCurrItem = plbCurrListbox->GetHighlightedData();
             if (BarterMenu::pCurrItem) {
-                InventoryMenu::SetupItemDataTile(BarterMenu::pCurrItem, pTiles[21]);
+                Interface::PopulateItemStatsDisplay(BarterMenu::pCurrItem, pTiles[21]);
                 pTiles[21]->Set(4003, 1);
                 const char* pIconOne = BarterMenu::pCurrItem->GetIconOne(nullptr);
                 pTiles[20]->Set(4044, pIconOne, true);

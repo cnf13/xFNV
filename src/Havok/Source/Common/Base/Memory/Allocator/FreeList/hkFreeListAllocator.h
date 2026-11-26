@@ -66,10 +66,10 @@ protected:
     void _deleteFreeList(hkFreeList* freeList);
 
 public:
-    // Pointer less-than used to sort pointer arrays (the quickSortRecursive calls of hkFreeList.cpp and
-    // hkFreeListAllocator.cpp pass it): *arResult = a < b, compared as unsigned addresses, and arResult is also
-    // returned.
-    static hkBool _comparePointers(const void* a, const void* b);
+    // The block sort's comparator: the two addresses are compared as unsigned integers; the pointees are never read.
+    static hkBool _comparePointers(void* a, void* b) {
+        return reinterpret_cast<uintptr_t>(a) < reinterpret_cast<uintptr_t>(b);
+    }
 
     // Held by every method that touches the free lists and the large-block allocator; mutable as in the Havok SDK,
     // since the const isOk takes it too.

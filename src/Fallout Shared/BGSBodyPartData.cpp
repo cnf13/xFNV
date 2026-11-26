@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSBodyPartData.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/MessageHandler.h"

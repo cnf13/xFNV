@@ -1,6 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9PersistentSrcTextureRendererData.h"
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPersistentSrcTextureRendererData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"

@@ -100,3 +100,5 @@ public:
     static NiRTTI ms_RTTI;
     static NiPointer<NiStencilProperty> ms_spDefault;
 };
+
+inline NiStencilProperty::~NiStencilProperty() {}

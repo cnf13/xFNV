@@ -36,3 +36,11 @@ public:
     NiPoint3 m_kNormal;
     float m_fConstant;
 };
+
+inline const NiPoint3& NiPlane::GetNormal() const {
+    return m_kNormal;
+}
+
+inline float NiPlane::GetConstant() const {
+    return m_fConstant;
+}

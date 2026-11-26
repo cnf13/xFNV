@@ -95,3 +95,15 @@ public:
     static inline FileFinder* pFinder;
     static inline bool bUseDDXTextures;
 };
+
+inline void FileFinder::AddPath_0(const char* apPath) {
+    if (FileFinder::pFinder) {
+        FileFinder::pFinder->AddPath(apPath);
+    }
+}
+
+inline void FileFinder::Close() {
+    if (FileFinder::pFinder) {
+        delete FileFinder::pFinder;
+    }
+}

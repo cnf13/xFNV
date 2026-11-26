@@ -17,3 +17,7 @@ static hkSphereClass_MembersArray hkSphereClass_Members{
 
 hkClass
     hkSphereClass("hkSphere", nullptr, 0x10, nullptr, 0, nullptr, 0, hkSphereClass_Members, 1, nullptr, nullptr, 0, 0);
+
+const hkClass& hkSphere::staticClass() {
+    return hkSphereClass;
+}

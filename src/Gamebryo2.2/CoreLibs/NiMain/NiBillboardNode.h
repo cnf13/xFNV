@@ -75,3 +75,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiBillboardNode::FaceMode NiBillboardNode::GetMode() const {
+    return static_cast<FaceMode>(GetField(FACE_MODE_MASK, FACE_MODE_POS));
+}

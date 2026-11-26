@@ -1,8 +1,30 @@
 #pragma once
 
 #include <string>
-#include "Fallout Shared/FaceGen/BSFaceGenModel.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/MatrixVT.h"
+
+// The texture mode of a FaceGen mesh: its scale, width, height and row padding, then its three byte vectors of image
+// data. fffReadEgtFile stores the .egt header's column and row counts in width and height.
+struct FffModeTexS {
+    FffModeTexS();
+    FffModeTexS(const FffModeTexS& _Right);
+    ~FffModeTexS();
+
+    // Copy assignment: copies the scale and the three dimensions, then assigns each image vector. Not declared as
+    // operator=, as FffModeGS::Assign.
+    FffModeTexS& Assign(const FffModeTexS& _Right);
+
+    static void operator delete(void* apMemory);
+
+    float scale;
+    uint32_t width;
+    uint32_t height;
+    uint32_t rowPad;
+    std::vector<uint8_t, std::allocator<uint8_t>> img[3];
+};
+
+// FffModeTexS::img: the three byte vectors of a texture mode's image data.
+using FffModeTexImgVector = std::vector<uint8_t, std::allocator<uint8_t>>;
 
 // A .egt file's header (0x38 bytes, the size fffReadEgtFile reads it with): the images' rows and columns, the
 // symmetric and asymmetric mode counts and the basis key. The PDB's members.

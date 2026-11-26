@@ -3,6 +3,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/TileShaderProperty.h"
 #include "Fallout Shared/Renderer.h"
@@ -17,7 +18,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -27,6 +27,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 FaderDataArray FaderData =

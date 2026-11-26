@@ -1,5 +1,5 @@
 #include "SDK/DirectShow/CEnumMediaTypes.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/DirectShow/CAsyncOutputPin.h"

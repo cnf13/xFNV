@@ -3,13 +3,14 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneLight.h"
 #include "BSShader/ShadowSceneNode.h"
@@ -56,25 +57,25 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiControllerSequence.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpAllRayHitCollector.h"
 
 VATS pVATS;
-SettingT<INISettingCollection> gs_fVATSLightLevelMin_VATS("fVATSLightLevelMin:VATS", 20.0f);
-SettingT<INISettingCollection> gs_fVATSLightLevelMax_VATS("fVATSLightLevelMax:VATS", 40.0f);
-SettingT<INISettingCollection> gs_fVATSLightAngle_VATS("fVATSLightAngle:VATS", 0.0f);
-SettingT<INISettingCollection> gs_fVATSLightDistance_VATS("fVATSLightDistance:VATS", 100.0f);
-SettingT<INISettingCollection> gs_fVATSLightElevation_VATS("fVATSLightElevation:VATS", 100.0f);
-SettingT<INISettingCollection> gs_fVatsLightColorR_VATS("fVatsLightColorR:VATS", 1.0f);
-SettingT<INISettingCollection> gs_fVatsLightColorG_VATS("fVatsLightColorG:VATS", 1.0f);
-SettingT<INISettingCollection> gs_fVatsLightColorB_VATS("fVatsLightColorB:VATS", 1.0f);
+SettingT<INISettingCollection> VATS::fVATSLightLevelMin("fVATSLightLevelMin:VATS", 20.0f);
+SettingT<INISettingCollection> VATS::fVATSLightLevelMax("fVATSLightLevelMax:VATS", 40.0f);
+SettingT<INISettingCollection> VATS::fVATSLightAngle("fVATSLightAngle:VATS", 0.0f);
+SettingT<INISettingCollection> VATS::fVATSLightDistance("fVATSLightDistance:VATS", 100.0f);
+SettingT<INISettingCollection> VATS::fVATSLightElevation("fVATSLightElevation:VATS", 100.0f);
+SettingT<INISettingCollection> VATS::fVatsLightColorR("fVatsLightColorR:VATS", 1.0f);
+SettingT<INISettingCollection> VATS::fVatsLightColorG("fVatsLightColorG:VATS", 1.0f);
+SettingT<INISettingCollection> VATS::fVatsLightColorB("fVatsLightColorB:VATS", 1.0f);
 
 bool VATSQueuedAction::IsActionGrenadeOrMine(ActionPoints::Action aeAction) {
     return aeAction >= ActionPoints::ACTION_ATTACK_GRENADE && aeAction <= ActionPoints::ACTION_ATTACK_MINE;
@@ -1283,16 +1284,16 @@ void VATS::UpdateVATSLight(TESObjectREFR* apVictim) {
             const NiPoint3& kVictimPos = apVictim->GetLocationOnReference();
             const NiPoint3& kAttackerPos = pVATSAttacker->GetLocationOnReference();
             NiPoint3 vec = kAttackerPos - kVictimPos;
-            rotmat.MakeZRotation(gs_fVATSLightAngle_VATS);
+            rotmat.MakeZRotation(VATS::fVATSLightAngle);
             vec.Unitize();
             vec = vec * rotmat;
-            vec *= gs_fVATSLightDistance_VATS;
+            vec *= VATS::fVATSLightDistance;
             pos = pos + vec;
-            double dElevation = static_cast<float>(gs_fVATSLightElevation_VATS);
+            double dElevation = static_cast<float>(VATS::fVATSLightElevation);
             pos.z = dElevation + pos.z;
-            float fColorB = gs_fVatsLightColorB_VATS.Float();
-            float fColorG = gs_fVatsLightColorG_VATS.Float();
-            NiColor lightcolor(gs_fVatsLightColorR_VATS.Float(), fColorG, fColorB);
+            float fColorB = VATS::fVatsLightColorB.Float();
+            float fColorG = VATS::fVatsLightColorG.Float();
+            NiColor lightcolor(VATS::fVatsLightColorR.Float(), fColorG, fColorB);
             int32_t inumberlights = 0;
             float fambient = 0.0f;
             float fdirectional = 0.0f;
@@ -1313,8 +1314,7 @@ void VATS::UpdateVATSLight(TESObjectREFR* apVictim) {
                                          pLight
                                      ) *
                 100.0;
-            float
-                intensity = FLerp(1.0f, 0.0f, gs_fVATSLightLevelMin_VATS, gs_fVATSLightLevelMax_VATS, ftargetluminance);
+            float intensity = FLerp(1.0f, 0.0f, VATS::fVATSLightLevelMin, VATS::fVATSLightLevelMax, ftargetluminance);
             intensity = BSMAX(0.0f, intensity);
             intensity = BSMIN(1.0f, intensity);
             lightcolor *= intensity;
@@ -1505,12 +1505,4 @@ void VATS_COMMAND::Initialize() {
 
 void VATS_COMMAND::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-float bhkWorld::QMaxPickTime() {
-    if (bhkWorld::bVatsReplay) {
-        return bhkWorld::fMaxPickTimeVATS;
-    }
-
-    return bhkWorld::fMaxPickTime;
 }

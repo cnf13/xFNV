@@ -20,7 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"

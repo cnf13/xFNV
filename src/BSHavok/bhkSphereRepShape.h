@@ -19,3 +19,7 @@ public:
 struct hkSphereRepShapeCinfo : public hkShapeCinfo {
     hkSphereRepShapeCinfo();
 };
+
+inline bhkSphereRepShape::bhkSphereRepShape() {
+    ++iCount;
+}

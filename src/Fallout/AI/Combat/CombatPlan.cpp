@@ -1,7 +1,7 @@
 #include "Fallout/AI/Combat/CombatPlan.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/AI/Combat/CombatAction.h"
 #include "Fallout/AI/Combat/CombatGoal.h"

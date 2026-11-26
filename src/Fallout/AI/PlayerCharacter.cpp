@@ -13,8 +13,10 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/MemoryPool.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
+#include "BSDevices/XPrefSettings.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkBlendCollisionObjectAddRotation.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -23,11 +25,9 @@
 #include "BSHavok/bhkForceController.h"
 #include "BSHavok/bhkMouseSpringAction.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRagdollPenetrationUtil.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
@@ -45,7 +45,7 @@
 #include "BSMain/BSXFlags.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileMenu.h"
@@ -299,7 +299,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -316,6 +315,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -382,8 +382,8 @@ SettingT<INISettingCollection> bTrackProgress("bTrackProgress:GamePlay", false);
 
 // No code reads this setting.
 static SettingT<INIPrefSettingCollection> uiRedeemedContentMask("uiRedeemedContent:GamePlay", 0u);
-SettingT<INIPrefSettingCollection> gs_iKillCamera_GamePlay("iKillCamera:GamePlay", 2);
-SettingT<INIPrefSettingCollection> gs_iDifficulty_GamePlay("iDifficulty:GamePlay", 2);
+SettingT<INIPrefSettingCollection> iKillCamera("iKillCamera:GamePlay", 2);
+SettingT<INIPrefSettingCollection> iDifficulty("iDifficulty:GamePlay", 2);
 SettingT<INIPrefSettingCollection> bShowQuestMarkers("bShowQuestMarkers:GamePlay", true);
 SettingT<INISettingCollection> sTrackProgressPath("sTrackProgressPath:GamePlay", "\\\\vault2\\Fallout\\LevelData\\");
 SettingT<INISettingCollection> fCameraCasterSize("fCameraCasterSize:HAVOK", 10.0f);
@@ -403,7 +403,7 @@ static SettingT<INISettingCollection> gs_fJoystickLookUDMult_Controls("fJoystick
 static SettingT<INISettingCollection> gs_fJoystickLookLRMult_Controls("fJoystickLookLRMult:Controls", 0.02f);
 static SettingT<INISettingCollection> gs_fPC360ControllerMouseXMult("fPC360ControllerMouseXMult", 1600.0f);
 static SettingT<INISettingCollection> gs_fPC360ControllerMouseYMult("fPC360ControllerMouseYMult", -1600.0f);
-SettingT<INIPrefSettingCollection> gs_bInvertYValues_Controls("bInvertYValues:Controls", false);
+SettingT<INIPrefSettingCollection> bInvertYValues("bInvertYValues:Controls", false);
 SettingT<INISettingCollection> fDlgFocus("fDlgFocus:Interface", 3.2f);
 SettingT<INISettingCollection> fDlgLookDegStart("fDlgLookDegStart:Interface", 13.0f);
 SettingT<INISettingCollection> fDlgLookDegStop("fDlgLookDegStop:Interface", 0.2f);
@@ -416,11 +416,11 @@ SettingT<INISettingCollection> bIronSightsZoomEnable("bIronSightsZoomEnable:Comb
 SettingT<INISettingCollection> fIronSightsZoomDefault("fIronSightsZoomDefault:Combat", 50.0f);
 SettingT<INISettingCollection> fZoom3rdPersonSnapDist("fZoom3rdPersonSnapDist:General", 50.0f);
 SettingT<INISettingCollection> iHoursToSleep("iHoursToSleep:General", 3);
-SettingT<INISettingCollection> gs_bBorderRegionsEnabled_General("bBorderRegionsEnabled:General", true);
+SettingT<INISettingCollection> bEnableBorderRegion("bBorderRegionsEnabled:General", true);
 SettingT<INISettingCollection> fForwardBias("fForwardBias:Controls", 1.7f);
 SettingT<INISettingCollection> fXenonMinLookSpeed("fXenonMinLookSpeed:Controls", 0.05f);
-SettingT<INIPrefSettingCollection> gs_fXenonHorizLookSpeed_Controls("fXenonHorizLookSpeed:Controls", 1500.0f);
-SettingT<INIPrefSettingCollection> gs_fXenonVertLookSpeed_Controls("fXenonVertLookSpeed:Controls", 1200.0f);
+SettingT<INIPrefSettingCollection> fXenonHorizLookSpeed("fXenonHorizLookSpeed:Controls", 1500.0f);
+SettingT<INIPrefSettingCollection> fXenonVertLookSpeed("fXenonVertLookSpeed:Controls", 1200.0f);
 SettingT<INISettingCollection> iXenonHorizLookAccel("iXenonHorizLookAccel:Controls", 2);
 SettingT<INISettingCollection> iXenonVertLookAccel("iXenonVertLookAccel:Controls", 2);
 SettingT<INISettingCollection> bAlwaysRunByDefault("bAlwaysRunByDefault:Controls", false);
@@ -446,260 +446,6 @@ void MarkPlayerBones(NiAVObject* apObject) {
             }
         }
     }
-}
-
-bool Cmd_DisableHardcoreTracking(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    if (pPlayer) {
-        pPlayer->ClearsHardcoreFlag();
-    }
-    return true;
-}
-
-bool au_re_Cmd_IsAlwaysHardcore(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    return Script::IsAlwaysHardcoreConditionalFunction(apRefObject, nullptr, nullptr, afReturnValue);
-}
-
-bool Cmd_GetOwnerLastTarget_Execute(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    afReturnValue = 0.0;
-    if (apContainer && apContainer->IsActor()) {
-        Actor* pActor = static_cast<Actor*>(apContainer);
-        HitData* pLastTargetInfo = pActor->GetLastAttackHitData();
-        if (pLastTargetInfo && pLastTargetInfo->pTarget) {
-            uint32_t uiFormID = pLastTargetInfo->pTarget->TESForm::GetFormID();
-            Script::PutNumericIDInDouble(uiFormID, afReturnValue);
-        }
-    }
-
-    return true;
-}
-
-// Opens the recipe menu for the calling reference's vendor: the actor itself, or the speaker of a talking activator
-// (the reference's own base object, or the one its mobile object talks through).
-bool Cmd_ShowRecipeMenu(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    TESForm* pCategory = nullptr;
-    Script::ParseParameters(
-        apParameters,
-        apCompiledParams,
-        auiOffset,
-        apRefObject,
-        apContainer,
-        apScript,
-        apScriptLocals,
-        &pCategory
-    );
-    if (apRefObject) {
-        MobileObject* pMobile = nullptr;
-        TESObjectREFR* pVendor = nullptr;
-        if (apRefObject->IsMobileObject()) {
-            pMobile = static_cast<MobileObject*>(apRefObject);
-        }
-        else {
-            BGSTalkingActivator* pActivator = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
-            pVendor = pActivator ? pActivator->GetTempRef() : nullptr;
-        }
-        if (pMobile) {
-            if (pMobile->IsActor()) {
-                pVendor = pMobile;
-            }
-            else if (pMobile->IsTalkingActivator()) {
-                // Takes the talking activator's base object as a BGSTalkingActivator without a check.
-                pVendor = static_cast<BGSTalkingActivator*>(pMobile->GetTalkingActivator()->GetObjectReference())
-                              ->GetTempRef();
-            }
-        }
-        if (pVendor) {
-            Interface::CreateRecipeMenu(pVendor, pCategory);
-        }
-    }
-    return true;
-}
-
-// The winnings level (0-4, quarters of the casino's maximum winnings) the player has reached at a casino.
-bool Cmd_GetCasinoWinningsLevel(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
-    TESCasino* apCasino[2];
-    // apCasino[0] starts null (a departure): ParseParameters can return before writing it (a null parameter list,
-    // a reference code other than 'r'), and the exe then tests it unset.
-    apCasino[0] = nullptr;
-    apCasino[1] = nullptr;
-    Script::ParseParameters(
-        apParameters,
-        apCompiledParams,
-        auiOffset,
-        apRefObject,
-        apContainer,
-        apScript,
-        apScriptLocals,
-        &apCasino[0]
-    );
-    TESCasino* pCasino = apCasino[0];
-    if (!pCasino) {
-        return false;
-    }
-    for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
-         pNode = pNode->m_pkNext) {
-        if (pNode->m_item->casinoID == pCasino->GetFormID()) {
-            int32_t iMaxWinnings = pCasino->data.iMaxWinnings;
-            int32_t iTotalWinnings = pNode->m_item->iTotalWinnings;
-            afReturnValue = 0.0;
-            for (int32_t i = 0; i < 4; ++i) {
-                if (static_cast<double>(iTotalWinnings) >=
-                    static_cast<double>(iMaxWinnings) * (static_cast<double>(i + 1) * 0.25)) {
-                    afReturnValue = static_cast<double>(i + 1);
-                }
-            }
-        }
-    }
-    return true;
-}
-
-// Sets the player's winnings level (0-4) at a casino and its winnings to that many quarters of the casino's maximum.
-bool Cmd_SetCasinoWinningsLevel(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
-    TESCasino* apCasino[2];
-    int32_t iLevel;
-    // apCasino[0] starts null (a departure): ParseParameters can return before writing it (a null parameter list,
-    // a reference code other than 'r'), and the exe then tests it unset.
-    apCasino[0] = nullptr;
-    apCasino[1] = nullptr;
-    iLevel = 0;
-    Script::ParseParameters(
-        apParameters,
-        apCompiledParams,
-        auiOffset,
-        apRefObject,
-        apContainer,
-        apScript,
-        apScriptLocals,
-        &apCasino[0],
-        &iLevel
-    );
-    TESCasino* pCasino = apCasino[0];
-    if (!pCasino) {
-        return false;
-    }
-    for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
-         pNode = pNode->m_pkNext) {
-        if (pNode->m_item->casinoID == pCasino->GetFormID() && iLevel >= 0 && iLevel <= 4) {
-            int32_t iMaxWinnings = pCasino->data.iMaxWinnings;
-            pNode->m_item->iWinningLevel = static_cast<int16_t>(iLevel);
-            int32_t iTotalWinnings = static_cast<int32_t>(
-                static_cast<double>(iLevel) * 0.25 * static_cast<double>(iMaxWinnings)
-            );
-            pNode->m_item->iTotalWinnings = iTotalWinnings;
-        }
-    }
-    return true;
-}
-
-bool Cmd_UnlockChallenge(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    TESChallenge* pChallenge = nullptr;
-    Script::ParseParameters(
-        apParameters,
-        apCompiledParams,
-        auiOffset,
-        apRefObject,
-        apContainer,
-        apScript,
-        apScriptLocals,
-        &pChallenge
-    );
-    if (!pChallenge) {
-        return false;
-    }
-    TESChallengeManager::UnlockChallenge(pChallenge);
-    return true;
-}
-
-bool Cmd_RemoveRecurringFromChallenge(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    TESChallenge* pChallenge = nullptr;
-    Script::ParseParameters(
-        apParameters,
-        apCompiledParams,
-        auiOffset,
-        apRefObject,
-        apContainer,
-        apScript,
-        apScriptLocals,
-        &pChallenge
-    );
-    if (!pChallenge) {
-        return false;
-    }
-    pChallenge->RemoveRecurringFromChallenge(1);
-    return true;
 }
 
 // An IterateInventory callback: appends the item's worn mark, count, name and form ID to the string apData.
@@ -982,8 +728,8 @@ PlayerCharacter::PlayerCharacter() : Character(), m_AllOccupiedRegions(true) {
     iCasinoCheatLevel = 0;
     SetHardcore(GamePlayFormulas::HARDCORE_OFF, false);
     bAlwaysHardcore = true;
-    eDifficultyLevel = static_cast<GamePlayFormulas::DifficultyLevel>(gs_iDifficulty_GamePlay.Int());
-    eKillCameraSetting = static_cast<KILL_CAM_TYPE>(gs_iKillCamera_GamePlay.Int());
+    eDifficultyLevel = static_cast<GamePlayFormulas::DifficultyLevel>(iDifficulty.Int());
+    eKillCameraSetting = static_cast<KILL_CAM_TYPE>(iKillCamera.Int());
     pInventoryWeaponEffect = nullptr;
     bBeingChased = false;
     bIsYoung = false;
@@ -1729,7 +1475,7 @@ void PlayerCharacter::SaveGame(uint32_t aiFlags) {
         }
         SaveNumericID(&iClassID, 4);
         if (pClass && pClass == pCustomClass) {
-            pClass->SaveGameTES();
+            pClass->SaveGame();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
@@ -1806,7 +1552,7 @@ void PlayerCharacter::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_ANIMATION)) {
         uint32_t isizePosition = apSaveGameBuffer->StartVariableSizedValue();
         uint32_t iposition1 = apSaveGameBuffer->iBufferPosition;
-        p1stPersonAnimation->SaveGameBGS(apSaveGameBuffer);
+        p1stPersonAnimation->SaveGame(apSaveGameBuffer);
         uint32_t iposition2 = apSaveGameBuffer->iBufferPosition;
         apSaveGameBuffer->SaveVariableSizedValue(iposition2 - iposition1, isizePosition);
     }
@@ -2431,7 +2177,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             ConflictingObjects.AddHead(pref);
         }
     }
-    ActiveEffect::LoadActiveEffectListTES(pActiveEffectList, this);
+    ActiveEffect::LoadActiveEffectList(pActiveEffectList, this);
     CharacterProgressionInfo.LoadGame(aiFlags, aiCurrentFlags);
     uint32_t iactivequestID;
     LoadNumericID(&iactivequestID, 4);
@@ -2520,7 +2266,7 @@ void PlayerCharacter::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
             pactorBase->SetClass(pclass);
         }
         if (pclass && pclass == pcustomClass) {
-            pclass->LoadGameTES();
+            pclass->LoadGame();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
@@ -3330,7 +3076,7 @@ void PlayerCharacter::Revert(uint32_t aiFlags) {
         ConflictingObjects.RemoveAll();
         ActiveEffect::RevertActiveEffectList(pActiveEffectList, this);
         if (((aiFlags & CHANGE_REFR_ANIMATION) != 0) && p1stPersonAnimation) {
-            p1stPersonAnimation->RevertTES(this);
+            p1stPersonAnimation->Revert(this);
         }
 
         ResetLastPlayingTimeUpdate();
@@ -3957,7 +3703,7 @@ void PlayerCharacter::SetParentCell(TESObjectCELL* apCell) {
             pBorderRegions->Add(pCurrentRegion);
         }
     }
-    if (gs_bBorderRegionsEnabled_General.Bool() &&
+    if (bEnableBorderRegion.Bool() &&
         pWorldSpace &&
         pWorldSpace->GetHasBorderRegion() &&
         !TES::pInstance->CellTestRunning() &&
@@ -4160,7 +3906,7 @@ void PlayerCharacter::Update(float afDelta) {
     }
     iActorsDismemberedThisFrame = 0;
     TESObjectREFR* phitRef = TESObjectREFR::FindReferenceFor3D(this->spTargeted3D.m_pObject);
-    HUDMainMenu::HandleHealthbarForCrosshairActor(phitRef, this->bTarget3DDistant);
+    HUDMainMenu::SetTargetType(phitRef, this->bTarget3DDistant);
     this->spTargeted3D = static_cast<NiAVObject*>(nullptr);
     this->ResetCachedGunSkill();
     alignas(16) AutoMemContext tempMemContext(
@@ -4955,7 +4701,7 @@ void PlayerCharacter::Update(float afDelta) {
                                 this->IsOverEncumbered() ||
                                 this->GetIronSights() ||
                                 !(fGrabMaxWeightRunning.Float() >= static_cast<double>(this->fGrabObjectWeight))) {
-                                PlayerCharacter::fWalkSpeedMult = gs_fMaxAnalogWalkSpeed_Controls.Float();
+                                PlayerCharacter::fWalkSpeedMult = fMaxAnalogWalkSpeed.Float();
                                 smoveMode |= ActorMover::MF_WALKING;
                             }
                             else {
@@ -5675,7 +5421,7 @@ void PlayerCharacter::Update(float afDelta) {
                     !this->IsPlayerCharacterInCombat(&bsearch) &&
                     !pVATS.IsInVats() &&
                     HUDMainMenu::IsXPMeterFinishedMoving() &&
-                    InterfaceManager::IsPipboyClosed() &&
+                    Interface::IsPipboyClosed() &&
                     !InterfaceManager::GetContainerMenuQueued() &&
                     !this->GetInChargen()) {
                     this->GetCharacterProgressionInfo()->BeginLevelUp();
@@ -5767,7 +5513,7 @@ void PlayerCharacter::Update(float afDelta) {
                                             const NiPoint3* pRefPos = &pRef->GetLocationOnReference();
                                             double dDistanceSquared = (*pRefPos - *pPlayerPos).SqrLength();
                                             if (dDistanceSquared < dRadiusSquared) {
-                                                TESSound* pSound = GetNthBrushPassthroughSound(
+                                                TESSound* pSound = TESSound::GetPassThroughSound(
                                                     pstat->cPassThroughSoundIndex
                                                 );
                                                 if (pSound) {
@@ -9569,7 +9315,7 @@ void PlayerCharacter::FastTravel(TESObjectREFR* apRef) {
         NiPoint3 lastcoord;
         static int32_t lastFastTravelSaveTime = appTimer.iLastTime;
         uint32_t uiTimeSinceSave = appTimer.iLastTime - lastFastTravelSaveTime;
-        if (gs_bSaveOnTravel_GamePlay.Bool() && (!uiTimeSinceSave || uiTimeSinceSave > 0x4E20)) {
+        if (bSaveOnTravel.Bool() && (!uiTimeSinceSave || uiTimeSinceSave > 0x4E20)) {
             pSaveLoadManager->Autosave();
             lastFastTravelSaveTime = appTimer.iLastTime;
         }
@@ -10029,8 +9775,8 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                             fNewVertMagnitude = fNewVertMagnitude * fMagnitude;
                         }
                         float fminLookSpeed = fXenonMinLookSpeed.Float();
-                        float fhorizLookSpeed = gs_fXenonHorizLookSpeed_Controls.Float();
-                        float fvertLookSpeed = gs_fXenonVertLookSpeed_Controls.Float();
+                        float fhorizLookSpeed = fXenonHorizLookSpeed.Float();
+                        float fvertLookSpeed = fXenonVertLookSpeed.Float();
                         if (fminLookSpeed > static_cast<double>(fNewHorizMagnitude)) {
                             fNewHorizMagnitude = fminLookSpeed;
                         }
@@ -10052,7 +9798,7 @@ bool PlayerCharacter::UpdateHeadingAndLooking(float afDelta, bool abHorse, uint1
                     imouseY = pcontrols->GetMouseAxis(2);
                     imouseZ = pcontrols->GetMouseAxis(3);
                 }
-                if (gs_bInvertYValues_Controls.Bool()) {
+                if (bInvertYValues.Bool()) {
                     imouseY = -imouseY;
                 }
                 if (GetControlsDisabled(PlayerCharacter::DPC_LOOKING)) {
@@ -14406,7 +14152,7 @@ void PlayerCharacter::UpdatePlayerCombat(float afDelta) {
 }
 
 void PlayerCharacter::CheckBorderRegion() {
-    if (gs_bBorderRegionsEnabled_General.Bool() && !TES::pInstance->CellTestRunning()) {
+    if (bEnableBorderRegion.Bool() && !TES::pInstance->CellTestRunning()) {
         bool binBorderRegion = false;
         if (bInBorderContainedCell) {
             binBorderRegion = true;
@@ -14470,7 +14216,7 @@ void PlayerCharacter::HandleFlycamMovement() {
         iInputX = pcontrols->GetMouseAxis(1);
         iInputY = pcontrols->GetMouseAxis(2);
     }
-    if (gs_bInvertYValues_Controls.Bool()) {
+    if (bInvertYValues.Bool()) {
         iInputY = -iInputY;
     }
     InterfaceManager::Instance();
@@ -16261,28 +16007,6 @@ void PlayerCharacter::PoisonWeapon() {
         }
         pPlayer->pPendingPoison = nullptr;
     }
-}
-
-uint32_t BSRandom::UnsignedInt(uint32_t auiMin, uint32_t auiMax) {
-    return auiMin + UnsignedInt(auiMax - auiMin);
-}
-
-void bhkMouseSpringAction::GetMousePositionInWorld(hkVector4& arPos) {
-    hkpMouseSpringAction* pAction = **this;
-    if (pAction) {
-        arPos = pAction->m_mousePositionInWorld;
-    }
-}
-
-void bhkMouseSpringAction::GetMousePositionInRBLocal(hkVector4& arPos) {
-    hkpMouseSpringAction* pAction = **this;
-    if (pAction) {
-        arPos = pAction->m_positionInRbLocal;
-    }
-}
-
-void BSShaderManager::SetFullScreenMotionBlurIronSights(bool abSet) {
-    BSShaderManager::bFullScreenMotionBlurIronSights = abSet;
 }
 
 uint8_t BGSEntryPointPerkEntry::GetEntryPoint() {

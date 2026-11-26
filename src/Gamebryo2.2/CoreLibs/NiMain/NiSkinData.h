@@ -64,3 +64,11 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline uint32_t NiSkinData::GetBoneCount() const {
+    return m_uiBones;
+}
+
+inline NiSkinData::BoneData* NiSkinData::GetBoneData() const {
+    return m_pkBoneData;
+}

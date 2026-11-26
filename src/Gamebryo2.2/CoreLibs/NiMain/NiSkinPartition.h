@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/MemoryManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
@@ -281,3 +281,11 @@ public:
 };
 
 NiSmartPointer(NiSkinPartition);
+
+inline uint32_t NiSkinPartition::GetPartitionCount() const {
+    return m_uiPartitions;
+}
+
+inline NiSkinPartition::Partition* NiSkinPartition::GetPartitions() const {
+    return m_pkPartitions;
+}

@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DRenderState.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9ShaderConstantManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 NiDX9RenderState::NiDX9RenderState(NiDX9Renderer* pkRenderer, const _D3DCAPS9* apkD3DCaps9)
   : NiD3DRenderState(pkRenderer), m_bUsingSoftwareVP(false), m_kD3DCaps9(*apkD3DCaps9) {}

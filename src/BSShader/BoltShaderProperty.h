@@ -108,3 +108,7 @@ public:
     // The live property count; the shader's shared resources go with the last one.
     static inline int32_t iRefCount;
 };
+
+inline bool BoltShaderProperty::IsFinished() {
+    return !bWrapped && iBoltStartSegment >= iBoltEndSegment;
+}

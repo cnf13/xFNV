@@ -2,9 +2,11 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout/AI/PlayerCharacter.h"
@@ -18,7 +20,7 @@
 static SettingT<INISettingCollection> fAnalogMaxRunZonePercent("fAnalogMaxRunZonePercent:Controls", 0.95f);
 static SettingT<INISettingCollection> fAnalogRunZonePercent("fAnalogRunZonePercent:Controls", 0.8f);
 static SettingT<INISettingCollection> fMinAnalogWalkSpeed("fMinAnalogWalkSpeed:Controls", 0.1f);
-SettingT<INISettingCollection> gs_fMaxAnalogWalkSpeed_Controls("fMaxAnalogWalkSpeed:Controls", 1.8f);
+SettingT<INISettingCollection> fMaxAnalogWalkSpeed("fMaxAnalogWalkSpeed:Controls", 1.8f);
 static SettingT<INISettingCollection> fMinAnalogRunSpeed("fMinAnalogRunSpeed:Controls", 0.7f);
 static SettingT<INISettingCollection> fMaxAnalogRunSpeed("fMaxAnalogRunSpeed:Controls", 1.0f);
 

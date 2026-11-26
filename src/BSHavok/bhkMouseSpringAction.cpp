@@ -1,5 +1,6 @@
 #include "BSHavok/bhkMouseSpringAction.h"
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkEntity.h"
@@ -8,16 +9,14 @@
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/bhkUnaryAction.h"
 #include "BSHavok/bhkWorldObject.h"
-#include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TES.h"
-#include "Fallout Shared/TESFile.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
@@ -63,10 +62,10 @@ void bhkMouseSpringAction::LoadBinary(NiStream& arStream) {
         hkMouseSpringActionCinfo& rInfo = static_cast<hkMouseSpringActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        ENDIAN(rInfo.m_springDamping, false);
-        ENDIAN(rInfo.m_springElasticity, false);
-        ENDIAN(rInfo.m_maxRelativeForce, false);
-        ENDIAN(rInfo.m_objectDamping, false);
+        BSEndian(rInfo.m_springDamping, false);
+        BSEndian(rInfo.m_springElasticity, false);
+        BSEndian(rInfo.m_maxRelativeForce, false);
+        BSEndian(rInfo.m_objectDamping, false);
     }
 }
 
@@ -78,19 +77,19 @@ void bhkMouseSpringAction::SaveBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        ENDIAN(rInfo.m_springDamping, false);
-        ENDIAN(rInfo.m_springElasticity, false);
-        ENDIAN(rInfo.m_maxRelativeForce, false);
-        ENDIAN(rInfo.m_objectDamping, false);
+        BSEndian(rInfo.m_springDamping, false);
+        BSEndian(rInfo.m_springElasticity, false);
+        BSEndian(rInfo.m_maxRelativeForce, false);
+        BSEndian(rInfo.m_objectDamping, false);
     }
     bhkUnaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_positionInRbLocal);
         bhkStream::Endian(rInfo.m_mousePositionInWorld);
-        ENDIAN(rInfo.m_springDamping, false);
-        ENDIAN(rInfo.m_springElasticity, false);
-        ENDIAN(rInfo.m_maxRelativeForce, false);
-        ENDIAN(rInfo.m_objectDamping, false);
+        BSEndian(rInfo.m_springDamping, false);
+        BSEndian(rInfo.m_springElasticity, false);
+        BSEndian(rInfo.m_maxRelativeForce, false);
+        BSEndian(rInfo.m_objectDamping, false);
     }
 }
 

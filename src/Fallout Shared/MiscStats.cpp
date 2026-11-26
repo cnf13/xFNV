@@ -2,9 +2,8 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileMenu.h"
@@ -12,6 +11,7 @@
 #include "Fallout Shared/BGSPerk.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESChallengeManager.h"
 #include "Fallout Shared/TESObjectREFR.h"

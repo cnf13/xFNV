@@ -8,7 +8,6 @@
 #include "BSCore/RTTI.h"
 #include "BSMain/BSXFlags.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEntryPoint.h"
@@ -18,6 +17,7 @@
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/MenuGameSettings.h"
 #include "Fallout Shared/PackageLocation.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
@@ -48,22 +48,22 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "SDK/MSVC/rtti.h"
 #include "xfnv/Compiler.h"
 
 #include <limits>
 
-SettingT<GameSettingCollection> gs_fRandomDoorDistance("fRandomDoorDistance", 150.0f);
-SettingT<GameSettingCollection> gs_fAutoDoorActivateDistance("fAutoDoorActivateDistance", 300.0f);
+SettingT<GameSettingCollection> fRandomDoorDistance("fRandomDoorDistance", 150.0f);
+SettingT<GameSettingCollection> fAutoDoorActivateDistance("fAutoDoorActivateDistance", 300.0f);
 SettingT<GameSettingCollection>
-    gs_sRandomDoorTeleportFailureMessage("sRandomDoorTeleportFailureMessage", "This door leads nowhere.");
+    sRandomDoorTeleportFailureMessage("sRandomDoorTeleportFailureMessage", "This door leads nowhere.");
 
 TESObjectDOOR::TESObjectDOOR() {
     SetFormType(DOOR_ID);
@@ -306,7 +306,7 @@ bool TESObjectDOOR::Activate(
         TESObjectREFR* pteldoor = FindRandomTeleportTarget(apItemActivated, apActionRef);
         if (!pteldoor) {
             Interface::ShowMessage(
-                gs_sRandomDoorTeleportFailureMessage.String(),
+                sRandomDoorTeleportFailureMessage.String(),
                 0,
                 "Interface\\Icons\\Message Icons\\glow_message_vaultboy_sad.dds",
                 nullptr,
@@ -358,7 +358,7 @@ bool TESObjectDOOR::Activate(
                             Interface::PlayMenuSound(18);
                         }
                         else {
-                            _ShowLockPickMenu(apItemActivated, 0, false);
+                            Interface::CreateLockPickMenu(apItemActivated, 0, false);
                         }
                         return false;
                     }
@@ -443,7 +443,7 @@ bool TESObjectDOOR::Activate(
                         Interface::PlayMenuSound(18);
                     }
                     else {
-                        _ShowLockPickMenu(apItemActivated, 0, false);
+                        Interface::CreateLockPickMenu(apItemActivated, 0, false);
                     }
                     return false;
                 }
@@ -548,7 +548,7 @@ NiAVObject* TESObjectDOOR::Clone3D(TESObjectREFR* apRequester) {
         else {
             if (!pcon) {
                 BSPlayerDistanceCheckController* pcontrol = new BSPlayerDistanceCheckController;
-                pcontrol->SetCheckDistance(gs_fAutoDoorActivateDistance.Float());
+                pcontrol->SetCheckDistance(fAutoDoorActivateDistance.Float());
                 pcontrol->SetCallback(&TESObjectDOOR::AutoDoorCallback);
                 pcontrol->SetTarget(p3D);
             }
@@ -760,7 +760,7 @@ void TESObjectDOOR::DoorTeleportPlayerArrivalCallback(uintptr_t aiArrivalData) {
         pNewParentCell->ForceLODFadeInLoadedCells();
     }
 
-    if (gs_bSaveOnTravel_GamePlay.Bool() && pNewParentCell) {
+    if (bSaveOnTravel.Bool() && pNewParentCell) {
         pSaveLoadManager->SetAutoSaveTimerTo1();
     }
 }
@@ -813,8 +813,8 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
             DoorTeleportData* ptel1 = apDoor1->AddTeleport();
             DoorTeleportData* ptel2 = apDoor2->AddTeleport();
             if (ptel1 && ptel2) {
-                float fdefdist = gs_fRandomDoorDistance.Float();
-                float fAutoDoorActivateDistance = gs_fAutoDoorActivateDistance.Float() + 100.0;
+                float fdefdist = fRandomDoorDistance.Float();
+                float fAutoDoorActivateDistance = ::fAutoDoorActivateDistance.Float() + 100.0;
                 float fautodist = BSMAX(fdefdist, fAutoDoorActivateDistance);
                 float f180 = 3.1415927f;
                 ptel1->pLinkedDoor = apDoor2;
@@ -858,8 +858,4 @@ void TESObjectDOOR::LinkRandomTeleportDoors(TESObjectREFR* apDoor1, TESObjectREF
             }
         }
     }
-}
-
-hkpMotion::MotionType hkpRigidBody::getMotionType() {
-    return getMotion()->getType();
 }

@@ -4,6 +4,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkWorld.h"
@@ -11,7 +12,7 @@
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShader.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
@@ -31,10 +32,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenMorphDataHair.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
 #include "Fallout Shared/FaceGen/BSFaceGenUtils.h"
-#include "Fallout Shared/FaceGen/FR2MatrixCTC.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
-#include "Fallout Shared/FaceGen/FanLinCtlGrpS.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Fallout Shared/FaceGenNpcData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/MenuGameSettings.h"
@@ -69,10 +66,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
@@ -97,11 +94,15 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSemaphore.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
+#include "SDK/FaceGen/FanControls.h"
 #include "SDK/FaceGen/FanCtlFile.h"
 #include "SDK/FaceGen/FutDensity.h"
+#include "SDK/FaceGen/MatrixCT.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/FaceGen/assert.hpp"
 #include "SDK/MSVC/ehvec.h"
@@ -119,20 +120,20 @@
 
 BSCriticalSection BSFaceGenManager::FGAccessCrit;
 SettingT<INISettingCollection> BSFaceGenManager::bUseFaceGenHeads("bUseFaceGenHeads:General", true);
-SettingT<INISettingCollection> TESRace::bFixFaceNormals("bFixFaceNormals:General", false);
+SettingT<INISettingCollection> BSFaceGenManager::bFixNormals("bFixFaceNormals:General", false);
 SettingT<INISettingCollection> BSFaceGenManager::bUseFaceGenLOD("bUseFaceGenLOD:LOD", false);
 SettingT<INISettingCollection> BSFaceGenManager::fLodDistance("fLodDistance:LOD", 500.0f);
 SettingT<INISettingCollection> BSFaceGenManager::fTalkingDistance("fTalkingDistance:LOD", 2000.0f);
 SettingT<INISettingCollection>
     BSFaceGenManager::bUseMultiThreadedFaceGen("bUseMultiThreadedFaceGen:BackgroundLoad", true);
 SettingT<INISettingCollection> BSFaceGenManager::bUseEyeEnvMapping("bUseEyeEnvMapping:General", true);
-SettingT<INISettingCollection> gs_uiFaceGenMaxEGMDataSize_General("uiFaceGenMaxEGMDataSize:General", 67108864u);
-SettingT<INISettingCollection> gs_uiFaceGenMaxEGTDataSize_General("uiFaceGenMaxEGTDataSize:General", 67108864u);
+SettingT<INISettingCollection> BSFaceGenManager::uiMaxEGMDataSize("uiFaceGenMaxEGMDataSize:General", 67108864u);
+SettingT<INISettingCollection> BSFaceGenManager::uiMaxEGTDataSize("uiFaceGenMaxEGTDataSize:General", 67108864u);
 SettingT<INISettingCollection> BSFaceGenManager::uiEGTClampSize("uiEGTClampSize:General", 30u);
 static SettingT<INISettingCollection> bDebugFaceGenMultithreading("bDebugFaceGenMultithreading:Debug", false);
 static SettingT<INISettingCollection> bDebugFaceGenCriticalSection("bDebugFaceGenCriticalSection:Debug", false);
 SettingT<INISettingCollection> BSFaceGenManager::bLoadBackgroundFaceGen("bLoadBackgroundFaceGen:BackgroundLoad", false);
-SettingT<INISettingCollection> BSFaceGenManager::bLoadFaceGenHeadEGTFiles("bLoadFaceGenHeadEGTFiles:General", false);
+SettingT<INISettingCollection> bLoadFaceGenHeadEGTFiles("bLoadFaceGenHeadEGTFiles:General", false);
 NiSemaphore BSFaceGenManager::LoadingSema(1, 1);
 BSCriticalSection BSFaceGenManager::QueueCritical;
 
@@ -486,448 +487,9 @@ void BSFaceGenModelMap::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-void FanLinCtlS::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-FanFgResidualS::~FanFgResidualS() {}
-
-void FanFgResidualS::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
 float fsqr(float afX) {
     return afX * afX;
 }
-
-FR2MatrixVTC<float>*
-ConcatRows(FR2MatrixVTC<float>* apResult, FR2MatrixVTC<float>* hProcess, FR2MatrixVTC<float>* apLower) {
-    FR2MatrixVTC<float>::RowT kRow;
-    FR2MatrixVTC<float> kConcat;
-    bool bUpperEmpty = !hProcess->nrows || !hProcess->ncols;
-    bool bLowerEmpty = !apLower->nrows || !apLower->ncols;
-    if (bUpperEmpty && bLowerEmpty) {
-        apResult->data.~vector<float, std::allocator<float>>();
-        ::new (&apResult->data) std::vector<float, std::allocator<float>>;
-        apResult->nrows = 0;
-        apResult->ncols = 0;
-        apResult->data.resize(apResult->nrows * apResult->ncols, 0.0f);
-        return apResult;
-    }
-
-    if (bUpperEmpty) {
-        ::new (apResult) FR2MatrixVTC<float>(*apLower);
-        return apResult;
-    }
-
-    if (bLowerEmpty) {
-        ::new (apResult) FR2MatrixVTC<float>(*hProcess);
-        return apResult;
-    }
-
-    if (hProcess->ncols != apLower->ncols) {
-        fr2Assert("d:\\_fallout3\\platforms\\common\\code\\sdk\\facegen\\matrixVT.hpp", 1278);
-    }
-    uint32_t ncols = hProcess->ncols;
-    uint32_t nrows = hProcess->nrows;
-    uint32_t uiLowerRows = apLower->nrows;
-    kConcat.data.~vector<float, std::allocator<float>>();
-    ::new (&kConcat.data) std::vector<float, std::allocator<float>>;
-    kConcat.nrows = uiLowerRows + nrows;
-    kConcat.ncols = ncols;
-    kConcat.data.resize((uiLowerRows + nrows) * ncols, 0.0f);
-    nrows = hProcess->nrows;
-    ncols = hProcess->ncols;
-    float* pSource = &hProcess->data[0];
-    float* pDest = &kConcat.data[0];
-    rt::memcpy(pDest, pSource, sizeof(float) * (ncols * nrows));
-    uiLowerRows = apLower->nrows;
-    uint32_t uiLowerCols = apLower->ncols;
-    kRow = (*apLower)[0];
-    rt::memcpy(kConcat[hProcess->nrows].p, kRow.p, sizeof(float) * (uiLowerCols * uiLowerRows));
-    ::new (apResult) FR2MatrixVTC<float>(kConcat);
-    return apResult;
-}
-
-// The end of the copy is computed first, from the byte span divided as signed: a plain pointer
-// difference would let clang assume an exact multiple.
-FanLinCtlS* CopyOpt(
-    FanLinCtlS* _First,
-    FanLinCtlS* _Last,
-    FanLinCtlS* _Dest,
-    [[maybe_unused]] uint8_t _IterCat,
-    [[maybe_unused]] uint8_t _PtrCat,
-    [[maybe_unused]] uint8_t _Checked
-) {
-    ptrdiff_t iBytes = static_cast<char*>(static_cast<void*>(_Last)) - static_cast<char*>(static_cast<void*>(_First));
-    FanLinCtlS* pEnd = _Dest + iBytes / static_cast<ptrdiff_t>(sizeof(FanLinCtlS));
-    for (; _First != _Last; ++_Dest, ++_First) {
-        _Dest->ctl = _First->ctl;
-        _Dest->label.assign(_First->label, 0, std::string::npos);
-    }
-    return pEnd;
-}
-
-FanRaceDistS::FanRaceDistS() {}
-
-FanRaceDistS::~FanRaceDistS() {}
-
-FanOffLinCtlS::FanOffLinCtlS() {}
-
-FanOffLinCtlS::~FanOffLinCtlS() {}
-
-FanPrtOffLinCtlS::FanPrtOffLinCtlS() {}
-
-FanPrtOffLinCtlS::~FanPrtOffLinCtlS() {}
-
-FanGenCtlsGrpC::FanGenCtlsGrpC() : initialized(false) {}
-
-FanGenCtlsGrpC::~FanGenCtlsGrpC() {}
-
-float FanGenCtlsGrpC::getAttribute(
-    FanRaceE race,
-    FanAttribE att,
-    FanTypeE type,
-    const FR2MatrixVTC<float> (*coord)[2]
-) {
-    FR2MatrixVTC<float> kProduct;
-    if (race >= FANRACE_SIZE) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 198);
-    }
-    if (att >= FANATT_SIZE) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 199);
-    }
-    if (type >= FANTYPE_SIZE) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 200);
-    }
-    if (initialized) {
-        FR2MatrixVTC<float>* pProduct = attr[race][att][type].ctl.Mul(&kProduct, (*coord)[2 * type]);
-        float fAttribute = *(*pProduct)[0].p;
-        return fAttribute + attr[race][att][type].off;
-    }
-
-    return 0.0f;
-}
-
-void FanGenCtlsGrpC::setAttributes(FanRaceE race, FanTypeE type, const float* val, FR2MatrixVTC<float> (*coord)[2]) {
-    FR2MatrixVTC<float> kScaled;
-    FR2MatrixVTC<float> kTransposed;
-    if (race >= FANRACE_SIZE) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 266);
-    }
-    if (initialized) {
-        float attBoundHi[2];
-        FR2Vect2TC<float> delta;
-        float attBoundLo[2];
-        FR2Vect2TC<float> valDiff;
-        uint32_t aa;
-        attBoundLo[0] = 15.0f;
-        attBoundLo[1] = -4.0f;
-        attBoundHi[0] = 65.0f;
-        attBoundHi[1] = 4.0f;
-        valDiff.x1 = 0.0f;
-        valDiff.x2 = 0.0f;
-        for (aa = 0; aa < 2; ++aa) {
-            float newVal = val[aa];
-            if (attBoundLo[aa] > static_cast<double>(newVal)) {
-                newVal = attBoundLo[aa];
-            }
-            if (attBoundHi[aa] < static_cast<double>(newVal)) {
-                newVal = attBoundHi[aa];
-            }
-            // The source counts the attributes with an unsigned index and passes it as the attribute.
-            double dAttribute = getAttribute(race, static_cast<FanAttribE>(aa), type, coord);
-            *(&valDiff.x1 + aa) = newVal - dAttribute;
-        }
-        // The 2 x 2 inverse goes to the matrix-vector product as its four floats, row by row.
-        MultiplyMatrixVector(&delta.x1, &invAttCov[race][type].data[0][0], &valDiff.x1);
-        for (aa = 0; aa < 2; ++aa) {
-            FR2MatrixVTC<float>* pTransposed = attr[race][aa][type].ctl.transpose(&kTransposed);
-            FR2MatrixVTC<float>* pScaled = pTransposed->MulScalar(&kScaled, *(&delta.x1 + aa));
-            (*coord)[2 * type] += *pScaled;
-        }
-    }
-}
-
-double
-FanGenCtlsGrpC::getCaricature(FanRaceE race, FanTypeE type, FanSymmE symm, const FR2MatrixVTC<float> (*coord)[2]) {
-    FR2MatrixVTC<float> kScaled;
-    FR2MatrixVTC<float> kTransposed;
-    FR2MatrixVTC<float>::RowT kRow;
-    FR2MatrixVTC<float> kProduct;
-    FR2MatrixVTC<float> kNormalized;
-    FR2MatrixVTC<float> kDelta;
-    if (race >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 308);
-    }
-    if (type >= 2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 309);
-    }
-    if (symm >= 2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 310);
-    }
-    if (!initialized) {
-        return 0.0;
-    }
-    if (symm == 1) {
-        float fLengthSqr = coord[type][symm].lengthSqr();
-        float fLength = std::sqrt(static_cast<double>(fLengthSqr));
-        float fRootRows = std::sqrt(static_cast<double>(coord[type][symm].nrows));
-        return fLength / fRootRows;
-    }
-
-    if (symm) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 344);
-        return 0.0;
-    }
-
-    coord[type][symm].Sub(&kDelta, distrib[race].mean[type]);
-    for (uint32_t i = 0; i < 2; ++i) {
-        FR2MatrixVTC<float>* pProduct = basis[4 * race + 2 * type + i].Mul(&kProduct, kDelta);
-        float fWeight = *(::new (&kRow) FR2MatrixVTC<float>::RowT((*pProduct)[0u]))->p;
-        FR2MatrixVTC<float>* pTransposed = basis[4 * race + 2 * type + i].transpose(&kTransposed);
-        FR2MatrixVTC<float>* pScaled = pTransposed->MulScalar(&kScaled, fWeight);
-        kDelta -= *pScaled;
-    }
-    distrib[race].invEigBasis[type].Mul(&kNormalized, kDelta);
-    float fLengthSqr = kNormalized.lengthSqr();
-    float fLength = std::sqrt(static_cast<double>(fLengthSqr));
-    float fDegrees = static_cast<double>(kNormalized.nrows) - 2.0;
-    float fRootDegrees = std::sqrt(static_cast<double>(fDegrees));
-    return fLength / fRootDegrees;
-}
-
-void FanGenCtlsGrpC::setCaricature(
-    FanRaceE race,
-    FanTypeE type,
-    FanSymmE symm,
-    float val,
-    FR2MatrixVTC<float> (*coord)[2]
-) {
-    FR2MatrixVTC<float> kNewCoord;
-    FR2MatrixVTC<float> kSum;
-    FR2MatrixVTC<float> kScaled;
-    FR2MatrixVTC<float> kTransposed;
-    FR2MatrixVTC<float>::RowT kRow;
-    FR2MatrixVTC<float> kProduct;
-    FR2MatrixVTC<float> m;
-    FR2MatrixVTC<float> kProjection;
-    if (race >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 370);
-    }
-    if (type >= 2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 371);
-    }
-    if (symm >= 2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 372);
-    }
-    if (initialized) {
-        if (val < 0.009999999776482582) {
-            val = 0.01f;
-        }
-        if (symm == 1) {
-            float fLengthSqr = coord[type][symm].lengthSqr();
-            float fLength = std::sqrt(static_cast<double>(fLengthSqr));
-            float fRootRows = std::sqrt(static_cast<double>(coord[type][symm].nrows));
-            float fCaricature = fLength / fRootRows;
-            if (fCaricature > 0.0) {
-                float fScale = val / fCaricature;
-                coord[type][symm] *= fScale;
-            }
-        }
-        else if (!symm) {
-            coord[type][symm].Sub(&m, distrib[race].mean[type]);
-            uint32_t ncols = coord[type][symm].ncols;
-            uint32_t nrows = coord[type][symm].nrows;
-            kProjection.data.~vector<float, std::allocator<float>>();
-            ::new (&kProjection.data) std::vector<float, std::allocator<float>>;
-            kProjection.nrows = nrows;
-            kProjection.ncols = ncols;
-            kProjection.data.resize(nrows * ncols, 0.0f);
-            kProjection.setZero();
-            for (uint32_t i = 0; i < 2; ++i) {
-                FR2MatrixVTC<float>* pProduct = basis[4 * race + 2 * type + i].Mul(&kProduct, m);
-                float fWeight = *(::new (&kRow) FR2MatrixVTC<float>::RowT((*pProduct)[0u]))->p;
-                FR2MatrixVTC<float>* pTransposed = basis[4 * race + 2 * type + i].transpose(&kTransposed);
-                FR2MatrixVTC<float>* pScaled = pTransposed->MulScalar(&kScaled, fWeight);
-                kProjection += *pScaled;
-            }
-            m -= kProjection;
-            float fCaricature = getCaricature(race, type, symm, coord);
-            if (fCaricature > 0.0) {
-                float fScale = val / fCaricature;
-                m *= fScale;
-                FR2MatrixVTC<float>* pSum = m.Add(&kSum, kProjection);
-                FR2MatrixVTC<float>* pNewCoord = pSum->Add(&kNewCoord, distrib[race].mean[type]);
-                coord[type][symm] = *pNewCoord;
-            }
-        }
-    }
-}
-
-double FanGenCtlsGrpC::getRace(int32_t race1, int32_t race2, const FR2MatrixVTC<float> (*coord)[2]) {
-    FR2MatrixVTC<float>::RowT kRow;
-    FR2MatrixVTC<float> kProduct;
-    if (race1 >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 436);
-    }
-    if (race2 >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 437);
-    }
-    if (race1 == race2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 438);
-    }
-    if (!initialized) {
-        return 0.0;
-    }
-    float fSum = 0.0f;
-    for (uint32_t i = 0; i < 2; ++i) {
-        FR2MatrixVTC<float>* pProduct = race[race1][race2].ctl[i].Mul(&kProduct, coord[i][0]);
-        fSum = *(::new (&kRow) FR2MatrixVTC<float>::RowT((*pProduct)[0u]))->p + fSum;
-    }
-    return fSum + race[race1][race2].off;
-}
-
-void FanGenCtlsGrpC::setRace(int32_t race1, int32_t race2, float val, FR2MatrixVTC<float> (*coord)[2]) {
-    FR2MatrixVTC<float> kScaled;
-    FR2MatrixVTC<float> kTransposed;
-    if (race1 >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 468);
-    }
-    if (race2 >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 469);
-    }
-    if (race1 == race2) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 470);
-    }
-    if (initialized) {
-        float s = (val - getRace(race1, race2, coord)) * race[race1][race2].scale;
-        for (uint32_t i = 0; i < 2; ++i) {
-            FR2MatrixVTC<float>* pTransposed = race[race1][race2].ctl[i].transpose(&kTransposed);
-            FR2MatrixVTC<float>* pScaled = pTransposed->MulScalar(&kScaled, s);
-            coord[i][0] += *pScaled;
-        }
-    }
-}
-
-void FanGenCtlsGrpC::random(int32_t aiRace, FR2MatrixVTC<float>* apCoord) {
-    FR2MatrixVTC<float> kLowerCoord;
-    FR2MatrixVTC<float> kLower;
-    FR2MatrixVTC<float> kUpperCoord;
-    FR2MatrixVTC<float> kUpper;
-    FR2MatrixVTC<float> kProduct;
-    FR2MatrixVTC<float>::RowT kRow;
-    FR2MatrixVTC<float> kConcat;
-    if (aiRace >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 498);
-    }
-    if (initialized) {
-        for (uint32_t j = 0; j < 2; ++j) {
-            for (uint32_t k = 0; k < 2; ++k) {
-                for (uint32_t i = 0; i < apCoord[2 * j + k].nrows; ++i) {
-                    kRow = apCoord[2 * j + k][i];
-                    float* p = kRow.p;
-                    *p = RngStdNormal();
-                }
-            }
-        }
-        ConcatRows(&kConcat, apCoord, apCoord + 2);
-        FR2MatrixVTC<float>* pProduct = distrib[aiRace].eigBasis.Mul(&kProduct, kConcat);
-        kConcat = *pProduct;
-        uint32_t nr = apCoord->nrows;
-        uint32_t nrows = apCoord[2].nrows;
-        FR2MatrixVTC<float>* pUpper = kConcat.subMatrix(&kUpper, 0, 0, nr, 1u);
-        FR2MatrixVTC<float>* pUpperCoord = pUpper->Add(&kUpperCoord, *distrib[aiRace].mean);
-        *apCoord = *pUpperCoord;
-        FR2MatrixVTC<float>* pLower = kConcat.subMatrix(&kLower, nr, 0, nrows, 1u);
-        FR2MatrixVTC<float>* pLowerCoord = pLower->Add(&kLowerCoord, distrib[aiRace].mean[1]);
-        *(apCoord + 2) = *pLowerCoord;
-    }
-}
-
-void FanGenCtlsGrpC::geneticRandom(
-    float afGeneticVariation,
-    FR2MatrixVTC<float> (*apSourceCoord)[2][2],
-    FR2MatrixVTC<float> (*apOutCoord)[2][2]
-) {
-    FR2MatrixVTC<float>::RowT kRow;
-    for (int32_t j = 0; j < 2; ++j) {
-        for (int32_t k = 0; k < 2; ++k) {
-            uint32_t ncols = (*apSourceCoord)[j][k].ncols;
-            uint32_t nrows = (*apSourceCoord)[j][k].nrows;
-            FR2MatrixVTC<float>* pOutMatrix = &(*apOutCoord)[j][k];
-            pOutMatrix->nrows = nrows;
-            pOutMatrix->ncols = ncols;
-            pOutMatrix->data.resize(ncols * nrows, 0.0f);
-            for (uint32_t i = 0; i < (*apSourceCoord)[j][k].nrows; ++i) {
-                for (uint32_t m = 0; m < (*apSourceCoord)[j][k].ncols; ++m) {
-                    if (k) {
-                        (*apOutCoord)[j][k][i].p[m] = 0.0f;
-                    }
-                    else {
-                        double dNoise = RngStdNormal() * afGeneticVariation * 1.5;
-                        float* pSource = &(*apSourceCoord)[j][k][i].p[m];
-                        kRow = (*apOutCoord)[j][k][i];
-                        kRow.p[m] = *pSource + dNoise;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void FanGenCtlsGrpC::reflect(FanRaceE race, FR2MatrixVTC<float> (*coord)[2]) {
-    FR2MatrixVTC<float> kDiff;
-    FR2MatrixVTC<float> kScaled;
-    FR2MatrixVTC<float> kNegated;
-    if (race >= 5) {
-        fr2Assert("D:\\_Fallout3\\Platforms\\Common\\Code\\SDK\\FaceGen\\FanControls.cpp", 629);
-    }
-    if (initialized) {
-        for (uint32_t i = 0; i < 2; ++i) {
-            FR2MatrixVTC<float>* pNegated = coord[i][1].MulScalar(&kNegated, -1.0f);
-            coord[i][1] = *pNegated;
-            FR2MatrixVTC<float>* pScaled = distrib[race].mean[i].MulScalar(&kScaled, 2.0f);
-            FR2MatrixVTC<float>* pDiff = pScaled->Sub(&kDiff, coord[i][0]);
-            coord[i][0] = *pDiff;
-        }
-    }
-}
-
-void FanGenCtlsGrpC::tween(
-    FanTypeE type,
-    FanSymmE symm,
-    float ratio,
-    const FR2MatrixVTC<float> (*parent1)[2],
-    const FR2MatrixVTC<float> (*parent2)[2],
-    FR2MatrixVTC<float> (*child)[2]
-) {
-    FR2MatrixVTC<float> kTween;
-    FR2MatrixVTC<float> kWeighted2;
-    FR2MatrixVTC<float> kWeighted1;
-    float fCaricature;
-    float fCaricature1 = getCaricature(FANRACE_ALL, type, symm, parent1);
-    float fCaricature2 = getCaricature(FANRACE_ALL, type, symm, parent2);
-    if (ratio < 0.0) {
-        fCaricature = fCaricature2;
-    }
-    else if (ratio > 1.0) {
-        fCaricature = fCaricature1;
-    }
-    else {
-        fCaricature = fCaricature1 * ratio + (1.0 - ratio) * fCaricature2;
-    }
-    float s = 1.0 - ratio;
-    FR2MatrixVTC<float>* pWeighted2 = parent2[type][symm].MulScalar(&kWeighted2, s);
-    FR2MatrixVTC<float>* pWeighted1 = parent1[type][symm].MulScalar(&kWeighted1, ratio);
-    FR2MatrixVTC<float>* pTween = pWeighted1->Add(&kTween, *pWeighted2);
-    child[type][symm] = *pTween;
-    setCaricature(FANRACE_ALL, type, symm, fCaricature, child);
-}
-
-FanFgFileDataS::FanFgFileDataS() {}
-
-FanFgFileDataS::~FanFgFileDataS() {}
 
 // Reads the FaceGen controls and sizes the face coordinates to them, then builds the hair and teeth alpha property and
 // the default base and detail modulation textures.
@@ -1829,9 +1391,9 @@ BSFaceGenModel* BSFaceGenManager::GetFaceGenModel(
         BSFaceGenModelMap* pModelMap;
         pModelMap = new BSFaceGenModelMap;
         BSFaceGenManager::GetInstance()->pModelMap = pModelMap;
-        uint32_t uiMaxEGMSize = gs_uiFaceGenMaxEGMDataSize_General;
+        uint32_t uiMaxEGMSize = BSFaceGenManager::uiMaxEGMDataSize;
         BSFaceGenManager::GetInstance()->pModelMap->SetMaxDataSize(BSFaceGenModelMap::DATA_TYPE_EGM, uiMaxEGMSize);
-        uint32_t uiMaxEGTSize = gs_uiFaceGenMaxEGTDataSize_General;
+        uint32_t uiMaxEGTSize = BSFaceGenManager::uiMaxEGTDataSize;
         BSFaceGenManager::GetInstance()->pModelMap->SetMaxDataSize(BSFaceGenModelMap::DATA_TYPE_EGT, uiMaxEGTSize);
     }
     if (apEGMFilename) {
@@ -2151,7 +1713,7 @@ void BSFaceGenManager::SetUseEmotions(bool abUseEmotions) {
 }
 
 bool BSFaceGenManager::GetFixNormals() {
-    return TESRace::bFixFaceNormals.Bool();
+    return BSFaceGenManager::bFixNormals.Bool();
 }
 
 BSFaceGenMorphData* BSFaceGenManager::GetFaceGenMorphData(NiTriBasedGeom* apGeom) {
@@ -2526,7 +2088,7 @@ bool BSFaceGenManager::CreateFaceGenHead(
             const char* pEGTFileName = nullptr;
             switch (uiPart) {
                 case 0u: {
-                    if (arNpcData.bPlayer || BSFaceGenManager::bLoadFaceGenHeadEGTFiles.Bool()) {
+                    if (arNpcData.bPlayer || bLoadFaceGenHeadEGTFiles.Bool()) {
                         pEGTFileName = BSFaceGenManager::GetAsEGTFile(fileEGT, filename.pString);
                     }
                     const char* pTRI = BSFaceGenManager::GetAsTRIFile(fileTRI, filename.pString, HAIR_PART_NONE);
@@ -2955,8 +2517,6 @@ void BSFaceGenManager::RandomizeFaceGenetic(
     }
 }
 
-FanLinCtlGrpS::FanLinCtlGrpS() {}
-
 NiPoint3* BSFaceGenBaseMorphExtraData::GetVertices() const {
     return pVerts;
 }
@@ -2993,24 +2553,4 @@ BSFaceGenMorphData* BSFaceGenModel::GetMorph() {
     NiPointer<BSFaceGenMorphData> spNull(nullptr);
     BSFaceGenMorphData* pMorph = spNull;
     return pMorph;
-}
-
-void NiAVObject::DetachProperty(NiProperty* pkProperty) {
-    NiPointer<NiProperty> spProperty(pkProperty);
-    { NiPointer<NiProperty> spRemoved = m_kPropertyList.Remove(spProperty); }
-}
-
-void NiGeometry::SetShader(BSShader* pkShader) {
-    this->m_spShader = pkShader;
-}
-
-void NiPixelData::SetNoConvert(bool abTF) {
-    bNoConvert = abTF;
-}
-
-NiSemaphore::NiSemaphore(int32_t aiCount, int32_t aiMaxCount)
-  : m_iCount(aiCount), m_iMaxCount(aiMaxCount), m_hSemaphore(new BSSystemSemaphore(m_iCount, m_iMaxCount)) {}
-
-NiSemaphore::~NiSemaphore() {
-    delete m_hSemaphore;
 }

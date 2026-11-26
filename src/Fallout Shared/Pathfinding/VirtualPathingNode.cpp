@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/VirtualPathingNode.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"

@@ -42,3 +42,7 @@ public:
     // Set when the geometry is a scissor (clipping) shape.
     uint8_t bIsScissor;
 };
+
+inline const char* TileImage::GetTypeName() {
+    return "IMGE";
+}

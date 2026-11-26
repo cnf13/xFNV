@@ -3,10 +3,12 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/BGSEquipType.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/Package.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESFile.h"
@@ -19,16 +21,16 @@
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> bFixAIPackagesOnLoad("bFixAIPackagesOnLoad:General", false);
-SettingT<GameSettingCollection> gs_fConfidenceFoolhardy("fConfidenceFoolhardy", 0.0f);
-SettingT<GameSettingCollection> gs_fConfidenceBrave("fConfidenceBrave", 0.5f);
-SettingT<GameSettingCollection> gs_fConfidenceAverage("fConfidenceAverage", 1.0f);
-SettingT<GameSettingCollection> gs_fConfidenceCautious("fConfidenceCautious", 2.0f);
-SettingT<GameSettingCollection> gs_fConfidenceCowardly("fConfidenceCowardly", 1000.0f);
+SettingT<GameSettingCollection> fConfidenceFoolhardy("fConfidenceFoolhardy", 0.0f);
+SettingT<GameSettingCollection> fConfidenceBrave("fConfidenceBrave", 0.5f);
+SettingT<GameSettingCollection> fConfidenceAverage("fConfidenceAverage", 1.0f);
+SettingT<GameSettingCollection> fConfidenceCautious("fConfidenceCautious", 2.0f);
+SettingT<GameSettingCollection> fConfidenceCowardly("fConfidenceCowardly", 1000.0f);
 
 // Swaps the two 32-bit fields read from a big-endian file; the byte fields are left alone.
 void AIDATA::Endian() {
-    ENDIAN(iServiceFlags, false);
-    ENDIAN(uiAggroRadius, false);
+    BSEndian(iServiceFlags, false);
+    BSEndian(uiAggroRadius, false);
 }
 
 TESAIForm::TESAIForm() {
@@ -52,11 +54,11 @@ void TESAIForm::InitializeDataComponent() {
     AIData.bAggroRadius = 0;
     AIData.uiAggroRadius = 0;
     if (!confidenceSet) {
-        fConfidences[0] = gs_fConfidenceCowardly.Float();
-        fConfidences[1] = gs_fConfidenceCautious.Float();
-        fConfidences[2] = gs_fConfidenceAverage.Float();
-        fConfidences[3] = gs_fConfidenceBrave.Float();
-        fConfidences[4] = gs_fConfidenceFoolhardy.Float();
+        fConfidences[0] = fConfidenceCowardly.Float();
+        fConfidences[1] = fConfidenceCautious.Float();
+        fConfidences[2] = fConfidenceAverage.Float();
+        fConfidences[3] = fConfidenceBrave.Float();
+        fConfidences[4] = fConfidenceFoolhardy.Float();
         confidenceSet = 1;
     }
 }

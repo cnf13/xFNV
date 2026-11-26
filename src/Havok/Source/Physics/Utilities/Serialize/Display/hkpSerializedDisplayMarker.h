@@ -20,5 +20,8 @@ public:
     hkTransform m_transform;
 };
 
+// The marker adds nothing to destroy.
+inline hkpSerializedDisplayMarker::~hkpSerializedDisplayMarker() {}
+
 extern hkClass hkpSerializedDisplayMarkerClass;
 extern hkTypeInfo hkpSerializedDisplayMarkerTypeInfo;

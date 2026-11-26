@@ -4,7 +4,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/ResponseListWrapper.h"
@@ -138,7 +138,7 @@ DialogueResponse* DialogueItem::GetDialogueResponseByIndex(int16_t aiIndex) {
     return nullptr;
 }
 
-void DialogueItem::SaveGameTES() {
+void DialogueItem::SaveGame() {
     char cResponseCount = 0;
     uint8_t* pCountSlot = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
     pSaveLoadGameOLD->SaveGameDataOLD(&cResponseCount, sizeof(cResponseCount));
@@ -242,7 +242,7 @@ void DialogueItem::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveFormID(pSpeaker, 0);
 }
 
-void DialogueItem::LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer) {
+void DialogueItem::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     uint32_t iSaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     for (uint32_t i = 0; i < iSaveGameCount; ++i) {
         DialogueResponse* pResponse = new DialogueResponse;

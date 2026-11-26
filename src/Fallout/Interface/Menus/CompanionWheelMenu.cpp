@@ -7,7 +7,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
-#include "BSHavok/bhkPickData.h"
+#include "BSHavok/bhkWorld.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
@@ -470,7 +470,7 @@ void CompanionWheelMenu::HandleMouseoverForTile(int32_t aiID, uint8_t abForce) {
                 break;
             }
             case 1: {
-                SetButtonPreviewText(gs_sCWheelUseStimpak.String());
+                SetButtonPreviewText(sCWheelUseStimPack.String());
                 break;
             }
             case 2: {
@@ -936,7 +936,7 @@ void CompanionWheelMenu::TransitionFromCloseToTalkTo() {
 
 void CompanionWheelMenu::DisplayCompanionWheelSubtitle(BSStringT<char> asText, BSSoundHandle ahSound) {
     if (asText.GetLength() &&
-        (gs_bGeneralSubtitles_Gameplay.Bool() ||
+        (bGeneralSubtitles.Bool() ||
          (m_pRelatedCompanion && static_cast<uint8_t>(m_pRelatedCompanion->GetShowSubtitles())))) {
         if (pTiles[12]) {
             pTiles[12]->Set(4036, asText.pString, true);

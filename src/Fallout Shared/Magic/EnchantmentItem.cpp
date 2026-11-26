@@ -17,9 +17,9 @@
 #include "SDK/MSVC/rtti.h"
 
 void EnchantmentItemData::Endian() {
-    ENDIAN(eCastingType, false);
-    ENDIAN(iChargeOverride, false);
-    ENDIAN(iCostOverride, false);
+    BSEndian(eCastingType, false);
+    BSEndian(iChargeOverride, false);
+    BSEndian(iCostOverride, false);
 }
 
 EnchantmentItem::EnchantmentItem() : MagicItemForm() {

@@ -3,7 +3,7 @@
 #include "BSMenu/Tile.h"
 #include "Fallout/Interface/Interface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 
 TileRect::TileRect() {}

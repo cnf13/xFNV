@@ -1,6 +1,6 @@
 #include "Fallout Shared/TESQuestTarget.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -12,7 +12,7 @@
 #include "SDK/MSVC/rtti.h"
 
 void QSTA_DATA::Endian() {
-    ENDIAN(uiTargetRef, false);
+    BSEndian(uiTargetRef, false);
 }
 
 TESQuestTarget::TESQuestTarget() : cFlags(0), m_pTargetRef(nullptr) {}

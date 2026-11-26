@@ -1,9 +1,11 @@
 #pragma once
 
+#include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/Xenon/NiPoint4.h"
 

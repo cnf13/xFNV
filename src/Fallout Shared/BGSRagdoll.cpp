@@ -4,7 +4,7 @@
 #include "BSCore/BSSimpleArray.inl"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSBodyPartData.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -26,83 +26,10 @@ using BSSimpleArray_GrabIK_DATA_GrabIK_Arm_DATA_1024 = BSSimpleArray<GrabIK_DATA
 
 // The enabled flags are single bytes.
 void RagdollSaveStruct::Endian() {
-    ENDIAN(usFeedbackDynamicBoneCount, false);
-    ENDIAN(usLegCount, false);
-    ENDIAN(usHeadCount, false);
-    ENDIAN(usArmCount, false);
-}
-
-RagdollFeedbackData::RagdollFeedbackSystemData::RagdollFeedbackSystemData()
-  : fKeyDynIntrp(0.9f), fHeirGain(0.8f), fPosGain(0.4f), fVelGain(0.2f), fAccGain(0.1f), fSnapGain(0.3f),
-    fVelDamp(0.0f), fSnapMaxLinVel(50.0f), fSnapMaxAngVel(50.0f), fSnapMaxLinDist(25.0f), fSnapMaxAngDist(25.0f),
-    fPosMaxLinVel(50.0f), fPosMaxAngVel(50.0f), uiImpulseMult1(10000), uiImpulseMult2(30000) {}
-
-void RagdollFeedbackData::RagdollFeedbackSystemData::Endian() {
-    ENDIAN(fKeyDynIntrp, false);
-    ENDIAN(fHeirGain, false);
-    ENDIAN(fPosGain, false);
-    ENDIAN(fVelGain, false);
-    ENDIAN(fAccGain, false);
-    ENDIAN(fSnapGain, false);
-    ENDIAN(fVelDamp, false);
-    ENDIAN(fSnapMaxLinVel, false);
-    ENDIAN(fSnapMaxAngVel, false);
-    ENDIAN(fSnapMaxLinDist, false);
-    ENDIAN(fSnapMaxAngDist, false);
-    ENDIAN(fPosMaxLinVel, false);
-    ENDIAN(fPosMaxAngVel, false);
-    ENDIAN(uiImpulseMult1, false);
-    ENDIAN(uiImpulseMult2, false);
-}
-
-RagdollFeedbackData::RagdollFeedbackData() : bEnabled(false) {}
-
-RagdollFeedbackData::~RagdollFeedbackData() {}
-
-void RagdollFeedbackData::Init() {
-    bEnabled = false;
-    SystemData = RagdollFeedbackData::RagdollFeedbackSystemData();
-    DynamicBoneIdxA.~BSSimpleArray<int16_t, 1024>();
-    ::new (&DynamicBoneIdxA) BSSimpleArray<int16_t, 1024>;
-}
-
-bool RagdollFeedbackData::Compare(RagdollFeedbackData* apOther) {
-    uint32_t iSize = DynamicBoneIdxA.iSize;
-    bool bret = false;
-    if (iSize != apOther->DynamicBoneIdxA.iSize) {
-        return true;
-    }
-    int32_t i = 0;
-    if (iSize) {
-        while (!bret) {
-            bret = DynamicBoneIdxA.pBuffer[i] != apOther->DynamicBoneIdxA.pBuffer[i];
-            if (++i >= iSize) {
-                break;
-            }
-        }
-        if (bret) {
-            return true;
-        }
-    }
-    if (bEnabled != apOther->bEnabled ||
-        apOther->SystemData.fKeyDynIntrp != SystemData.fKeyDynIntrp ||
-        apOther->SystemData.fHeirGain != SystemData.fHeirGain ||
-        apOther->SystemData.fPosGain != SystemData.fPosGain ||
-        apOther->SystemData.fVelGain != SystemData.fVelGain ||
-        apOther->SystemData.fAccGain != SystemData.fAccGain ||
-        apOther->SystemData.fSnapGain != SystemData.fSnapGain ||
-        apOther->SystemData.fVelDamp != SystemData.fVelDamp ||
-        apOther->SystemData.fSnapMaxLinVel != SystemData.fSnapMaxLinVel ||
-        apOther->SystemData.fSnapMaxAngVel != SystemData.fSnapMaxAngVel ||
-        apOther->SystemData.fSnapMaxLinDist != SystemData.fSnapMaxLinDist ||
-        apOther->SystemData.fSnapMaxAngDist != SystemData.fSnapMaxAngDist ||
-        apOther->SystemData.fPosMaxLinVel != SystemData.fPosMaxLinVel ||
-        SystemData.uiImpulseMult1 != apOther->SystemData.uiImpulseMult1 ||
-        SystemData.uiImpulseMult2 != apOther->SystemData.uiImpulseMult2 ||
-        apOther->SystemData.fPosMaxAngVel != SystemData.fPosMaxAngVel) {
-        return true;
-    }
-    return bret;
+    BSEndian(usFeedbackDynamicBoneCount, false);
+    BSEndian(usLegCount, false);
+    BSEndian(usHeadCount, false);
+    BSEndian(usArmCount, false);
 }
 
 PoseMatching_DATA::PoseMatching_System_DATA::PoseMatching_System_DATA()
@@ -111,13 +38,13 @@ PoseMatching_DATA::PoseMatching_System_DATA::PoseMatching_System_DATA()
 
 // The disable flag is a single byte.
 void PoseMatching_DATA::PoseMatching_System_DATA::Endian() {
-    ENDIAN(sRootMatchingBone, false);
-    ENDIAN(sMatchingBone2, false);
-    ENDIAN(sMatchingBone3, false);
-    ENDIAN(fMotorStrength, false);
-    ENDIAN(fDelayTime, false);
-    ENDIAN(fErrorAllowance, false);
-    ENDIAN(fDisableDisplacement, false);
+    BSEndian(sRootMatchingBone, false);
+    BSEndian(sMatchingBone2, false);
+    BSEndian(sMatchingBone3, false);
+    BSEndian(fMotorStrength, false);
+    BSEndian(fDelayTime, false);
+    BSEndian(fErrorAllowance, false);
+    BSEndian(fDisableDisplacement, false);
 }
 
 PoseMatching_DATA::PoseMatching_DATA() : bEnabled(false) {}
@@ -548,7 +475,7 @@ bool BGSRagdoll::Load(TESFile* apFile) {
                 uint32_t uiCount = FeedbackData.DynamicBoneIdxA.GetSize();
                 if (apFile->QEndian()) {
                     for (uint32_t i = 0; i < uiCount; ++i) {
-                        ENDIAN(FeedbackData.DynamicBoneIdxA.GetAt(i), false);
+                        BSEndian(FeedbackData.DynamicBoneIdxA.GetAt(i), false);
                     }
                 }
                 break;

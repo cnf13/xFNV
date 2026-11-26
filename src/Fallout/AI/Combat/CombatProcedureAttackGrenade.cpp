@@ -229,7 +229,7 @@ bool CombatProcedureAttackGrenade::GetTargetedPoint(NiPoint3& arTargetedPoint, N
 
 void CombatProcedureAttackGrenade::FiredProjectile(Projectile* apProjectile) {
     if (bHighArc) {
-        apProjectile->SetSpeedMult(gs_fGrenadeHighArcSpeedPercentage.Float());
+        apProjectile->SetSpeedMult(fGrenadeHighArcSpeedMult.Float());
     }
     bHighArc = false;
     if (bTargetLocation) {
@@ -295,7 +295,7 @@ NiPoint3 CombatProcedureAttackGrenade::CalculateTargetedPoint() {
         TESObjectWEAP* pWeapon = pCombatController->GetCurrentWeapon();
         Actor* pAttacker = GetAttacker();
         BGSProjectile* pProjectile = pWeapon->GetProjectile(pAttacker);
-        float fSpeedMult = this->bHighArc ? gs_fGrenadeHighArcSpeedPercentage.Float() : 1.0f;
+        float fSpeedMult = this->bHighArc ? fGrenadeHighArcSpeedMult.Float() : 1.0f;
         float fProjectileSpeed = pProjectile->GetSpeed() * fSpeedMult;
         bool bHighArc = this->bHighArc;
         if (bTargetLocation) {

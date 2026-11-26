@@ -23,3 +23,19 @@ public:
     // Protected in the SDK.
     hkInplaceArray<hkpRootCdBodyPair, 16> m_hits;
 };
+
+// Clears the hits, then the base's early-out flag.
+inline void hkpAllCdBodyPairCollector::reset() {
+    m_hits.clear();
+    hkpCdBodyPairCollector::reset();
+}
+
+inline hkpAllCdBodyPairCollector::~hkpAllCdBodyPairCollector() {}
+
+inline hkpAllCdBodyPairCollector::hkpAllCdBodyPairCollector() : m_hits(0) {
+    hkpAllCdBodyPairCollector::reset();
+}
+
+inline const hkArray<hkpRootCdBodyPair, hkContainerHeapAllocator>& hkpAllCdBodyPairCollector::getHits() const {
+    return m_hits;
+}

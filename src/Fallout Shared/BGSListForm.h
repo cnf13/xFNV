@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 
 // A form list (FLST): an ordered list of forms, plus the number of forms scripts added to it at run time.

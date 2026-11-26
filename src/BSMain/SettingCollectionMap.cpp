@@ -1,9 +1,7 @@
-#include "BSMain/SettingCollectionMap.h"
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
 

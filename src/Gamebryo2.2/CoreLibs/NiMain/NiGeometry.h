@@ -78,3 +78,57 @@ public:
 };
 
 NiSmartPointer(NiGeometry);
+
+inline NiGeometryData* NiGeometry::GetModelData() const {
+    return m_spModelData;
+}
+
+inline NiPoint3* NiGeometry::GetVertices() {
+    return this->m_spModelData->m_pkVertex;
+}
+
+inline void NiGeometry::SetModelBound(const NiBound& kBound) {
+    m_spModelData->SetBound(kBound);
+}
+
+inline NiPoint3* NiGeometry::GetNormals() {
+    return m_spModelData->GetNormals();
+}
+
+inline NiColorA* NiGeometry::GetColors() {
+    return m_spModelData->GetColors();
+}
+
+inline NiPoint2* NiGeometry::GetTextures() {
+    NiGeometryData* pModelData = m_spModelData;
+    return pModelData->m_pkTexture;
+}
+
+inline void NiGeometry::SetShader(BSShader* pkShader) {
+    this->m_spShader = pkShader;
+}
+
+inline void NiGeometry::SetConsistency(NiGeometryData::Consistency eConsistency) {
+    NiGeometryData* pModelData = this->m_spModelData;
+    pModelData->SetConsistency(eConsistency);
+}
+
+// The shared model-data getter's class (TESActorBaseData) has its field at another offset than m_usVertices with
+// 8-byte pointers, so the field is read directly.
+inline uint16_t NiGeometry::GetVertexCount() {
+    return this->m_spModelData->m_usVertices;
+}
+
+// The m_kBound field is read directly from the model data (the exe's shared getter has another class's offset, which
+// differs with 8-byte pointers).
+inline NiBound& NiGeometry::GetModelBound() {
+    return this->m_spModelData->m_kBound;
+}
+
+// The additional geometry data of the model data, null without model data.
+inline NiAdditionalGeometryData* NiGeometry::GetAdditionalGeometryData() {
+    if (!m_spModelData) {
+        return nullptr;
+    }
+    return m_spModelData->GetAdditionalGeometryData();
+}

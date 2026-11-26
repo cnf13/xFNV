@@ -1,6 +1,7 @@
 #include "Fallout Shared/ExperiencePoints.h"
 
 #include "BSMain/Setting.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 
 XPActivitySettingPairs s_xpRewardKillOpponent{
     {&iXPLevelKillCreatureVeryEasy, &iXPRewardKillOpponentVeryEasy},

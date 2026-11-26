@@ -68,10 +68,6 @@ void BSBipNode::UpdateBipOnly(float afTime, NiAVObject* apAccumRoot) {
     bhkNiCollisionObject::SetSyncMode(bhkNiCollisionObject::SYNC_BOTH);
 }
 
-void bhkNiCollisionObject::SetSyncMode(bhkNiCollisionObject::SYNCMODE aeMode) {
-    eHavokSyncMode = aeMode;
-}
-
 void BSTransCon::UpdateAllButTarget(float afTime, bool abSkipSelectiveUpdateTest) {
     if (GetActive() && m_usNumInterps) {
         int32_t i;
@@ -109,24 +105,4 @@ void BSTransCon::UpdateAllButTarget(float afTime, bool abSkipSelectiveUpdateTest
             }
         }
     }
-}
-
-void NiAVObject::UpdateObjectControllers(NiUpdateData& UpdateData, bool bProperties) {
-    if (bProperties && static_cast<uint8_t>(QHasPropController())) {
-        auto* pkPosition = m_kPropertyList.GetHeadPos();
-        while (pkPosition) {
-            NiPointer<NiProperty>& spProperty = m_kPropertyList.GetNext(pkPosition);
-            NiProperty* pkProperty = spProperty;
-            if (pkProperty && pkProperty->GetControllers()) {
-                pkProperty->Update(UpdateData);
-            }
-        }
-    }
-    for (NiTimeController* pkController = GetControllers(); pkController; pkController = pkController->GetNext()) {
-        pkController->Update(UpdateData);
-    }
-}
-
-void NiAVObject::SetRotate_0(const NiQuaternion& kQuat) {
-    kQuat.ToRotation(m_kLocal.m_Rotate);
 }

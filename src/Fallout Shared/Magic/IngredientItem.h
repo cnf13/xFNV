@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEquipType.h"
 #include "Fallout Shared/Magic/MagicItemObject.h"

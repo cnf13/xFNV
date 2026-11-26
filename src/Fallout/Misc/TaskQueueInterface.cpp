@@ -3,6 +3,7 @@
 #include "BSCore/BSScrapArray.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkWorld.h"
@@ -1168,32 +1169,4 @@ void TaskQueueInterface::TaskUnpackFunc(const BSPackedTask& arTask) {
             return;
         }
     }
-}
-
-BSParallelArrayTask::BSParallelArrayTask(TaskFunc_t apTaskFunc, void* apData, uint32_t aiSize)
-  : pTaskFunc(apTaskFunc), pData(apData), iSize(aiSize), iIndex(0) {}
-
-bool BSPackedTaskQueue::IsEmpty() {
-    return Queue.IsEmpty();
-}
-
-// Runs the queued tasks until none is left and the semaphore holds no count. The loop leaves only when TryPop failed,
-// so the result is always false.
-bool BSPackedTaskQueue::Process() {
-    bool bResult;
-    BSPackedTask task;
-    bProcessing = true;
-    bResult = true;
-    while (bResult || Queue.semaphore.iCount > 0) {
-        bResult = static_cast<BSTMessageQueue*>(&Queue)->TryPop(&task);
-        if (bResult) {
-            pUnpackFunc(&task);
-        }
-    }
-    bProcessing = false;
-    return bResult;
-}
-
-float NiAVObject::GetWorldBoundRadius() {
-    return GetWorldBound().m_fRadius;
 }

@@ -114,3 +114,5 @@ char* NiVertexColorProperty::GetViewerString(const char* apcPrefix, LightingMode
     }
     return pcString;
 }
+
+NiVertexColorProperty::~NiVertexColorProperty() {}

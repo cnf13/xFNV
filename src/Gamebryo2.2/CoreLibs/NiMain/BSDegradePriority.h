@@ -23,3 +23,7 @@ public:
     // A PRIORITY_STATE, stored as a byte.
     uint8_t cState;
 };
+
+inline PRIORITY_STATE BSDegradePriority::QState() {
+    return static_cast<PRIORITY_STATE>(cState);
+}

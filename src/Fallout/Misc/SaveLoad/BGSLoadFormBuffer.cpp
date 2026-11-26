@@ -1,6 +1,6 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/AI/Actor.h"

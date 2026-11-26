@@ -197,18 +197,6 @@ protected:
     static MemoryManager s_Instance;
 };
 
-// The engine's CRT free.
-void ourFree(void* apPtr);
-// The engine's CRT malloc.
-void* ourMalloc(uint32_t aSize);
-// The engine's CRT realloc (defined in ExtraDataList.cpp).
-void* ourRealloc(void* apPtr, uint32_t aSize);
-// The engine's zeroing allocator.
-void* ourCalloc(uint32_t aNum, uint32_t aSize);
-// The engine's memset wrapper (it calls the CRT memset and returns its result).
-void* ourMemset(void* apDest, int32_t aiValue, uint32_t aCount);
-// The engine's memcpy wrapper: it calls the CRT memcpy and returns its result. Defined in BGSDehydration.cpp.
-void* ourMemcpy(void* apDest, const void* apSrc, size_t aCount);
 // The calling thread's memory context, MemoryManager::eMemContext (the exe's inlined sites read and write it directly).
 // Defined in EffectItem.cpp.
 MEM_CONTEXT QMemContext();
@@ -250,3 +238,11 @@ inline PoolNameText aPool48{"Pool 48"};
 
 // Compared unsigned against 0x3A98.
 inline uint32_t uiReallocOnCrossPageBoundaryPaddingST;
+
+inline MEM_CONTEXT QMemContext() {
+    return MemoryManager::eMemContext;
+}
+
+inline void SetMemContext(MEM_CONTEXT aeContext) {
+    MemoryManager::eMemContext = aeContext;
+}

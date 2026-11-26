@@ -4,21 +4,21 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/BSTaskManager.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
+#include "BSMain/ThreadSafeStructures.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSSystem/Archive.h"
-#include "Fallout Shared/BSTaskThread.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Fallout Shared/KFModel.h"
-#include "Fallout Shared/LockFreeMap.h"
 #include "Fallout Shared/TESAnimGroup.h"
 #include "Fallout Shared/TESBipedModelForm.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"
 
@@ -44,9 +44,6 @@ class TESObjectCELL;
 class TESObjectTREE;
 struct TESTextureListArray;
 struct TREE_BILLBOARD_DATA;
-
-template <class T>
-class LockFreeQueue;
 
 // A loaded model file, shared by everything that uses it and counted twice: by the clones in use and by the
 // holders that keep it loaded on purpose.
@@ -92,496 +89,6 @@ inline void NiIncRefCount(Model* apModel) {
 
 inline void NiDecRefCount(Model* apModel) {
     apModel->DecRefCount();
-}
-
-// A lock-free map keyed by file name.
-template <class Data>
-class LockFreeStringMap : public LockFreeMap<const char*, Data> {
-public:
-    // A walk that keeps a copy of the last key in its own buffer (LastKey points at pBuffer).
-    class LockFreeStringMapIterator : public LockFreeMap<const char*, Data>::LockFreeMapIterator {
-    public:
-        // The key buffer is empty and LastKey points at it.
-        LockFreeStringMapIterator() {
-            this->LastKey = pBuffer;
-            pBuffer[0] = 0;
-        }
-
-        // Forgets the last key returned: empties the key buffer.
-        void ClearKey() override {
-            pBuffer[0] = 0;
-        }
-
-        static void operator delete(void* apMemory) {
-            ourFree(apMemory);
-        }
-
-        char pBuffer[0x104];
-    };
-
-    LockFreeStringMap(uint32_t aiMaxThreads, uint32_t aiNumBuckets, uint32_t aiDeleteBatchSize)
-      : LockFreeMap<const char*, Data>(aiMaxThreads, aiNumBuckets, aiDeleteBatchSize) {}
-
-    // Empties the map while this class's DeleteKey still frees the keys.
-    ~LockFreeStringMap() override {
-        this->RemoveAll(true);
-    }
-
-    // The key's bucket: the string's hash (h = h * 33 + c over its chars) modulo uiNumBuckets. The model, KF and file
-    // maps share one body.
-    uint32_t GetBucketForKey(const char* apKey) override;
-    // Frees a key CopyKey made, with ourFree. One body for the string maps and the case-insensitive ones.
-    void DeleteKey(const char* apKey) override;
-    // A copy of the key the map keeps: BSstrlen + 1 bytes from ourMalloc under an AutoMemContext, filled with BSstrcpy.
-    // One body for the three maps.
-    const char* CopyKey(const char* apKey) override;
-    // Copies the key into the buffer arpCopiedKey points at (an iterator's key buffer), at most 0x100 bytes, with
-    // BSstrcpy. One body for the string maps and the case-insensitive ones.
-    void CopyKeyDirect(const char* apKey, const char*& arpCopiedKey) override;
-    // The keys are compared as strings with strcmp (>= 0).
-    bool IsKeyGreaterOrEqual(const char* apKey1, const char* apKey2) override;
-    // The keys are compared as strings with strcmp (equal when it returns 0).
-    bool IsKeyEqual(const char* apKey1, const char* apKey2) override;
-
-    static void operator delete(void* apMemory) {
-        ourFree(apMemory);
-    }
-};
-
-// The string's hash: h = h * 33 + c over its chars, each sign-extended.
-template <class Data>
-uint32_t LockFreeStringMap<Data>::GetBucketForKey(const char* apKey) {
-    uint32_t uiHash = 0;
-    while (*apKey) {
-        uiHash = *apKey++ + 33 * uiHash;
-    }
-    return uiHash % this->uiNumBuckets;
-}
-
-// The key is the copy CopyKey allocated.
-template <class Data>
-void LockFreeStringMap<Data>::DeleteKey(const char* apKey) {
-    ourFree(const_cast<char*>(apKey));
-}
-
-template <class Data>
-const char* LockFreeStringMap<Data>::CopyKey(const char* apKey) {
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    uint32_t uiSize = BSstrlen(apKey) + 1;
-    char* pCopy = static_cast<char*>(ourMalloc(uiSize));
-    BSstrcpy(pCopy, static_cast<int32_t>(uiSize), apKey);
-    return pCopy;
-}
-
-// The destination key points at the iterator's buffer, which the copy writes through.
-template <class Data>
-void LockFreeStringMap<Data>::CopyKeyDirect(const char* apKey, const char*& arpCopiedKey) {
-    BSstrcpy(const_cast<char*>(arpCopiedKey), 256, apKey);
-}
-
-template <class Data>
-bool LockFreeStringMap<Data>::IsKeyGreaterOrEqual(const char* apKey1, const char* apKey2) {
-    return std::strcmp(apKey1, apKey2) >= 0;
-}
-
-template <class Data>
-bool LockFreeStringMap<Data>::IsKeyEqual(const char* apKey1, const char* apKey2) {
-    return std::strcmp(apKey1, apKey2) == 0;
-}
-
-// A lock-free map keyed by file name, compared without case: each override lower-cases the key, character by character
-// through the CRT's tolower, before LockFreeMap's own slot or the hash sees it.
-template <class Data>
-class LockFreeCaseInsensitiveStringMap : public LockFreeStringMap<Data> {
-public:
-    using LockFreeStringMap<Data>::SetAt;
-
-    LockFreeCaseInsensitiveStringMap(uint32_t aiMaxThreads, uint32_t aiNumBuckets, uint32_t aiDeleteBatchSize)
-      : LockFreeStringMap<Data>(aiMaxThreads, aiNumBuckets, aiDeleteBatchSize) {}
-
-    ~LockFreeCaseInsensitiveStringMap() override;
-
-    // GetAt with the key lower-cased into a 1000-byte buffer.
-    bool GetAt(const char* apKey, Data& aData) override;
-    // The key overload of SetAt with the key lower-cased into a 1000-byte buffer.
-    bool SetAt(const char* apKey, const Data& aData, bool abReplaceExisting) override;
-    // RemoveAt with the key lower-cased into a 1000-byte buffer.
-    bool RemoveAt(const char* apKey) override;
-    // The lower-cased string's hash (h = h * 33 + c) modulo uiNumBuckets.
-    uint32_t GetBucketForKey(const char* apKey) override;
-    // Returns a lower-cased copy of the key, BSstrlen + 1 bytes from ourMalloc under an AutoMemContext.
-    const char* CopyKey(const char* apKey) override;
-};
-template <class Data>
-LockFreeCaseInsensitiveStringMap<Data>::~LockFreeCaseInsensitiveStringMap() {}
-
-// Each override lower-cases the key character by character through tolower (each char passed sign-extended) before
-// LockFreeMap's own member or the hash sees it.
-template <class Data>
-bool LockFreeCaseInsensitiveStringMap<Data>::GetAt(const char* apKey, Data& aData) {
-    char acLowerKey[1000];
-    char* pDest = acLowerKey;
-    while (*apKey) {
-        *pDest++ = static_cast<char>(std::tolower(*apKey++));
-    }
-    *pDest = 0;
-    return LockFreeMap<const char*, Data>::GetAt(acLowerKey, aData);
-}
-
-template <class Data>
-bool LockFreeCaseInsensitiveStringMap<Data>::SetAt(const char* apKey, const Data& aData, bool abReplaceExisting) {
-    char acLowerKey[1000];
-    char* pDest = acLowerKey;
-    while (*apKey) {
-        *pDest++ = static_cast<char>(std::tolower(*apKey++));
-    }
-    *pDest = 0;
-    return LockFreeMap<const char*, Data>::SetAt(acLowerKey, aData, abReplaceExisting);
-}
-
-template <class Data>
-bool LockFreeCaseInsensitiveStringMap<Data>::RemoveAt(const char* apKey) {
-    char acLowerKey[1000];
-    char* pDest = acLowerKey;
-    while (*apKey) {
-        *pDest++ = static_cast<char>(std::tolower(*apKey++));
-    }
-    *pDest = 0;
-    return LockFreeMap<const char*, Data>::RemoveAt(acLowerKey);
-}
-
-template <class Data>
-uint32_t LockFreeCaseInsensitiveStringMap<Data>::GetBucketForKey(const char* apKey) {
-    uint32_t uiHash = 0;
-    while (*apKey) {
-        uiHash = std::tolower(*apKey++) + 33 * uiHash;
-    }
-    return uiHash % this->uiNumBuckets;
-}
-
-template <class Data>
-const char* LockFreeCaseInsensitiveStringMap<Data>::CopyKey(const char* apKey) {
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    char* pCopy = static_cast<char*>(ourMalloc(BSstrlen(apKey) + 1));
-    char* pDest = pCopy;
-    while (*apKey) {
-        *pDest++ = static_cast<char>(std::tolower(*apKey++));
-    }
-    *pDest = 0;
-    return pCopy;
-}
-
-// A lock-free FIFO queue.
-template <class T>
-class LockFreeQueue : public InterfacedClass {
-public:
-    // A queued element: the next node and the queued item.
-    class LockFreeQueueNode {
-    public:
-        LockFreeQueueNode() : pNext(nullptr), Data() {}
-
-        // A deleted node is linked into its interface's delete list through Data's storage: the word
-        // at Data is the next node. The items are pointers and NiPointers, released before the link is stored.
-        LockFreeQueueNode* GetNextDelete() {
-            static_assert(sizeof(T) >= sizeof(LockFreeQueueNode*), "the delete link lives in Data");
-            LockFreeQueueNode* pNextDelete;
-            std::memcpy(&pNextDelete, static_cast<const void*>(&Data), sizeof(pNextDelete));
-            return pNextDelete;
-        }
-
-        void SetNextDelete(LockFreeQueueNode* apNextDelete) {
-            static_assert(sizeof(T) >= sizeof(LockFreeQueueNode*), "the delete link lives in Data");
-            std::memcpy(static_cast<void*>(&Data), &apNextDelete, sizeof(apNextDelete));
-        }
-
-        static void operator delete(void* apMemory) {
-            ourFree(apMemory);
-        }
-
-        LockFreeQueueNode* pNext;
-        T Data;
-    };
-
-    // The per-thread interface of a queue: the nodes the thread has pinned and the nodes it has deleted.
-    class LockFreeQueueInterface : public InterfacedClass::BaseInterface {
-    public:
-        LockFreeQueueInterface(LockFreeQueue* apOwner, LockFreeQueueNode** apNode, LockFreeQueueNode** apData)
-          : InterfacedClass::BaseInterface{apOwner}, pReferencedNodes{apNode, apData}, iDeleteCount(0),
-            pDeleteHead(nullptr) {}
-
-        ~LockFreeQueueInterface() {
-            while (iDeleteCount) {
-                ScanForDeletedNodes();
-            }
-        }
-
-        // Appends arData at the tail: a node from the task memory context, linked in by CompareAndSwapEx, then the
-        // owner's count incremented. Defined per instantiation (see the specializations below).
-        void Push(const T& arData);
-        // Takes the item at the head into arData; false when the queue is empty. The
-        // instantiation's body is the specialization below.
-        bool Pop(T& arData);
-        // Puts apNode on the delete list and scans it once the list reaches the owner's batch size.
-        // Defined per instantiation (see the specialization below).
-        void DeleteNode(LockFreeQueueNode* apNode);
-        // Frees the nodes of the delete list no thread has pinned and keeps the pinned ones.
-        // Defined per instantiation (see the specialization below).
-        void ScanForDeletedNodes();
-
-        static void operator delete(void* apMemory) {
-            ourFree(apMemory);
-        }
-
-        LockFreeQueueNode** pReferencedNodes[2];
-        uint32_t iDeleteCount;
-        LockFreeQueueNode* pDeleteHead;
-    };
-
-    LockFreeQueue(uint32_t aiMaxThreads, uint32_t aiDeleteBatchSize);
-    ~LockFreeQueue() override;
-
-    // Builds the per-thread interface of thread aiNum.
-    BaseInterface* AllocateInterface(uint32_t aiNum) override;
-    // Slots 2-4: the queued item count.
-    virtual void IncrementCount();
-    virtual void DecrementCount();
-    virtual uint32_t GetCount();
-
-    // Takes the item at the head into arData through the calling thread's interface, under the lock; false when the
-    // queue is empty.
-    bool Pop(T& arData);
-    // Appends aData at the tail through the calling thread's interface, under the lock.
-    void Push(const T& aData);
-    // Frees every node and the interface manager under the lock; unless abCalledByDestructor, gives the queue a new
-    // empty node and a new interface manager for as many threads.
-    void RemoveAll(bool abCalledByDestructor);
-
-    // The calling thread's interface of the queue.
-    LockFreeQueueInterface* GetInterface() {
-        return static_cast<LockFreeQueueInterface*>(pInterfaceManager->GetInterface(this));
-    }
-
-    // The most threads the queue hands interfaces to (the manager at +0x14, as in LockFreeMap).
-    uint32_t GetMaxThreads() {
-        return pInterfaceManager->GetMaxThreads();
-    }
-
-    static void operator delete(void* apMemory) {
-        ourFree(apMemory);
-    }
-
-    LockFreeQueueNode* pHead;
-    LockFreeQueueNode* pTail;
-    uint32_t iDeleteBatchSize;
-    LockFreeQueueNode** pReferencedNodes;
-    ThreadSpecificInterfaceManager* pInterfaceManager;
-    uint32_t iCount;
-    // The four bytes between the count and the lock are the lock's alignment padding, because BSSpinLock is 32-byte
-    // aligned. No code reads or writes them.
-    uint32_t padding1C;
-    BSSpinLock kLock;
-};
-
-// The queue starts with one empty node, as head and tail, and a pinned-node slot pair per thread.
-template <class T>
-LockFreeQueue<T>::LockFreeQueue(uint32_t aiMaxThreads, uint32_t aiDeleteBatchSize)
-  : pHead(new LockFreeQueueNode), pTail(pHead), iDeleteBatchSize(aiDeleteBatchSize),
-    pReferencedNodes(static_cast<LockFreeQueueNode**>(ourMalloc(2 * aiMaxThreads * sizeof(LockFreeQueueNode*)))),
-    pInterfaceManager(new ThreadSpecificInterfaceManager(aiMaxThreads)), iCount(0) {}
-
-template <class T>
-LockFreeQueue<T>::~LockFreeQueue() {
-    RemoveAll(true);
-    ourFree(pReferencedNodes);
-}
-
-// The interface of thread aiNum: its two pinned-node slots, allocated in the task memory context.
-template <class T>
-InterfacedClass::BaseInterface* LockFreeQueue<T>::AllocateInterface(uint32_t aiNum) {
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    return new LockFreeQueueInterface(this, &pReferencedNodes[2 * aiNum], &pReferencedNodes[2 * aiNum + 1]);
-}
-
-template <class T>
-void LockFreeQueue<T>::IncrementCount() {
-    NiAtomicIncrement(iCount);
-}
-
-template <class T>
-void LockFreeQueue<T>::DecrementCount() {
-    NiAtomicDecrement(iCount);
-}
-
-template <class T>
-uint32_t LockFreeQueue<T>::GetCount() {
-    return iCount;
-}
-
-template <class T>
-bool LockFreeQueue<T>::Pop(T& arData) {
-    kLock.Lock(nullptr);
-    bool bResult = GetInterface()->Pop(arData);
-    kLock.Unlock();
-    return bResult;
-}
-
-template <class T>
-void LockFreeQueue<T>::Push(const T& aData) {
-    kLock.Lock(nullptr);
-    GetInterface()->Push(aData);
-    kLock.Unlock();
-}
-
-// Under the lock and in the task memory context: drops the interface manager with every thread's interface (the
-// standalone manager does not know their class, so the queue deletes them here), frees every node with its item
-// released; unless abCalledByDestructor, a new empty node and a new manager for as many threads.
-template <class T>
-void LockFreeQueue<T>::RemoveAll(bool abCalledByDestructor) {
-    kLock.Lock(nullptr);
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    uint32_t uiMaxThreads = GetMaxThreads();
-    if (pInterfaceManager) {
-        for (uint32_t i = 0; i < pInterfaceManager->GetMaxThreads(); ++i) {
-            delete static_cast<LockFreeQueueInterface*>(pInterfaceManager->pInterfaces[i].pInterface);
-        }
-        delete pInterfaceManager;
-    }
-    pInterfaceManager = nullptr;
-    iCount = 0;
-    while (pHead) {
-        LockFreeQueueNode* pNext = pHead->pNext;
-        pHead->Data = T();
-        delete pHead;
-        pHead = pNext;
-    }
-    if (!abCalledByDestructor) {
-        pHead = new LockFreeQueueNode;
-        pTail = pHead;
-        pInterfaceManager = new ThreadSpecificInterfaceManager(uiMaxThreads);
-    }
-    kLock.Unlock();
-}
-
-// Allocates the node in the task memory context, then links it after the tail with compare-and-swap, helping a lagging
-// tail along first; the tail is moved to the new node last. The tail is pinned while it is read. A node link is swapped
-// as an untyped pointer word, so the link's address is passed as one.
-template <class T>
-void LockFreeQueue<T>::LockFreeQueueInterface::Push(const T& arData) {
-    LockFreeQueue* pQueue = static_cast<LockFreeQueue*>(pOwner);
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    LockFreeQueueNode* pNewNode = new LockFreeQueueNode;
-    pNewNode->Data = arData;
-    LockFreeQueueNode* pTail;
-    while (true) {
-        pTail = pQueue->pTail;
-        *pReferencedNodes[0] = pTail;
-        if (pTail != pQueue->pTail) {
-            continue;
-        }
-        LockFreeQueueNode* pNext = pTail->pNext;
-        if (pTail != pQueue->pTail) {
-            continue;
-        }
-        if (pNext) {
-            CompareAndSwapEx(reinterpret_cast<void* volatile*>(&pQueue->pTail), pNext, pTail);
-            continue;
-        }
-        if (CompareAndSwapEx(reinterpret_cast<void* volatile*>(&pTail->pNext), pNewNode, nullptr)) {
-            pQueue->IncrementCount();
-            break;
-        }
-    }
-    CompareAndSwapEx(reinterpret_cast<void* volatile*>(&pQueue->pTail), pNewNode, pTail);
-    *pReferencedNodes[0] = nullptr;
-}
-
-// The head is a dummy node: the item is the next node's, and that node becomes the new dummy head once the
-// compare-and-swap moves the head to it; the old head goes to the delete list. Head and next are pinned while read.
-// The links are swapped as untyped pointer words, as in Push.
-template <class T>
-bool LockFreeQueue<T>::LockFreeQueueInterface::Pop(T& arData) {
-    LockFreeQueue* pQueue = static_cast<LockFreeQueue*>(pOwner);
-    LockFreeQueueNode* pHead;
-    while (true) {
-        pHead = pQueue->pHead;
-        *pReferencedNodes[0] = pHead;
-        if (pHead != pQueue->pHead) {
-            continue;
-        }
-        LockFreeQueueNode* pTail = pQueue->pTail;
-        LockFreeQueueNode* pNext = pHead->pNext;
-        *pReferencedNodes[1] = pNext;
-        if (pHead != pQueue->pHead) {
-            continue;
-        }
-        if (!pNext) {
-            *pReferencedNodes[0] = nullptr;
-            arData = T();
-            return false;
-        }
-        if (pHead == pTail) {
-            CompareAndSwapEx(reinterpret_cast<void* volatile*>(&pQueue->pTail), pNext, pTail);
-            continue;
-        }
-        arData = pNext->Data;
-        if (CompareAndSwapEx(reinterpret_cast<void* volatile*>(&pQueue->pHead), pNext, pHead)) {
-            pQueue->DecrementCount();
-            pNext->Data = T();
-            break;
-        }
-    }
-    *pReferencedNodes[0] = nullptr;
-    *pReferencedNodes[1] = nullptr;
-    DeleteNode(pHead);
-    return true;
-}
-
-// Releases the node's item and links the node into the delete list through the same word; a full batch is scanned.
-template <class T>
-void LockFreeQueue<T>::LockFreeQueueInterface::DeleteNode(LockFreeQueueNode* apNode) {
-    apNode->Data = T();
-    apNode->SetNextDelete(pDeleteHead);
-    pDeleteHead = apNode;
-    ++iDeleteCount;
-    if (iDeleteCount == static_cast<LockFreeQueue*>(pOwner)->iDeleteBatchSize) {
-        ScanForDeletedNodes();
-    }
-}
-
-// Frees the listed nodes no thread has pinned and keeps the others listed. The pinned nodes are copied first, in the
-// task memory context.
-template <class T>
-void LockFreeQueue<T>::LockFreeQueueInterface::ScanForDeletedNodes() {
-    AutoMemContext kMemContext(MEM_CONTEXT_TASK_OVERHEAD);
-    LockFreeQueue* pQueue = static_cast<LockFreeQueue*>(pOwner);
-    uint32_t uiReferencedNodeCount = 2 * pQueue->GetMaxThreads();
-    LockFreeQueueNode** ppReferencedNodes = new LockFreeQueueNode*[uiReferencedNodeCount];
-    std::memcpy(ppReferencedNodes, pQueue->pReferencedNodes, sizeof(LockFreeQueueNode*) * uiReferencedNodeCount);
-    LockFreeQueueNode* pNewDeleteHead = nullptr;
-    uint32_t uiNewDeleteCount = 0;
-    while (pDeleteHead) {
-        LockFreeQueueNode* pNode = pDeleteHead;
-        pDeleteHead = pNode->GetNextDelete();
-        bool bReferenced = false;
-        for (uint32_t i = 0; i < uiReferencedNodeCount; ++i) {
-            if (pNode == ppReferencedNodes[i]) {
-                bReferenced = true;
-                break;
-            }
-        }
-        if (bReferenced) {
-            pNode->SetNextDelete(pNewDeleteHead);
-            pNewDeleteHead = pNode;
-            ++uiNewDeleteCount;
-        }
-        else {
-            pNode->SetNextDelete(nullptr);
-            delete pNode;
-        }
-    }
-    delete[] ppReferencedNodes;
-    pDeleteHead = pNewDeleteHead;
-    iDeleteCount = uiNewDeleteCount;
 }
 
 // The task that attaches a reference's distant 3D on the main thread.
@@ -912,22 +419,13 @@ bool IsFlag1(uint8_t aFlags);
 uint8_t* SetFlag4(bool abValue, uint8_t* apFlags);
 // Whether flag 4 is set.
 bool MLGetFlag4(uint8_t aFlags);
-// Allocates a thread-local storage index through the kernel32 import; returns the index, or
-// 0xFFFFFFFF when none is free.
-uint32_t BSTlsAlloc();
-// Frees a TLS index through the kernel32 import; returns its result.
-void BSTlsFree(uint32_t aiTlsIndex);
 bool MLGetFlag_8(uint8_t aFlags);
-bool CompareAndSwapEx(int32_t* apDestination, int32_t aiExchange, int32_t aiCompare);
-// The pointer-width form of CompareAndSwapEx, used for the node pointers of the lock-free queues and maps.
-bool CompareAndSwapEx(void* volatile* apDestination, void* apExchange, void* apCompare);
 // Copy for a float vector: memmove_s of the elements from [apFirst, apLast) to apDest, returning the end of the copy.
 float* CopyOpt(float* apFirst, float* apLast, float* apDest);
 bool MLGetFlag_16(uint8_t aFlags);
 void MLSetFlag_16(char abSet, uint8_t* apFlags);
 bool MLGetFlag_32(uint8_t aFlags);
 void MLSetFlag_32(char abSet, uint8_t* apFlags);
-int32_t SetTlsValue(uint32_t aiTlsIndex, void* apValue);
 
 NiSmartPointer(QueuedReference);
 
@@ -1351,3 +849,21 @@ inline ModelLoader* pModelLoader;
 // The game settings ModelLoader.cpp defines.
 extern SettingT<INISettingCollection> fLODFadeOutPercent;
 extern SettingT<INISettingCollection> fLODBoundRadiusMult;
+
+// Spins until the loaded-file lock is free, then takes the reference under it.
+inline void LoadedFile::IncRefCount() {
+    while (!LSAccessCrit.TryLock()) {}
+    NiAtomicIncrement(iRefCount);
+    LSAccessCrit.Unlock();
+}
+
+inline void LoadedFile::DecRefCount() {
+    while (!LoadedFile::LSAccessCrit.TryLock()) {
+        ;
+    }
+    NiAtomicDecrement(iRefCount);
+    LoadedFile::LSAccessCrit.Unlock();
+    if (!iRefCount && this) {
+        delete this;
+    }
+}

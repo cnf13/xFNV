@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
@@ -16,5 +17,11 @@ public:
     static void operator delete(void* apMemory);
 };
 
+inline void hkpCollidableCollidableFilter::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}
+
 // The class's reflection record.
 extern hkClass hkpCollidableCollidableFilterClass;
+
+inline hkpCollidableCollidableFilter::~hkpCollidableCollidableFilter() {}

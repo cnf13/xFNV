@@ -1,7 +1,8 @@
 #pragma once
 
+#include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSSystemUtilities/BSSaveDataSystemUtility.h"
 
@@ -14,8 +15,6 @@ class BSSaveDataSystemUtilityFile;
 template <class T>
 class BSSimpleList;
 
-// Prints the formatted text through the CRT's vprintf.
-int32_t BSprintf(const char* apFormat, ...);
 // BSprintf as Havok's error report function (hkErrorReportFunction): bhkWorld's InitSystem hands hkBaseSystem::init
 // BSprintf itself, which prints the report's text as its format.
 void BSprintf_ErrorReport(const char* apText, void* apErrorReportObject);

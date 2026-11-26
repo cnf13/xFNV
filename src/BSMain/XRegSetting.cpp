@@ -2,7 +2,6 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "platform/System.h"
@@ -124,3 +123,5 @@ void RegSettingCollection::Init() {
         SettingT<RegSettingCollection>::pCollection = new RegSettingCollection;
     }
 }
+
+RegSettingCollection::RegSettingCollection() {}

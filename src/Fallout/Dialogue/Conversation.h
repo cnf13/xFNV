@@ -25,12 +25,12 @@ public:
     bool FirstItem();
     int16_t GetDialogueItemIndex(DialogueItem* apDialogueItem);
     DialogueItem* GetDialogueItemByIndex(int16_t aiIndex);
-    uint16_t GetSaveSizeTES();
-    void SaveGameTES();
-    void LoadGameTES();
-    void InitLoadGameTES();
-    void SaveGameBGS(BGSSaveFormBuffer* apBuffer);
-    void LoadGameBGS(BGSLoadFormBuffer* apBuffer);
+    uint16_t GetSaveSize();
+    void SaveGame();
+    void LoadGame();
+    void InitLoadGame();
+    void SaveGame(BGSSaveFormBuffer* apBuffer);
+    void LoadGame(BGSLoadFormBuffer* apBuffer);
     // Both callers (FalloutRadio::StationState::InitLoadGame and DialoguePackage::InitLoadGame) pass their load buffer.
     void InitItem(BGSLoadGameBuffer* apLoadGameBuffer);
     // Precaches each item's voice files.

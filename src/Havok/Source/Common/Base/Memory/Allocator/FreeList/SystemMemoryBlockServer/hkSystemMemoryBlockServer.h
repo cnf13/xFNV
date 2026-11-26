@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkMemoryBlockServer.h"
 
 class hkMemoryAllocator;

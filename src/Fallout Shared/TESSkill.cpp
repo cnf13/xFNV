@@ -1,8 +1,9 @@
 #include "Fallout Shared/TESSkill.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESDescription.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
@@ -22,11 +23,11 @@ static BSStringT<char> sUnreadString0;
 static BSStringT<char> sUnreadString1;
 
 void SKILL_DATA::Endian() {
-    ENDIAN(eIndex, false);
-    ENDIAN(eAttribute, false);
-    ENDIAN(eSpecialization, false);
+    BSEndian(eIndex, false);
+    BSEndian(eAttribute, false);
+    BSEndian(eSpecialization, false);
     for (float& fValue : fActionValue) {
-        ENDIAN(fValue, false);
+        BSEndian(fValue, false);
     }
 }
 

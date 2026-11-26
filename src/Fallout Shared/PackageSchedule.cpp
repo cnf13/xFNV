@@ -4,7 +4,7 @@
 #include "Fallout Shared/TESForm.h"
 
 void PACK_SCHED_DATA::Endian() {
-    ENDIAN(iDuration, false);
+    BSEndian(iDuration, false);
 }
 
 PackageSchedule::PackageSchedule() {

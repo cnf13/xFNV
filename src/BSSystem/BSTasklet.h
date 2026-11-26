@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
+
 class BSTaskletData;
 
 // A handle a tasklet group runs: the data whose Process the tasklet thread calls.
@@ -15,3 +17,15 @@ public:
 
     BSTaskletData* pData;
 };
+
+inline void BSTasklet::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+inline BSTasklet::BSTasklet() : pData(nullptr) {}
+
+inline BSTasklet::~BSTasklet() {}
+
+inline void BSTasklet::SetTaskData(BSTaskletData* apData) {
+    pData = apData;
+}

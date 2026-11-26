@@ -16,3 +16,5 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline BSFadeNodeCuller::BSFadeNodeCuller(NiVisibleArray* apVisSet) : NiCullingProcess(apVisSet) {}

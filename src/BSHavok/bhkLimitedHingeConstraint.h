@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/LimitedHinge/hkpLimitedHingeConstraintData.h"
 
@@ -56,3 +55,19 @@ public:
     uint32_t CreateData() override;
     void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) override;
 };
+
+// The constraint's creation info, from the hkSerializableCinfo CreateCinfo returns, null for none. The downcast goes
+// through a pointer: the result is tested for null before subtracting the base's offset.
+inline hkLimitedHingeConstraintCinfo& bhkLimitedHingeConstraint::GetCinfo() {
+    bool bc;
+    hkSerializableCinfo* pCinfo = &CreateCinfo(bc);
+    return *static_cast<hkLimitedHingeConstraintCinfo*>(pCinfo);
+}
+
+inline void bhkLimitedHingeConstraint::SetMotorActive(bool abActive) {
+    hkpLimitedHingeConstraintData* pData = GetMotor();
+    if (pData) {
+        hkBool kActive(abActive);
+        pData->setMotorActive(**this, kActive);
+    }
+}

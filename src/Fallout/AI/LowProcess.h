@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/PackageLocation.h"
 #include "Fallout/AI/BaseProcess.h"

@@ -1,8 +1,14 @@
 #pragma once
 
 #include "BSHavok/bhkBvTreeShape.h"
+#include "BSHavok/hkBSHeightFieldShape.h"
 
-class hkTriSampledHeightFieldBvTreeShapeCinfo;
+// The construction data of the terrain's triangle-sampled height field shape: hkBvTreeShapeCinfo's user data and
+// shape collection, then the 16-aligned hkBSHeightFieldShapeCinfo base at 0x10.
+class hkTriSampledHeightFieldBvTreeShapeCinfo : public hkBvTreeShapeCinfo, public hkBSHeightFieldShapeCinfo {
+public:
+    hkTriSampledHeightFieldBvTreeShapeCinfo();
+};
 
 // A bounding volume tree over a sampled height field of triangles (the landscape's collision shape). The Havok shape
 // holds the data; this class declares no fields for it.

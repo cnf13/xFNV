@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Font.h"
 #include "Fallout Shared/BGSExplosion.h"
 #include "Fallout Shared/CombatFormulas.h"

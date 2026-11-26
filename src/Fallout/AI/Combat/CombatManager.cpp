@@ -5,7 +5,7 @@
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSTestObjects.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BoltShader.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -526,7 +526,7 @@ void CombatManager::UpdateDebugGeometry() {
     NiPoint3 actorLoc;
     for (CombatGroup* pGroup : CombatGroups) {
         if (pGroup) {
-            pGroup->CreateDebugGeometry(eFalse);
+            pGroup->CreateDebugGeometry(false);
             uint32_t uiMemberCount = pGroup->GetMemberCount();
             for (uint32_t j = 0; j < uiMemberCount; ++j) {
                 Actor* pActor = pGroup->GetMember(j);

@@ -4,7 +4,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESRaceForm.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -224,12 +224,13 @@ public:
     // The NPCs whose faces are character-generation presets.
     static BSSimpleList<TESNPC*> CharGenPresetFaceList;
     static SettingT<GameSettingCollection> iVampirismAgeOffset;
+
+protected:
+    static SettingT<GameSettingCollection> fNPCGeneticVariation;
 };
 
 // The game settings TESNPC.cpp defines.
 extern SettingT<GameSettingCollection> fAttributeClassSecondaryBonus;
 extern SettingT<GameSettingCollection> fAttributeClassPrimaryBonus;
 
-extern SettingT<GameSettingCollection> gs_fNPCGeneticVariation;
-
-extern SettingT<GameSettingCollection> gs_sNoPickPocketAgain;
+extern SettingT<GameSettingCollection> sNoPickpocketAgain;

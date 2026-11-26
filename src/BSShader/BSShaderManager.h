@@ -2,7 +2,6 @@
 
 #include "BSMain/Setting.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
-#include "Fallout Shared/eBool.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPlane.h"
@@ -1127,15 +1126,13 @@ public:
     static void EnableFullScreenScissor(uint32_t uiX0, uint32_t uiY0, uint32_t uiX1, uint32_t uiY1);
     static void DisableFullScreenScissor();
     static void SetIsLiteBrite(bool abLiteBrite);
-    static double CalculateTime(int32_t iDelta);
     static NiTexture* GetSceneDepthTexture();
     static NiFile* DefaultFileCreateFunc(const char* apName, NiFile::OpenMode aeMode, uint32_t auiSize);
     static void ResetNextAvailableShadowMapAccumulator();
     static void SetLoadedRange(tagRECT* apLoadedRect);
     static void RegisterStreamables();
     static BSShaderAccumulator* GetNextAvailableShadowMapAccumulator();
-    static void Free(eBool abFinal);
-    static void Shutdown(eBool abFinal);
+    static void Free(bool abFinal);
 
     static inline bool bOcclusionQuery;
     static inline int32_t usDebugMode;
@@ -1342,6 +1339,34 @@ inline ShaderTarget_t ShaderTarget_ps_3_0{"ps_3_0"};
 extern SettingT<INISettingCollection> bDo30VFog;
 extern SettingT<INISettingCollection> bDoTestHDR;
 
-extern SettingT<INISettingCollection> gs_bImageSpaceEffects_Display;
+extern SettingT<INISettingCollection> bImageSpace;
 
-extern SettingT<RendererSettingCollection> gs_iMaxAnisotropy_Display;
+extern SettingT<RendererSettingCollection> iMaxAnisotropy;
+
+inline float BSShaderManager::GetTimer(bool bDelta) {
+    return fTimerValues[bDelta];
+}
+
+inline int32_t BSSM_ShaderPropertyIsLighting(NiShadeProperty* apShaderProp) {
+    if (!apShaderProp) {
+        return 0;
+    }
+    int32_t iShaderPropertyType = apShaderProp->GetShaderPropertyType();
+    return iShaderPropertyType >= 1 && iShaderPropertyType <= 12;
+}
+
+inline void BSShaderManager::SetWindDirection(NiPoint2 aDirection) {
+    WindDirection = aDirection;
+}
+
+inline void BSShaderManager::SetProjectedShadowTexture(NiTexture* apTexture) {
+    pProjectedShadowTexture = apTexture;
+}
+
+inline void BSShaderManager::SetDebugMode(BSShaderManager::etRenderMode aeDebugMode) {
+    usDebugMode = aeDebugMode;
+}
+
+inline void BSShaderManager::SetFullScreenMotionBlurIronSights(bool abSet) {
+    BSShaderManager::bFullScreenMotionBlurIronSights = abSet;
+}

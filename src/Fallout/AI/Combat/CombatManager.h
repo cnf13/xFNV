@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 #include "Fallout/AI/Combat/CombatTimer.h"

@@ -65,3 +65,17 @@ public:
 };
 
 NiSmartPointer(NiFloatInterpolator);
+
+inline void NiFloatInterpolator::ReplaceKeys(NiFloatKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
+    if (uiNumKeys) {
+        if (!m_spFloatData) {
+            NiFloatData* pkData = new NiFloatData;
+            m_spFloatData = pkData;
+        }
+        m_spFloatData->ReplaceAnim(pkKeys, uiNumKeys, eType);
+        m_uiLastIdx = 0;
+    }
+    else if (m_spFloatData) {
+        m_spFloatData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
+    }
+}

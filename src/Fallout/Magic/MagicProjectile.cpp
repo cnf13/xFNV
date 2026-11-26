@@ -5,7 +5,6 @@
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSCloningProcess.h"

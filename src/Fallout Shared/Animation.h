@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
 #include "Fallout Shared/KFModel.h"
@@ -139,7 +140,7 @@ public:
     bool PlayAnim(BSAnimGroupSequence* apSeq);
     // Marks a playing idle done once its sequence stops, releasing the actor's special idle state.
     void Update(Animation* apAnimation);
-    void LoadGameTES(float afTime, Animation* apAnimation);
+    void LoadGame(float afTime, Animation* apAnimation);
     TESObjectANIO* GetAnimObject(int32_t aiIndex);
 
     // The save size of apAnimIdle's data, block header included.
@@ -176,7 +177,7 @@ public:
     // Clears the blend interpolators of the animation's sequences.
     void ClearBlendInterps();
     // Loads the animation's state from the save buffer.
-    void LoadGameBGS(BGSLoadFormBuffer* apBuffer);
+    void LoadGame(BGSLoadFormBuffer* apBuffer);
     // The group to play in place of ausAnimGroup when it has no sequence.
     uint16_t PickBestAnimation(uint16_t asAnimGroup, bool abRecursive);
     // Whether the special idle is playing.
@@ -345,11 +346,11 @@ protected:
 
 public:
     // Reverts the animation of apRef for a TES-format load.
-    void RevertTES(TESObjectREFR* apRef);
+    void Revert(TESObjectREFR* apRef);
     // Reverts the animation for a BGS-format load.
     void Revert(BGSLoadGameBuffer* apLoadGameBuffer);
     // Saves the animation into apSaveGameBuffer.
-    void SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer);
+    void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
     void SpecialIdleQueue(TESIdleForm* apIdleForm, ANIM_GROUP_SECTION aeSection);
     // The bytes SaveAnimation writes for this animation of apRef.
     uint16_t GetAnimationSaveSize(TESObjectREFR* apRef);
@@ -358,8 +359,8 @@ public:
     char FindNextNoteKey(ANIM_GROUP_SECTION aeSection, const char* apSearchKey, float* apKeyTime);
     bool SpecialIdlePlay(Actor* apActor);
     void AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle);
-    void SaveGameTES(TESForm* apForm);
-    void LoadGameTES(TESObjectREFR* apref);
+    void SaveGame(TESForm* apForm);
+    void LoadGame(TESObjectREFR* apref);
 
     // Clears the interpolators of the controllers on apObj's sub-tree.
     static void ClearControllersInterpolators(NiAVObject* apObj);

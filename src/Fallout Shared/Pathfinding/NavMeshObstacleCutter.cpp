@@ -24,7 +24,7 @@
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
 #include "Fallout/AI/BaseProcess.h"
 #include "Fallout/AI/Combat/CombatGroup.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"

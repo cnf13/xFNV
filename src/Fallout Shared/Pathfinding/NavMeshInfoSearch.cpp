@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/NavMeshInfoSearch.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/DoorLock.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/ExtraDataObjects.h"

@@ -31,7 +31,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPersistentSrcTextureRendererData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
@@ -3159,13 +3159,4 @@ void NiDX9Renderer::AddDisplayFormat(D3DFORMAT aeFormat) {
     );
     pkNode->m_element = aeFormat;
     ms_kDisplayFormats.AddNodeTail(pkNode);
-}
-
-void NiRenderer::SetLastErrorString(const char* pcStr) {
-    if (pcStr) {
-        strncpy_s(ms_acErrorString, sizeof(ms_acErrorString), pcStr, sizeof(ms_acErrorString) - 1);
-    }
-    else {
-        ms_acErrorString[0] = '\0';
-    }
 }

@@ -295,3 +295,22 @@ public:
 
 using a0_0_t = const char[4];
 inline a0_0_t a0_0{"0"};
+
+inline void ShadowLightShader::SetProjectedShadowMaskLL(NiPoint2 aLL) {
+    ShadowLightShader::kShadowProjData.x = aLL.x;
+    ShadowLightShader::kShadowProjData.y = aLL.y;
+}
+
+// Stores the point's two floats straight into the shadow projection transform.
+inline void ShadowLightShader::SetProjectedShadowTranslate(NiPoint2 aTranslate) {
+    kShadowProjTransform.x = aTranslate.x;
+    kShadowProjTransform.y = aTranslate.y;
+}
+
+inline NiDX9ShaderDeclaration* ShadowLightShader::GetDefaultShaderDecl() {
+    return spShaderDecl;
+}
+
+inline NiDX9ShaderDeclaration* ShadowLightShader::GetLandShaderDecl() {
+    return spSplatTexturingShaderDecl;
+}

@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 #include "SDK/MSVC/stdexcept.h"
 #include "SpeedTree/Random.h"

@@ -3,11 +3,14 @@
 #include "BSCore/BSCriticalSection.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/BSXFlags.h"
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/Setting.h"
+#include "BSMain/ThreadSafeStructures.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
@@ -21,9 +24,9 @@
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/GridCell.h"
-#include "Fallout Shared/LockFreeMap.h"
 #include "Fallout Shared/Region System/TESRegionDataLandscape.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/SpeedTree/BSTreeModel.h"
 #include "Fallout Shared/SpeedTree/BSTreeNode.h"
@@ -45,7 +48,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFogProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
@@ -53,6 +55,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SpeedTree/SpeedTreeRT.h"
@@ -60,27 +63,27 @@
 #include <cmath>
 #include <cstdint>
 
-SettingT<GameSettingCollection> gs_fTreeNearDistanceBase("fTreeNearDistanceBase", 2048.0f);
-SettingT<GameSettingCollection> gs_fTreeFarDistanceBase("fTreeFarDistanceBase", 16384.0f);
-SettingT<GameSettingCollection> gs_fTreeSizeConversion("fTreeSizeConversion", 10.0f);
-SettingT<GameSettingCollection> gs_fLeafRustleTimeScale("fLeafRustleTimeScale", 0.5f);
-SettingT<GameSettingCollection> gs_fLeafRockSpeedSwayInfluence("fLeafRockSpeedSwayInfluence", 1.0f);
-SettingT<GameSettingCollection> gs_fLeafRustleSpeedSwayInfluence("fLeafRustleSpeedSwayInfluence", 1.0f);
-SettingT<GameSettingCollection> gs_fLeafRockAmountSwayInfluence("fLeafRockAmountSwayInfluence", 1.0f);
-SettingT<GameSettingCollection> gs_fLeafRustleAmountSwayInfluence("fLeafRustleAmountSwayInfluence", 1.0f);
-SettingT<INISettingCollection> gs_bEnableTrees_SpeedTree("bEnableTrees:SpeedTree", true);
-SettingT<INISettingCollection> gs_fTreeForceCS_SpeedTree("fTreeForceCS:SpeedTree", -1.0f);
-SettingT<INISettingCollection> gs_fTreeForceBranchDimming_SpeedTree("fTreeForceBranchDimming:SpeedTree", -1.0f);
-SettingT<INISettingCollection> gs_fTreeForceLeafDimming_SpeedTree("fTreeForceLeafDimming:SpeedTree", -1.0f);
-SettingT<INISettingCollection> gs_fTreeForceMinBudAngle_SpeedTree("fTreeForceMinBudAngle:SpeedTree", -1.0f);
-SettingT<INISettingCollection> gs_fTreeForceMaxBudAngle_SpeedTree("fTreeForceMaxBudAngle:SpeedTree", -1.0f);
+SettingT<GameSettingCollection> BSTreeManager::fTreeNearDistanceBase("fTreeNearDistanceBase", 2048.0f);
+SettingT<GameSettingCollection> BSTreeManager::fTreeFarDistanceBase("fTreeFarDistanceBase", 16384.0f);
+SettingT<GameSettingCollection> BSTreeManager::fTreeSizeConversion("fTreeSizeConversion", 10.0f);
+SettingT<GameSettingCollection> BSTreeManager::fLeafRustleTimeScale("fLeafRustleTimeScale", 0.5f);
+SettingT<GameSettingCollection> BSTreeManager::fLeafRockSpeedSwayInfluence("fLeafRockSpeedSwayInfluence", 1.0f);
+SettingT<GameSettingCollection> BSTreeManager::fLeafRustleSpeedSwayInfluence("fLeafRustleSpeedSwayInfluence", 1.0f);
+SettingT<GameSettingCollection> BSTreeManager::fLeafRockAmountSwayInfluence("fLeafRockAmountSwayInfluence", 1.0f);
+SettingT<GameSettingCollection> BSTreeManager::fLeafRustleAmountSwayInfluence("fLeafRustleAmountSwayInfluence", 1.0f);
+SettingT<INISettingCollection> BSTreeManager::bEnableTrees("bEnableTrees:SpeedTree", true);
+SettingT<INISettingCollection> BSTreeManager::fTreeForceCS("fTreeForceCS:SpeedTree", -1.0f);
+SettingT<INISettingCollection> BSTreeManager::fTreeForceBranchDimming("fTreeForceBranchDimming:SpeedTree", -1.0f);
+SettingT<INISettingCollection> BSTreeManager::fTreeForceLeafDimming("fTreeForceLeafDimming:SpeedTree", -1.0f);
+SettingT<INISettingCollection> BSTreeManager::fTreeForceMinBudAngle("fTreeForceMinBudAngle:SpeedTree", -1.0f);
+SettingT<INISettingCollection> BSTreeManager::fTreeForceMaxBudAngle("fTreeForceMaxBudAngle:SpeedTree", -1.0f);
 SettingT<GameSettingCollection> BSTreeManager::fTreeWindVariance("fTreeWindVariance", 0.05f);
 SettingT<GameSettingCollection> BSTreeManager::fLeafRockTimeScale("fLeafRockTimeScale", 2.0f);
 SettingT<INISettingCollection> BSTreeManager::bForceFullLOD("bForceFullLOD:SpeedTree", false);
 SettingT<INISettingCollection> BSTreeManager::fTreeLODExponent("fTreeLODExponent:SpeedTree", 1.0f);
 SettingT<INISettingCollection> BSTreeManager::fTreeForceLLA("fTreeForceLLA:SpeedTree", -1.0f);
-SettingT<INISettingCollection> gs_iCanopyShadowScale_SpeedTree("iCanopyShadowScale:SpeedTree", 512);
-SettingT<INISettingCollection> gs_fCanopyShadowGrassMult_SpeedTree("fCanopyShadowGrassMult:SpeedTree", 1.0f);
+SettingT<INISettingCollection> BSTreeManager::iCanopyShadowScale("iCanopyShadowScale:SpeedTree", 512);
+SettingT<INISettingCollection> BSTreeManager::fCanopyShadowGrassMult("fCanopyShadowGrassMult:SpeedTree", 1.0f);
 BSCriticalSection BSTreeManager::kModelCriticalSection;
 
 char SetWindMatrix(uint32_t auiMatrixIndex, float Yaw, float Pitch) {
@@ -106,7 +109,7 @@ char SetWindMatrix(uint32_t auiMatrixIndex, float Yaw, float Pitch) {
     kMatrix._11 = 1.0f;
     D3DXMatrixRotationYawPitchRoll_Thunk(&kMatrix, Yaw, Pitch, 0.0f);
     D3DXMatrixTranspose_Thunk(&kMatrix, &kMatrix);
-    SpeedTreeShader_pWindMatrices[auiMatrixIndex] = kMatrix;
+    SpeedTreeShader::pWindMatrices[auiMatrixIndex] = kMatrix;
     return 1;
 }
 
@@ -125,7 +128,7 @@ BSTreeManager::BSTreeManager()
     CSpeedTreeRT::SetNumWindMatrices(4);
     CSpeedTreeRT::SetDropToBillboard(true);
     CSpeedTreeRT::SetTextureFlip(true);
-    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
+    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(BSTreeManager::iCanopyShadowScale.Int()));
     pBackgroundLoadedTreeMap = new LockFreeMap<TESObjectREFR*, BSTreeNode*>(2u, 37u, 12u);
 }
 
@@ -157,7 +160,7 @@ BSTreeNode* BSTreeManager::CreateTreeForReference(TESObjectREFR* apTreeRefr, TES
     );
     NiPointer<BSTreeModel> spBaseModel(static_cast<BSTreeModel*>(nullptr));
     BSTreeModel* pModel = nullptr;
-    if (!SpeedTree::bEnableTrees::Get() ||
+    if (!BSTreeManager::CanTreesLoad() ||
         !apTreeObj ||
         !apTreeObj->GetModel() ||
         !apTreeObj->GetModelLength() ||
@@ -289,16 +292,18 @@ void BSTreeManager::UpdateWindMatrices() {
         float fYaw = fbaseAngle * fxPercent;
         SetWindMatrix(i, fYaw, fPitch);
     }
-    double dRockAmountBase = 1.0 - gs_fLeafRockAmountSwayInfluence.Float();
-    float frockAmountSway = gs_fLeafRockAmountSwayInfluence.Float() * fSwayAmount / 2.0 + dRockAmountBase;
-    double dRustleAmountBase = 1.0 - gs_fLeafRustleAmountSwayInfluence.Float();
-    float frustleAmountSway = gs_fLeafRustleAmountSwayInfluence.Float() * fSwayAmount / 2.0 + dRustleAmountBase;
-    double dRockSpeedBase = 1.0 - gs_fLeafRockSpeedSwayInfluence.Float();
-    float frockSpeedSway = gs_fLeafRockSpeedSwayInfluence.Float() * fSwayAmount / 2.0 + dRockSpeedBase;
-    double dRustleSpeedBase = 1.0 - gs_fLeafRustleSpeedSwayInfluence.Float();
-    float frustleSpeedSway = gs_fLeafRustleSpeedSwayInfluence.Float() * fSwayAmount / 2.0 + dRustleSpeedBase;
+    double dRockAmountBase = 1.0 - BSTreeManager::fLeafRockAmountSwayInfluence.Float();
+    float frockAmountSway = BSTreeManager::fLeafRockAmountSwayInfluence.Float() * fSwayAmount / 2.0 + dRockAmountBase;
+    double dRustleAmountBase = 1.0 - BSTreeManager::fLeafRustleAmountSwayInfluence.Float();
+    float frustleAmountSway = BSTreeManager::fLeafRustleAmountSwayInfluence.Float() * fSwayAmount / 2.0 +
+        dRustleAmountBase;
+    double dRockSpeedBase = 1.0 - BSTreeManager::fLeafRockSpeedSwayInfluence.Float();
+    float frockSpeedSway = BSTreeManager::fLeafRockSpeedSwayInfluence.Float() * fSwayAmount / 2.0 + dRockSpeedBase;
+    double dRustleSpeedBase = 1.0 - BSTreeManager::fLeafRustleSpeedSwayInfluence.Float();
+    float frustleSpeedSway = BSTreeManager::fLeafRustleSpeedSwayInfluence.Float() * fSwayAmount / 2.0 +
+        dRustleSpeedBase;
     double dSeconds = appTimer.fDelta;
-    float fRustleTimeScale = gs_fLeafRustleTimeScale.Float() * dSeconds * frustleSpeedSway;
+    float fRustleTimeScale = BSTreeManager::fLeafRustleTimeScale.Float() * dSeconds * frustleSpeedSway;
     dSeconds = appTimer.fDelta;
     float fRockTimeScale = BSTreeManager::fLeafRockTimeScale.Float() * dSeconds * frockSpeedSway;
     float fRustleAmount = fWindSpeed * frustleAmountSway;
@@ -416,7 +421,7 @@ void BSTreeManager::ClearModelCache(bool abClearManagerOnlyHeldOnly) {
 
 // Tests the flag's whole byte, so the byte is read as an integer.
 bool BSTreeManager::GetTreesEnabled() {
-    return SpeedTree::bEnableTrees::Get() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowTrees) != 0;
+    return BSTreeManager::CanTreesLoad() && reinterpret_cast<const uint8_t&>(GetInstance(true)->bShowTrees) != 0;
 }
 
 // Tests the flag's whole byte, so the byte is read as an integer.
@@ -426,14 +431,14 @@ bool BSTreeManager::AreLeavesVisible() {
 
 // Keeps the base distance as a double and rounds the product to a float.
 float BSTreeManager::GetNearDistance() {
-    double dBase = GameSetting::fTreeNearDistanceBase::Get();
-    return static_cast<float>(gs_fLODMultTrees_LOD.Float() * dBase);
+    double dBase = BSTreeManager::GetNearDistanceBase();
+    return static_cast<float>(BSFadeNode::fLODMultTrees.Float() * dBase);
 }
 
 // Keeps the base distance as a double and rounds the product to a float.
 float BSTreeManager::GetFarDistance() {
-    double dBase = GameSetting::fTreeFarDistanceBase::Get();
-    return static_cast<float>(gs_fLODMultTrees_LOD.Float() * dBase);
+    double dBase = BSTreeManager::GetFarDistanceBase();
+    return static_cast<float>(BSFadeNode::fLODMultTrees.Float() * dBase);
 }
 
 NiTexture* BSTreeManager::GetCanopyShadow() {
@@ -514,8 +519,8 @@ void BSTreeManager::Update(NiCamera* apCamera, bool abMenuMode) {
         BSTreeManager::GetInstance(true)->UpdateWindMatrices();
     }
     // SetProjectedShadowScale takes an unsigned int.
-    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(gs_iCanopyShadowScale_SpeedTree.Int()));
-    SpeedTree::fCanopyShadowGrassMult::Set(gs_fCanopyShadowGrassMult_SpeedTree.Float());
+    ShadowLightShader::SetProjectedShadowScale(static_cast<uint32_t>(BSTreeManager::iCanopyShadowScale.Int()));
+    TallGrassShader::SetProjShadowMult(BSTreeManager::fCanopyShadowGrassMult.Float());
 }
 
 void BSTreeManager::SetForceFullLOD(bool abForce) {
@@ -551,35 +556,4 @@ void BSTreeManager::Destroy() {
         delete pTreeManager;
         pTreeManager = nullptr;
     }
-}
-
-// NaN is sent to 0.
-void SpeedTree::fCanopyShadowGrassMult::Set(float afValue) {
-    float fValue;
-    if (!(afValue >= 0.0)) {
-        fValue = 0.0f;
-    }
-    else if (afValue > 1.0) {
-        fValue = 1.0f;
-    }
-    else {
-        fValue = afValue;
-    }
-    TallGrassShader::fProjShadowMult = fValue;
-}
-
-float GameSetting::fTreeNearDistanceBase::Get() {
-    return gs_fTreeNearDistanceBase.Float();
-}
-
-float GameSetting::fTreeFarDistanceBase::Get() {
-    return gs_fTreeFarDistanceBase.Float();
-}
-
-float GameSetting::fTreeSizeConversion::Get() {
-    return gs_fTreeSizeConversion.Float();
-}
-
-void BSShaderManager::SetProjectedShadowTexture(NiTexture* apTexture) {
-    pProjectedShadowTexture = apTexture;
 }

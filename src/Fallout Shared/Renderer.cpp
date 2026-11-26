@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSDevices/XPrefSettings.h"
 #include "BSMain/BSUtilities.h"
@@ -25,6 +26,7 @@
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
 #include "Fallout Shared/TES.h"
+#include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESNPC.h"
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESRace.h"
@@ -45,7 +47,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDevImageConverter.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiImageConverter.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
@@ -54,6 +55,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/ADL/adl_structures.h"
 #include "SDK/MSVC/stdio.h"
@@ -85,10 +87,10 @@ SettingT<INISettingCollection> Renderer::bUseRefractionShader("bUseRefractionSha
 SettingT<RendererSettingCollection> Renderer::bDrawShadows("bDrawShadows:Display", false);
 SettingT<RendererSettingCollection> Renderer::iShadowMode("iShadowMode:Display", 3);
 SettingT<INISettingCollection> Renderer::bDoCanopyShadowPass("bDoCanopyShadowPass:Display", true);
-SettingT<INISettingCollection> gs_bDoAmbientPass_Display("bDoAmbientPass:Display", true);
-SettingT<INISettingCollection> gs_bDoDiffusePass_Display("bDoDiffusePass:Display", true);
-SettingT<INISettingCollection> gs_bDoSpecularPass_Display("bDoSpecularPass:Display", true);
-SettingT<INISettingCollection> gs_bDoTexturePass_Display("bDoTexturePass:Display", true);
+SettingT<INISettingCollection> Renderer::bDoAmbientPass("bDoAmbientPass:Display", true);
+SettingT<INISettingCollection> Renderer::bDoDiffusePass("bDoDiffusePass:Display", true);
+SettingT<INISettingCollection> Renderer::bDoSpecularPass("bDoSpecularPass:Display", true);
+SettingT<INISettingCollection> Renderer::bDoTexturePass("bDoTexturePass:Display", true);
 SettingT<INISettingCollection> Renderer::bDoActorShadows("bDoActorShadows:Display", true);
 SettingT<INISettingCollection> Renderer::bDoStaticAndArchShadows("bDoStaticAndArchShadows:Display", false);
 SettingT<INISettingCollection> Renderer::bForceMultiPass("bForceMultiPass:Display", true);
@@ -138,21 +140,16 @@ SettingT<INISettingCollection> Renderer::fEyeAdaptSpeed("fEyeAdaptSpeed:BlurShad
 SettingT<INISettingCollection> Renderer::fEmissiveHDRMult("fEmissiveHDRMult:BlurShaderHDR", 1.0f);
 SettingT<INISettingCollection> Renderer::fTreeDimmer("fTreeDimmer:BlurShaderHDR", 1.2f);
 SettingT<INISettingCollection> Renderer::fGrassDimmer("fGrassDimmer:BlurShaderHDR", 1.3f);
-static SettingT<INISettingCollection> gs_fUpperLUMClamp_BlurShaderHDR("fUpperLUMClamp:BlurShaderHDR", 1.0f);
-static SettingT<INISettingCollection> gs_fTargetLUM_BlurShaderHDR("fTargetLUM:BlurShaderHDR", 1.2f);
-static SettingT<INISettingCollection>
-    gs_iNumBlurpasses_BlurShaderHDRInterior("iNumBlurpasses:BlurShaderHDRInterior", 1);
-static SettingT<INISettingCollection> gs_fBlurRadius_BlurShaderHDRInterior("fBlurRadius:BlurShaderHDRInterior", 7.0f);
-static SettingT<INISettingCollection>
-    gs_fBrightClamp_BlurShaderHDRInterior("fBrightClamp:BlurShaderHDRInterior", 0.225f);
-static SettingT<INISettingCollection>
-    gs_fBrightScale_BlurShaderHDRInterior("fBrightScale:BlurShaderHDRInterior", 2.25f);
-static SettingT<INISettingCollection>
-    gs_fEyeAdaptSpeed_BlurShaderHDRInterior("fEyeAdaptSpeed:BlurShaderHDRInterior", 0.5f);
-static SettingT<INISettingCollection>
-    gs_fEmissiveHDRMult_BlurShaderHDRInterior("fEmissiveHDRMult:BlurShaderHDRInterior", 1.0f);
-SettingT<INISettingCollection> Renderer::fUpperLUMClamp("fUpperLUMClamp:BlurShaderHDRInterior", 1.0f);
-SettingT<INISettingCollection> Renderer::fTargetLUM("fTargetLUM:BlurShaderHDRInterior", 1.0f);
+SettingT<INISettingCollection> Renderer::fUpperLUMClamp("fUpperLUMClamp:BlurShaderHDR", 1.0f);
+SettingT<INISettingCollection> Renderer::fTargetLUM("fTargetLUM:BlurShaderHDR", 1.2f);
+SettingT<INISettingCollection> Renderer::iIniBlurPassesHDRInterior("iNumBlurpasses:BlurShaderHDRInterior", 1);
+SettingT<INISettingCollection> Renderer::fIniBlurRadiusHDRInterior("fBlurRadius:BlurShaderHDRInterior", 7.0f);
+SettingT<INISettingCollection> Renderer::fBrightClampInterior("fBrightClamp:BlurShaderHDRInterior", 0.225f);
+SettingT<INISettingCollection> Renderer::fBrightScaleInterior("fBrightScale:BlurShaderHDRInterior", 2.25f);
+SettingT<INISettingCollection> Renderer::fEyeAdaptSpeedInterior("fEyeAdaptSpeed:BlurShaderHDRInterior", 0.5f);
+SettingT<INISettingCollection> Renderer::fEmissiveHDRMultInterior("fEmissiveHDRMult:BlurShaderHDRInterior", 1.0f);
+SettingT<INISettingCollection> Renderer::fUpperLUMClampInterior("fUpperLUMClamp:BlurShaderHDRInterior", 1.0f);
+SettingT<INISettingCollection> Renderer::fTargetLUMInterior("fTargetLUM:BlurShaderHDRInterior", 1.0f);
 SettingT<INISettingCollection> Renderer::fLightLODDefaultStartFade("fLightLODDefaultStartFade:Display", 1000.0f);
 SettingT<RendererSettingCollection>
     Renderer::fLightLODStartFade("fLightLODStartFade:Display", Renderer::fLightLODDefaultStartFade.Float());
@@ -175,7 +172,7 @@ SettingT<INISettingCollection> Renderer::fEnvMapLODStartFade("fEnvMapLOD1:Displa
 SettingT<INISettingCollection> Renderer::fEnvMapLODEnd("fEnvMapLOD2:Display", 1800.0f);
 SettingT<INISettingCollection> Renderer::fEyeEnvMapLODStartFade("fEyeEnvMapLOD1:Display", 45.0f);
 SettingT<INISettingCollection> Renderer::fEyeEnvMapLODEnd("fEyeEnvMapLOD2:Display", 65.0f);
-SettingT<INISettingCollection> gs_fDecalLOD0_Display("fDecalLOD0:Display", 800.0f);
+SettingT<INISettingCollection> Renderer::fDecalLODStart("fDecalLOD0:Display", 800.0f);
 SettingT<RendererSettingCollection> Renderer::fDecalLODStartFade("fDecalLOD1:Display", 1000.0f);
 SettingT<RendererSettingCollection> Renderer::fDecalLODEnd("fDecalLOD2:Display", 1500.0f);
 SettingT<INISettingCollection> Renderer::fSkinnedDecalLODStart("fSkinnedDecalLOD0:Display", 300.0f);
@@ -201,12 +198,12 @@ static SettingT<INISettingCollection> uVideoDeviceIdentifierPart3("uVideoDeviceI
 static SettingT<INISettingCollection> uVideoDeviceIdentifierPart4("uVideoDeviceIdentifierPart4:Display", 0u);
 static SettingT<INISettingCollection> iLastHDRSetting("iLastHDRSetting", -1);
 SettingT<INISettingCollection> Renderer::bDecalsOnSkinnedGeometry("bDecalsOnSkinnedGeometry:Display", true);
-SettingT<INIPrefSettingCollection> gs_fGamma_Display("fGamma:Display", 1.0f);
+SettingT<INIPrefSettingCollection> Renderer::fGamma("fGamma:Display", 1.0f);
 SettingT<INISettingCollection> Renderer::iPresentInterval("iPresentInterval:Display", 1);
 SettingT<INISettingCollection> Renderer::bCreateShaderPackage("bCreateShaderPackage:General", false);
 SettingT<INISettingCollection> Renderer::fShadowFadeTime("fShadowFadeTime:Display", 1.0f);
 SettingT<INISettingCollection> Renderer::bTintMipMaps("bTintMipMaps:General", false);
-SettingT<RendererSettingCollection> gs_sD3DDevice_Display("sD3DDevice:Display", "");
+SettingT<RendererSettingCollection> Renderer::sD3DDevice("sD3DDevice:Display", "");
 SettingT<INISettingCollection> Renderer::fInterfaceTintR("fInterfaceTintR:Interface", 0.6314f);
 SettingT<INISettingCollection> Renderer::fInterfaceTintG("fInterfaceTintG:Interface", 0.9843f);
 SettingT<INISettingCollection> Renderer::fInterfaceTintB("fInterfaceTintB:Interface", 0.8824f);
@@ -214,7 +211,28 @@ SettingT<INISettingCollection> Renderer::bDynamicWindowReflections("bDynamicWind
 BSCriticalSection Renderer::SuspendCriticalSection;
 SettingT<RendererSettingCollection> gs_bEnableEyefinity_Display("bEnableEyefinity:Display", true);
 NiPointer<NiDX9Renderer> Renderer::spRenderer;
-NiColor BSShaderManager::kBackgroundColor(NiColor::BLACK);
+
+void Renderer::Kill(bool abFinalKill) {
+    BSShaderManager::Free(abFinalKill);
+    if (abFinalKill && Renderer::spRenderer.m_pObject && (Renderer::spRenderer->m_uiRefCount != 1)) {
+        TESDataHandler::RegisterError();
+        if (Renderer::spRenderer->m_uiRefCount == 2) {
+            Warning(
+                "SHADERS: There is 1 object with a smart pointer to the renderer we are trying to "
+                "release."
+            );
+        }
+        else {
+            Warning(
+                "SHADERS: There are %d objects with smart pointers to the renderer we are trying to "
+                "release.",
+                Renderer::spRenderer->m_uiRefCount - 1
+            );
+        }
+    }
+
+    Renderer::spRenderer = static_cast<NiDX9Renderer*>(nullptr);
+}
 
 NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
     AutoMemContext kContext(
@@ -594,7 +612,7 @@ NiDX9Renderer* Renderer::Init(HWND__* ahWnd, HINSTANCE__* ahInstance) {
         D3DFMT_A16B16G16R16
     );
     BSShaderManager::bUseDisplacementWaterStencil = hStencilResult >= 0;
-    SetGamma(gs_fGamma_Display.Float());
+    SetGamma(Renderer::fGamma.Float());
     // Append the device report to RendererInfo.txt.
     const char* pShaderLevel = BSShaderManager::GetShaderLevelString();
     BSsprintf(acFileName, 260, "%sRendererInfo.txt", BSUtilities::GetPersonalPath());
@@ -1222,7 +1240,7 @@ void Renderer::SetupEyefinity() {
 }
 
 bool Renderer::QDoDiffusePass() {
-    return gs_bDoDiffusePass_Display.Bool();
+    return Renderer::bDoDiffusePass.Bool();
 }
 
 void Renderer::SetErrorString(const char* apReason) {
@@ -1235,7 +1253,7 @@ void Renderer::SetErrorString(const char* apReason) {
 void Renderer::UpdateGamma() {
     D3DGAMMARAMP kRamp;
     Renderer::bGammaDirty = false;
-    gs_fGamma_Display = Renderer::fCurGamma;
+    Renderer::fGamma = Renderer::fCurGamma;
     for (uint16_t us = 0; us < 256u; ++us) {
         float afX = static_cast<double>(us) / 255.0;
         kRamp.red[us] = static_cast<int32_t>(std::pow(afX, Renderer::fCurGamma) * 65535.0 + 0.5);
@@ -1247,15 +1265,15 @@ void Renderer::UpdateGamma() {
 }
 
 bool Renderer::QDoAmbientPass() {
-    return gs_bDoAmbientPass_Display.Bool();
+    return Renderer::bDoAmbientPass.Bool();
 }
 
 bool Renderer::QDoSpecularPass() {
-    return gs_bDoSpecularPass_Display.Bool();
+    return Renderer::bDoSpecularPass.Bool();
 }
 
 bool Renderer::QDoTexturePass() {
-    return gs_bDoTexturePass_Display.Bool();
+    return Renderer::bDoTexturePass.Bool();
 }
 
 char CreateDisplayDriver() {
@@ -1264,7 +1282,7 @@ char CreateDisplayDriver() {
         NiDX9AdapterDesc* pAdapterDesc = Renderer::GetAdapterDesc(0);
         if (pAdapterDesc) {
             char* pcDescription = pAdapterDesc->GetDescription();
-            if (_stricmp(gs_sD3DDevice_Display.String(), pcDescription)) {
+            if (_stricmp(Renderer::sD3DDevice.String(), pcDescription)) {
                 // The settings were made for another adapter, or by no launcher yet. Returns 1, and WinMain starts
                 // FalloutNVLauncher.exe (which writes FalloutPrefs.ini for this adapter) and exits. Where there is no
                 // launcher, the program does its part here and goes on with this start, as it does once the
@@ -1281,9 +1299,9 @@ char CreateDisplayDriver() {
         }
     }
     ourStrcpy(cDriver, "\"");
-    std::strcat(cDriver, gs_sD3DDevice_Display.String());
+    std::strcat(cDriver, Renderer::sD3DDevice.String());
     std::strcat(cDriver, "\"");
-    gs_sD3DDevice_Display = static_cast<const char*>(cDriver);
+    Renderer::sD3DDevice = static_cast<const char*>(cDriver);
     return 0;
 }
 
@@ -1697,14 +1715,6 @@ uint32_t atiEyefinityGetConfigInfo(
         ourMemset(lpEyefinityInfo, 0, sizeof(lpEyefinityInfo->iSLSActive));
     }
     return iReturn;
-}
-
-void NiSourceTexture::SetUsePreloading(bool bPreload) {
-    NiSourceTexture::ms_bPreload = bPreload;
-}
-
-void NiTexture::SetMipmapByDefault(bool bMipmap) {
-    NiTexture::ms_bMipmapByDefault = bMipmap;
 }
 
 void Renderer::SetBackgroundColor(NiColor* apColor) {

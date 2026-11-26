@@ -6,6 +6,7 @@
 #include "BSCore/MemoryManager.h"
 #include "BSMain/MessageHandler.h"
 #include "Fallout Shared/BGSMenuIcon.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESDescription.h"
 #include "Fallout Shared/TESFile.h"

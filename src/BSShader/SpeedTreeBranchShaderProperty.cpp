@@ -5,7 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShadeProperty.h"
 

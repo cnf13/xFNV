@@ -14,9 +14,9 @@
 #include "SDK/MSVC/rtti.h"
 
 void SpellItemData::Endian() {
-    ENDIAN(iSpellType, false);
-    ENDIAN(iCostOverride, false);
-    ENDIAN(eLevelOverride, false);
+    BSEndian(iSpellType, false);
+    BSEndian(iCostOverride, false);
+    BSEndian(eLevelOverride, false);
 }
 
 SpellItem::SpellItem() : MagicItemForm() {

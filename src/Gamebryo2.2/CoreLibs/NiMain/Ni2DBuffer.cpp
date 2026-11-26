@@ -2,7 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDepthStencilBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"

@@ -18,9 +18,11 @@ public:
     // A registered collision: the contact manager, the listener to tell and which body's listener it is.
     struct Collision {
         // The same manager, listener and source.
-        hkBool equals(const Collision& other) const;
+        hkBool operator==(const Collision& other) const;
         // Ordered by the uids of the collision's two entities, the first entity's first: the merge's sort key.
         hkBool operator<(const Collision& other) const;
+        // The uids of the collision's two entities, the first entity's in the high half.
+        uint64_t getUid() const;
 
         hkpSimpleConstraintContactMgr* m_mgr;
         hkpContactListener* m_listener;
@@ -29,6 +31,11 @@ public:
 
     // A collision registered during the step, with the order it was registered in.
     struct NewCollision : public Collision {
+        // Ordered by uid, then by the order they were registered in: the new collisions' sort key. Against a
+        // registered collision (mergeCollisions) the uid alone orders them.
+        using Collision::operator<;
+        hkBool operator<(const NewCollision& other) const;
+
         int32_t m_sequenceNumber;
     };
 
@@ -63,11 +70,6 @@ public:
         hkpContactListener* listener,
         hkpCollisionEvent::CallbackSource source
     );
-    // hkAlgorithm::quickSortRecursive over the new collisions. The comparator (an empty
-    // hkAlgorithm::less<NewCollision>) travels in a 4-byte stack slot of which the caller writes only the low byte and
-    // which the recursion hands on unread, so it is that byte here, as hkAlgorithm::quickSort's aiLess (hkSort.h): an
-    // empty class argument carries no bytes in C++.
-    static void sortNewCollisions(NewCollision* first, int32_t low, int32_t high, uint8_t cmpLess);
     // Removes from removedCollisions every collision that list holds too, and drops those from list.
     template <typename T>
     static void removeCollisions(hkArray<Collision>& removedCollisions, hkArray<T>& list);

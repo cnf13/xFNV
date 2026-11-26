@@ -1,6 +1,6 @@
 #include "SDK/DirectShow/CAsyncOutputPin.h"
 #include "BSAudio/DirectSound.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "SDK/DirectShow/CAsyncIo.h"
 #include "SDK/DirectShow/CAsyncReader.h"

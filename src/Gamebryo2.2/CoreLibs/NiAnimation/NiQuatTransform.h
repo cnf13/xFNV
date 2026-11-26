@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
@@ -73,3 +73,9 @@ public:
         -std::numeric_limits<float>::max()
     };
 };
+
+inline void NiQuatTransform::SetRotateValid(bool bValid) {
+    if (!bValid) {
+        m_kRotate.SetX(-std::numeric_limits<float>::max());
+    }
+}

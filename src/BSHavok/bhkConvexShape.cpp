@@ -7,7 +7,7 @@
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkSphereRepShape.h"
 #include "BSHavok/bhkTriangleShape.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

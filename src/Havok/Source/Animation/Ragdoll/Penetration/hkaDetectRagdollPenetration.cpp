@@ -1,5 +1,6 @@
 #include "Havok/Source/Animation/Ragdoll/Penetration/hkaDetectRagdollPenetration.h"
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Animation/Animation/Ik/LookAt/hkaLookAtIkSolver.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaBone.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaPose.h"
@@ -151,4 +152,8 @@ hkBool hkaDetectRagdollPenetration::detectPenetration(
 
     m_ragdollIsOut.m_bool = 1;
     return 0;
+}
+
+void hkaRagdollRaycastInterface::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
 }

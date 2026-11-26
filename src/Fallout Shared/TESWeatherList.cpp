@@ -1,6 +1,7 @@
 #include "Fallout Shared/TESWeatherList.h"
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESGlobal.h"
 #include "Fallout Shared/TESLeveledList.h"
@@ -10,9 +11,9 @@
 tmpWeatherEntry::tmpWeatherEntry() : uiNumericID(0), uiChance(0), uiGlobalID(0) {}
 
 void tmpWeatherEntry::Endian() {
-    ENDIAN(uiNumericID, false);
-    ENDIAN(uiChance, false);
-    ENDIAN(uiGlobalID, false);
+    BSEndian(uiNumericID, false);
+    BSEndian(uiChance, false);
+    BSEndian(uiGlobalID, false);
 }
 
 WeatherEntry::WeatherEntry() : pWeather(nullptr), uiChance(0), pChanceVar(nullptr) {}

@@ -10,7 +10,6 @@
 #include "BSShader/ImageSpaceEffectBlur.h"
 #include "BSShader/ImageSpaceEffectCinematic.h"
 #include "BSShader/ImageSpaceEffectDepthOfField.h"
-#include "BSShader/ImageSpaceEffectFullScreenBlur.h"
 #include "BSShader/ImageSpaceEffectGetHit.h"
 #include "BSShader/ImageSpaceEffectHDR.h"
 #include "BSShader/ImageSpaceEffectInterface.h"
@@ -28,10 +27,6 @@
 #include "BSShader/ImageSpaceEffectWaterFFT.h"
 #include "BSShader/ImageSpaceShader.h"
 #include "BSShader/ImageSpaceShaderAlphaMult.h"
-#include "BSShader/ImageSpaceShaderBPBlur11.h"
-#include "BSShader/ImageSpaceShaderBPBlur13.h"
-#include "BSShader/ImageSpaceShaderBPBlur15.h"
-#include "BSShader/ImageSpaceShaderBPBlur9.h"
 #include "BSShader/ImageSpaceShaderBlend.h"
 #include "BSShader/ImageSpaceShaderBlur.h"
 #include "BSShader/ImageSpaceShaderBlur11.h"
@@ -41,40 +36,34 @@
 #include "BSShader/ImageSpaceShaderBlur5.h"
 #include "BSShader/ImageSpaceShaderBlur7.h"
 #include "BSShader/ImageSpaceShaderBlur9.h"
+#include "BSShader/ImageSpaceShaderBrightPassBlur11.h"
+#include "BSShader/ImageSpaceShaderBrightPassBlur13.h"
+#include "BSShader/ImageSpaceShaderBrightPassBlur15.h"
 #include "BSShader/ImageSpaceShaderBrightPassBlur3.h"
 #include "BSShader/ImageSpaceShaderBrightPassBlur5.h"
 #include "BSShader/ImageSpaceShaderBrightPassBlur7.h"
-#include "BSShader/ImageSpaceShaderBrightPassFilter.h"
+#include "BSShader/ImageSpaceShaderBrightPassBlur9.h"
 #include "BSShader/ImageSpaceShaderCinematic.h"
 #include "BSShader/ImageSpaceShaderCopy.h"
 #include "BSShader/ImageSpaceShaderCopyRenderTarget1.h"
-#include "BSShader/ImageSpaceShaderDS16LightAdapt.h"
-#include "BSShader/ImageSpaceShaderDS16LumClamp.h"
-#include "BSShader/ImageSpaceShaderDS4LightAdapt.h"
-#include "BSShader/ImageSpaceShaderDS4LumClamp.h"
 #include "BSShader/ImageSpaceShaderDepthOfField.h"
 #include "BSShader/ImageSpaceShaderDepthOfFieldMask.h"
 #include "BSShader/ImageSpaceShaderDoubleVision.h"
-#include "BSShader/ImageSpaceShaderDownsample16.h"
-#include "BSShader/ImageSpaceShaderDownsample4.h"
-#include "BSShader/ImageSpaceShaderDownsample9.h"
-#include "BSShader/ImageSpaceShaderFFTDisplayAmplitude.h"
-#include "BSShader/ImageSpaceShaderFFTDisplayHighW.h"
-#include "BSShader/ImageSpaceShaderFFTDisplayNormals.h"
-#include "BSShader/ImageSpaceShaderFFTDisplayWaterHeight.h"
-#include "BSShader/ImageSpaceShaderFFTFilter.h"
-#include "BSShader/ImageSpaceShaderFFTHorizontalButterfly.h"
-#include "BSShader/ImageSpaceShaderFFTHorizontalScramble.h"
-#include "BSShader/ImageSpaceShaderFFTNormals.h"
-#include "BSShader/ImageSpaceShaderFFTVerticalButterfly.h"
-#include "BSShader/ImageSpaceShaderFFTVerticalScramble.h"
-#include "BSShader/ImageSpaceShaderFFTWaterSpectrum.h"
-#include "BSShader/ImageSpaceShaderHDRBlend.h"
-#include "BSShader/ImageSpaceShaderHDRBlendCinematic.h"
-#include "BSShader/ImageSpaceShaderHDRBlendCinematicAlphaMask.h"
+#include "BSShader/ImageSpaceShaderHDRBlendInShader.h"
+#include "BSShader/ImageSpaceShaderHDRBlendInShaderCinematic.h"
+#include "BSShader/ImageSpaceShaderHDRBlendInShaderCinematicAlphamask.h"
 #include "BSShader/ImageSpaceShaderHDRBlur.h"
-#include "BSShader/ImageSpaceShaderLightAdapt.h"
-#include "BSShader/ImageSpaceShaderLumClamp.h"
+#include "BSShader/ImageSpaceShaderHDRBrightPassFilter.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample16.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample16LightAdapt.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample16LumClamp.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample4.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample4LightAdapt.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample4LumClamp.h"
+#include "BSShader/ImageSpaceShaderHDRDownSample9.h"
+#include "BSShader/ImageSpaceShaderHDRLightAdapt.h"
+#include "BSShader/ImageSpaceShaderHDRLumClamp.h"
+#include "BSShader/ImageSpaceShaderInterfaceScanlinesBlend.h"
 #include "BSShader/ImageSpaceShaderMap.h"
 #include "BSShader/ImageSpaceShaderMenuBG.h"
 #include "BSShader/ImageSpaceShaderMenuUnpack.h"
@@ -88,26 +77,36 @@
 #include "BSShader/ImageSpaceShaderRadialBlurMedium.h"
 #include "BSShader/ImageSpaceShaderRefraction.h"
 #include "BSShader/ImageSpaceShaderRestoreEDRAM.h"
-#include "BSShader/ImageSpaceShaderScanlinesBlend.h"
-#include "BSShader/ImageSpaceShaderScanlinesBlend_.h"
 #include "BSShader/ImageSpaceShaderStencilCopy.h"
 #include "BSShader/ImageSpaceShaderStencilCopyNoTextureNoDepth.h"
 #include "BSShader/ImageSpaceShaderSunbeams.h"
 #include "BSShader/ImageSpaceShaderTV.h"
 #include "BSShader/ImageSpaceShaderTextureMask.h"
 #include "BSShader/ImageSpaceShaderVATSScan.h"
+#include "BSShader/ImageSpaceShaderVATSScanlinesBlend.h"
 #include "BSShader/ImageSpaceShaderVolumetricFog.h"
+#include "BSShader/ImageSpaceShaderWaterBlendHeightmaps.h"
+#include "BSShader/ImageSpaceShaderWaterDisplacementClearSimulation.h"
+#include "BSShader/ImageSpaceShaderWaterDisplacementNormals.h"
+#include "BSShader/ImageSpaceShaderWaterDisplacementRainRipple.h"
+#include "BSShader/ImageSpaceShaderWaterDisplacementTexOffset.h"
+#include "BSShader/ImageSpaceShaderWaterDisplacementWadingRipple.h"
+#include "BSShader/ImageSpaceShaderWaterFFTDisplayAmplitude.h"
+#include "BSShader/ImageSpaceShaderWaterFFTDisplayHighW.h"
+#include "BSShader/ImageSpaceShaderWaterFFTDisplayNormals.h"
+#include "BSShader/ImageSpaceShaderWaterFFTDisplayWaterHeight.h"
+#include "BSShader/ImageSpaceShaderWaterFFTFilter.h"
+#include "BSShader/ImageSpaceShaderWaterFFTHorizontalButterfly.h"
+#include "BSShader/ImageSpaceShaderWaterFFTHorizontalScramble.h"
+#include "BSShader/ImageSpaceShaderWaterFFTNormals.h"
+#include "BSShader/ImageSpaceShaderWaterFFTVerticalButterfly.h"
+#include "BSShader/ImageSpaceShaderWaterFFTVerticalScramble.h"
+#include "BSShader/ImageSpaceShaderWaterFFTWaterSpectrum.h"
+#include "BSShader/ImageSpaceShaderWaterRainHeightmap.h"
+#include "BSShader/ImageSpaceShaderWaterSmoothHeightmap.h"
+#include "BSShader/ImageSpaceShaderWaterWadingHeightmap.h"
 #include "BSShader/ImageSpaceTexture.h"
 #include "BSShader/SkyShader.h"
-#include "BSShader/WaterBlendHeightmaps.h"
-#include "BSShader/WaterDisplaceClearSimulation.h"
-#include "BSShader/WaterDisplaceTexOffset.h"
-#include "BSShader/WaterDisplacementNormals.h"
-#include "BSShader/WaterDisplacementRainRipple.h"
-#include "BSShader/WaterDisplacementWadingRipple.h"
-#include "BSShader/WaterRainHeightmap.h"
-#include "BSShader/WaterSmoothHeightmap.h"
-#include "BSShader/WaterWadingHeightmap.h"
 #include "Fallout/Misc/Main.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
@@ -115,7 +114,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -131,6 +129,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DPass.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DPixelShader.h"
@@ -521,37 +520,37 @@ void ImageSpaceManager::InitEffects() {
     pEffectList.SetAt(56, static_cast<ImageSpaceEffect*>(pShader));
     pShader = new ImageSpaceShaderSunbeams;
     pEffectList.SetAt(57, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderHDRBlend;
+    pShader = new ImageSpaceShaderHDRBlendInShader;
     pEffectList.SetAt(58, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderHDRBlendCinematic;
+    pShader = new ImageSpaceShaderHDRBlendInShaderCinematic;
     pEffectList.SetAt(59, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderHDRBlendCinematicAlphaMask;
+    pShader = new ImageSpaceShaderHDRBlendInShaderCinematicAlphamask;
     pEffectList.SetAt(60, static_cast<ImageSpaceEffect*>(pShader));
     pShader = new ImageSpaceShaderHDRBlur;
     pEffectList.SetAt(61, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderBrightPassFilter;
+    pShader = new ImageSpaceShaderHDRBrightPassFilter;
     pEffectList.SetAt(62, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDownsample16;
+    pShader = new ImageSpaceShaderHDRDownSample16;
     pEffectList.SetAt(63, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDownsample9;
+    pShader = new ImageSpaceShaderHDRDownSample9;
     pEffectList.SetAt(64, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDownsample4;
+    pShader = new ImageSpaceShaderHDRDownSample4;
     pEffectList.SetAt(65, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDS4LightAdapt;
+    pShader = new ImageSpaceShaderHDRDownSample4LightAdapt;
     pEffectList.SetAt(67, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDS4LumClamp;
+    pShader = new ImageSpaceShaderHDRDownSample4LumClamp;
     pEffectList.SetAt(66, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDS16LightAdapt;
+    pShader = new ImageSpaceShaderHDRDownSample16LightAdapt;
     pEffectList.SetAt(69, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderDS16LumClamp;
+    pShader = new ImageSpaceShaderHDRDownSample16LumClamp;
     pEffectList.SetAt(68, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderLightAdapt;
+    pShader = new ImageSpaceShaderHDRLightAdapt;
     pEffectList.SetAt(70, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderLumClamp;
+    pShader = new ImageSpaceShaderHDRLumClamp;
     pEffectList.SetAt(71, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderScanlinesBlend_;
+    pShader = new ImageSpaceShaderInterfaceScanlinesBlend;
     pEffectList.SetAt(72, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderScanlinesBlend;
+    pShader = new ImageSpaceShaderVATSScanlinesBlend;
     pEffectList.SetAt(73, static_cast<ImageSpaceEffect*>(pShader));
     pShader = new ImageSpaceShaderVATSScan;
     pEffectList.SetAt(EFFECT_VATS_SCAN_SHADER, static_cast<ImageSpaceEffect*>(pShader));
@@ -577,56 +576,56 @@ void ImageSpaceManager::InitEffects() {
     pEffectList.SetAt(86, static_cast<ImageSpaceEffect*>(pShader));
     pShader = new ImageSpaceShaderBrightPassBlur7;
     pEffectList.SetAt(87, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderBPBlur9;
+    pShader = new ImageSpaceShaderBrightPassBlur9;
     pEffectList.SetAt(88, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderBPBlur11;
+    pShader = new ImageSpaceShaderBrightPassBlur11;
     pEffectList.SetAt(89, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderBPBlur13;
+    pShader = new ImageSpaceShaderBrightPassBlur13;
     pEffectList.SetAt(90, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderBPBlur15;
+    pShader = new ImageSpaceShaderBrightPassBlur15;
     pEffectList.SetAt(91, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTWaterSpectrum;
+    pShader = new ImageSpaceShaderWaterFFTWaterSpectrum;
     pEffectList.SetAt(93, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTHorizontalButterfly;
+    pShader = new ImageSpaceShaderWaterFFTHorizontalButterfly;
     pEffectList.SetAt(94, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTVerticalButterfly;
+    pShader = new ImageSpaceShaderWaterFFTVerticalButterfly;
     pEffectList.SetAt(95, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTHorizontalScramble;
+    pShader = new ImageSpaceShaderWaterFFTHorizontalScramble;
     pEffectList.SetAt(96, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTVerticalScramble;
+    pShader = new ImageSpaceShaderWaterFFTVerticalScramble;
     pEffectList.SetAt(97, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTNormals;
+    pShader = new ImageSpaceShaderWaterFFTNormals;
     pEffectList.SetAt(98, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTFilter;
+    pShader = new ImageSpaceShaderWaterFFTFilter;
     pEffectList.SetAt(99, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTDisplayNormals;
+    pShader = new ImageSpaceShaderWaterFFTDisplayNormals;
     pEffectList.SetAt(100, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTDisplayHighW;
+    pShader = new ImageSpaceShaderWaterFFTDisplayHighW;
     pEffectList.SetAt(101, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTDisplayAmplitude;
+    pShader = new ImageSpaceShaderWaterFFTDisplayAmplitude;
     pEffectList.SetAt(102, static_cast<ImageSpaceEffect*>(pShader));
     // A second water spectrum shader.
-    pShader = new ImageSpaceShaderFFTWaterSpectrum;
+    pShader = new ImageSpaceShaderWaterFFTWaterSpectrum;
     pEffectList.SetAt(103, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new ImageSpaceShaderFFTDisplayWaterHeight;
+    pShader = new ImageSpaceShaderWaterFFTDisplayWaterHeight;
     pEffectList.SetAt(104, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterDisplaceClearSimulation;
+    pShader = new ImageSpaceShaderWaterDisplacementClearSimulation;
     pEffectList.SetAt(105, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterDisplaceTexOffset;
+    pShader = new ImageSpaceShaderWaterDisplacementTexOffset;
     pEffectList.SetAt(106, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterDisplacementWadingRipple;
+    pShader = new ImageSpaceShaderWaterDisplacementWadingRipple;
     pEffectList.SetAt(107, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterDisplacementRainRipple;
+    pShader = new ImageSpaceShaderWaterDisplacementRainRipple;
     pEffectList.SetAt(108, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterWadingHeightmap;
+    pShader = new ImageSpaceShaderWaterWadingHeightmap;
     pEffectList.SetAt(109, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterRainHeightmap;
+    pShader = new ImageSpaceShaderWaterRainHeightmap;
     pEffectList.SetAt(110, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterBlendHeightmaps;
+    pShader = new ImageSpaceShaderWaterBlendHeightmaps;
     pEffectList.SetAt(111, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterSmoothHeightmap;
+    pShader = new ImageSpaceShaderWaterSmoothHeightmap;
     pEffectList.SetAt(112, static_cast<ImageSpaceEffect*>(pShader));
-    pShader = new WaterDisplacementNormals;
+    pShader = new ImageSpaceShaderWaterDisplacementNormals;
     pEffectList.SetAt(113, static_cast<ImageSpaceEffect*>(pShader));
     pShader = new ImageSpaceShaderNoiseScrollAndBlend;
     pEffectList.SetAt(114, static_cast<ImageSpaceEffect*>(pShader));
@@ -1873,13 +1872,13 @@ void ImageSpaceShaderDoubleVision::ReloadShaders() {
     LoadStagesAndPasses();
 }
 
-ImageSpaceShaderFFTDisplayWaterHeight::ImageSpaceShaderFFTDisplayWaterHeight() {
+ImageSpaceShaderWaterFFTDisplayWaterHeight::ImageSpaceShaderWaterFFTDisplayWaterHeight() {
     pTextures.SetSize(2u);
 }
 
-ImageSpaceShaderFFTDisplayWaterHeight::~ImageSpaceShaderFFTDisplayWaterHeight() {}
+ImageSpaceShaderWaterFFTDisplayWaterHeight::~ImageSpaceShaderWaterFFTDisplayWaterHeight() {}
 
-void ImageSpaceShaderFFTDisplayWaterHeight::ReloadShaders() {
+void ImageSpaceShaderWaterFFTDisplayWaterHeight::ReloadShaders() {
     BSShaderMacro v3;
     BSShaderMacro v4;
     v4.strPath = "imagespace\\1x\\v\\base.v.hlsl";
@@ -1926,13 +1925,13 @@ void ImageSpaceShaderHDRBlur::ReloadShaders() {
     LoadStagesAndPasses();
 }
 
-ImageSpaceShaderLightAdapt::ImageSpaceShaderLightAdapt() {
+ImageSpaceShaderHDRLightAdapt::ImageSpaceShaderHDRLightAdapt() {
     pTextures.SetSize(3u);
 }
 
-ImageSpaceShaderLightAdapt::~ImageSpaceShaderLightAdapt() {}
+ImageSpaceShaderHDRLightAdapt::~ImageSpaceShaderHDRLightAdapt() {}
 
-void ImageSpaceShaderLightAdapt::ReloadShaders() {
+void ImageSpaceShaderHDRLightAdapt::ReloadShaders() {
     const char* pcName;
     // These locals are 8-byte aligned.
     alignas(8) BSShaderMacro kVShader;

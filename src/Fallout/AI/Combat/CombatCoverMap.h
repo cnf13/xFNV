@@ -1,7 +1,9 @@
 #pragma once
 
+#include "BSCore/BSCoreMath.h"
 #include "BSCore/BSReadWriteLock.h"
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
@@ -14,8 +16,6 @@ class CombatController;
 class CombatCoverLocation;
 class PathingCoverLocation;
 class ReservedCoverLocation;
-
-uint8_t BSMIN(uint8_t acA, uint8_t acB);
 
 // Where an actor stands along a cover edge: the edge's segments and the segment and width the actor takes. The byte
 // fields are unsigned.

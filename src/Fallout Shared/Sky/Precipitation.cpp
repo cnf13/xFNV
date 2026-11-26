@@ -6,6 +6,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -99,7 +100,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -127,16 +127,11 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysRotationModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysSphereEmitter.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <cstdint>
-
-void NiSinCos_Fast(float afAngle, float* apSin, float* apCos) {
-    int32_t iIndex = static_cast<int32_t>(512.0 / NI_TWO_PI * afAngle);
-    *apSin = s_fSinTableA[iIndex & 511];
-    *apCos = s_fCosTableA[iIndex & 511];
-}
 
 Precipitation::Precipitation()
   : spCurrentPrecipRoot(nullptr), spLastPrecipRoot(nullptr), pParent(nullptr), fBirthRate(0.0f), pQueuedModel(nullptr) {
@@ -608,8 +603,8 @@ NiGeometry* Precipitation::CreateShaderGeometry(
     float fCosPlan;
     float fSinDec;
     float fCosDec;
-    NiSinCos_Fast(fPlan, &fSinPlan, &fCosPlan);
-    NiSinCos_Fast(fDec, &fSinDec, &fCosDec);
+    NiSinCosQ(fPlan, &fSinPlan, &fCosPlan);
+    NiSinCosQ(fDec, &fSinDec, &fCosDec);
     float fdirY = fSinDec * fSinPlan;
     float fdirX = fSinDec * fCosPlan;
     NiPoint3 kDirection;
@@ -830,43 +825,4 @@ NiGeometry* Precipitation::CreateShaderGeometry(
 
 void Precipitation::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-NiBillboardNode::FaceMode NiBillboardNode::GetMode() const {
-    return static_cast<FaceMode>(GetField(FACE_MODE_MASK, FACE_MODE_POS));
-}
-
-uint32_t NiPSysMeshEmitter::GetGeometryEmitterCount() {
-    return m_kGeomEmitterArray.GetEffectiveSize();
-}
-
-// The mesh in slot uiWhichEmitter, or null past the count.
-NiGeometry* NiPSysMeshEmitter::GetGeometryEmitter(uint32_t uiWhichEmitter) {
-    if (uiWhichEmitter >= GetGeometryEmitterCount()) {
-        return nullptr;
-    }
-    return m_kGeomEmitterArray[uiWhichEmitter].m_pObject;
-}
-
-NiAVObject* NiPSysMeshUpdateModifier::GetMeshAt(uint32_t uiIndex) {
-    if (uiIndex >= m_kMeshes.GetSize()) {
-        return nullptr;
-    }
-    return m_kMeshes[uiIndex];
-}
-
-NiPSysModifier* NiParticleSystem::GetModifierAt(uint32_t uiIndex) {
-    NiTListItem<NiPointer<NiPSysModifier>>* kIter;
-    if (uiIndex >= m_kModifierList.m_uiCount) {
-        return nullptr;
-    }
-    uint32_t uiCount = 0;
-    kIter = m_kModifierList.m_pkHead;
-    while (kIter) {
-        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kIter).m_pObject;
-        if (uiCount++ == uiIndex) {
-            return pkModifier;
-        }
-    }
-    return nullptr;
 }

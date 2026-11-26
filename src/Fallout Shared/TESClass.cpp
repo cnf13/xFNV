@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESClass.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -22,17 +22,17 @@
 
 // The service flags first, then the tag skills; the class flags are left alone.
 void CLASS_DATA::Endian() {
-    ENDIAN(iServiceFlags, false);
+    BSEndian(iServiceFlags, false);
     for (int32_t& eTagSkill : eTagSkills) {
-        ENDIAN(eTagSkill, false);
+        BSEndian(eTagSkill, false);
     }
 }
 
 // The service flags first, then the three tag skills; the class flags are deliberately left alone.
 void OLD_CLASS_DATA::Endian() {
-    ENDIAN(iServiceFlags, false);
+    BSEndian(iServiceFlags, false);
     for (int32_t& eTagSkill : eTagSkills) {
-        ENDIAN(eTagSkill, false);
+        BSEndian(eTagSkill, false);
     }
 }
 
@@ -229,7 +229,7 @@ bool TESClass::CheckData() {
     return false;
 }
 
-void TESClass::SaveGameTES() {
+void TESClass::SaveGame() {
     pSaveLoadGameOLD->SaveGameDataOLD(&data, sizeof(data));
     uint8_t cLength = 0;
     if (GetFullName()) {
@@ -253,7 +253,7 @@ void TESClass::SaveGameTES() {
     }
 }
 
-void TESClass::LoadGameTES() {
+void TESClass::LoadGame() {
     uint8_t cLength;
     pSaveLoadGameOLD->LoadGameDataOLD(&data, sizeof(data));
     pSaveLoadGameOLD->LoadGameDataOLD(&cLength, sizeof(cLength));

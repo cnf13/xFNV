@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/NavMeshGrid.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESFile.h"
@@ -120,15 +120,15 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
     uint32_t uiCopy = 36;
     ourMemcpy(this, apBuffer, 36u);
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(iGridSize, false);
-        ENDIAN<float>(fColumnSectionLen, false);
-        ENDIAN<float>(fRowSectionLen, false);
-        ENDIAN<float>(GridBoundsMin.x, false);
-        ENDIAN<float>(GridBoundsMin.y, false);
-        ENDIAN<float>(GridBoundsMin.z, false);
-        ENDIAN<float>(GridBoundsMax.x, false);
-        ENDIAN<float>(GridBoundsMax.y, false);
-        ENDIAN<float>(GridBoundsMax.z, false);
+        BSEndian<uint32_t>(iGridSize, false);
+        BSEndian<float>(fColumnSectionLen, false);
+        BSEndian<float>(fRowSectionLen, false);
+        BSEndian<float>(GridBoundsMin.x, false);
+        BSEndian<float>(GridBoundsMin.y, false);
+        BSEndian<float>(GridBoundsMin.z, false);
+        BSEndian<float>(GridBoundsMax.x, false);
+        BSEndian<float>(GridBoundsMax.y, false);
+        BSEndian<float>(GridBoundsMax.z, false);
     }
     if (iGridSize) {
         uint32_t uiTotalGridSize = iGridSize * iGridSize;
@@ -141,13 +141,13 @@ bool NavMeshGrid::Load(const char* apBuffer, uint32_t aiBufferSize, TESFile* apF
         for (uint32_t i = 0; i < uiTotalGridSize; ++i) {
             uint16_t usSize = *pBuffer++;
             if (apFile->QEndian()) {
-                ENDIAN<uint16_t>(usSize, false);
+                BSEndian<uint16_t>(usSize, false);
             }
             GridData[i].SetSize(usSize, true);
             if (usSize) {
                 if (apFile->QEndian()) {
                     for (uint16_t k = 0; k < static_cast<int32_t>(usSize); ++k) {
-                        ENDIAN<uint16_t>(pBuffer[k], false);
+                        BSEndian<uint16_t>(pBuffer[k], false);
                     }
                 }
                 ourMemcpy(&GridData[i].GetAt(0), pBuffer, sizeof(uint16_t) * usSize);

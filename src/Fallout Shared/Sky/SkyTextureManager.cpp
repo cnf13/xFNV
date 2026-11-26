@@ -1,6 +1,7 @@
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSShader/BSShaderManager.h"

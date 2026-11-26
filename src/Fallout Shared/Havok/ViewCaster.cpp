@@ -1,20 +1,20 @@
 #include "Fallout Shared/Havok/ViewCaster.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkEntity.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkShapePhantom.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
-#include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -30,10 +30,10 @@
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiPick.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
@@ -430,11 +430,3 @@ bhkRigidBody* ViewCaster::GetFuzzyBody() {
 void ViewCaster::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
-
-hkBool hkpShapeRayCastCollectorOutput::hasHit() const {
-    hkBool kResult(m_hitFraction < 1.0);
-    return kResult;
-}
-
-// The ray's ends are left as they are.
-hkpShapeRayCastInput::hkpShapeRayCastInput() : m_filterInfo(0), m_rayShapeCollectionFilter(nullptr) {}

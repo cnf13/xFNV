@@ -43,3 +43,10 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiAVObject* NiPSysMeshUpdateModifier::GetMeshAt(uint32_t uiIndex) {
+    if (uiIndex >= m_kMeshes.GetSize()) {
+        return nullptr;
+    }
+    return m_kMeshes[uiIndex];
+}

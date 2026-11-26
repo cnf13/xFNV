@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Pathfinding/AStarNode.h"
 
 class CombatPlanLink;

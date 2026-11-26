@@ -3,7 +3,7 @@
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSGameSound.h"
 #include "BSAudio/BSSoundHandle.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
@@ -43,7 +43,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -52,6 +51,7 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysEmitter.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysSpawnModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 
 #include <cmath>

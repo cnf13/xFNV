@@ -47,3 +47,5 @@ public:
 };
 
 NiSmartPointer(NiProperty);
+
+inline NiProperty::NiProperty() {}

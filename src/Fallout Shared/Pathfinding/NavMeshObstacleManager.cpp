@@ -7,13 +7,14 @@
 #include "BSCore/BSThread.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSSystem/BSTasklet.h"
 #include "BSSystem/BSTaskletGroup.h"
 #include "BSSystem/BSTaskletManager.h"
@@ -43,7 +44,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -55,6 +55,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
@@ -1569,39 +1570,4 @@ bool NavMeshObstacleManager::IsPointInBox(
         }
     }
     return false;
-}
-
-BSTasklet::BSTasklet() : pData(nullptr) {}
-
-BSTasklet::~BSTasklet() {}
-
-void BSTasklet::SetTaskData(BSTaskletData* apData) {
-    pData = apData;
-}
-
-void BSTasklet::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-bool BSTaskletGroup::Close() {
-    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
-    return singleton->BSTaskletManager::CloseTaskGroup(*this);
-}
-
-bool BSTaskletGroup::Open() {
-    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
-    return singleton->BSTaskletManager::OpenTaskGroup(*this);
-}
-
-bool BSTaskletGroup::AttachTask(BSTasklet& aTask, bool abLastTask) {
-    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
-    return singleton->BSTaskletManager::AttachTask(*this, aTask, abLastTask);
-}
-
-hkpEntityActivationListener::hkpEntityActivationListener() {}
-
-hkpEntityActivationListener::~hkpEntityActivationListener() {}
-
-void hkpEntityActivationListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
 }

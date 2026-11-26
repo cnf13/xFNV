@@ -8,6 +8,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
@@ -18,7 +19,7 @@
 #include "BSMain/BSParallelTaskManager.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "Fallout Shared/ActorValue.h"
@@ -158,7 +159,7 @@ ProcessLists::ProcessLists()
     DialogPackageList(), kNearbyActorLock(), kUpdateLock(), kLipSyncManager(), bRunScheduals(true), bRunDetection(true),
     bShowDetectionStats(false), pStatdetect(nullptr), bProcessHigh(true), bProcessLow(true), bProcessMHigh(true),
     bProcessMLow(true), bProcessSche(true), bShowSubtitle(false), bUpdatingLowList(false), iNumberHighActors(0),
-    fCrimeUpdateTimer(0.0f), iCrimeNumber(0), fRemoveExcessDeadTimer(gs_fRemoveExcessComplexDeadTime.Float()),
+    fCrimeUpdateTimer(0.0f), iCrimeNumber(0), fRemoveExcessDeadTimer(fRemoveExcessDeadComplexTime.Float()),
     MovementSyncSema(0, 40) {
     kLock_10340.uiOwningThread = 0;
     kLock_10340.uiLockCount = 0;
@@ -2140,7 +2141,7 @@ void ProcessLists::ChangeProcessLevelTempList() {
         }
 
         if ((!pCPLRef->IsActor() || pCPLRef->GetCurrentAIProcess()) &&
-            (!pCPLRef->IsTalkingActivator() || GetDialogMenuParterRef() == pCPLRef)) {
+            (!pCPLRef->IsTalkingActivator() || Interface::InDialogWith() == pCPLRef)) {
             // The death time must not be equal to 0 (NaN goes on); the hours are converted as unsigned. The hours
             // passed must be strictly greater.
             bool bRespawn = false;
@@ -4323,7 +4324,7 @@ void ProcessLists::DisableExcessDeadActors(float afDeltaTime) {
             bcomplex = false;
         }
         if (bcomplex) {
-            fTimer = gs_fRemoveExcessComplexDeadTime.Float();
+            fTimer = fRemoveExcessDeadComplexTime.Float();
         }
         else {
             fTimer = fRemoveExcessDeadTime.Float();
@@ -4831,10 +4832,6 @@ void ProcessLists::DeleteAttachedArrows(
             ++icount;
         }
     }
-}
-
-void bhkRagdollController::ReinitRBControllerOnUpdate(bool abReinit) {
-    bReinitRBController = abReinit;
 }
 
 void BSTempEffect::RemoveAllDecals() {

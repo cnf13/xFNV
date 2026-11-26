@@ -1,6 +1,7 @@
 #include "Fallout Shared/TESObjectTREE.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
@@ -26,7 +27,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBillboardNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -39,6 +39,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShapeData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
@@ -46,14 +47,14 @@
 
 // Byte swaps every field, in field order.
 void OBJ_TREE::Endian() {
-    ENDIAN(fCurveScalar, false);
-    ENDIAN(fMinimumLeafAngle, false);
-    ENDIAN(fMaximumLeafAngle, false);
-    ENDIAN(fBranchDimming, false);
-    ENDIAN(fLeafDimming, false);
-    ENDIAN(iCanopyShadowRadius, false);
-    ENDIAN(fRockSpeed, false);
-    ENDIAN(fRustleSpeed, false);
+    BSEndian(fCurveScalar, false);
+    BSEndian(fMinimumLeafAngle, false);
+    BSEndian(fMaximumLeafAngle, false);
+    BSEndian(fBranchDimming, false);
+    BSEndian(fLeafDimming, false);
+    BSEndian(iCanopyShadowRadius, false);
+    BSEndian(fRockSpeed, false);
+    BSEndian(fRustleSpeed, false);
 }
 
 TREE_BILLBOARD_DATA::TREE_BILLBOARD_DATA(
@@ -154,7 +155,7 @@ bool TESObjectTREE::Load(TESFile* apFile) {
                 SeedArray.RemoveAll();
                 for (uint32_t i = 0; i < uiCount; ++i) {
                     if (apFile->QEndian()) {
-                        ENDIAN(pSeeds[i], false);
+                        BSEndian(pSeeds[i], false);
                     }
                     if (pSeeds[i] > 0) {
                         SeedArray.Add(pSeeds[i]);
@@ -168,8 +169,8 @@ bool TESObjectTREE::Load(TESFile* apFile) {
                 if (uiChunkSize == 8) {
                     apFile->GetChunkData(&BillboardSize, uiChunkSize);
                     if (apFile->QEndian()) {
-                        ENDIAN(BillboardSize.x, false);
-                        ENDIAN(BillboardSize.y, false);
+                        BSEndian(BillboardSize.x, false);
+                        BSEndian(BillboardSize.y, false);
                     }
                 }
                 break;
@@ -373,7 +374,7 @@ void TESObjectTREE::CreateDistant3D(
         !apLocArray ||
         !apColorArray ||
         !aiArraySize ||
-        !SpeedTree::bEnableTrees::Get() ||
+        !BSTreeManager::CanTreesLoad() ||
         !IsLargeEnoughForDistantLOD()) {
         return;
     }
@@ -603,14 +604,6 @@ NiNode* TESObjectTREE::BuildDistant3D(bool abZUp) {
     return pnode;
 }
 
-BSTextureSet::BSTextureSet() {}
-
-BSTextureSet::~BSTextureSet() {}
-
-bool SpeedTree::bEnableTrees::Get() {
-    return gs_bEnableTrees_SpeedTree.Bool();
-}
-
 TESIconTree::TESIconTree() : TESTexture1024() {}
 
 TESIconTree::~TESIconTree() {}
@@ -626,5 +619,3 @@ TESModelTree::~TESModelTree() {}
 TESTexture1024::TESTexture1024() : TESTexture() {}
 
 TESTexture1024::~TESTexture1024() {}
-
-NiBillboardNode::~NiBillboardNode() {}

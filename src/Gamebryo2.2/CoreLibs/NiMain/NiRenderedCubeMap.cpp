@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedCubeMap.h"
 
 #include "Gamebryo2.2/CoreLibs/NiMain/Ni2DBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"

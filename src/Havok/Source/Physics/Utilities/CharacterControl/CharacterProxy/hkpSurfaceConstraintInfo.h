@@ -18,3 +18,9 @@ public:
     float m_dynamicFriction;
     int32_t m_priority;
 };
+
+inline hkpSurfaceConstraintInfo*
+hkpSurfaceConstraintInfo::Assign(hkpSurfaceConstraintInfo* apThis, const hkpSurfaceConstraintInfo& arOther) {
+    *apThis = arOther;
+    return apThis;
+}

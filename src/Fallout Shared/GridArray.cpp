@@ -1,6 +1,6 @@
 #include "Fallout Shared/GridArray.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
 GridArray::GridArray() {}

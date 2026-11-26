@@ -28,6 +28,11 @@ public:
             return minP[3];
         }
 
+        // Ordered by the lowest corner's x, the axis the sweep walks.
+        bool operator<(const AabbInt& other) const {
+            return m_min[0] < other.m_min[0];
+        }
+
         void operator=(const AabbInt& other) {
             hkString::memCpy16<sizeof(AabbInt)>(this, &other);
         }

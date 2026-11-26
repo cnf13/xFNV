@@ -6,7 +6,7 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
-#include "BSHavok/bhkPickData.h"
+#include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/ActorValue.h"
@@ -323,7 +323,7 @@ void LowProcess::Update(MobileObject* apRef) {
             case PROCEDURE_ACTIVATE: ProcessActivate(pActor, true); break;
             case PROCEDURE_ACQUIRE: ProcessAcquire(pActor); break;
             case PROCEDURE_SLEEP:
-                if (Interface::GetConsoleSelection() == pActor) {
+                if (Interface::GetPickREFR() == pActor) {
                     char acText[0x130];
                     PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                     const char* pPackName = NavMeshInfo::GetCellOrCoords(
@@ -336,7 +336,7 @@ void LowProcess::Update(MobileObject* apRef) {
                 }
                 break;
             case PROCEDURE_EAT:
-                if (Interface::GetConsoleSelection() == pActor) {
+                if (Interface::GetPickREFR() == pActor) {
                     char acText[0x130];
                     PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                     const char* pPackName = NavMeshInfo::GetCellOrCoords(
@@ -471,7 +471,7 @@ void LowProcess::Update(MobileObject* apRef) {
                 if (GetCurrentPackage() && GetCurrentPackage()->GetIsCreated()) {
                     pActor->EndInterruptPackage(false);
                 }
-                if (Interface::GetConsoleSelection() == pActor) {
+                if (Interface::GetPickREFR() == pActor) {
                     char acText[0x130];
                     PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                     const char* pPackName = NavMeshInfo::GetCellOrCoords(
@@ -2316,7 +2316,7 @@ void LowProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObjec
     pSaveLoadGameOLD->LoadNumericID(&ilocationID, 4u);
     pGenericLocation = reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(ilocationID));
     if ((aiFlags & CHANGE_ACTOR_DAMAGE_MODIFIERS) != 0) {
-        pDamageModifiers.LoadGameTES();
+        pDamageModifiers.LoadGame();
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() < 51u && (aiFlags & CHANGE_ACTOR_PERMANENT_MODIFIERS) != 0) {
         uint16_t icount;

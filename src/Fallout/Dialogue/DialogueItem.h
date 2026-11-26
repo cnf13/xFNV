@@ -32,10 +32,10 @@ public:
     void SetCurrentResponse(DialogueResponse* apDialogueResponse);
     int16_t GetDialogueResponseIndex(DialogueResponse* apDialogueResponse);
     DialogueResponse* GetDialogueResponseByIndex(int16_t aiIndex);
-    void SaveGameTES();
+    void SaveGame();
     void LoadGame();
     void SaveGame(BGSSaveGameBuffer* apSaveGameBuffer);
-    void LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer);
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     void PrecacheSounds();
     // The save size in bytes.
     uint16_t GetSaveSize();

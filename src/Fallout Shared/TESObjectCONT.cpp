@@ -3,10 +3,9 @@
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEntryPoint.h"
@@ -334,7 +333,7 @@ bool TESObjectCONT::Activate(
                     );
                 }
                 else {
-                    _ShowLockPickMenu(apItemActivated, 0, false);
+                    Interface::CreateLockPickMenu(apItemActivated, 0, false);
                 }
             }
             else {

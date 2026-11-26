@@ -257,22 +257,22 @@ public:
 extern SettingT<INISettingCollection> fRotationSpeedIncrease;
 extern SettingT<INISettingCollection> fLODActorAvoidanceDistance;
 
-extern SettingT<INISettingCollection> gs_fAICombatTurnSpeedScale_Pathfinding;
+extern SettingT<INISettingCollection> fINICombatTurnSpeedScale;
 
-extern SettingT<INISettingCollection> gs_fAITurnSpeedScale_Pathfinding;
+extern SettingT<INISettingCollection> fINITurnSpeedScale;
 
-extern SettingT<INISettingCollection> gs_fCreatureCombatTurnSpeedScale_Pathfinding;
+extern SettingT<INISettingCollection> fINICreatureCombatTurnSpeedScale;
 
-extern SettingT<INISettingCollection> fAvoidanceMinWaitTime;
+extern SettingT<INISettingCollection> fINIAvoidanceMinWaitTime;
 
-extern SettingT<INISettingCollection> gs_fRepathingWaitDistance_Pathfinding;
+extern SettingT<INISettingCollection> fINIRepathingWaitDistance;
 
-extern SettingT<INISettingCollection> gs_fAvoidanceAvoidAllRadius_Pathfinding;
+extern SettingT<INISettingCollection> fINIAvoidanceAvoidAllRadius;
 
-extern SettingT<INISettingCollection> gs_fAvoidanceTimeCheck_Pathfinding;
+extern SettingT<INISettingCollection> fINIAvoidanceTimeCheck;
 
-extern SettingT<INISettingCollection> gs_bUseActorAvoidance_Pathfinding;
+extern SettingT<INISettingCollection> bINIUseActorAvoidance;
 
-extern SettingT<INISettingCollection> gs_fCreatureTurnSpeedScale_Pathfinding;
+extern SettingT<INISettingCollection> fINICreatureTurnSpeedScale;
 
 #pragma pack(pop)

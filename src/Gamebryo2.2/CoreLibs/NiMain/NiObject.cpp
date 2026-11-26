@@ -2,7 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMainSDM.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
@@ -136,4 +136,16 @@ bool NiObject::IsExactKindOf(const NiRTTI* pkRTTI, const NiObject* pkObject) {
 
 bool NiObject::IsKindOf_0(NiRTTI* pkRTTI, NiObject* pkObject) {
     return pkObject && pkObject->IsKindOfMember(pkRTTI);
+}
+
+NiObject* NiObject::DynamicCastMember(const NiRTTI* pkRTTI) const {
+    return IsKindOfMember(pkRTTI) ? const_cast<NiObject*>(this) : nullptr;
+}
+
+// Static NiObject::DynamicCast: null for a null object, else the member DynamicCast.
+NiObject* NiObject::DynamicCastStatic(const NiRTTI* pkRTTI, const NiObject* pkObject) {
+    if (!pkObject) {
+        return nullptr;
+    }
+    return pkObject->DynamicCastMember(pkRTTI);
 }

@@ -6,7 +6,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkShape.h"
@@ -17,7 +17,7 @@
 #include "BSMain/BSUtilities.h"
 #include "BSMain/BSValueNode.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSRenderedTexture.h"
@@ -181,7 +181,7 @@ static SettingT<INISettingCollection> uGeometryMemoryBudgetCap("uGeometryMemory:
 static SettingT<INISettingCollection> uTextureMemoryBudgetCap("uTextureMemory:BudgetCaps", 20971520u);
 static SettingT<INISettingCollection> uWaterMemoryBudgetCap("uWaterMemory:BudgetCaps", 5242880u);
 static SettingT<INISettingCollection> uLightCountBudgetCap("uLightCount:BudgetCaps", 10u);
-SettingT<INISettingCollection> gs_uLightExcessGeometry_BudgetCaps("uLightExcessGeometry:BudgetCaps", 100u);
+SettingT<INISettingCollection> uLightExcessGeometryBudgetCap("uLightExcessGeometry:BudgetCaps", 100u);
 static SettingT<INISettingCollection> uDecalCountBudgetCap("uDecalCount:BudgetCaps", 500u);
 static SettingT<INISettingCollection> uHavokTriCountBudgetCap("uHavokTriCount:BudgetCaps", 5000u);
 static SettingT<INISettingCollection> uRefCountBudgetCapInterior("uRefCountInterior:BudgetCaps", 1000u);
@@ -258,7 +258,7 @@ SCENE_INFO_INFOArray pSceneInfoInfo{
     {"Water Memory", &uWaterMemoryBudgetCap, &uWaterMemoryBudgetCapInterior, nullptr, true, false},
     {"Lights", &uLightCountBudgetCap, &uLightCountBudgetCapInterior, &fMsLightCountBudgetCap, false, false},
     {"Lights w/Excess Geom",
-     &gs_uLightExcessGeometry_BudgetCaps,
+     &uLightExcessGeometryBudgetCap,
      &uLightExcessGeometryBudgetCapInterior,
      &fMsLightExcessGeometryBudgetCap,
      false,
@@ -493,7 +493,7 @@ void BGSSceneInfo::CollectSceneDataRecursive(
                             int32_t icount = 0;
                             BGSSceneInfo::LightGeomMap.GetAt(plight, icount);
                             BGSSceneInfo::LightGeomMap.SetAt(plight, ++icount);
-                            if (icount == gs_uLightExcessGeometry_BudgetCaps.Int()) {
+                            if (icount == uLightExcessGeometryBudgetCap.Int()) {
                                 ++psceneDataToFill[SID_LIGHT_COUNT_EXCESS_GEOM];
                             }
                         }
@@ -758,35 +758,4 @@ void BGSSceneInfo::TexUseCB(NiTexture* apTexture, uint32_t aulMemorySize, void* 
     }
 }
 
-// Returns spTexture[aiTextureID]; a null this reads a temporary null pointer instead and returns null.
-NiRenderedTexture* BSRenderedTexture::GetTexture(int32_t aiIndex) {
-    if (!this) {
-        NiPointer<NiRenderedTexture> spTemp;
-        NiRenderedTexture* pTexture = spTemp;
-        return pTexture;
-    }
-    return spTexture[aiIndex];
-}
-
 BGSTextureUseMap::BGSTextureUseMap() : UserMap(37u) {}
-
-NiPoint3* NiGeometry::GetNormals() {
-    return m_spModelData->GetNormals();
-}
-
-NiColorA* NiGeometry::GetColors() {
-    return m_spModelData->GetColors();
-}
-
-NiPoint2* NiGeometry::GetTextures() {
-    NiGeometryData* pModelData = m_spModelData;
-    return pModelData->m_pkTexture;
-}
-
-NiPoint3* NiGeometryData::GetNormals() const {
-    return m_pkNormal;
-}
-
-hkpShapeType hkpShape::getType() const {
-    return m_type;
-}

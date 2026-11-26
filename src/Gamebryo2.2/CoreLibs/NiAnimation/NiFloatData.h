@@ -42,3 +42,10 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiFloatKey* NiFloatData::GetAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) {
+    uiNumKeys = m_uiNumKeys;
+    eType = m_eType;
+    ucSize = m_ucKeySize;
+    return m_pkKeys;
+}

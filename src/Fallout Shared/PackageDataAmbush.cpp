@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/PackageData.h"
 #include "Fallout Shared/PackageLocation.h"

@@ -7,7 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBMPReader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDDSReader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiImageReader.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"

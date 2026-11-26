@@ -464,18 +464,6 @@ void Menu::SetMenuByClass(int32_t aiClass, Tile* apTile) {
     }
 }
 
-// Menus laid out in screen pixels rather than the 1280-wide menu space: the pip-boy menu (id 0x70), the computers,
-// hacking and race/sex menus (classes 0x421, 0x41F, 0x40C). Both values are truncated before the compares.
-bool Menu::ShouldScaleByResolutionRatio(Menu* apMenu) {
-    TileMenu* menuTile = apMenu ? apMenu->GetMenuTile() : nullptr;
-    if (!menuTile) {
-        return false;
-    }
-    const int32_t id = static_cast<int32_t>(menuTile->GetFloat(Tile::kTileValue_ID));
-    const int32_t menuClass = static_cast<int32_t>(menuTile->GetFloat(Tile::kTileValue_Class));
-    return id == 0x70 || menuClass == 0x421 || menuClass == 0x41F || menuClass == 0x40C;
-}
-
 void Menu::operator delete(void* apMemory) {
     MemoryManager::Instance().Deallocate(apMemory);
 }

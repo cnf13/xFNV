@@ -2,7 +2,7 @@
 
 #include "BSCore/BSCriticalSection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout/AI/Combat/Projectile.h"
 #include "Fallout/Audio/WeaponNearFarSound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -46,7 +46,7 @@ public:
     using GunshotHandleArray = WeaponNearFarSound[20];
 
     // Plays apRef's jump sound; aiFootType is not read, and the only caller passes 0.
-    static void PlayJumpSound(TESObjectREFR* apRef, int32_t aiFootType);
+    static void PlayJump(TESObjectREFR* apRef, int32_t aiFootType);
     // Plays apWeapon's gunshot sound for apSource at aOriginNode.
     static void PlayGunshot(TESObjectWEAP* apWeapon, TESObjectREFR* apSource, NiAVObject* aOriginNode, bool abPlayer);
     static const char* GetMaterialSoundName(int32_t aiMat);
@@ -111,7 +111,7 @@ public:
     static inline StepSoundNameTable
         pStepSoundNames{"WalkL", "WalkR", "RunR", "RunL", "SneakL", "SneakR", "StairsL", "StairsR", "Land", "Jump"};
     static inline FootstepSoundTable pFootSteps{};
-    // The armour footstep and jump sounds PlayFootstep and PlayJumpSound look up on first use
+    // The armour footstep and jump sounds PlayFootstep and PlayJump look up on first use
     // ("FSTArmorPowerL", "FSTArmorPowerR", "FSTArmorL", "FSTArmorR", "FSTJumpArmor", "FSTJumpPower").
     static inline TESSound* pPowerArmorStepL;
     static inline TESSound* pPowerArmorStepR;
@@ -135,41 +135,22 @@ public:
     static GunshotHandleArray GunshotHandles;
     static inline int32_t MaterialEquivalents[36]{0, 0, 7, 0, 8, 2, 0, 0, 9, 5, 0, 2, 5, 2, 0,  0,  3,  4,
                                                   6, 1, 2, 2, 3, 4, 6, 4, 2, 2, 5, 5, 2, 5, 10, 11, 12, 7};
+
+private:
+    static SettingT<INISettingCollection> fWoodMediumMass;
+    static SettingT<INISettingCollection> fWoodLargeMass;
+    static SettingT<INISettingCollection> fStoneMediumMass;
+    static SettingT<INISettingCollection> fStoneLargeMass;
+    static SettingT<INISettingCollection> fEarthMediumMass;
+    static SettingT<INISettingCollection> fEarthLargeMass;
+    static SettingT<INISettingCollection> fSkinMediumMass;
+    static SettingT<INISettingCollection> fSkinLargeMass;
+    static SettingT<INISettingCollection> fMetalMediumMass;
+    static SettingT<INISettingCollection> fMetalLargeMass;
+    static SettingT<INISettingCollection> fCollisionSoundHeavyThreshold;
+    static SettingT<INISettingCollection> fPlayerFootVolume;
+    static SettingT<INISettingCollection> fMaxFootstepDistance;
 };
 
 // The footstep sound index of each Havok material
 // (GetFootstepIndexForType).
-
-extern SettingT<INISettingCollection> gs_fWeaponInteriorFarAttenuationMod;
-
-extern SettingT<INISettingCollection> gs_fWeaponInteriorNearVolumeMod;
-
-extern SettingT<INISettingCollection> gs_fWeaponInteriorFarVolumeMod;
-
-extern SettingT<INISettingCollection> gs_fWeaponInteriorNearAttenuationMod;
-
-extern SettingT<INISettingCollection> gs_fMetalLargeMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fCollisionSoundHeavyThreshold_Audio;
-
-extern SettingT<INISettingCollection> gs_fMetalMediumMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fMaxFootstepDistance_Audio;
-
-extern SettingT<INISettingCollection> gs_fEarthMediumMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fSkinLargeMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fWoodMediumMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fPlayerFootVolume_Audio;
-
-extern SettingT<INISettingCollection> gs_fSkinMediumMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fStoneLargeMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fEarthLargeMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fStoneMediumMassMin_Audio;
-
-extern SettingT<INISettingCollection> gs_fWoodLargeMassMin_Audio;

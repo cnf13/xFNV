@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESObjectARMO.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSAddonNode.h"
@@ -10,6 +10,7 @@
 #include "Fallout Shared/BGSEquipType.h"
 #include "Fallout Shared/BGSPickupPutdownSounds.h"
 #include "Fallout Shared/BGSRepairItemList.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESBipedModelForm.h"
 #include "Fallout Shared/TESEnchantableForm.h"
 #include "Fallout Shared/TESFile.h"
@@ -31,6 +32,7 @@
 SettingT<GameSettingCollection> sArmorWeightLight("sArmorWeightLight", "Light");
 SettingT<GameSettingCollection> sArmorWeightHeavy("sArmorWeightHeavy", "Heavy");
 SettingT<GameSettingCollection> sArmorWeightMedium("sArmorWeightMedium", "Medium");
+SettingT<GameSettingCollection>* pGSArmorWeight[3]{&sArmorWeightLight, &sArmorWeightHeavy, &sArmorWeightMedium};
 static SettingT<GameSettingCollection> iArmorWeightHelmet("iArmorWeightHelmet", 5);
 static SettingT<GameSettingCollection> iArmorWeightCuirass("iArmorWeightCuirass", 30);
 static SettingT<GameSettingCollection> iArmorWeightGreaves("iArmorWeightGreaves", 15);

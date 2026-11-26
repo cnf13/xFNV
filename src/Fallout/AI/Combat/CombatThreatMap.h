@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSReadWriteLock.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -118,4 +119,4 @@ public:
 
 extern SettingT<INISettingCollection> bDebugCombatThreats;
 
-extern SettingT<GameSettingCollection> gs_fCombatThreatExtrudeVelocityThreshold;
+extern SettingT<GameSettingCollection> fCombatThreatExtrudeRadiusMult;

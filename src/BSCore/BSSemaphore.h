@@ -24,3 +24,6 @@ public:
     BSSystemSemaphore* hSemaphore;
     int32_t iMaxCount;
 };
+
+inline BSSemaphore::BSSemaphore(int32_t aiCount)
+  : iCount(aiCount), hSemaphore(new BSSystemSemaphore(aiCount, aiCount + 1)), iMaxCount(aiCount + 1) {}

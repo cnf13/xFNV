@@ -1,4 +1,5 @@
 #include "BSMain/Setting.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESScriptFunctions.h"
 #include "Fallout/Misc/Calendar.h"
 

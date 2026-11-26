@@ -2,8 +2,9 @@
 
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderBloodSplatter.h"
 #include "BSShader/BSShaderBloodSplatterProperty.h"
 #include "BSShader/BSShaderManager.h"
@@ -21,7 +22,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -33,6 +33,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 NiRTTI BSSplatterExtraData::ms_RTTI("BSSplatterExtraData", &NiExtraData::ms_RTTI);
 SettingT<INISettingCollection> bBloodSplatterEnabled("bBloodSplatterEnabled:ScreenSplatter", true);

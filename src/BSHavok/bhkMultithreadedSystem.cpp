@@ -2,7 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -65,6 +65,3 @@ void bhkMultithreadedSystem::QuitMTSystem() {
         uiMTResourceOwner = 0;
     }
 }
-
-// The hardware thread id array is freed by its own destructor.
-hkCpuJobThreadPoolCinfo::~hkCpuJobThreadPoolCinfo() {}

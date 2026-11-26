@@ -42,3 +42,21 @@ void* NiFixedString::Set(char* pcString) {
 bool NiFixedString::HandlesEqual(const NiFixedString& arString1, const NiFixedString& arString2) {
     return arString1.m_kHandle == arString2.m_kHandle;
 }
+
+void NiFixedString::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+const char* NiFixedString::GetHandleString() const {
+    return NiGlobalStringTable::GetString(m_kHandle);
+}
+
+NiFixedString& NiFixedString::Assign(const NiFixedString& kString) {
+    if (m_kHandle != kString.m_kHandle) {
+        NiGlobalStringTable::GlobalStringHandle kHandle = kString.m_kHandle;
+        NiGlobalStringTable::IncHandleRefCount(kHandle);
+        NiGlobalStringTable::DecHandleRefCount(m_kHandle);
+        m_kHandle = kHandle;
+    }
+    return *this;
+}

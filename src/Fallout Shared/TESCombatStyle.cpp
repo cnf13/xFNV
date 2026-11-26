@@ -1,6 +1,6 @@
 #include "Fallout Shared/TESCombatStyle.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/CombatFormulas.h"
@@ -14,69 +14,69 @@
 // Swaps the floats read from a big-endian file in the game's order (fWeaponMaxRangeMult before fClusterDistance); the
 // weapon restrictions byte is left alone.
 void SimpleCombatStyleData::Endian() {
-    ENDIAN(fCoverSearchRadius, false);
-    ENDIAN(fCoverChance, false);
-    ENDIAN(fCoverWaitTimerMin, false);
-    ENDIAN(fCoverWaitTimerMax, false);
-    ENDIAN(fCoverWaitToFireTimerMin, false);
-    ENDIAN(fCoverWaitToFireTimerMax, false);
-    ENDIAN(fCoverFireTimerMin, false);
-    ENDIAN(fCoverFireTimerMax, false);
-    ENDIAN(fWeaponMinRangeMult, false);
-    ENDIAN(fWeaponMaxRangeMult, false);
-    ENDIAN(fClusterDistance, false);
-    ENDIAN(fTargetingFOV, false);
-    ENDIAN(fCombatRadius, false);
-    ENDIAN(fSemiAutoFiringDelayMinMult, false);
-    ENDIAN(fSemiAutoFiringDelayMaxMult, false);
+    BSEndian(fCoverSearchRadius, false);
+    BSEndian(fCoverChance, false);
+    BSEndian(fCoverWaitTimerMin, false);
+    BSEndian(fCoverWaitTimerMax, false);
+    BSEndian(fCoverWaitToFireTimerMin, false);
+    BSEndian(fCoverWaitToFireTimerMax, false);
+    BSEndian(fCoverFireTimerMin, false);
+    BSEndian(fCoverFireTimerMax, false);
+    BSEndian(fWeaponMinRangeMult, false);
+    BSEndian(fWeaponMaxRangeMult, false);
+    BSEndian(fClusterDistance, false);
+    BSEndian(fTargetingFOV, false);
+    BSEndian(fCombatRadius, false);
+    BSEndian(fSemiAutoFiringDelayMinMult, false);
+    BSEndian(fSemiAutoFiringDelayMaxMult, false);
 }
 
 // Swaps the 21 floats read from a big-endian file, in the game's order (fAttackDuringBlockMult before
 // fAttackNoAttackMult).
 void AdvancedCombatStyleData::Endian() {
-    ENDIAN(fDodgeFatigueMult, false);
-    ENDIAN(fDodgeFatigueBase, false);
-    ENDIAN(fDodgeSpeedBase, false);
-    ENDIAN(fDodgeSpeedMult, false);
-    ENDIAN(fDodgeDuringAttackMult, false);
-    ENDIAN(fDodgeNoAttackMult, false);
-    ENDIAN(fDodgeBackDuringAttackMult, false);
-    ENDIAN(fDodgeBackNoAttackMult, false);
-    ENDIAN(fDodgeForwardWhileAttackingMult, false);
-    ENDIAN(fDodgeForwardNotAttackingMult, false);
-    ENDIAN(fBlockSkillMult, false);
-    ENDIAN(fBlockSkillBase, false);
-    ENDIAN(fBlockDuringAttackMult, false);
-    ENDIAN(fBlockNoAttackMult, false);
-    ENDIAN(fAttackSkillMult, false);
-    ENDIAN(fAttackSkillBase, false);
-    ENDIAN(fAttackDuringAttackMult, false);
-    ENDIAN(fAttackDuringBlockMult, false);
-    ENDIAN(fAttackNoAttackMult, false);
-    ENDIAN(fPowerAttackFatigueBase, false);
-    ENDIAN(fPowerAttackFatigueMult, false);
+    BSEndian(fDodgeFatigueMult, false);
+    BSEndian(fDodgeFatigueBase, false);
+    BSEndian(fDodgeSpeedBase, false);
+    BSEndian(fDodgeSpeedMult, false);
+    BSEndian(fDodgeDuringAttackMult, false);
+    BSEndian(fDodgeNoAttackMult, false);
+    BSEndian(fDodgeBackDuringAttackMult, false);
+    BSEndian(fDodgeBackNoAttackMult, false);
+    BSEndian(fDodgeForwardWhileAttackingMult, false);
+    BSEndian(fDodgeForwardNotAttackingMult, false);
+    BSEndian(fBlockSkillMult, false);
+    BSEndian(fBlockSkillBase, false);
+    BSEndian(fBlockDuringAttackMult, false);
+    BSEndian(fBlockNoAttackMult, false);
+    BSEndian(fAttackSkillMult, false);
+    BSEndian(fAttackSkillBase, false);
+    BSEndian(fAttackDuringAttackMult, false);
+    BSEndian(fAttackDuringBlockMult, false);
+    BSEndian(fAttackNoAttackMult, false);
+    BSEndian(fPowerAttackFatigueBase, false);
+    BSEndian(fPowerAttackFatigueMult, false);
 }
 
 // Swaps the floats and the flags read from a big-endian file in the game's order (fRushingAttackDistanceMult before
 // iFlags); the chance bytes are left alone.
 void CombatStyleData::Endian() {
-    ENDIAN(fDodgeLeftRightMinTime, false);
-    ENDIAN(fDodgeLeftRightMaxTime, false);
-    ENDIAN(fDodgeForwardMinTime, false);
-    ENDIAN(fDodgeForwardMaxTime, false);
-    ENDIAN(fDodgeBackwardMinTime, false);
-    ENDIAN(fDodgeBackwardMaxTime, false);
-    ENDIAN(fIdleMinTime, false);
-    ENDIAN(fIdleMaxTime, false);
-    ENDIAN(fAttackDuringRecoilStaggerBonus, false);
-    ENDIAN(fAttackDuringUnconsciousBonus, false);
-    ENDIAN(fAttackHandBonus, false);
-    ENDIAN(fPowerAttackRecoilStaggerBonus, false);
-    ENDIAN(fPowerAttackUnconsciousBonus, false);
-    ENDIAN(fHoldMinTime, false);
-    ENDIAN(fHoldMaxTime, false);
-    ENDIAN(fRushingAttackDistanceMult, false);
-    ENDIAN(iFlags, false);
+    BSEndian(fDodgeLeftRightMinTime, false);
+    BSEndian(fDodgeLeftRightMaxTime, false);
+    BSEndian(fDodgeForwardMinTime, false);
+    BSEndian(fDodgeForwardMaxTime, false);
+    BSEndian(fDodgeBackwardMinTime, false);
+    BSEndian(fDodgeBackwardMaxTime, false);
+    BSEndian(fIdleMinTime, false);
+    BSEndian(fIdleMaxTime, false);
+    BSEndian(fAttackDuringRecoilStaggerBonus, false);
+    BSEndian(fAttackDuringUnconsciousBonus, false);
+    BSEndian(fAttackHandBonus, false);
+    BSEndian(fPowerAttackRecoilStaggerBonus, false);
+    BSEndian(fPowerAttackUnconsciousBonus, false);
+    BSEndian(fHoldMinTime, false);
+    BSEndian(fHoldMaxTime, false);
+    BSEndian(fRushingAttackDistanceMult, false);
+    BSEndian(iFlags, false);
 }
 
 TESCombatStyle::TESCombatStyle() {

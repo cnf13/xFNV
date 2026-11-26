@@ -2,8 +2,10 @@
 
 #include "BSCore/BSCriticalSection.h"
 #include "BSCore/BSSimpleArray.h"
+#include "BSMain/BSMultiBoundRoom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
@@ -70,3 +72,49 @@ public:
 
     static BSCriticalSection kAlwaysQueueCrit;
 };
+
+inline void BSPortalGraph::AddRoomToAccumList(BSMultiBoundRoom* apRoom) {
+    if (apRoom) {
+        apRoom->IncRefCount();
+    }
+
+    auto* pItem = lMultiBoundRoomAccumList.m_pkHead;
+    bool bAdd = true;
+    while (pItem) {
+        auto* pElement = &pItem->m_element;
+        pItem = pItem->m_pkNext;
+        if (apRoom == pElement->m_pObject) {
+            bAdd = false;
+            break;
+        }
+    }
+    NiRefObject* pRoom = apRoom;
+    if (pRoom) {
+        pRoom->DecRefCount();
+    }
+
+    if (bAdd) {
+        NiPointer<BSMultiBoundRoom> spRoom;
+        spRoom.m_pObject = apRoom;
+        if (apRoom) {
+            apRoom->IncRefCount();
+        }
+        lMultiBoundRoomAccumList.AddTail(spRoom);
+        spRoom.m_pObject = nullptr;
+        if (pRoom) {
+            pRoom->DecRefCount();
+        }
+    }
+}
+
+inline const NiTPointerList<NiPointer<BSMultiBoundRoom>>& BSPortalGraph::QRooms() const {
+    return lMultiBoundRoomList;
+}
+
+inline BSMultiBoundRoom* BSPortalGraph::QRoomRoot() {
+    return static_cast<BSMultiBoundRoom*>(spMultiBoundRoomRoot.m_pObject);
+}
+
+inline NiTPointerList<BSOcclusionPlane*>& BSPortalGraph::QOccluderList() {
+    return lOccluderList;
+}

@@ -386,19 +386,6 @@ public:
     struct Vertex : hkgpAbstractMeshDefinitions::Vertex<Vertex, hkgpConvexHull::Vertex> {
         // Clears the scratch slot and marks the vertex unindexed (-1); the other fields are left unset.
         Vertex() : m_scratch(0.0f), m_index(-1) {}
-        Vertex(const Vertex&) = default;
-
-        // Copies the vertex's own fields; the list links stay.
-        Vertex& operator=(const Vertex& other) {
-            m_source = other.m_source;
-            m_x[0] = other.m_x[0];
-            m_x[1] = other.m_x[1];
-            m_x[2] = other.m_x[2];
-            m_scratch = other.m_scratch;
-            m_refs = other.m_refs;
-            m_index = other.m_index;
-            return *this;
-        }
 
         // Orders vertices by their integer coordinates, the first differing one deciding (signed compares): the
         // operator hkAlgorithm::less<Vertex> calls.
@@ -429,7 +416,11 @@ public:
     // plane and the plane and triangle ids.
     struct Triangle : hkgpAbstractMeshDefinitions::Triangle<Triangle, hkgpConvexHull::Triangle, Vertex*> {
         // Orders triangles by their plane id (an empty comparator; the release hkinternal.pdb, sizeof 1).
-        struct SortByPlaneId {};
+        struct SortByPlaneId {
+            bool operator()(const Triangle* a, const Triangle* b) const {
+                return a->m_plane.m_index < b->m_plane.m_index;
+            }
+        };
 
         Plane m_plane;
         int32_t m_pid;
@@ -483,8 +474,14 @@ public:
         bool m_visited;
     };
 
-    // Orders points by their angle about m_origin.
+    // Orders points by their squared distance to m_origin, nearest first.
     struct RadialSort {
+        RadialSort(const hkVector4& origin) : m_origin(&origin) {}
+
+        bool operator()(const hkVector4& a, const hkVector4& b) const {
+            return a.distanceToSquared3(*m_origin) < b.distanceToSquared3(*m_origin);
+        }
+
         const hkVector4* m_origin;
     };
 
@@ -725,12 +722,6 @@ public:
     static inline int32_t g_uidGenerator;
 };
 
-// A quicksort of triangle pointers by their plane's index (signed); apArr is the array, aiLow/aiHigh the inclusive
-// bounds, aiLess the comparator's byte.
-int32_t sortTrianglesByPlaneIndex(hkgpConvexHullImpl::Triangle** apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess);
-// Sorts points[lo..hi] by squared distance to origin, nearest first (a quicksort, recursing on the lower part).
-void sortByDistance(hkVector4* points, int32_t lo, int32_t hi, const hkVector4* origin);
-
 // The hull implementation's abstract mesh.
 using hkgpConvexHullImplAbstractMesh = hkgpAbstractMesh<
     hkgpConvexHullImpl::Edge,
@@ -742,28 +733,3 @@ extern int32_t s_staticPair0;
 extern int32_t s_staticPair1;
 extern int32_t s_staticPair_guard;
 
-namespace hkAlgorithm {
-
-    // Sorts apArr[aiLow..aiHigh] in place (inclusive bounds) by integer coordinates, with the comparator inlined.
-    // aiLess stands for the comparator (an empty class), which is passed on to the recursive call as a single byte,
-    // since an empty class argument carries no bytes in C++. Returns the low bound of the last pass, or the last
-    // recursive call's result.
-    int32_t quickSortRecursive(hkgpConvexHullImpl::Vertex* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess);
-
-} // namespace hkAlgorithm
-
-namespace hkAlgorithm {
-
-    // Sorts apArr[aiLow..aiHigh] in place (inclusive bounds), largest key first. aiLess stands in for the comparator,
-    // which is passed on whole as an int32_t.
-    void quickSortRecursive(hkgpConvexHullImpl::SortedEdge* apArr, int32_t aiLow, int32_t aiHigh, int32_t aiLess);
-
-} // namespace hkAlgorithm
-
-namespace hkAlgorithm {
-
-    // Sorts buildIndices's triangles apArr[aiLow..aiHigh] in place (inclusive bounds), largest key first. aiLess is the
-    // comparator, passed on whole by the recursive call, so it is an integer here.
-    void quickSortRecursive(hkgpConvexHullImpl::SortedTriangle* apArr, int32_t aiLow, int32_t aiHigh, int32_t aiLess);
-
-} // namespace hkAlgorithm

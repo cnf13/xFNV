@@ -1,6 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"

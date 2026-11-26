@@ -1,8 +1,8 @@
 #include "Fallout/Misc/SeenData.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderNoLightingProperty.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -16,10 +16,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <limits>
 

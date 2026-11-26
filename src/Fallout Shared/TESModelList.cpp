@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSSystem/BSHash.h"
 #include "Fallout Shared/BaseFormComponent.h"
@@ -42,7 +42,7 @@ void TESTextureListArray::Load(TESModelList* apModelList, TESFile* apFile) {
     apFile->GetChunkData(pBuffer, uiSize);
     ourMemcpy(this, pBuffer, 4);
     if (apFile->QEndian()) {
-        ENDIAN(iTextureListCount, false);
+        BSEndian(iTextureListCount, false);
     }
     uint32_t uiOffset = 4;
     // The size is 0xFFFFFFFF when 4 * iTextureListCount overflows 32 bits.

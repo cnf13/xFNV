@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/PathingLOSMap.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XInputManager.h"
 #include "BSMain/BSTestObjects.h"
 #include "BSShader/BSShaderManager.h"
@@ -15,7 +15,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAlphaProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -25,6 +24,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 char BSMAX_1(char acA, char acB) {
@@ -224,8 +224,4 @@ void PathingLOSMap::ClearUnseenTriangles() {
 bool PathingLOSMap::IsNavMeshInMap(uint32_t aiNavMeshID) {
     uint32_t uiOffset;
     return NavMeshToOffsetMap.GetAt(aiNavMeshID, uiOffset);
-}
-
-void NiNode::SetChildArraySize(uint32_t aiSize) {
-    m_kChildren.SetSize(aiSize);
 }

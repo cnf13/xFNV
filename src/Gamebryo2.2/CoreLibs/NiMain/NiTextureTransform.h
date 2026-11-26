@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 
 class NiStream;
@@ -49,3 +49,10 @@ public:
     // The identity transform: no translation or rotation, unit scale, centred at (0.5, 0.5), MAYA_TRANSFORM.
     static const NiTextureTransform IDENTITY;
 };
+
+inline const NiMatrix3* NiTextureTransform::GetMatrix() const {
+    if (m_bMatrixDirty) {
+        UpdateMatrix();
+    }
+    return &m_kMatrix;
+}

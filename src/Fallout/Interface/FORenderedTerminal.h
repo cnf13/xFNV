@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Fallout/Interface/FORenderedMenu.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -61,12 +62,12 @@ extern SettingT<INISettingCollection> fRenderedTerminalHPos;
 extern SettingT<INISettingCollection> fRenderedTerminalZoom;
 extern SettingT<INISettingCollection> fRenderedTerminalScanlineScale;
 
-extern SettingT<INISettingCollection> gs_fScreenLightColorB_RenderedTerminal;
+extern SettingT<INISettingCollection> fTermScreenLightColorB;
 
-extern SettingT<INISettingCollection> gs_fScreenLightColorR_RenderedTerminal;
+extern SettingT<INISettingCollection> fTermScreenLightColorR;
 
-extern SettingT<INISettingCollection> gs_fScreenLightRadius_RenderedTerminal;
+extern SettingT<INISettingCollection> fTermScreenLightRadius;
 
-extern SettingT<INISettingCollection> g_fScreenLightBaseIntensity_RenderedTerminal;
+extern SettingT<INISettingCollection> fTermScreenLightBaseIntensity;
 
-extern SettingT<INISettingCollection> gs_fScreenLightColorG_RenderedTerminal;
+extern SettingT<INISettingCollection> fTermScreenLightColorG;

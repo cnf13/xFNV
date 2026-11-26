@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/IOManager.h"
 #include "BSShader/BSShaderManager.h"
 #include "Fallout Shared/ActorValue.h"

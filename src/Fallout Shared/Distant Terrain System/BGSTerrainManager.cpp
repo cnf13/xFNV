@@ -2,8 +2,9 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSSystem/BSFile.h"
 #include "BSSystem/FileFinder.h"
@@ -22,12 +23,12 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCullingProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/stdio.h"
 
 // The game settings this file defines, with their IDs and values, in initialization order.
@@ -303,16 +304,4 @@ bool BGSTerrainManager::GetCurrentWorldHasLOD() {
 
 void BGSTerrainManager::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-// Reads a 16-bit value into arVal and records the byte count.
-BSFile& BSFile::operator>>(int16_t& arVal) {
-    iResult = NiBinaryStream::Read(&arVal, 2u);
-    return *this;
-}
-
-// Reads a 32-bit value into arVal and records the byte count.
-BSFile& BSFile::operator>>(uint32_t& arVal) {
-    iResult = NiBinaryStream::Read(&arVal, 4u);
-    return *this;
 }

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "Fallout Shared/FaceGen/BSFaceGenAnimationData.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

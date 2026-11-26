@@ -1,5 +1,5 @@
 #include "SDK/MSVC/exception.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/MSVC/stdexcept.h"
 #include "SDK/MSVC/string.h"
 #include <cstdlib>

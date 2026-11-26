@@ -1,12 +1,13 @@
 #include "Fallout Shared/TESTerrainLODManager.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSMultiBoundAABB.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "BSShader/TallGrassShader.h"
@@ -28,31 +29,31 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 // The game settings this file defines, with their IDs and values, in the game's initialization order.
-SettingT<INISettingCollection> gs_bDrawShaderGrass_Grass("bDrawShaderGrass:Grass", true);
-SettingT<INISettingCollection> gs_bGrassPointLighting_Grass("bGrassPointLighting:Grass", false);
+SettingT<INISettingCollection> bDrawShaderGrass("bDrawShaderGrass:Grass", true);
+SettingT<INISettingCollection> bGrassPointLighting("bGrassPointLighting:Grass", false);
 SettingT<INISettingCollection> fGrassMinStartFadeDistance("fGrassMinStartFadeDistance:Grass", 400.0f);
 SettingT<INISettingCollection> fGrassMaxStartFadeDistance("fGrassMaxStartFadeDistance:Grass", 7000.0f);
 SettingT<INISettingCollection> fGrassDefaultStartFadeDistance("fGrassDefaultStartFadeDistance:Grass", 3500.0f);
 SettingT<INISettingCollection> fGrassFadeRange("fGrassFadeRange:Grass", 1000.0f);
 SettingT<RendererSettingCollection>
     fGrassStartFadeDistance("fGrassStartFadeDistance:Grass", fGrassDefaultStartFadeDistance.Float());
-SettingT<INISettingCollection> gs_iMinGrassSize_Grass("iMinGrassSize:Grass", 80);
-SettingT<INISettingCollection> gs_fGrassWindMagnitudeMin_Grass("fGrassWindMagnitudeMin:Grass", 5.0f);
-SettingT<INISettingCollection> gs_fGrassWindMagnitudeMax_Grass("fGrassWindMagnitudeMax:Grass", 125.0f);
+SettingT<INISettingCollection> iMinGrassSize("iMinGrassSize:Grass", 80);
+SettingT<INISettingCollection> fGrassWindMagnitudeMin("fGrassWindMagnitudeMin:Grass", 5.0f);
+SettingT<INISettingCollection> fGrassWindMagnitudeMax("fGrassWindMagnitudeMax:Grass", 125.0f);
 
 // The first manager allocates the shared low-detail grass buffers, the last one frees them.
 TESTerrainLODManager::TESTerrainLODManager() {
     if (!iManagerCount) {
-        int32_t iSizeCap = (TESObjectLAND::GetGrassEvalSize() << 8) / gs_iMinGrassSize_Grass.Int();
+        int32_t iSizeCap = (TESObjectLAND::GetGrassEvalSize() << 8) / iMinGrassSize.Int();
         uint32_t uiCount = static_cast<uint32_t>(iSizeCap * iSizeCap);
         if (!pLowpositions) {
             pLowpositions = static_cast<NiPoint3*>(ourMalloc(uiCount * sizeof(NiPoint3)));
@@ -62,7 +63,7 @@ TESTerrainLODManager::TESTerrainLODManager() {
         }
     }
     ++iManagerCount;
-    TallGrassShader::SetWindRanges(gs_fGrassWindMagnitudeMin_Grass.Float(), gs_fGrassWindMagnitudeMax_Grass.Float());
+    TallGrassShader::SetWindRanges(fGrassWindMagnitudeMin.Float(), fGrassWindMagnitudeMax.Float());
 }
 
 TESTerrainLODManager::~TESTerrainLODManager() {
@@ -85,11 +86,11 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
         "D:\\_Fallout3\\Platforms\\Common\\Code\\Fallout Shared\\TESTerrainLODManager.cpp",
         177
     );
-    if (!TES::pInstance->pInteriorCell && gs_bDrawShaderGrass_Grass.Bool() && bIsToggleGrassUpdate) {
+    if (!TES::pInstance->pInteriorCell && bDrawShaderGrass.Bool() && bIsToggleGrassUpdate) {
         if (!TESTerrainLODManager::bGrassInitialized) {
             TESTerrainLODManager::InitGrass();
         }
-        TallGrassShaderProperty::bPointLighting = gs_bGrassPointLighting_Grass.Bool();
+        TallGrassShaderProperty::bPointLighting = bGrassPointLighting.Bool();
         float fMaxRange = fGrassStartFadeDistance.Float() + fGrassFadeRange.Float();
         float fFadeRange = fGrassStartFadeDistance.Float();
         if (!(fGrassStartFadeDistance.Float() < fGrassMinStartFadeDistance.Float() + 0.5)) {
@@ -146,7 +147,7 @@ void TESTerrainLODManager::UpdateGrass(NiPoint3 apCameraPosition, NiPoint3 apCam
                     }
                 }
             }
-            if (gs_bGrassPointLighting_Grass) {
+            if (bGrassPointLighting) {
                 NiNode* pNode = TESTerrainLODManager::pGrassNode;
                 NiNode* pBaseNode = BSShaderManager::GetShadowSceneNode(0);
                 static_cast<ShadowSceneNode*>(pBaseNode)->ShadowSceneNode::UpdateObjectLighting(pNode, false);
@@ -382,7 +383,7 @@ void TESTerrainLODManager::CreateGrass(
         float fGrassArea = static_cast<float>(TESObjectLAND::GetGrassEvalSize() << 8);
         uint16_t usGrassSize = static_cast<int32_t>(fGrassArea / apGrassParam->fPositionRange);
         int32_t iGrassEvalSize = TESObjectLAND::GetGrassEvalSize();
-        uint16_t usMaxSize = (iGrassEvalSize << 8) / gs_iMinGrassSize_Grass.Int();
+        uint16_t usMaxSize = (iGrassEvalSize << 8) / iMinGrassSize.Int();
         if (usGrassSize > static_cast<int32_t>(usMaxSize)) {
             usGrassSize = usMaxSize;
         }
@@ -564,8 +565,4 @@ void TESTerrainLODManager::CreateGrass(
             );
         }
     }
-}
-
-float NiCosQ(float afRadians) {
-    return s_fCosTableA[static_cast<int32_t>(512.0 / NI_TWO_PI * afRadians) & 511];
 }

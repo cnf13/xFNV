@@ -4,6 +4,7 @@
 #include "BSCore/BSScrapArray.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
@@ -18,12 +19,12 @@
 #include "Fallout Shared/TES.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 PathingLOSGridMap::PathingLOSGridMap()

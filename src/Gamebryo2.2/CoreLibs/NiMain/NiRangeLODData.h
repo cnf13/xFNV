@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLODData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
 // LOD by camera distance from a center: one near/far range per level.

@@ -397,7 +397,7 @@ public:
     // Clips this mesh and a new mesh made from hull against each other
     // until a pass clips nothing, removes the triangles the two share, rebuilds this mesh's tree and returns the new
     // mesh; null (the mesh deleted) when nothing was clipped.
-    hkgpMesh* clipByConvexHull(const hkgpConvexHull& hull);
+    hkgpMesh* trim(const hkgpConvexHull& hull);
     // Splits edge at a new vertex at position; returns the edge from the new vertex through arResult.
     hkgpMeshBase::Edge*
     splitEdge(hkgpMeshBase::Edge* arResult, hkgpMeshBase::Edge edge, const hkVector4& position, bool abFlag);

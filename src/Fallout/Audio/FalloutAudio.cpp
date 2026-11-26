@@ -30,15 +30,17 @@
 #include <cmath>
 
 SettingT<INISettingCollection> FalloutAudio::fMainMenuMusicVolume("fMainMenuMusicVolume:Audio", 0.6f);
-SettingT<INISettingCollection> gs_fASFadeInTime_Audio("fASFadeInTime:Audio", 3.0f);
-SettingT<INISettingCollection> gs_fASFadeOutTime_Audio("fASFadeOutTime:Audio", 5.0f);
-SettingT<INISettingCollection> gs_fASFadeStartTime_Audio("fASFadeStartTime:Audio", 2.0f);
-SettingT<INISettingCollection> gs_fRegionLoopFadeInTime_Audio("fRegionLoopFadeInTime:Audio", 0.6f);
-SettingT<INISettingCollection> gs_fRegionLoopFadeOutTime_Audio("fRegionLoopFadeOutTime:Audio", 1.0f);
-SettingT<INISettingCollection> gs_fWeaponInteriorNearVolumeMod("fWeaponInteriorNearVolumeMod", 1.0f);
-SettingT<INISettingCollection> gs_fWeaponInteriorNearAttenuationMod("fWeaponInteriorNearAttenuationMod", 3.0f);
-SettingT<INISettingCollection> gs_fWeaponInteriorFarVolumeMod("fWeaponInteriorFarVolumeMod", 0.1f);
-SettingT<INISettingCollection> gs_fWeaponInteriorFarAttenuationMod("fWeaponInteriorFarAttenuationMod", 0.75f);
+SettingT<INISettingCollection> FalloutAudio::fASFadeInTime("fASFadeInTime:Audio", 3.0f);
+SettingT<INISettingCollection> FalloutAudio::fASFadeOutTime("fASFadeOutTime:Audio", 5.0f);
+SettingT<INISettingCollection> FalloutAudio::fASFadeStartTime("fASFadeStartTime:Audio", 2.0f);
+SettingT<INISettingCollection> FalloutAudio::fRegionLoopFadeInTime("fRegionLoopFadeInTime:Audio", 0.6f);
+SettingT<INISettingCollection> FalloutAudio::fRegionLoopFadeOutTime("fRegionLoopFadeOutTime:Audio", 1.0f);
+SettingT<INISettingCollection> FalloutAudio::fWeaponInteriorNearVolumeMod("fWeaponInteriorNearVolumeMod", 1.0f);
+SettingT<INISettingCollection>
+    FalloutAudio::fWeaponInteriorNearAttenuationMod("fWeaponInteriorNearAttenuationMod", 3.0f);
+SettingT<INISettingCollection> FalloutAudio::fWeaponInteriorFarVolumeMod("fWeaponInteriorFarVolumeMod", 0.1f);
+SettingT<INISettingCollection>
+    FalloutAudio::fWeaponInteriorFarAttenuationMod("fWeaponInteriorFarAttenuationMod", 0.75f);
 SettingT<INISettingCollection> FalloutAudio::iMusicTransitionInMS("iMusicTransitionInMS:Audio", 1000);
 SettingT<INISettingCollection> FalloutAudio::iMusicSynchOverride("iMusicSynchOverride:Audio", 0);
 BSSoundHandle FalloutAudio::UnderwaterLoop;
@@ -159,9 +161,9 @@ void FalloutAudio::UpdateRegionSounds() {
     if (!Interface::IsTopMenuID(Interface::eStartMenu)) {
         TES::pInstance->UpdateRefSounds();
     }
-    float fFadeInTime = gs_fASFadeStartTime_Audio.Float();
+    float fFadeInTime = FalloutAudio::fASFadeStartTime.Float();
     if (FalloutAudio::kAmbientLoop.IsPlaying()) {
-        fFadeInTime = gs_fASFadeInTime_Audio.Float();
+        fFadeInTime = FalloutAudio::fASFadeInTime.Float();
     }
     if (FalloutAudio::pCurrentSpace && pPlayer) {
         TESSound* pambSound;
@@ -177,7 +179,7 @@ void FalloutAudio::UpdateRegionSounds() {
                 }
                 if (FalloutAudio::kAmbientLoop.IsPlaying()) {
                     FalloutAudio::kAmbientLoop.FadeOutAndRelease(
-                        static_cast<int64_t>(gs_fASFadeOutTime_Audio.Float() * 500.0)
+                        static_cast<int64_t>(FalloutAudio::fASFadeOutTime.Float() * 500.0)
                     );
                     FalloutAudio::kAmbientLoop.Clear();
                 }
@@ -196,26 +198,26 @@ void FalloutAudio::UpdateRegionSounds() {
             if (!FalloutAudio::bUpdateAcousticSpace) {
                 switch (FalloutAudio::iCurrentTime) {
                     case 0: {
-                        if (gs_fDayTime_Audio.Float() < static_cast<double>(ftimeOfDay)) {
+                        if (BSAudio::fDayTime.Float() < static_cast<double>(ftimeOfDay)) {
                             bHasChanged = true;
                         }
                         break;
                     }
                     case 1: {
-                        if (gs_fDuskTime_Audio.Float() < static_cast<double>(ftimeOfDay)) {
+                        if (BSAudio::fDuskTime.Float() < static_cast<double>(ftimeOfDay)) {
                             bHasChanged = true;
                         }
                         break;
                     }
                     case 2: {
-                        if (gs_fNightTime_Audio.Float() < static_cast<double>(ftimeOfDay)) {
+                        if (BSAudio::fNightTime.Float() < static_cast<double>(ftimeOfDay)) {
                             bHasChanged = true;
                         }
                         break;
                     }
                     case 3: {
-                        if (gs_fDawnTime_Audio.Float() < static_cast<double>(ftimeOfDay)) {
-                            if (gs_fNightTime_Audio.Float() > static_cast<double>(ftimeOfDay)) {
+                        if (BSAudio::fDawnTime.Float() < static_cast<double>(ftimeOfDay)) {
+                            if (BSAudio::fNightTime.Float() > static_cast<double>(ftimeOfDay)) {
                                 bHasChanged = true;
                             }
                         }
@@ -233,21 +235,21 @@ void FalloutAudio::UpdateRegionSounds() {
                 }
                 else {
                     FalloutAudio::kAmbientLoop.FadeOutAndRelease(
-                        static_cast<int64_t>(gs_fASFadeOutTime_Audio.Float() * 1000.0)
+                        static_cast<int64_t>(FalloutAudio::fASFadeOutTime.Float() * 1000.0)
                     );
                     FalloutAudio::kAmbientLoop.Clear();
                 }
                 FalloutAudio::bUseWalla = false;
-                if (gs_fDawnTime_Audio.Float() < static_cast<double>(ftimeOfDay)) {
-                    if (!(gs_fDayTime_Audio.Float() < static_cast<double>(ftimeOfDay))) {
+                if (BSAudio::fDawnTime.Float() < static_cast<double>(ftimeOfDay)) {
+                    if (!(BSAudio::fDayTime.Float() < static_cast<double>(ftimeOfDay))) {
                         pambSound = FalloutAudio::pCurrentSpace->pDawnSound;
                         FalloutAudio::iCurrentTime = 0;
                     }
-                    else if (!(gs_fDuskTime_Audio.Float() < static_cast<double>(ftimeOfDay))) {
+                    else if (!(BSAudio::fDuskTime.Float() < static_cast<double>(ftimeOfDay))) {
                         pambSound = FalloutAudio::pCurrentSpace->pNoonSound;
                         FalloutAudio::iCurrentTime = 1;
                     }
-                    else if (!(gs_fNightTime_Audio.Float() < static_cast<double>(ftimeOfDay))) {
+                    else if (!(BSAudio::fNightTime.Float() < static_cast<double>(ftimeOfDay))) {
                         pambSound = FalloutAudio::pCurrentSpace->pDuskSound;
                         FalloutAudio::iCurrentTime = 2;
                     }
@@ -317,17 +319,19 @@ void FalloutAudio::UpdateRegionSounds() {
                     *phndle = BSAudio::QInstance().GetSoundHandleByFilename(pFilename, 0x11011u, psoundData);
                     phndle->bAssumeSuccess = true;
                     FalloutAudio::CurrentRegionSounds.SetAt(psoundData->iFormID, phndle);
-                    phndle->FadeInPlay(static_cast<int64_t>(gs_fRegionLoopFadeInTime_Audio.Float() * 1000.0));
+                    phndle->FadeInPlay(static_cast<int64_t>(FalloutAudio::fRegionLoopFadeInTime.Float() * 1000.0));
                 }
                 else if (bisLoop && bisInMap) {
                     if (!plookup->IsPlaying() || bcanPlay) {
                         if (plookup->IsValid() && !plookup->IsPlaying() && bcanPlay) {
-                            plookup->FadeInPlay(static_cast<int64_t>(gs_fRegionLoopFadeInTime_Audio.Float() * 1000.0));
+                            plookup->FadeInPlay(
+                                static_cast<int64_t>(FalloutAudio::fRegionLoopFadeInTime.Float() * 1000.0)
+                            );
                         }
                     }
                     else {
                         plookup->FadeOutAndRelease(
-                            static_cast<int64_t>(gs_fRegionLoopFadeOutTime_Audio.Float() * 1000.0)
+                            static_cast<int64_t>(FalloutAudio::fRegionLoopFadeOutTime.Float() * 1000.0)
                         );
                         FalloutAudio::CurrentRegionSounds.RemoveAt(psoundData->iFormID);
                         if (plookup) {
@@ -388,7 +392,7 @@ void FalloutAudio::UpdateRegionSounds() {
             if (!bisInList) {
                 FalloutAudio::CurrentRegionSounds.RemoveAt(ikey);
                 pPos = FalloutAudio::CurrentRegionSounds.GetFirstPos();
-                plookup->FadeOutAndRelease(static_cast<int64_t>(gs_fRegionLoopFadeOutTime_Audio.Float() * 1000.0));
+                plookup->FadeOutAndRelease(static_cast<int64_t>(FalloutAudio::fRegionLoopFadeOutTime.Float() * 1000.0));
                 if (plookup) {
                     delete plookup;
                 }
@@ -425,7 +429,9 @@ void FalloutAudio::ClearAcousticSpace(BGSAcousticSpace* apSpace) {
     if (!FalloutAudio::bLockAcousticSpace &&
         (!apSpace || apSpace == FalloutAudio::pCurrentSpace) &&
         FalloutAudio::pCurrentSpace) {
-        FalloutAudio::kAmbientLoop.FadeOutAndRelease(static_cast<int64_t>(gs_fASFadeOutTime_Audio.Float() * 1000.0));
+        FalloutAudio::kAmbientLoop.FadeOutAndRelease(
+            static_cast<int64_t>(FalloutAudio::fASFadeOutTime.Float() * 1000.0)
+        );
         FalloutAudio::kAmbientLoop.Clear();
         FalloutAudio::pCurrentSpace = nullptr;
         FalloutAudio::bUpdateAcousticSpace = true;
@@ -443,7 +449,9 @@ void FalloutAudio::SetNextAcousticSpace(BGSAcousticSpace* apSpace) {
 
 void FalloutAudio::SetAcousticSpace(BGSAcousticSpace* apSpace) {
     if (FalloutAudio::pCurrentSpace != apSpace) {
-        FalloutAudio::kAmbientLoop.FadeOutAndRelease(static_cast<int64_t>(gs_fASFadeOutTime_Audio.Float() * 1000.0));
+        FalloutAudio::kAmbientLoop.FadeOutAndRelease(
+            static_cast<int64_t>(FalloutAudio::fASFadeOutTime.Float() * 1000.0)
+        );
         FalloutAudio::kAmbientLoop.Clear();
         if (apSpace) {
             uint32_t uiEnvType = static_cast<uint32_t>(apSpace->eEnvType);

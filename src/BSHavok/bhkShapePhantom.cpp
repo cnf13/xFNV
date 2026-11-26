@@ -6,7 +6,7 @@
 #include "BSHavok/bhkWorldObject.h"
 #include "Fallout Shared/TES.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
@@ -131,3 +131,10 @@ void bhkShapePhantom::setTransform(hkTransform* apTransform) {
         v3->setTransform(*apTransform);
     }
 }
+
+bhkShapePhantom::~bhkShapePhantom() {
+    bhkSerializable::Kill();
+    --iCount;
+}
+
+hkShapePhantomCinfo::~hkShapePhantomCinfo() {}

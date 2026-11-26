@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysUpdateTask.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParallelUpdateTaskManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -18,13 +18,6 @@
 NiRTTI NiPSysUpdateTask::ms_RTTI("NiPSysUpdateTask", &NiTask::ms_RTTI);
 NiCriticalSection NiPSysUpdateTask::ms_kPoolCriticalSection;
 NiTObjectPool<NiPSysUpdateTask> NiPSysUpdateTask::ms_kPool;
-
-// A real new[]: clang gives the class a vector deleting destructor only where its new[] is seen, and _SDMShutdown's
-// delete[] goes through it.
-template <>
-NiPSysUpdateTask* NiTNewInterface<NiPSysUpdateTask>::Allocate(uint32_t uiNumElements) {
-    return new NiPSysUpdateTask[uiNumElements];
-}
 
 using NiTPool_lNiPSysUpdateTask_cNiTNewInterface_lNiPSysUpdateTask = NiTPool<
     NiPSysUpdateTask,

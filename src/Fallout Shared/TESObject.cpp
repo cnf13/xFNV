@@ -5,7 +5,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkShape.h"
@@ -15,7 +15,7 @@
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/BSXFlags.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/Setting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderManager.h"
@@ -129,7 +129,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
@@ -140,6 +139,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehdata.h"
 #include "SDK/MSVC/iosfwd.h"
 #include "SDK/MSVC/rtti.h"
@@ -149,49 +149,6 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-
-NiNPShortPoint3::NiNPShortPoint3(int32_t aiX, int32_t aiY, int32_t aiZ)
-  : x(static_cast<int16_t>(aiX)), y(static_cast<int16_t>(aiY)), z(static_cast<int16_t>(aiZ)) {}
-
-float NiNPShortPoint3::GetFloatX() const {
-    return static_cast<float>(x);
-}
-
-float NiNPShortPoint3::GetFloatY() const {
-    return static_cast<float>(y);
-}
-
-float NiNPShortPoint3::GetFloatZ() const {
-    return static_cast<float>(z);
-}
-
-float NiNPShortPoint3::Length() const {
-    float fLengthSquared = static_cast<float>(static_cast<double>(z * z + (y * y + x * x)));
-    return NiSqrt(fLengthSquared);
-}
-
-// The component-wise difference this - arPoint, constructed in apResult.
-NiNPShortPoint3*
-NiNPShortPoint3::CalculateRelativeBounds(NiNPShortPoint3* apResult, const NiNPShortPoint3& arPoint) const {
-    ::new (apResult) NiNPShortPoint3(x - arPoint.x, y - arPoint.y, z - arPoint.z);
-    return apResult;
-}
-
-NiNPShortPoint3& NiNPShortPoint3::operator=(const NiNPShortPoint3& arPt) {
-    x = arPt.x;
-    y = arPt.y;
-    z = arPt.z;
-    return *this;
-}
-
-const NiNPShortPoint3& NiNPShortPoint3::GetZERO() {
-    if ((ZERO_guard & 1) == 0) {
-        ZERO_guard |= 1u;
-        NiNPShortPoint3::ZERO.~NiNPShortPoint3();
-        ::new (&NiNPShortPoint3::ZERO) NiNPShortPoint3(0, 0, 0);
-    }
-    return NiNPShortPoint3::ZERO;
-}
 
 TESObject::TESObject() : m_pParentList(nullptr), nod_lpPrev(nullptr), nod_lpNext(nullptr) {}
 
@@ -360,12 +317,12 @@ void TESObject::GetScaledModelFileName(TESObjectREFR* apRef, char* apScaledFileN
 TESBoundObject::BOUND_DATA::BOUND_DATA() {}
 
 void TESBoundObject::BOUND_DATA::Endian() {
-    ENDIAN(BoundMax.x, false);
-    ENDIAN(BoundMax.y, false);
-    ENDIAN(BoundMax.z, false);
-    ENDIAN(BoundMin.x, false);
-    ENDIAN(BoundMin.y, false);
-    ENDIAN(BoundMin.z, false);
+    BSEndian(BoundMax.x, false);
+    BSEndian(BoundMax.y, false);
+    BSEndian(BoundMax.z, false);
+    BSEndian(BoundMin.x, false);
+    BSEndian(BoundMin.y, false);
+    BSEndian(BoundMin.z, false);
 }
 
 TESBoundObject::TESBoundObject() {
@@ -715,20 +672,6 @@ void TESObjectList::lnk_Destroy() {
 
 TESObject* TESObjectList::lnk_GetPrev(TESObject* lpNode) {
     return lpNode->nod_lpPrev;
-}
-
-void BSBound::GetBoundMin(NiPoint3& arPoint) {
-    NiPoint3 kMin;
-    arPoint = *&(kMin = Center - Extents);
-}
-
-void BSBound::GetBoundMax(NiPoint3& arPoint) {
-    NiPoint3 kMax;
-    arPoint = *&(kMax = Center + Extents);
-}
-
-const NiFixedString& BSBound::Tag() {
-    return *BSBound::pTag;
 }
 
 NiFixedString& FixedStrings::QUnequip() {

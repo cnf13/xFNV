@@ -1,5 +1,6 @@
 #include "Fallout Shared/KFModel.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/TESAnimGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"

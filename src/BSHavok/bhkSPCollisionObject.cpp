@@ -5,7 +5,7 @@
 #include "BSHavok/bhkPCollisionObject.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkShapePhantom.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
@@ -98,3 +98,5 @@ void bhkSPCollisionObject::CopyMembers(bhkSPCollisionObject* apDest, NiCloningPr
 NiObject* bhkSPCollisionObject::CreateObject() {
     return new bhkSPCollisionObject;
 }
+
+bhkSPCollisionObject::~bhkSPCollisionObject() {}

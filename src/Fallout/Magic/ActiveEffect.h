@@ -117,13 +117,13 @@ public:
 
     static ActiveEffect*
     Activate(MagicCaster* apCaster, MagicItem* apMagicItem, EffectItem* apEffectItem, TESBoundObject* apObject);
-    // Loads a saved effect: spell form, effect index, archetype, then Activate and LoadGameBGS.
+    // Loads a saved effect: spell form, effect index, archetype, then Activate and LoadGame.
     static ActiveEffect* LoadActiveEffect(BGSLoadFormBuffer* apLoadGameBuffer);
     // Reverts apActiveEffectList, then reads the saved count and inserts each loaded effect in sorted order.
     static void
     LoadActiveEffectList(BGSLoadFormBuffer* apLoadGameBuffer, BSSimpleList<ActiveEffect*>* apActiveEffectList);
     // Reads apActiveEffectList back from the old-format save (TESSaveLoadGame) for apActor.
-    static void LoadActiveEffectListTES(BSSimpleList<ActiveEffect*>* apActiveEffectList, Actor* apActor);
+    static void LoadActiveEffectList(BSSimpleList<ActiveEffect*>* apActiveEffectList, Actor* apActor);
     // Clears apActiveEffectList for a load.
     static void
     RevertActiveEffectList(BGSLoadFormBuffer* apLoadGameBuffer, BSSimpleList<ActiveEffect*>* apActiveEffectList);
@@ -152,7 +152,7 @@ public:
     // pass pActiveEffectList and the actor.
     static uint16_t GetActiveEffectListSaveSize(BSSimpleList<ActiveEffect*>* apActiveEffectList, Actor* apActor);
     static void operator delete(void* apMemory);
-    static ActiveEffect* LoadActiveEffectTES(Actor* apActor);
+    static ActiveEffect* LoadActiveEffect(Actor* apActor);
     static void
     InitLoadActiveEffectList(BGSLoadFormBuffer* apLoadGameBuffer, BSSimpleList<ActiveEffect*>* apActiveEffectList);
     static void SaveActiveEffect(BGSSaveFormBuffer* apSaveGameBuffer, ActiveEffect* apEffect);

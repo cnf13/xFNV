@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysUpdateCtlr.h"
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
@@ -117,18 +117,4 @@ bool NiPSysUpdateCtlr::TargetIsRequiredType() const {
 
 NiObject* NiPSysUpdateCtlr::CreateObject() {
     return new NiPSysUpdateCtlr;
-}
-
-void NiTimeController::SetNext(NiTimeController* pkNext) {
-    NiTimeController* pkOld = m_spNext.m_pObject;
-    NiTimeController* pkNew = pkNext;
-    if (pkOld != pkNew) {
-        if (pkOld) {
-            NiDecRefCount(pkOld);
-        }
-        m_spNext.m_pObject = pkNew;
-        if (pkNew) {
-            NiIncRefCount(pkNew);
-        }
-    }
 }

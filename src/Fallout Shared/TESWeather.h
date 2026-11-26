@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSShader/ImageSpaceManager.h"
 #include "Fallout Shared/TESForm.h"
@@ -7,9 +8,6 @@
 #include "Fallout Shared/TESModel.h"
 #include "Fallout Shared/TESTexture1024.h"
 #include "SDK/MSVC/ehvec.h"
-
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
 
 // A weather form (WTHR).
 class TESWeather : public TESForm, public TESImageSpaceModifiableCountForm<6> {

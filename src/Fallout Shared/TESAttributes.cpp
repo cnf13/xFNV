@@ -1,6 +1,6 @@
 #include "Fallout Shared/TESAttributes.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/BaseFormComponent.h"
@@ -57,11 +57,11 @@ void TESAttributes::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
 }
 
-void TESAttributes::SaveGameTES(uint32_t aiFlags) {
+void TESAttributes::SaveGame(uint32_t aiFlags) {
     ;
 }
 
-void TESAttributes::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
+void TESAttributes::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     ;
 }
 

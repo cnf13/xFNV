@@ -22,7 +22,7 @@
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Fallout/AI/Combat/CombatState.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"

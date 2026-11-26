@@ -74,12 +74,3 @@ public:
     static MembersArray Members;
 };
 
-// Sorts the cached collision details: the hkAlgorithm::quickSortRecursive instantiation for hkpCollisionDetail and
-// OrderByUid, called with the array, the first and last index and the comparator (an empty class, OrderByUid). aFlag
-// stands in for the comparator, as an empty class argument carries no bytes in C++.
-void quickSortRecursive(
-    hkpCachingShapePhantom::hkpCollisionDetail* apDetails,
-    int32_t aFirst,
-    int32_t aLast,
-    uint8_t aFlag
-);

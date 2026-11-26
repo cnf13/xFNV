@@ -20,7 +20,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -377,8 +377,4 @@ bool Moon::UpdatePhase(const Sky* apSky) {
     }
     eCurrentPhase = uiPhase;
     return true;
-}
-
-uint32_t NiAVObject::GetDisplayObject() {
-    return GetFlag(NiAVObject::DISPLAY_OBJECT);
 }

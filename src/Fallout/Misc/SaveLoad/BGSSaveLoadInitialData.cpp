@@ -1,6 +1,6 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadInitialData.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSProjectile.h"
 #include "Fallout Shared/ExtraDataList.h"

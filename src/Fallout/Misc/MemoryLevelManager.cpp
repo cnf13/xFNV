@@ -5,6 +5,7 @@
 #include "BSCore/MemoryPool.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/NiObjectGarbage.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"

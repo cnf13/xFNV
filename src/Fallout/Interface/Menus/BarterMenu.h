@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/BSString.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/ListBox.h"
 
@@ -12,8 +14,6 @@ class TESObjectREFR;
 
 // Defined in Fallout/Interface/InterfaceManager.h.
 enum MENU_SOUNDS : int32_t;
-
-int32_t BSstrupr(char* apString1, int32_t aiSize);
 
 class BarterMenu : public Menu {
 public:

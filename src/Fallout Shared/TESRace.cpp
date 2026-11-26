@@ -5,10 +5,11 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -31,7 +32,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenAnimationData.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/FaceGenNpcData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/InventoryChanges.h"
@@ -41,6 +41,7 @@
 #include "Fallout Shared/ScreenCustomSplatter.h"
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -95,12 +96,13 @@
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiCollisionSDM.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSTexturePalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
@@ -203,7 +205,7 @@ bool TESRace::Load(TESFile* apFile) {
                     apFile->GetChunkData(auiVoiceIDs, 8);
                     if (apFile->QEndian()) {
                         for (uint32_t& uiVoiceID : auiVoiceIDs) {
-                            ENDIAN(uiVoiceID, false);
+                            BSEndian(uiVoiceID, false);
                         }
                     }
                     // Kept as form IDs until InitItem: the raw IDs are stored in the pointers.
@@ -237,7 +239,7 @@ bool TESRace::Load(TESFile* apFile) {
                 apFile->GetChunkData(auiHairIDs, 8);
                 if (apFile->QEndian()) {
                     for (uint32_t& uiHairID : auiHairIDs) {
-                        ENDIAN(uiHairID, false);
+                        BSEndian(uiHairID, false);
                     }
                 }
                 // Kept as form IDs until InitItem: the raw IDs are stored in the pointers.
@@ -291,7 +293,7 @@ bool TESRace::Load(TESFile* apFile) {
                 apFile->GetChunkData(pValues, uiSize);
                 for (uint32_t i = 0; i < uiCount; ++i) {
                     if (apFile->QEndian()) {
-                        ENDIAN(pValues[i], false);
+                        BSEndian(pValues[i], false);
                     }
                     if (!iSex || bHasNAM2) {
                         MeanFaceCoordMale[iFaceGenType][iFaceGenPart][i][0] = pValues[i];
@@ -327,7 +329,7 @@ bool TESRace::Load(TESFile* apFile) {
                     apFile->GetChunkData(puiHairIDs, uiSize);
                     for (uint32_t i = 0; i < uiCount; ++i) {
                         if (apFile->QEndian()) {
-                            ENDIAN(puiHairIDs[i], false);
+                            BSEndian(puiHairIDs[i], false);
                         }
                         TESForm::AddCompileIndex(puiHairIDs[i], apFile);
                         TESHair* pHair = dynamic_cast<TESHair*>(TESForm::GetFormByNumericID(puiHairIDs[i]));
@@ -365,7 +367,7 @@ bool TESRace::Load(TESFile* apFile) {
                     apFile->GetChunkData(puiEyeIDs, uiSize);
                     for (uint32_t i = 0; i < uiCount; ++i) {
                         if (apFile->QEndian()) {
-                            ENDIAN(puiEyeIDs[i], false);
+                            BSEndian(puiEyeIDs[i], false);
                         }
                         TESForm::AddCompileIndex(puiEyeIDs[i], apFile);
                         TESEyes* pEyes = dynamic_cast<TESEyes*>(TESForm::GetFormByNumericID(puiEyeIDs[i]));
@@ -453,10 +455,10 @@ bool TESRace::Load(TESFile* apFile) {
 
 void RACE_DATA::Endian() {
     for (int32_t i = 0; i < 2; ++i) {
-        ENDIAN(fHeight[i], false);
-        ENDIAN(fWeight[i], false);
+        BSEndian(fHeight[i], false);
+        BSEndian(fWeight[i], false);
     }
-    ENDIAN(iFlags, false);
+    BSEndian(iFlags, false);
 }
 
 TESRace::TESRace() : FaceGenUndoStates(0, 1) {

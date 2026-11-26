@@ -1,8 +1,9 @@
 #include "Fallout Shared/TESAmmoEffect.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
@@ -19,9 +20,9 @@ SettingT<GameSettingCollection> sAmmoEffectCondition("sAmmoEffectCondition", "Gu
 SettingT<GameSettingCollection> sAmmoEffectFatigue("sAmmoEffectFatigue", "Target Fatigue");
 
 void AMMO_EFFECT_DATA::Endian() {
-    ENDIAN(iAmmoEffectType, false);
-    ENDIAN(iOperation, false);
-    ENDIAN(fValue, false);
+    BSEndian(iAmmoEffectType, false);
+    BSEndian(iOperation, false);
+    BSEndian(fValue, false);
 }
 
 TESAmmoEffect::TESAmmoEffect() : data{} {

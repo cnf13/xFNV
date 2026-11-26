@@ -1,6 +1,7 @@
 #include "Fallout/Misc/SaveLoad/BGSUnloadedFormBuffer.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"

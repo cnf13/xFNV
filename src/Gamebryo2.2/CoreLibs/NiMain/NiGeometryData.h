@@ -7,6 +7,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderDeclaration.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTConvertingStrideIterator.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <stdint.h>
 
@@ -24,7 +25,7 @@ class NiTriStripsData;
 // The vertex arrays and bound shared by NiGeometry objects.
 class NiGeometryData : public NiObject {
 public:
-    // The renderer's per-geometry vertex buffer data (defined in NiGeometryBufferData.h).
+    // The renderer's per-geometry vertex buffer data.
     class RendererData;
 
     // The data kept on the CPU after it is packed for the renderer.
@@ -223,4 +224,41 @@ public:
     static inline uint16_t ms_usNextID = 1;
 };
 
+inline void NiGeometryData::SetBound(const NiBound& kBound) {
+    m_kBound.Copy(&kBound);
+}
+
+// Renderer-side data of a geometry; the renderer derives its buffer data from it.
+class NiGeometryData::RendererData : public NiMemObject {
+public:
+    virtual ~RendererData();
+
+    virtual bool ContainsVertexData(NiShaderDeclaration::ShaderParameter aeParameter) = 0;
+
+    // Renderer data is freed through MemoryManager, not NiMemObject's operator.
+    static void operator delete(void* apMemory);
+};
+
 NiSmartPointer(NiGeometryData);
+
+inline NiPoint3* NiGeometryData::GetNormals() const {
+    return m_pkNormal;
+}
+
+inline uint16_t NiGeometryData::GetVertexCount() const {
+    return m_usVertices;
+}
+
+inline NiPoint3* NiGeometryData::GetVertices() const {
+    return m_pkVertex;
+}
+
+inline NiColorA* NiGeometryData::GetColors() const {
+    return m_pkColor;
+}
+
+inline void NiGeometryData::SetCompressFlags(uint32_t uiCompressFlags) {
+    m_ucCompressFlags = static_cast<uint8_t>(uiCompressFlags);
+}
+
+inline NiGeometryData::RendererData::~RendererData() {}

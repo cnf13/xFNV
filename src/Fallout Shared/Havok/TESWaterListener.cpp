@@ -3,7 +3,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkEntity.h"
@@ -16,7 +16,7 @@
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSPlaceableWater.h"
 #include "Fallout Shared/ExtraDataList.h"
@@ -82,18 +82,6 @@ static float fSubmergedMaxDepth = 1.2f;
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> bAutoWaterUsesHavokShapes("bAutoWaterUsesHavokShapes:HAVOK", false);
 NiTMapHkpRigidBodyBool TESWaterListener::RigidBodyUnderwaterMap(37);
-
-float NiSign(float fValue) {
-    if (fValue > 0.0) {
-        return 1.0f;
-    }
-
-    if (!(fValue < 0.0)) {
-        return 0.0f;
-    }
-
-    return -1.0f;
-}
 
 WaterZone::WaterZone(TESObjectREFR* apRef, const hkpCollidable* apCol)
   : ZoneEntry(apRef, apCol), fWaterHeight(apRef ? apRef->GetLocationOnReference().z : 0.0f), pGroup(nullptr) {}

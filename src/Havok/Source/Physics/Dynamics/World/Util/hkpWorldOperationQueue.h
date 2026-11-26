@@ -300,16 +300,6 @@ namespace hkWorldOperation {
     static_assert(sizeof(SetRigidBodyAngularVelocity) <= sizeof(BiggestOperation));
     static_assert(sizeof(UserCallbackOperation) <= sizeof(BiggestOperation));
 } // namespace hkWorldOperation
-namespace hkAlgorithm {
-    // Sorts the pending island merges apArr[aiLow..aiHigh] in place (inclusive bounds). The comparator is islandLess.
-    // Returns the low bound of the last pass, or the last recursive call's return value.
-    int32_t quickSortRecursive(
-        hkWorldOperation::BiggestOperation* apArr,
-        int32_t aiLow,
-        int32_t aiHigh,
-        hkBool (*cmpLess)(const hkWorldOperation::BiggestOperation&, const hkWorldOperation::BiggestOperation&)
-    );
-} // namespace hkAlgorithm
 
 // One deferred operation on an entity.
 struct hkpBodyOperationEntry {
@@ -320,8 +310,6 @@ struct hkpBodyOperationEntry {
 };
 
 bool hkpWorldBodyOperationQueueSortCmp(const hkpBodyOperationEntry& a, const hkpBodyOperationEntry& b);
-
-using hkpBodyOperationEntryLess = bool (*)(const hkpBodyOperationEntry&, const hkpBodyOperationEntry&);
 namespace hkAlgorithm {}
 
 // The world's queue of deferred operations: the operations waiting to run, the pending island merges and the

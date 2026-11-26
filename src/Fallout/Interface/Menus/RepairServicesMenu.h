@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/ListBox.h"
 

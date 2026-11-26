@@ -1,7 +1,5 @@
 #include "SDK/FaceGen/EgmFileIO.h"
 #include "BSCore/MemoryManager.h"
-#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
-#include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/MSVC/crtdefs.h"
@@ -111,4 +109,14 @@ char fffIsEgmFile(std::basic_string<char, std::char_traits<char>, std::allocator
 	FutBinaryFileC kFile(kFileId);
 	char cResult = kFile.isCorrectFileId(*a1);
 	return cResult;
+}
+
+FffModeGS::FffModeGS(const FffModeGS& _Right) : scale(_Right.scale), vertPos(_Right.vertPos) {}
+
+FffModeGS::~FffModeGS() {}
+
+FffModeGS& FffModeGS::Assign(const FffModeGS& _Right) {
+    scale = _Right.scale;
+    vertPos = _Right.vertPos;
+    return *this;
 }

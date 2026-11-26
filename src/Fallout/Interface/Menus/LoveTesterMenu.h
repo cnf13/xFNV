@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"

@@ -32,3 +32,5 @@ public:
     int32_t invZRes;
     float fOffset;
 };
+
+inline hkBSHeightFieldShapeCinfo::hkBSHeightFieldShapeCinfo() : pData(nullptr), fOffset(0.0f) {}

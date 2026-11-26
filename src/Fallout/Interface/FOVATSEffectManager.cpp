@@ -6,7 +6,7 @@
 #include "BSMain/BSOcclusionQuery.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderManager.h"
@@ -49,7 +49,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -58,45 +57,45 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSkinInstance.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStencilProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 
 // The game settings this file defines, with their IDs and default values, in initialization order.
-SettingT<INISettingCollection> gs_fScanlineFrequency_VATS("fScanlineFrequency:VATS", 125.0f);
-SettingT<INISettingCollection> gs_fBlurRadius_VATS("fBlurRadius:VATS", 4.0f);
-SettingT<INISettingCollection> gs_fBlurIntensity_VATS("fBlurIntensity:VATS", 0.5f);
-SettingT<INISettingCollection> gs_fDistortVerticalScale_VATS("fDistortVerticalScale:VATS", 5.0f);
-SettingT<INISettingCollection> gs_fDistortHorizontalScale_VATS("fDistortHorizontalScale:VATS", 1.0f);
-SettingT<INISettingCollection> gs_fDistortDuration_VATS("fDistortDuration:VATS", 500.0f);
-SettingT<INISettingCollection> gs_iDistortMaxInterval_VATS("iDistortMaxInterval:VATS", 4500);
-SettingT<INISettingCollection> gs_fScanModeDuration_VATS("fScanModeDuration:VATS", 250.0f);
-SettingT<INISettingCollection> gs_fScanModeVerticalScale_VATS("fScanModeVerticalScale:VATS", 2.0f);
-SettingT<INISettingCollection> gs_fScanModeScanlineFrequency_VATS("fScanModeScanlineFrequency:VATS", 150.0f);
-SettingT<INISettingCollection> gs_fBurstDuration_VATS("fBurstDuration:VATS", 200.0f);
-SettingT<INISettingCollection> gs_fBurstIntensity_VATS("fBurstIntensity:VATS", 5.0f);
-SettingT<INISettingCollection> gs_fPulseIntensity_VATS("fPulseIntensity:VATS", 0.3f);
-SettingT<INISettingCollection> gs_fPulseRadius_VATS("fPulseRadius:VATS", 0.05f);
-SettingT<INISettingCollection> gs_fPulseRate_VATS("fPulseRate:VATS", 0.0005f);
+SettingT<INISettingCollection> fVATSScanlineFrequency("fScanlineFrequency:VATS", 125.0f);
+SettingT<INISettingCollection> fVATSBlurRadius("fBlurRadius:VATS", 4.0f);
+SettingT<INISettingCollection> fVATSBlurIntensity("fBlurIntensity:VATS", 0.5f);
+SettingT<INISettingCollection> fVATSDistortVerticalScale("fDistortVerticalScale:VATS", 5.0f);
+SettingT<INISettingCollection> fVATSDistortHorizontalScale("fDistortHorizontalScale:VATS", 1.0f);
+SettingT<INISettingCollection> fVATSDistortDuration("fDistortDuration:VATS", 500.0f);
+SettingT<INISettingCollection> iVATSDistortMaxInterval("iDistortMaxInterval:VATS", 4500);
+SettingT<INISettingCollection> fVATSScanDuration("fScanModeDuration:VATS", 250.0f);
+SettingT<INISettingCollection> fVATSScanVerticalScale("fScanModeVerticalScale:VATS", 2.0f);
+SettingT<INISettingCollection> fVATSScanScanlineFrequency("fScanModeScanlineFrequency:VATS", 150.0f);
+SettingT<INISettingCollection> fVATSBurstDuration("fBurstDuration:VATS", 200.0f);
+SettingT<INISettingCollection> fVATSBurstIntensity("fBurstIntensity:VATS", 5.0f);
+SettingT<INISettingCollection> fVATSPulseIntensity("fPulseIntensity:VATS", 0.3f);
+SettingT<INISettingCollection> fVATSPulseRadius("fPulseRadius:VATS", 0.05f);
+SettingT<INISettingCollection> fVATSPulseRate("fPulseRate:VATS", 0.0005f);
 SettingT<INISettingCollection> fVATSTargetPulseRate("fVATSTargetPulseRate:VATS", 0.005f);
 SettingT<INISettingCollection> fVATSColorR("fVATSColorR:VATS", 0.256f);
 SettingT<INISettingCollection> fVATSColorG("fVATSColorG:VATS", 0.823f);
 SettingT<INISettingCollection> fVATSColorB("fVATSColorB:VATS", 0.627f);
 SettingT<INISettingCollection>
-    gs_sScanlineTexture_VATS("sScanlineTexture:VATS", "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds");
+    sVATSScanlinesTexture("sScanlineTexture:VATS", "Data\\Textures\\Pipboy3000\\PipboyScanlines.dds");
 
 FOVATSEffectManager::VATS_TARGET::VATS_TARGET() : spObj(nullptr) {}
 
 FOVATSEffectManager::FOVATSEffectManager()
   : EffectMode(FOVATSEffectManager::SINGLE_TARGET), SingleTarget(), iNumMultiTargets(0), iSelectedMultiTarget(-1),
     pMultiTargets(), spStencilProp(nullptr), bOcclusionEnabled(false), bEffectEnabled(true), iNumAdditionalLimbs(0),
-    bDistortActive(false), fDistortPosition(0.0f), fDistortDuration(gs_fDistortDuration_VATS.Float()),
-    bBurstActive(false), fPulseCurrentIntensity(0.0f), fPulseCurrentRadius(0.0f), bScanning(false),
-    bExitScanMode(false), fPulseIntensity(0.0f), spScanlinesTexture(nullptr), uiPartialResultMult(1),
-    spAccumulator(nullptr) {
+    bDistortActive(false), fDistortPosition(0.0f), fDistortDuration(fVATSDistortDuration.Float()), bBurstActive(false),
+    fPulseCurrentIntensity(0.0f), fPulseCurrentRadius(0.0f), bScanning(false), bExitScanMode(false),
+    fPulseIntensity(0.0f), spScanlinesTexture(nullptr), uiPartialResultMult(1), spAccumulator(nullptr) {
     double fTime = static_cast<double>(appTimer.iLastTime);
-    fNextDistortTime = static_cast<double>(rt::rand() % gs_iDistortMaxInterval_VATS.Int()) + fTime;
+    fNextDistortTime = static_cast<double>(rt::rand() % iVATSDistortMaxInterval.Int()) + fTime;
     SingleTarget.pRef = nullptr;
-    BSShaderManager::GetTexture(gs_sScanlineTexture_VATS.String(), true, spScanlinesTexture, false, false);
+    BSShaderManager::GetTexture(sVATSScanlinesTexture.String(), true, spScanlinesTexture, false, false);
     spAccumulator = new BSShaderAccumulator(101, 1u, 759u);
     spAccumulator->SetRenderDecals(false);
     for (int32_t i = 0; i < 16; ++i) {
@@ -207,8 +206,8 @@ void FOVATSEffectManager::SetTarget(TESObjectREFR* apTarget, BGSBodyPart::LIMB_E
     if (bEffectEnabled && !bScanning && apTarget) {
         pNode = apTarget->Get3D();
         if (pNode == SingleTarget.spObj.m_pObject) {
-            float fBurstIntensity = gs_fBurstIntensity_VATS.Float();
-            TriggerBurst(gs_fBurstDuration_VATS.Float(), fBurstIntensity, true);
+            float fBurstIntensity = fVATSBurstIntensity.Float();
+            TriggerBurst(fVATSBurstDuration.Float(), fBurstIntensity, true);
         }
     }
 
@@ -372,11 +371,11 @@ void FOVATSEffectManager::DrawTarget(bool abQueryMode, VATS_DRAW_MODE aeDrawMode
 }
 
 void FOVATSEffectManager::UpdatePulse(float afTime) {
-    float fX = afTime * gs_fPulseRate_VATS.Float();
+    float fX = afTime * fVATSPulseRate.Float();
     float fNoise = BSNoise1D::Noise(fX);
     float fPulse = fNoise + fNoise;
-    fPulseCurrentIntensity = fPulse * gs_fPulseIntensity_VATS.Float();
-    fPulseCurrentRadius = fPulse * gs_fPulseRadius_VATS.Float();
+    fPulseCurrentIntensity = fPulse * fVATSPulseIntensity.Float();
+    fPulseCurrentRadius = fPulse * fVATSPulseRadius.Float();
 }
 
 void FOVATSEffectManager::SetMultiTarget(TESObjectREFR* apTarget) {
@@ -433,8 +432,8 @@ void FOVATSEffectManager::PrepareHighlightEffect(
     BSShaderManager::GetImageSpaceManager()->GetEffect(ImageSpaceManager::EFFECT_INTERFACE)->bIsActive = true;
     ImageSpaceEffectInterface::spMaskTexture = static_cast<NiTexture*>(apSourceMask->GetTexture(0));
     if (bDistortActive) {
-        ImageSpaceEffectInterface::fDistortVerticalScale = gs_fDistortVerticalScale_VATS.Float();
-        ImageSpaceEffectInterface::fDistortHorizontalScale = gs_fDistortHorizontalScale_VATS.Float();
+        ImageSpaceEffectInterface::fDistortVerticalScale = fVATSDistortVerticalScale.Float();
+        ImageSpaceEffectInterface::fDistortHorizontalScale = fVATSDistortHorizontalScale.Float();
         ImageSpaceEffectInterface::fDistortVerticalPosition = fDistortPosition;
         ImageSpaceEffectInterface::bDistortEverywhere = false;
     }
@@ -446,8 +445,8 @@ void FOVATSEffectManager::PrepareHighlightEffect(
     ImageSpaceEffectInterface::fVerticalHold = 0.0f;
     ImageSpaceEffectInterface::spScanlinesTexture = spScanlinesTexture;
     ImageSpaceEffectInterface::kTint = newcolor;
-    ImageSpaceEffectInterface::fBlurIntensity = gs_fBlurIntensity_VATS.Float();
-    ImageSpaceEffectInterface::fBlurRadius = gs_fBlurRadius_VATS.Float();
+    ImageSpaceEffectInterface::fBlurIntensity = fVATSBlurIntensity.Float();
+    ImageSpaceEffectInterface::fBlurRadius = fVATSBlurRadius.Float();
     ImageSpaceEffectInterface::fBlurIntensity = ImageSpaceEffectInterface::fBlurIntensity + fPulseCurrentIntensity;
     ImageSpaceEffectInterface::fBlurRadius = ImageSpaceEffectInterface::fBlurRadius + fPulseCurrentRadius;
     if (bBurstActive) {
@@ -457,7 +456,7 @@ void FOVATSEffectManager::PrepareHighlightEffect(
             ImageSpaceEffectInterface::fBlurRadius;
     }
     ImageSpaceEffectInterface::fPulse = fPulseIntensity;
-    ImageSpaceEffectInterface::fScanlineFrequency = gs_fScanlineFrequency_VATS.Float();
+    ImageSpaceEffectInterface::fScanlineFrequency = fVATSScanlineFrequency.Float();
     ImageSpaceEffectInterface::fTextureUsedPart = 1.0f;
     ImageSpaceEffectInterface::eClearFlag = static_cast<NiRenderer::ClearFlags>(abClearTarget);
 }
@@ -471,8 +470,8 @@ void FOVATSEffectManager::PrepareScanEffect(
     NiColorA newcolor(0.0f, 0.0f, 0.0f, 0.0f);
     SystemColorManager::GetInstance()->GetColor(1, newcolor);
     ImageSpaceEffectVATSScan::fScanVerticalPosition = fScanPosition;
-    ImageSpaceEffectVATSScan::fScanVerticalScale = gs_fScanModeVerticalScale_VATS.Float();
-    ImageSpaceEffectVATSScan::fScanlineFrequency = gs_fScanModeScanlineFrequency_VATS.Float();
+    ImageSpaceEffectVATSScan::fScanVerticalScale = fVATSScanVerticalScale.Float();
+    ImageSpaceEffectVATSScan::fScanlineFrequency = fVATSScanScanlineFrequency.Float();
     ImageSpaceEffectVATSScan::kTint = newcolor;
     ImageSpaceEffectVATSScan::spScanlinesTexture = spScanlinesTexture;
     ImageSpaceEffectVATSScan::spMaskTexture = static_cast<NiTexture*>(apSourceMask->GetTexture(0));
@@ -699,11 +698,11 @@ void FOVATSEffectManager::UpdateBurst(float afTime) {
 void FOVATSEffectManager::UpdateDistort(float afTime) {
     float fElapsed = afTime - fDistortStartTime;
     fDistortPosition = fElapsed / fDistortDuration;
-    if (fDistortPosition > gs_fDistortVerticalScale_VATS.Float() + 1.0) {
+    if (fDistortPosition > fVATSDistortVerticalScale.Float() + 1.0) {
         bDistortActive = false;
         int32_t iRand = rt::rand();
         fNextDistortTime = static_cast<float>(
-            static_cast<double>(iRand % static_cast<int32_t>(gs_iDistortMaxInterval_VATS.UInt())) + afTime
+            static_cast<double>(iRand % static_cast<int32_t>(iVATSDistortMaxInterval.UInt())) + afTime
         );
     }
 }
@@ -718,12 +717,12 @@ void FOVATSEffectManager::UpdateScan(float afTime) {
         fScanStartTime = afTime;
     }
     float fElapsed = afTime - fScanStartTime;
-    fScanPosition = fElapsed / gs_fScanModeDuration_VATS.Float();
-    if (bExitScanMode && fScanPosition > gs_fScanModeVerticalScale_VATS.Float() + 1.0) {
+    fScanPosition = fElapsed / fVATSScanDuration.Float();
+    if (bExitScanMode && fScanPosition > fVATSScanVerticalScale.Float() + 1.0) {
         bScanning = false;
         bExitScanMode = false;
-        float fBurstIntensity = gs_fBurstIntensity_VATS.Float();
-        TriggerBurst(gs_fBurstDuration_VATS.Float(), fBurstIntensity, true);
+        float fBurstIntensity = fVATSBurstIntensity.Float();
+        TriggerBurst(fVATSBurstDuration.Float(), fBurstIntensity, true);
     }
 }
 
@@ -966,8 +965,4 @@ void FOVATSEffectManager::FreeOcclusionQueries() {
             pEntireLimbQuery[i] = nullptr;
         }
     }
-}
-
-void ImageSpaceEffect::SetActive(bool abActive) {
-    bIsActive = abActive;
 }

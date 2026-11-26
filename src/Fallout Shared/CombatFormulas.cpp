@@ -7,8 +7,6 @@
 #include "BSCore/RTTI.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
 #include "BSMenu/DebugText.h"
 #include "Fallout Shared/ActionPoints.h"
 #include "Fallout Shared/ActorValue.h"
@@ -41,6 +39,7 @@
 #include "Fallout Shared/Pathfinding/PathBuilder.h"
 #include "Fallout Shared/Pathfinding/PathingRequest.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
 #include "Fallout Shared/TES.h"
@@ -170,7 +169,7 @@ SettingT<GameSettingCollection> fPickupWeaponMeleeDistanceMin("fPickupWeaponMele
 SettingT<GameSettingCollection> fPickupWeaponMeleeDistanceMax("fPickupWeaponMeleeDistanceMax", 1024.0f);
 SettingT<GameSettingCollection> fPickupWeaponRangedDistanceMin("fPickupWeaponRangedDistanceMin", 512.0f);
 SettingT<GameSettingCollection> fPickupWeaponRangedDistanceMax("fPickupWeaponRangedDistanceMax", 2048.0f);
-SettingT<GameSettingCollection> gs_fDisarmedPickupWeaponDistanceMult("fDisarmedPickupWeaponDistanceMult", 2.0f);
+SettingT<GameSettingCollection> fPickupWeaponDisarmedDistanceMult("fDisarmedPickupWeaponDistanceMult", 2.0f);
 SettingT<GameSettingCollection>
     fPickupWeaponTargetUnreachableDistanceMult("fPickupWeaponTargetUnreachableDistanceMult", 4.0f);
 SettingT<GameSettingCollection>
@@ -178,7 +177,7 @@ SettingT<GameSettingCollection>
 SettingT<GameSettingCollection> fPickupWeaponDistanceMinMaxDPSMult("fPickupWeaponDistanceMinMaxDPSMult", 5.0f);
 SettingT<GameSettingCollection> fPickupWeaponMeleeWeaponDPSMult("fPickupWeaponMeleeWeaponDPSMult", 0.5f);
 SettingT<GameSettingCollection> fPickupItemDistanceFudge("fPickupItemDistanceFudge", 32.0f);
-SettingT<GameSettingCollection> gs_fGrenadeHighArcSpeedPercentage("fGrenadeHighArcSpeedPercentage", 0.67f);
+SettingT<GameSettingCollection> fGrenadeHighArcSpeedMult("fGrenadeHighArcSpeedPercentage", 0.67f);
 SettingT<GameSettingCollection> fCoverEvaluationLastSeenExpireTime("fCoverEvaluationLastSeenExpireTime", 5.0f);
 SettingT<GameSettingCollection> fCoverFiredProjectileExpireTime("fCoverFiredProjectileExpireTime", 5.0f);
 SettingT<GameSettingCollection> fCoverWaitReloadClipPercent("fCoverWaitReloadClipPercent", 0.33f);
@@ -307,7 +306,7 @@ SettingT<GameSettingCollection>
     fCombatDetectionDialogueIdleMinElapsedTime("fCombatDetectionDialogueIdleMinElapsedTime", 3.0f);
 SettingT<GameSettingCollection>
     fCombatDetectionDialogueIdleMaxElapsedTime("fCombatDetectionDialogueIdleMaxElapsedTime", 10.0f);
-SettingT<GameSettingCollection> gs_fCombatThreatExtrudeVelocityThreshold("fCombatThreatExtrudeVelocityThreshold", 2.0f);
+SettingT<GameSettingCollection> fCombatThreatExtrudeRadiusMult("fCombatThreatExtrudeVelocityThreshold", 2.0f);
 SettingT<GameSettingCollection> fCombatThreatExtrudeTime("fCombatThreatExtrudeTime", 2.0f);
 SettingT<GameSettingCollection> fCombatThreatNegativeExtrudeTime("fCombatThreatNegativeExtrudeTime", 0.5f);
 SettingT<GameSettingCollection> fCombatThreatTimedExplosionLength("fCombatThreatTimedExplosionLength", 5.0f);

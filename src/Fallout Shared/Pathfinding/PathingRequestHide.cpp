@@ -5,7 +5,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 PathingRequestHide::PathingRequestHide() : PathingRequest(), ThreatLocation(), fMinHideDistance(128.0f) {
     Destination.SetUnused();

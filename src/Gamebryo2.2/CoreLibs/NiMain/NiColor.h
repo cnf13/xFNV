@@ -63,6 +63,20 @@ public:
     static NiColor CYAN;
 };
 
+inline NiColor& NiColor::operator/=(float fScalar) {
+    r = r / fScalar;
+    g = g / fScalar;
+    b = b / fScalar;
+    return *this;
+}
+
+inline NiColor& NiColor::operator*=(float fScalar) {
+    r *= fScalar;
+    g *= fScalar;
+    b *= fScalar;
+    return *this;
+}
+
 class NiColorA {
 public:
     constexpr NiColorA(float fR = 0.0f, float fG = 0.0f, float fB = 0.0f, float fA = 0.0f)
@@ -121,8 +135,19 @@ public:
     static NiColorA CYAN;
 };
 
+inline NiColorA NiColorA::operator*(float fScalar) const {
+    NiColorA kResult = *this;
+    kResult.r *= fScalar;
+    kResult.g *= fScalar;
+    kResult.b *= fScalar;
+    kResult.a *= fScalar;
+    return kResult;
+}
+
 // The colour times afScalar.
-NiColorA operator*(float afScalar, const NiColorA& arColor);
+inline NiColorA operator*(float afScalar, const NiColorA& arColor) {
+    return arColor * afScalar;
+}
 
 inline NiColor NiColor::BLACK{};
 

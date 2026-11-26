@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSMain/Setting.h"
-#include "Fallout Shared/Havok/bhkArrowTargetListener.h"
+#include "BSHavok/bhkWorld.h"
 
 class bhkRigidBody;
 class NiAVObject;

@@ -1,6 +1,37 @@
 #pragma once
 
-#include "Fallout Shared/GlobalFunc.h"
+#include "BSCore/MemoryManager.h"
+
+#include <cstdint>
+
+// The warning categories a context-tagged Warning call names.
+enum WARNING_TYPES : int32_t {
+    WARN_DEFAULT = 0,
+    WARN_COMBAT = 1,
+    WARN_ANIMATION = 2,
+    WARN_AI = 3,
+    WARN_SCRIPTS = 4,
+    WARN_SAVELOAD = 5,
+    WARN_DIALOGUE = 6,
+    WARN_QUESTS = 7,
+    WARN_PACKAGES = 8,
+    WARN_EDITOR = 9,
+    WARN_MODELS = 10,
+    WARN_TEXTURES = 11,
+    WARN_PLUGINS = 12,
+    WARN_MASTERFILE = 13,
+    WARN_FORMS = 14,
+    WARN_MAGIC = 15,
+    WARN_SHADERS = 16,
+    WARN_PATHFINDING = 17,
+    WARN_MENUS = 18,
+    WARN_AUDIO = 19,
+    WARN_CELLS = 20,
+    WARN_HAVOK = 21,
+    WARN_WATER = 22,
+    WARN_INGAME_MESSAGE = 23,
+    MAX_WARNING_TYPES = 24,
+};
 
 // The engine's message handler. The release build's virtuals are empty stubs returning 0; MessageHandler overrides
 // the destructor and both Asserts.
@@ -56,5 +87,7 @@ public:
     }
 
     static inline BSCoreMessage* pHandler;
+    // The context warnings are reported in.
+    static inline WARNING_TYPES sCurrentWarningContext;
     static inline WarningsDisabledTable bWarningsDisabled{};
 };

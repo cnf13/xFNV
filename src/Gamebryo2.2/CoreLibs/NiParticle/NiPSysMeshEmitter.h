@@ -127,3 +127,15 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline uint32_t NiPSysMeshEmitter::GetGeometryEmitterCount() {
+    return m_kGeomEmitterArray.GetEffectiveSize();
+}
+
+// The mesh in slot uiWhichEmitter, or null past the count.
+inline NiGeometry* NiPSysMeshEmitter::GetGeometryEmitter(uint32_t uiWhichEmitter) {
+    if (uiWhichEmitter >= GetGeometryEmitterCount()) {
+        return nullptr;
+    }
+    return m_kGeomEmitterArray[uiWhichEmitter].m_pObject;
+}

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkUnaryAction.h"
-#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
 
 class bhkWorldObject;
@@ -74,3 +74,53 @@ public:
     static NiRTTI ms_RTTI;
     static inline uint32_t iCount;
 };
+
+inline hkpMouseSpringAction* bhkMouseSpringAction::operator*() const {
+    if (this) {
+        return static_cast<hkpMouseSpringAction*>(GethkObject());
+    }
+
+    return nullptr;
+}
+
+// bhkVector4's constructor zeroes the vectors.
+inline hkMouseSpringActionCinfo::hkMouseSpringActionCinfo()
+  : hkUnaryActionCinfo(), m_springDamping(0.5f), m_springElasticity(0.3f), m_maxRelativeForce(250.0f),
+    m_objectDamping(0.95f) {}
+
+// Converts the game-unit point to Havok units in a local (NI2HK, which writes all four lanes) and moves the spring's
+// target there through the hkVector4 overload.
+inline void bhkMouseSpringAction::SetMousePosition(const NiPoint3& arPos) {
+    hkVector4 hkp;
+    SetMousePosition(NI2HK(hkp, arPos));
+}
+
+// Sets the wrapped action's target to arPos when there is a wrapped action.
+inline void bhkMouseSpringAction::SetMousePosition(const hkVector4& arPos) {
+    hkpMouseSpringAction* pm = **this;
+    if (pm) {
+        pm->setMousePosition(arPos);
+    }
+}
+
+inline void bhkMouseSpringAction::GetMousePositionInWorld(hkVector4& arPos) {
+    hkpMouseSpringAction* pAction = **this;
+    if (pAction) {
+        arPos = pAction->m_mousePositionInWorld;
+    }
+}
+
+inline void bhkMouseSpringAction::GetMousePositionInRBLocal(hkVector4& arPos) {
+    hkpMouseSpringAction* pAction = **this;
+    if (pAction) {
+        arPos = pAction->m_positionInRbLocal;
+    }
+}
+
+// The game-unit overload.
+inline void bhkMouseSpringAction::GetMousePositionInWorld(NiPoint3& arPos) {
+    hkpMouseSpringAction* pm = **this;
+    if (pm) {
+        HK2NI(arPos, pm->m_mousePositionInWorld);
+    }
+}

@@ -130,3 +130,7 @@ public:
     bhkShape* m_userData;
     hkEnum<hkpShapeType, uint32_t> m_type;
 };
+
+inline hkpShapeType hkpShape::getType() const {
+    return m_type;
+}

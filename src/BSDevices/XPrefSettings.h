@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 
 #include <stdint.h>
 

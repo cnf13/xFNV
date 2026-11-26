@@ -180,9 +180,3 @@ void bhkCharacterListener::SetMoveLimitMass(float afValue) {
 void bhkCharacterListener::operator delete(void* apMemory) {
     MemoryManager::Instance().Deallocate(apMemory);
 }
-
-hkpCharacterProxyListener::~hkpCharacterProxyListener() {}
-
-void hkpCharacterProxyListener::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}

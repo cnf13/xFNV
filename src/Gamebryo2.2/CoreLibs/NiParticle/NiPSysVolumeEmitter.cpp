@@ -125,3 +125,5 @@ void NiPSysVolumeEmitter::ComputeInitialPositionAndVelocity(NiPoint3& kPosition,
 void NiPSysVolumeEmitter::CopyMembers(NiPSysVolumeEmitter* pkDest, NiCloningProcess& kCloning) {
     NiPSysEmitter::CopyMembers(pkDest, kCloning);
 }
+
+NiPSysVolumeEmitter::~NiPSysVolumeEmitter() {}

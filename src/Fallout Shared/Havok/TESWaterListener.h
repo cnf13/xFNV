@@ -4,6 +4,7 @@
 #include "BSHavok/bhkWaterListener.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
@@ -11,8 +12,6 @@
 class hkpRigidBody;
 class PlaceableWaterGroup;
 class WaterZone;
-
-float NiSign(float fValue);
 
 using NiTMapHkpRigidBodyBool = NiTMap<hkpRigidBody*, bool>;
 

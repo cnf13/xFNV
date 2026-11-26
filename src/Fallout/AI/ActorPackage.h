@@ -23,9 +23,9 @@ public:
 
     // Clamps the current procedure index to the package's
     // procedures; the callee ignores both arguments.
-    void InitLoadGameTES(int32_t aiFlags, int32_t aiOldFlags);
+    void InitLoadGame(int32_t aiFlags, int32_t aiOldFlags);
     // Does nothing and returns 0; the argument is unused.
-    int32_t RevertTES(int32_t);
+    int32_t Revert(int32_t);
     // Saves the package into the form buffer.
     void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
     // Writes the package's form ID, the target and the procedure index to the old save game; BaseProcess's save calls
@@ -36,7 +36,7 @@ public:
     // Loads the package from the form buffer.
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Resolves the saved package of the load game buffer.
-    void InitLoadGameBGS(BGSLoadFormBuffer* apBuffer);
+    void InitLoadGame(BGSLoadFormBuffer* apBuffer);
     // Moves the package into another ActorPackage, leaving this one empty.
     void Copy(ActorPackage* apDestination);
 
@@ -61,9 +61,9 @@ public:
     float GetPackageStartTime() {
         return fPackageStartTime;
     }
-    void RevertBGS(BGSLoadFormBuffer* apLoadGameBuffer);
+    void Revert(BGSLoadFormBuffer* apLoadGameBuffer);
     uint16_t GetSaveSize(uint32_t aiFlags);
-    void LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags);
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags);
     void AddToCurrentProcedureIndex(int32_t aiOffset);
 
     // The package form itself, held referenced for as long as the actor has it.

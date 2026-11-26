@@ -1,14 +1,12 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 
 #include "BSCore/MemoryManager.h"
-#include "BSMain/BSSceneGraph.h"
-#include "Fallout Shared/Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSNiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -831,45 +829,6 @@ void NiCamera::ScreenSpaceBoundBound(
             kMinBound.z = 1.0f;
         }
     }
-}
-
-// The Eyefinity group is drawn at 4:3 per screen: the frustum's width is scaled by 0.75 and by one screen's aspect
-// ratio, and the vertical field of view is afScale times fDefaultFOV in radians, widened by 1.1 and capped at
-// 1.53938043117523193359375. Compares and rounds in double; NaN takes the cap.
-void NiCamera::HandleEyeFinityFOVScale(NiCamera* apCamera, float afScale) {
-    if (!apCamera) {
-        return;
-    }
-    if (!Renderer::is_bEyeFinity()) {
-        return;
-    }
-    float fAspectRatio = static_cast<float>(retn_0_75());
-    apCamera->AdjustAspectRatio(fAspectRatio, false);
-    double dWidth = Renderer::GetEyefinitySLSWidth();
-    float fScreenRatio = static_cast<float>(dWidth / Renderer::GetEyefinitySLSHeight());
-    double dFOV;
-    if (afScale * BSSceneGraph::fDefaultFOV.Float() * 0.01745329238474369049072265625 * 1.10000002384185791015625 <
-        1.53938043117523193359375) {
-        dFOV = afScale * BSSceneGraph::fDefaultFOV.Float() * 0.01745329238474369049072265625 *
-            1.10000002384185791015625;
-    }
-    else {
-        dFOV = 1.53938043117523193359375;
-    }
-    float fFOV = static_cast<float>(dFOV);
-    NiFrustum kFrustum(false);
-    kFrustum.m_fLeft = -std::tan(fFOV) * fAspectRatio * fScreenRatio;
-    kFrustum.m_fRight = std::tan(fFOV) * fAspectRatio * fScreenRatio;
-    kFrustum.m_fBottom = -std::tan(fFOV) * fAspectRatio;
-    kFrustum.m_fTop = std::tan(fFOV) * fAspectRatio;
-    kFrustum.m_bOrtho = false;
-    kFrustum.m_fNear = 1.0f;
-    kFrustum.m_fFar = 5000.0f;
-    apCamera->SetViewFrustum(kFrustum);
-}
-
-double NiCamera::retn_0_75() {
-    return 0.75f;
 }
 
 NiObject* NiCamera::CreateObject() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Pathfinding/PathingCoverLocation.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -18,7 +19,7 @@ public:
     void Clear();
     // Copies apCopy, or resets when it is null.
     void Copy(const CombatCoverSearchInfo* apCopy);
-    void LoadGameBGS(BGSLoadGameBuffer* apLoadGameBuffer);
+    void LoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
     void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
 
     static void operator delete(void* apMemory) {

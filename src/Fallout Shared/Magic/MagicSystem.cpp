@@ -8,6 +8,7 @@
 #include "Fallout Shared/Magic/EffectSettingCollection.h"
 #include "Fallout Shared/Magic/SpellItem.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESEffectShader.h"
 #include "Fallout Shared/TESForm.h"

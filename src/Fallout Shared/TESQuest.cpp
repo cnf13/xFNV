@@ -5,7 +5,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/AudioMarkerData.h"
 #include "Fallout Shared/BGSQuestObjective.h"
 #include "Fallout Shared/Date.h"
@@ -45,7 +45,7 @@ QUEST_DATA* QUEST_DATA::Init() {
 }
 
 void QUEST_DATA::Endian() {
-    ENDIAN(fQuestDelayTime, false);
+    BSEndian(fQuestDelayTime, false);
 }
 
 TESQuest::TESQuest() : pScriptLocals(nullptr) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
+
 #include <cmath>
 
 class NiMatrix3;
@@ -74,6 +76,34 @@ public:
     static NiQuaternion IDENTITY;
 };
 
+// Each component times fScalar, rounded to float, set through SetValues.
+inline NiQuaternion NiQuaternion::operator*(float fScalar) const {
+    NiQuaternion kResult;
+    kResult.SetValues(m_fW * fScalar, m_fX * fScalar, m_fY * fScalar, m_fZ * fScalar);
+    return kResult;
+}
+
+// NaN in any component compares as unequal.
+inline bool NiQuaternion::operator!=(const NiQuaternion& q) const {
+    int32_t iNotEqual;
+    if (m_fW != q.m_fW) {
+        iNotEqual = 1;
+    }
+    else if (m_fX != q.m_fX) {
+        iNotEqual = 1;
+    }
+    else if (m_fY != q.m_fY) {
+        iNotEqual = 1;
+    }
+    else if (m_fZ != q.m_fZ) {
+        iNotEqual = 1;
+    }
+    else {
+        iNotEqual = 0;
+    }
+    return iNotEqual != 0;
+}
+
 // Every component of kQ times fScalar.
 NiQuaternion operator*(float fScalar, const NiQuaternion& kQ);
 
@@ -92,3 +122,14 @@ static const float ISQRT_ADDITIVE_CONSTANT = ISQRT_SCALE / std::sqrt(ISQRT_NEIGH
 static const float ISQRT_FACTOR = static_cast<float>(
     ISQRT_SCALE * (-0.5 / (static_cast<double>(std::sqrt(ISQRT_NEIGHBORHOOD)) * ISQRT_NEIGHBORHOOD))
 );
+
+inline void NiQuaternion::SetX(float x) {
+    m_fX = x;
+}
+
+inline void NiQuaternion::FromAngleAxisX(float fAngle) {
+    float fHalfAngle = static_cast<float>(fAngle * 0.5);
+    NiSinCos(fHalfAngle, m_fX, m_fW);
+    m_fZ = 0.0f;
+    m_fY = 0.0f;
+}

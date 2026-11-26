@@ -11,6 +11,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
 #include "BSDevices/XPrefSettings.h"
@@ -21,7 +22,6 @@
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
@@ -36,13 +36,13 @@
 #include "BSMain/BSPortalGraph.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/BSStream.h"
+#include "BSMain/BSTaskManager.h"
 #include "BSMain/BSTestObjects.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/DebugText.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
@@ -93,10 +93,12 @@
 #include "Fallout Shared/BGSDecalManager.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEncounterZone.h"
+#include "Fallout Shared/BGSEquipType.h"
 #include "Fallout Shared/BGSImpactData.h"
 #include "Fallout Shared/BGSImpactDataSet.h"
 #include "Fallout Shared/BGSListForm.h"
 #include "Fallout Shared/BGSLoadedReferenceCollection.h"
+#include "Fallout Shared/BGSMenuIcon.h"
 #include "Fallout Shared/BGSMessage.h"
 #include "Fallout Shared/BGSNote.h"
 #include "Fallout Shared/BGSOpenCloseForm.h"
@@ -112,7 +114,6 @@
 #include "Fallout Shared/BGSTextureUseMap.h"
 #include "Fallout Shared/BGSWorldLocation.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
-#include "Fallout Shared/BSTaskThread.h"
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/ContainerItemExtra.h"
@@ -175,6 +176,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Atmosphere.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
@@ -357,7 +359,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -384,6 +385,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/Xenon/NiPoint4.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysEmitterCtlr.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/LocalArray/hkLocalBuffer.h"
@@ -439,7 +441,7 @@ void ConsoleShaderError(const char* apErrorString, const NiAVObject* apObject) {
     Interface::PrintLine<>(NavMeshInfo::GetCellOrCoords(const_cast<char*>(apErrorString), 0));
 }
 
-bool Cmd_GetCurrentWeatherPercent_Execute(
+bool Script::GetWeatherPercentFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -452,7 +454,7 @@ bool Cmd_GetCurrentWeatherPercent_Execute(
     return Script::GetWeatherPercentConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_GetDisabled_Execute(
+bool Script::GetDisabledFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -466,7 +468,7 @@ bool Cmd_GetDisabled_Execute(
     return Script::GetDisabledConditionFunction(apRefObject, apScriptLocals, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_GetIsLockBroken(
+bool Script::GetIsLockBrokenFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -479,7 +481,7 @@ bool au_re_Cmd_GetIsLockBroken(
     return Script::GetIsLockBrokenConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_RemoveFromAllFactions(
+bool Script::RemoveFromAllFactionsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -503,7 +505,7 @@ bool Cmd_RemoveFromAllFactions(
     return true;
 }
 
-bool au_re_Cmd_GetXPForNextLevel(
+bool Script::GetXPForNextLevelFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -516,7 +518,7 @@ bool au_re_Cmd_GetXPForNextLevel(
     return Script::GetXPForNextLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_IsActorDetected_Execute(
+bool Script::IsActorDetected(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -541,7 +543,7 @@ bool Cmd_IsActorDetected_Execute(
     return true;
 }
 
-bool Cmd_ShowTraitSelectMenu(
+bool Script::ShowTraitSelectMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -557,7 +559,7 @@ bool Cmd_ShowTraitSelectMenu(
     return true;
 }
 
-bool Cmd_ShowTraitMenu(
+bool Script::ShowTraitMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -573,7 +575,7 @@ bool Cmd_ShowTraitMenu(
     return true;
 }
 
-bool Cmd_GetIsGhost_Execute(
+bool Script::GetGhostFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -586,7 +588,7 @@ bool Cmd_GetIsGhost_Execute(
     return Script::GetGhostConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_GetMinorCrimeCount(
+bool Script::GetMinorCrimeCountFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -599,7 +601,7 @@ bool au_re_Cmd_GetMinorCrimeCount(
     return Script::GetMinorCrimeCountConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_DrawSkeleton(
+bool Script::DrawSkeleton(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -645,7 +647,7 @@ bool Cmd_DrawSkeleton(
     return true;
 }
 
-bool au_re_Cmd_IsGoreDisabled(
+bool Script::IsGoreDisabledFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -658,20 +660,7 @@ bool au_re_Cmd_IsGoreDisabled(
     return Script::IsGoreDisabledConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_SetArgTo0AndReturnTrue_0(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    return Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
-}
-
-bool Cmd_GetTimeDead_Execute(
+bool Script::GetTimeDeadFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -688,7 +677,7 @@ bool Cmd_GetTimeDead_Execute(
     return true;
 }
 
-bool Cmd_ToggleCombatStats(
+bool Script::ToggleCombatStatsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -702,7 +691,7 @@ bool Cmd_ToggleCombatStats(
     return true;
 }
 
-bool Cmd_AddCardToPlayer(
+bool Script::AddCardToPlayer(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -737,7 +726,7 @@ bool Cmd_AddCardToPlayer(
     return true;
 }
 
-bool Cmd_GetPlayerTeammate_Execute(
+bool Script::GetPlayerTeammateFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -750,7 +739,7 @@ bool Cmd_GetPlayerTeammate_Execute(
     return Script::GetPlayerTeammateConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_ShowWhoDetectsPlayer(
+bool Script::ShowWhoDetectsPlayer(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -765,7 +754,7 @@ bool Cmd_ShowWhoDetectsPlayer(
     return true;
 }
 
-bool Cmd_DispelAllSpells(
+bool Script::DispelAllSpellsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -784,7 +773,7 @@ bool Cmd_DispelAllSpells(
     return true;
 }
 
-bool au_re_Cmd_GetLocked(
+bool Script::GetLockedFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -798,7 +787,7 @@ bool au_re_Cmd_GetLocked(
     return Script::GetLockedConditionFunction(apRefObject, apScriptLocals, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_SameFactionAsPC(
+bool Script::SameFactionAsPC(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -808,10 +797,10 @@ bool au_re_Cmd_SameFactionAsPC(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Cmd_SameFaction(apRefObject, pPlayer, nullptr, afReturnValue);
+    return Script::SameFactionConditionFunction(apRefObject, pPlayer, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_GetIsPlayableRace(
+bool Script::GetIsPlayableRace(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -824,7 +813,7 @@ bool au_re_Cmd_GetIsPlayableRace(
     return Script::GetIsPlayableRaceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_IsActor_Execute(
+bool Script::IsActorFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -841,7 +830,7 @@ bool Cmd_IsActor_Execute(
     return true;
 }
 
-bool au_re_Cmd_GetMajorCrimeCount(
+bool Script::GetMajorCrimeCountFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -854,7 +843,7 @@ bool au_re_Cmd_GetMajorCrimeCount(
     return Script::GetMajorCrimeCountConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_GetActorAggroRadiusViolated(
+bool Script::GetAggroRadiusViolatedFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -867,7 +856,7 @@ bool au_re_Cmd_GetActorAggroRadiusViolated(
     return Script::GetAggroRadiusViolatedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool GetForceHitReactionFunction(
+bool Script::GetForceHitReactionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -894,7 +883,7 @@ bool GetForceHitReactionFunction(
     return true;
 }
 
-bool Cmd_AddFaceAnimNote(
+bool Script::AddFaceAnimNoteFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -926,7 +915,7 @@ bool Cmd_AddFaceAnimNote(
     return true;
 }
 
-bool au_re_Cmd_HasBeenEaten(
+bool Script::HasBeenEatenFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -939,7 +928,7 @@ bool au_re_Cmd_HasBeenEaten(
     return Script::HasBeenEatenConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_IsEssential_Execute(
+bool Script::IsEssentialFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -956,7 +945,7 @@ bool Cmd_IsEssential_Execute(
     return true;
 }
 
-bool Cmd_IsPlayerMovingIntoNewSpace_Execute(
+bool Script::IsPlayerMovingIntoNewSpaceFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -973,7 +962,7 @@ bool Cmd_IsPlayerMovingIntoNewSpace_Execute(
     return true;
 }
 
-bool Cmd_DropMe_Execute(
+bool Script::DropMeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1005,23 +994,7 @@ bool Cmd_DropMe_Execute(
     return false;
 }
 
-bool Cmd_DeprecatedDOF(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    if (Script::bSystemOutput) {
-        Interface::PrintLine("This function is no longer supported");
-    }
-    return true;
-}
-
-bool Cmd_CloseAllMenus(
+bool Script::CloseAllMenusFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1035,7 +1008,7 @@ bool Cmd_CloseAllMenus(
     return true;
 }
 
-bool Cmd_RemoveMe_Execute(
+bool Script::RemoveMeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1089,7 +1062,7 @@ bool Cmd_RemoveMe_Execute(
     return false;
 }
 
-bool Cmd_DuplicateAllItems_Execute(
+bool Script::DuplicateAllItemsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1124,7 +1097,7 @@ bool Cmd_DuplicateAllItems_Execute(
     return true;
 }
 
-bool Cmd_RemoveAllTypedItems(
+bool Script::RemoveAllTypedItemsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1176,7 +1149,7 @@ bool Cmd_RemoveAllTypedItems(
     return true;
 }
 
-bool Cmd_RemoveAllItems(
+bool Script::RemoveAllItemsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1216,7 +1189,7 @@ bool Cmd_RemoveAllItems(
     return true;
 }
 
-bool Cmd_IsOwner_Execute(
+bool Script::GetOwnershipFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1243,11 +1216,11 @@ bool Cmd_IsOwner_Execute(
     if (!pOwner) {
         pOwner = pPlayer->GetObjectReference();
     }
-    Cmd_IsOwner_Eval(apRefObject, pOwner, nullptr, afReturnValue);
+    Script::GetOwnershipConditionFunction(apRefObject, pOwner, nullptr, afReturnValue);
     return true;
 }
 
-bool Cmd_SetOwnership(
+bool Script::SetOwnershipFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1280,7 +1253,7 @@ bool Cmd_SetOwnership(
     return true;
 }
 
-bool Cmd_Drop_Execute(
+bool Script::DropItemFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1311,7 +1284,7 @@ bool Cmd_Drop_Execute(
     return true;
 }
 
-bool Cmd_IsActionRef(
+bool Script::IsActionRefFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1347,7 +1320,7 @@ bool Cmd_IsActionRef(
     return true;
 }
 
-bool Cmd_PlayerSpellBook(
+bool Script::PlayerSpellBook(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1375,7 +1348,7 @@ bool Cmd_PlayerSpellBook(
     return true;
 }
 
-bool Cmd_PrintAiList(
+bool Script::PrintAILists(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1389,7 +1362,7 @@ bool Cmd_PrintAiList(
     return true;
 }
 
-bool Cmd_SetWeather(
+bool Script::SetActiveWeather(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1433,7 +1406,7 @@ bool Cmd_SetWeather(
     return true;
 }
 
-bool Cmd_ForceWeather(
+bool Script::ForceWeather(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1464,7 +1437,7 @@ bool Cmd_ForceWeather(
     return true;
 }
 
-bool Cmd_ReleaseWeatherOverride(
+bool Script::ReleaseWeatherOverride(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1478,7 +1451,7 @@ bool Cmd_ReleaseWeatherOverride(
     return true;
 }
 
-bool Cmd_ApplyImageSpaceModifier(
+bool Script::ApplyImageSpaceModifier(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1507,7 +1480,7 @@ bool Cmd_ApplyImageSpaceModifier(
     return true;
 }
 
-bool Cmd_SetCellImageSpace(
+bool Script::SetCellImageSpace(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1536,7 +1509,7 @@ bool Cmd_SetCellImageSpace(
     return true;
 }
 
-bool Cmd_SetImageSpace(
+bool Script::SetImageSpace(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1570,7 +1543,7 @@ bool Cmd_SetImageSpace(
     return true;
 }
 
-bool Cmd_ModScale(
+bool Script::ModScaleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1607,7 +1580,7 @@ bool Cmd_ModScale(
     return true;
 }
 
-bool Cmd_GetLineOfSight(
+bool Script::GetLOSFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1631,7 +1604,7 @@ bool Cmd_GetLineOfSight(
         Script::GetLOSConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool Cmd_RemoveSpell(
+bool Script::RemoveSpellFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1671,7 +1644,7 @@ bool Cmd_RemoveSpell(
     return true;
 }
 
-bool Cmd_CastImmediateOnSelf(
+bool Script::CastImmediateOnSelfFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1709,7 +1682,7 @@ bool Cmd_CastImmediateOnSelf(
     return true;
 }
 
-bool Cmd_Dispel(
+bool Script::DispelFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1746,7 +1719,7 @@ bool Cmd_Dispel(
     return true;
 }
 
-bool Cmd_DisableAllActors(
+bool Script::DisableAllActors(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1768,7 +1741,7 @@ bool Cmd_DisableAllActors(
     return true;
 }
 
-bool Cmd_GetIsFormType(
+bool Script::GetIsFormTypeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1802,7 +1775,7 @@ bool Cmd_GetIsFormType(
     return true;
 }
 
-bool Cmd_GetDetected_Execute(
+bool Script::GetDetected(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1826,7 +1799,7 @@ bool Cmd_GetDetected_Execute(
         Script::GetDetectedConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool Cmd_GetQuestRunning_0(
+bool Script::GetQuestRunning(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1850,7 +1823,7 @@ bool Cmd_GetQuestRunning_0(
         Script::GetQuestRunningConditionFunction(apRefObject, pQuest, nullptr, afReturnValue);
 }
 
-bool Cmd_StartQuest(
+bool Script::StartQuestFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1879,7 +1852,7 @@ bool Cmd_StartQuest(
     return true;
 }
 
-bool Cmd_StopQuest(
+bool Script::StopQuestFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1908,7 +1881,7 @@ bool Cmd_StopQuest(
     return true;
 }
 
-bool Cmd_CompleteQuest(
+bool Script::CompleteQuestFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1937,7 +1910,7 @@ bool Cmd_CompleteQuest(
     return true;
 }
 
-bool Cmd_ModFactionRank_Execute(
+bool Script::ModFactionRank(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -1974,7 +1947,7 @@ bool Cmd_ModFactionRank_Execute(
     return true;
 }
 
-bool Cmd_GetFactionReaction(
+bool Script::GetFactionReaction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2012,7 +1985,7 @@ bool Cmd_GetFactionReaction(
     return true;
 }
 
-bool Cmd_SetFactionReaction(
+bool Script::SetFactionReaction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2047,7 +2020,7 @@ bool Cmd_SetFactionReaction(
     return true;
 }
 
-bool Cmd_SetAlly(
+bool Script::SetAllyFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2095,7 +2068,7 @@ bool Cmd_SetAlly(
     return true;
 }
 
-bool Cmd_SetEnemy(
+bool Script::SetEnemyFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2143,7 +2116,7 @@ bool Cmd_SetEnemy(
     return true;
 }
 
-bool Cmd_ModFactionReaction(
+bool Script::ModFactionReaction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2178,7 +2151,7 @@ bool Cmd_ModFactionReaction(
     return true;
 }
 
-bool Cmd_ShowPivot(
+bool Script::ShowPivotFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2232,7 +2205,7 @@ bool Cmd_ShowPivot(
     return true;
 }
 
-bool Cmd_GetIsCurrentPackage_Execute(
+bool Script::GetIsCurrentPackageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2261,7 +2234,7 @@ bool Cmd_GetIsCurrentPackage_Execute(
     return true;
 }
 
-bool Cmd_ShowSlotMachineMenu(
+bool Script::ShowSlotMachineMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2306,7 +2279,7 @@ bool Cmd_ShowSlotMachineMenu(
     return true;
 }
 
-bool Cmd_ShowBlackJackMenu(
+bool Script::ShowBlackJackMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2351,7 +2324,7 @@ bool Cmd_ShowBlackJackMenu(
     return true;
 }
 
-bool Cmd_ShowRouletteMenu(
+bool Script::ShowRouletteMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2396,7 +2369,7 @@ bool Cmd_ShowRouletteMenu(
     return true;
 }
 
-bool Cmd_ShowCaravanMenu(
+bool Script::ShowCaravanMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2454,7 +2427,7 @@ bool Cmd_ShowCaravanMenu(
     return true;
 }
 
-bool Cmd_IsPlayerInRegion(
+bool Script::IsPlayerInRegion(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2501,7 +2474,7 @@ bool Cmd_IsPlayerInRegion(
     return true;
 }
 
-bool Cmd_ShowComputersInterface(
+bool Script::ShowComputersInterface(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2534,7 +2507,7 @@ bool Cmd_ShowComputersInterface(
     return true;
 }
 
-bool GetSandmanFunction(
+bool Script::GetSandmanFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2547,7 +2520,7 @@ bool GetSandmanFunction(
     return Script::GetSandmanConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool GetCannibalFunction(
+bool Script::GetCannibalFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2560,7 +2533,7 @@ bool GetCannibalFunction(
     return Script::GetCannibalConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_StartMisterSandMan(
+bool Script::StartSandmanFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2599,7 +2572,7 @@ bool Cmd_StartMisterSandMan(
     return true;
 }
 
-bool Cmd_StartCannibal(
+bool Script::StartCannibalFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2629,7 +2602,7 @@ bool Cmd_StartCannibal(
     return true;
 }
 
-bool Cmd_SetGhost_Execute(
+bool Script::SetGhostFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2662,7 +2635,7 @@ bool Cmd_SetGhost_Execute(
     return true;
 }
 
-bool Cmd_EquipItem_Execute(
+bool Script::EquipItemFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2742,7 +2715,7 @@ bool Cmd_EquipItem_Execute(
     return true;
 }
 
-bool Cmd_UnequipItem_Execute(
+bool Script::UnEquipItemFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2835,7 +2808,7 @@ bool Cmd_UnequipItem_Execute(
     return true;
 }
 
-bool Cmd_SetClass_Execute(
+bool Script::SetClassFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2872,7 +2845,7 @@ bool Cmd_SetClass_Execute(
     return true;
 }
 
-bool Cmd_ResetInterior(
+bool Script::ResetCellFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2901,7 +2874,7 @@ bool Cmd_ResetInterior(
     return true;
 }
 
-bool Cmd_WaterShallowColor(
+bool Script::ModifyWaterShaderShallowColor(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -2952,7 +2925,7 @@ bool Cmd_WaterShallowColor(
     return true;
 }
 
-bool Cmd_WaterDeepColor(
+bool Script::ModifyWaterShaderDeepColor(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3003,7 +2976,7 @@ bool Cmd_WaterDeepColor(
     return true;
 }
 
-bool Cmd_WaterReflectionColor(
+bool Script::ModifyWaterShaderReflectionColor(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3053,7 +3026,7 @@ bool Cmd_WaterReflectionColor(
     return true;
 }
 
-bool Cmd_DamageObject(
+bool Script::DamageObjectFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3088,7 +3061,7 @@ bool Cmd_DamageObject(
     return true;
 }
 
-bool Cmd_ResetAllTerminals(
+bool Script::ResetAllTerminals(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3102,7 +3075,7 @@ bool Cmd_ResetAllTerminals(
     return true;
 }
 
-bool Cmd_ExitGame_Execute(
+bool Script::ExitGame(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3121,7 +3094,7 @@ bool Cmd_ExitGame_Execute(
     return true;
 }
 
-bool Cmd_ShowWarning_Execute(
+bool Script::ShowWarningFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3162,7 +3135,7 @@ bool Cmd_ShowWarning_Execute(
 // How deep EnterTrigger runs the reference's script inside itself on this thread.
 static thread_local int32_t iEnterTriggerRecursionDepth;
 
-bool Cmd_EnterTrigger_Execute(
+bool Script::TriggerEnterFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3199,7 +3172,7 @@ bool Cmd_EnterTrigger_Execute(
     return true;
 }
 
-bool Cmd_SetConsoleOutputFile_Execute(
+bool Script::SetConsoleOutputFileFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3238,7 +3211,7 @@ bool Cmd_SetConsoleOutputFile_Execute(
     return true;
 }
 
-bool Cmd_TestRaceSexTerimnal(
+bool Script::TestRaceSexTerminalFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3252,7 +3225,7 @@ bool Cmd_TestRaceSexTerimnal(
     return true;
 }
 
-bool Cmd_SetPlayerTeammate_Execute(
+bool Script::SetPlayerTeammateFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3282,7 +3255,7 @@ bool Cmd_SetPlayerTeammate_Execute(
     return true;
 }
 
-bool Cmd_OpenTeammateContainer(
+bool Script::OpenTeammateContainerFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3321,7 +3294,7 @@ bool Cmd_OpenTeammateContainer(
     return true;
 }
 
-bool Cmd_ClearFactionPlayerEnemyFlag(
+bool Script::ClearFactionPlayerEnemyFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3348,7 +3321,7 @@ bool Cmd_ClearFactionPlayerEnemyFlag(
     return true;
 }
 
-bool Cmd_ResetQuest(
+bool Script::ResetQuestFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3378,7 +3351,7 @@ bool Cmd_ResetQuest(
 }
 
 // The quest's script delay, and its change flag CHANGE_QUEST_SCRIPT_DELAY (4) for the save game.
-bool Cmd_SetQuestDelay(
+bool Script::SetQuestDelayFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3410,7 +3383,7 @@ bool Cmd_SetQuestDelay(
     return true;
 }
 
-bool Cmd_ClearDestruction(
+bool Script::ClearDestructionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3424,7 +3397,7 @@ bool Cmd_ClearDestruction(
     return true;
 }
 
-bool Cmd_FireWeapon(
+bool Script::FireWeaponFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3467,7 +3440,7 @@ bool Cmd_FireWeapon(
     return true;
 }
 
-bool Cmd_SetWeaponHealthPerc(
+bool Script::SetWeaponHealthPercFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3520,7 +3493,7 @@ bool Cmd_SetWeaponHealthPerc(
     return true;
 }
 
-bool Cmd_ModWeaponHealthPerc(
+bool Script::ModWeaponHealthPercFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3573,7 +3546,7 @@ bool Cmd_ModWeaponHealthPerc(
     return true;
 }
 
-bool Cmd_SetRumble(
+bool Script::SetRumbleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3607,7 +3580,7 @@ bool Cmd_SetRumble(
     return true;
 }
 
-bool Cmd_SetNoActivationSound(
+bool Script::SetNoActivationSound(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3644,7 +3617,7 @@ bool Cmd_SetNoActivationSound(
     return true;
 }
 
-bool Cmd_Abs(
+bool Script::AbsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3671,7 +3644,7 @@ bool Cmd_Abs(
     return true;
 }
 
-bool Cmd_EnableWeaponMod(
+bool Script::EnableWeaponModFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3706,7 +3679,7 @@ bool Cmd_EnableWeaponMod(
     return true;
 }
 
-bool Cmd_AddReputation(
+bool Script::AddReputationFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3740,7 +3713,7 @@ bool Cmd_AddReputation(
     return true;
 }
 
-bool Cmd_AddReputationExact(
+bool Script::AddReputationExactFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3774,7 +3747,7 @@ bool Cmd_AddReputationExact(
     return true;
 }
 
-bool Cmd_RemoveReputation(
+bool Script::RemoveReputationFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3808,7 +3781,7 @@ bool Cmd_RemoveReputation(
     return true;
 }
 
-bool Cmd_RemoveReputationExact(
+bool Script::RemoveReputationExactFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3842,7 +3815,7 @@ bool Cmd_RemoveReputationExact(
     return true;
 }
 
-bool Cmd_SetReputation(
+bool Script::SetReputationFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -3876,7 +3849,7 @@ bool Cmd_SetReputation(
     return true;
 }
 
-bool Cmd_DetonatePlacedExplosives(
+bool Script::DetonatePlacedExplosivesFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4089,7 +4062,7 @@ bool Cmd_AlwaysShowActorSubtitles(
     return true;
 }
 
-bool Cmd_ModWaterShader(
+bool Script::ModifyWaterShader(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4563,269 +4536,7 @@ bool Cmd_ModWaterShader(
     return false;
 }
 
-bool Cmd_EssentialDeathReload_Parse(
-    const uint16_t asParamCount,
-    const SCRIPT_PARAMETER* apParameters,
-    SCRIPT_LINE* apScriptLine,
-    ScriptCompileData* apCompileData
-) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, true, false);
-}
-
-bool Cmd_ShowMessage_Parse(
-    const uint16_t asParamCount,
-    const SCRIPT_PARAMETER* apParameters,
-    SCRIPT_LINE* apScriptLine,
-    ScriptCompileData* apCompileData
-) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, false, false);
-}
-
-bool Cmd_ShowWarning_Parse(
-    const uint16_t asParamCount,
-    const SCRIPT_PARAMETER* apParameters,
-    SCRIPT_LINE* apScriptLine,
-    ScriptCompileData* apCompileData
-) {
-    return Cmd_NonDefault_Parse(asParamCount, apParameters, apScriptLine, apCompileData, false, true);
-}
-
-// The compiled line is raw bytecode: its 16-bit and 32-bit values are written into the output byte buffer unaligned.
-bool Cmd_NonDefault_Parse(
-    const uint16_t asParamCount,
-    const SCRIPT_PARAMETER* apParameters,
-    SCRIPT_LINE* apScriptLine,
-    ScriptCompileData* apCompileData,
-    bool abButtons,
-    bool abWarning
-) {
-    apScriptLine->uiOffset = 0;
-    uint16_t usOne = 1;
-    *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = usOne;
-    apScriptLine->uiOutputSize += 2;
-    SCRIPT_WORD kTextWord;
-    BGSMessage* pMessage = nullptr;
-    int32_t iCount = 0;
-    if (abWarning) {
-        iCount = ScriptCompiler::GetNextWord(
-            apCompileData,
-            &kTextWord,
-            apScriptLine->pLine,
-            apScriptLine->uiOffset,
-            false,
-            false
-        );
-        if (!iCount) {
-            ScriptCompiler::ScriptError(apCompileData, "No message text.");
-            return false;
-        }
-        *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-            iCount
-        );
-        apScriptLine->uiOutputSize += 2;
-        ourMemcpy(&apScriptLine->pOutput[apScriptLine->uiOutputSize], kTextWord.pText, iCount);
-        apScriptLine->uiOutputSize += iCount;
-    }
-    else {
-        SCRIPT_WORD kMessageWord;
-        iCount = ScriptCompiler::GetNextWord(
-            apCompileData,
-            &kMessageWord,
-            apScriptLine->pLine,
-            apScriptLine->uiOffset,
-            false,
-            false
-        );
-        if (!iCount) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Missing parameter %s.\r\nCompiled script not saved!",
-                apParameters->pParamName
-            );
-            return false;
-        }
-        if (kMessageWord.uiRefObjectIndex || kMessageWord.cVariableType) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Parameter %s may not be a variable.\r\nCompiled script not saved!",
-                apParameters->pParamName
-            );
-            return false;
-        }
-        if (!apCompileData->GetReferencedObject(&kMessageWord, false, false) || !kMessageWord.uiRefObjectIndex) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Item '%s' not found for parameter %s.\r\nCompiled script not saved!",
-                kMessageWord.pText,
-                apParameters->pParamName
-            );
-            return false;
-        }
-        pMessage = dynamic_cast<BGSMessage*>(kMessageWord.pForm);
-        if (!kMessageWord.uiVariableID && !pMessage) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Invalid message '%s' for parameter %s.\r\nCompiled script not saved!",
-                kMessageWord.pText,
-                apParameters->pParamName
-            );
-            return false;
-        }
-        char* pOutput = apScriptLine->pOutput;
-        pOutput[apScriptLine->uiOutputSize++] = 'r';
-        *reinterpret_cast<uint16_t*>(&pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-            kMessageWord.uiRefObjectIndex
-        );
-        apScriptLine->uiOutputSize += 2;
-    }
-    // The message text, scanned for its '%' format specifiers ("%%" is a literal percent sign).
-    const char* pText = nullptr;
-    if (abWarning) {
-        pText = kTextWord.pText;
-    }
-    else if (pMessage) {
-        pText = static_cast<TESDescription*>(pMessage)->GetDescription(nullptr, DESC_ID);
-    }
-    int32_t iVariableCount = 0;
-    while (pText && *pText) {
-        if (*pText == '%') {
-            if (pText[1] == '%') {
-                ++pText;
-            }
-            else {
-                ++iVariableCount;
-            }
-        }
-        ++pText;
-    }
-    if (iVariableCount >= 10) {
-        ScriptCompiler::ScriptError(apCompileData, "Max variables of %d exceeded.", 10);
-        return false;
-    }
-    *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-        iVariableCount
-    );
-    apScriptLine->uiOutputSize += 2;
-    char* pVarOutput = apScriptLine->pOutput;
-    for (int32_t i = 0; i < iVariableCount; ++i) {
-        SCRIPT_WORD kVariableWord;
-        iCount = ScriptCompiler::GetNextWord(
-            apCompileData,
-            &kVariableWord,
-            apScriptLine->pLine,
-            apScriptLine->uiOffset,
-            true,
-            false
-        );
-        if (!iCount) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Too few variables in MessageBox parameters; expected %d, found %d.",
-                iVariableCount,
-                i
-            );
-            return false;
-        }
-        if (!kVariableWord.cVariableType) {
-            ScriptCompiler::ScriptError(
-                apCompileData,
-                "Unknown variable '%s' in MessageBox parameters.",
-                kVariableWord.pText
-            );
-            return false;
-        }
-        if (kVariableWord.uiRefObjectIndex) {
-            if (kVariableWord.cVariableType == 'G') {
-                pVarOutput[apScriptLine->uiOutputSize] = 'G';
-            }
-            else {
-                pVarOutput[apScriptLine->uiOutputSize] = 'r';
-            }
-            *reinterpret_cast<uint16_t*>(&pVarOutput[++apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-                kVariableWord.uiRefObjectIndex
-            );
-            apScriptLine->uiOutputSize += 2;
-        }
-        if (kVariableWord.cVariableType != 'G') {
-            if (!kVariableWord.uiVariableID) {
-                ScriptCompiler::ScriptError(
-                    apCompileData,
-                    "Unknown compiler error in MessageBoxCompile.  Failed to parse variable '%s'.",
-                    kVariableWord.pText
-                );
-                return false;
-            }
-            pVarOutput[apScriptLine->uiOutputSize++] = kVariableWord.cVariableType;
-            *reinterpret_cast<uint16_t*>(&pVarOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-                kVariableWord.uiVariableID
-            );
-            apScriptLine->uiOutputSize += 2;
-        }
-    }
-    if (!abWarning) {
-        if (abButtons) {
-            SCRIPT_WORD kButtonWords[10];
-            int32_t iButtonCount = 0;
-            do {
-                iCount = ScriptCompiler::GetNextWord(
-                    apCompileData,
-                    &kButtonWords[iButtonCount],
-                    apScriptLine->pLine,
-                    apScriptLine->uiOffset,
-                    false,
-                    false
-                );
-                if (iCount <= 0) {
-                    break;
-                }
-                ++iButtonCount;
-            }
-            while (iButtonCount < 10);
-            *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
-                iButtonCount
-            );
-            apScriptLine->uiOutputSize += 2;
-            for (int32_t j = 0; j < iButtonCount; ++j) {
-                *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = 1;
-                apScriptLine->uiOutputSize += 2;
-                iCount = BSstrlen(kButtonWords[j].pText);
-                *reinterpret_cast<uint16_t*>(
-                    &apScriptLine->pOutput[apScriptLine->uiOutputSize]
-                ) = static_cast<uint16_t>(iCount);
-                apScriptLine->uiOutputSize += 2;
-                ourMemcpy(&apScriptLine->pOutput[apScriptLine->uiOutputSize], kButtonWords[j].pText, iCount);
-                apScriptLine->uiOutputSize += iCount;
-            }
-        }
-        else {
-            int32_t iMessageTime = 0;
-            SCRIPT_WORD kTimeWord;
-            iCount = ScriptCompiler::GetNextWord(
-                apCompileData,
-                &kTimeWord,
-                apScriptLine->pLine,
-                apScriptLine->uiOffset,
-                false,
-                false
-            );
-            if (iCount > 0) {
-                if (!IsStringInteger(kTimeWord.pText)) {
-                    ScriptCompiler::ScriptError(
-                        apCompileData,
-                        "Message time must be an integer.\r\nCompiled script not saved!"
-                    );
-                    return false;
-                }
-                iMessageTime = std::atol(kTimeWord.pText);
-            }
-            *reinterpret_cast<uint32_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = iMessageTime;
-            apScriptLine->uiOutputSize += 4;
-        }
-    }
-    return true;
-}
-
-bool Cmd_EssentialDeathReload_Execute(
+bool Script::EssentailDeathReloadFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4879,7 +4590,7 @@ bool Cmd_EssentialDeathReload_Execute(
     return true;
 }
 
-bool Cmd_PrintDeprecatedReturnTrue(
+bool Script::OutputMemContexts(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4898,7 +4609,7 @@ uint32_t GetTextureDumpSize(NiTexture* apTexture) {
     return 0;
 }
 
-bool Cmd_OutputTextureUseMap(
+bool Script::OutputTextureUseMap(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4956,7 +4667,7 @@ bool Cmd_OutputTextureUseMap(
     return true;
 }
 
-bool Cmd_TestAllCells(
+bool Script::TestAllCellsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -4988,7 +4699,7 @@ bool Cmd_TestAllCells(
     return true;
 }
 
-bool Cmd_RenderTestCell(
+bool Script::RenderTestCellFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5008,7 +4719,7 @@ bool Cmd_RenderTestCell(
     return true;
 }
 
-bool Cmd_RenderTestHere(
+bool Script::RenderTestHereFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5028,7 +4739,7 @@ bool Cmd_RenderTestHere(
     return true;
 }
 
-bool Cmd_ToggleConversations(
+bool Script::ToggleConversationStatsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5049,7 +4760,7 @@ bool Cmd_ToggleConversations(
     return true;
 }
 
-bool Cmd_ToggleCollisionGeometry(
+bool Script::ToggleCollisionGeometryFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5063,7 +4774,7 @@ bool Cmd_ToggleCollisionGeometry(
     return true;
 }
 
-bool Cmd_ToggleProjectileDebug(
+bool Script::ToggleProjectileDebugFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5088,7 +4799,7 @@ void ToggleProjectileDebug() {
     bIsProjectileDebug = !bIsProjectileDebug;
 }
 
-bool Cmd_SetTargetRefractionFire(
+bool Script::SetTargetRefractionFire(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5144,7 +4855,7 @@ bool Cmd_SetTargetRefractionFire(
     return true;
 }
 
-bool Cmd_ToggleLiteBrite(
+bool Script::ToggleLiteBriteFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5163,7 +4874,7 @@ bool Cmd_ToggleLiteBrite(
     return true;
 }
 
-bool Cmd_SetDebugText(
+bool Script::SetDebugTextFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5204,7 +4915,7 @@ bool Cmd_SetDebugText(
     return true;
 }
 
-bool Cmd_ShowFullScenegraph(
+bool Script::ShowFullScenegraphFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5239,7 +4950,7 @@ bool Cmd_ShowFullScenegraph(
     return true;
 }
 
-bool Cmd_SetTerminalMenuPos(
+bool Script::SetTerminalMenuPosFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5272,7 +4983,7 @@ bool Cmd_SetTerminalMenuPos(
     return true;
 }
 
-bool Cmd_MovePipboyKnob(
+bool Script::MovePipboyKnobFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5303,7 +5014,7 @@ bool Cmd_MovePipboyKnob(
     return true;
 }
 
-bool Cmd_ToggleTestLight(
+bool Script::ToggleTestLight(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5332,7 +5043,7 @@ bool Cmd_ToggleTestLight(
     return true;
 }
 
-bool Cmd_ToggleCombatAI(
+bool Script::ToggleCombatAI(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5342,7 +5053,7 @@ bool Cmd_ToggleCombatAI(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bool bOn = ToggleCombatAI();
+    bool bOn = CombatController::ToggleCombatAI();
     if (Script::bSystemOutput) {
         const char* pState = bOn ? "On" : "Off";
         Interface::PrintLine("All Combat AI processing is %s", pState);
@@ -5350,12 +5061,7 @@ bool Cmd_ToggleCombatAI(
     return true;
 }
 
-bool ToggleCombatAI() {
-    CombatController::bProcessCombat = !CombatController::bProcessCombat;
-    return CombatController::bProcessCombat;
-}
-
-bool Cmd_ShowHeadTrackTarget(
+bool Script::ShowHeadTrackTarget(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5382,7 +5088,7 @@ bool Cmd_ShowHeadTrackTarget(
     return true;
 }
 
-bool Cmd_ToggleHighProcess(
+bool Script::ToggleHighProcess(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5403,7 +5109,7 @@ bool Cmd_ToggleHighProcess(
     return true;
 }
 
-bool Cmd_ToggleLowProcess(
+bool Script::ToggleLowProcess(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5421,7 +5127,7 @@ bool Cmd_ToggleLowProcess(
     return true;
 }
 
-bool Cmd_ToggleMiddleLowProcess(
+bool Script::ToggleMiddleLowProcess(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5439,7 +5145,7 @@ bool Cmd_ToggleMiddleLowProcess(
     return true;
 }
 
-bool Cmd_ToggleMiddleHighProcess(
+bool Script::ToggleMiddleHighProcess(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5457,7 +5163,7 @@ bool Cmd_ToggleMiddleHighProcess(
     return true;
 }
 
-bool Cmd_SpeakSound(
+bool Script::SpeakSoundFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5532,7 +5238,7 @@ bool Cmd_SpeakSound(
     return false;
 }
 
-bool Cmd_Help(
+bool Script::HelpFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5643,7 +5349,7 @@ bool Cmd_Help(
     return true;
 }
 
-bool Cmd_DisableNavMesh_Execute(
+bool Script::DisableNavMesh(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5681,7 +5387,7 @@ bool Cmd_DisableNavMesh_Execute(
     return true;
 }
 
-bool Cmd_EnableNavmesh_Execute(
+bool Script::EnableNavMesh(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5719,7 +5425,7 @@ bool Cmd_EnableNavmesh_Execute(
     return true;
 }
 
-bool Cmd_CenterOnCell_Execute(
+bool Script::CenterOnCellFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5747,7 +5453,7 @@ bool Cmd_CenterOnCell_Execute(
     return true;
 }
 
-bool Cmd_CenterOnExterior(
+bool Script::CenterOnExteriorFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5797,7 +5503,7 @@ bool Cmd_CenterOnExterior(
     return true;
 }
 
-bool Cmd_CenterOnWorld(
+bool Script::CenterOnWorldFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5845,7 +5551,7 @@ bool Cmd_CenterOnWorld(
     return true;
 }
 
-bool Cmd_SetSize(
+bool Script::SetSizeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5878,7 +5584,7 @@ bool Cmd_SetSize(
     return true;
 }
 
-bool Cmd_KillActor_Execute(
+bool Script::KillActorFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5949,7 +5655,7 @@ bool Cmd_KillActor_Execute(
     return true;
 }
 
-bool Cmd_KillAllActors(
+bool Script::KillAllActorsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -5983,7 +5689,7 @@ bool Cmd_KillAllActors(
     return true;
 }
 
-bool Cmd_ResurrectActor(
+bool Script::ResurrectActorFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6017,7 +5723,7 @@ bool Cmd_ResurrectActor(
     return true;
 }
 
-bool GetFatiguePercentageFunction(
+bool Script::GetFatiguePercentageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6030,7 +5736,7 @@ bool GetFatiguePercentageFunction(
     return Script::GetFatiguePercentageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_GetHealthPercentage_Execute(
+bool Script::GetHealthPercentageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6043,7 +5749,7 @@ bool Cmd_GetHealthPercentage_Execute(
     return Script::GetHealthPercentageConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_GetBaseActorValue_Execute(
+bool Script::GetBaseActorValueFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6064,13 +5770,18 @@ bool Cmd_GetBaseActorValue_Execute(
             apScriptLocals,
             &eActorValue
         )) {
-        return Script::GetBaseActorValue_Eval(static_cast<Actor*>(apRefObject), eActorValue, 0, &afReturnValue);
+        return Script::GetBaseActorValueConditionFunction(
+            static_cast<Actor*>(apRefObject),
+            eActorValue,
+            0,
+            &afReturnValue
+        );
     }
 
     return false;
 }
 
-bool Cmd_GetCauseOfDeath_Eval(
+bool Script::GetCauseofDeathFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6083,7 +5794,7 @@ bool Cmd_GetCauseOfDeath_Eval(
     return Script::GetCauseofDeathConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_FriendDispositionBoost(
+bool Script::FriendDispositionBoostFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6104,7 +5815,7 @@ bool Cmd_FriendDispositionBoost(
     return true;
 }
 
-bool Cmd_GetGameSetting(
+bool Script::GetGameSettingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6170,7 +5881,7 @@ bool Cmd_GetGameSetting(
     return true;
 }
 
-bool Cmd_SetGameSetting(
+bool Script::SetGameSettingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6240,7 +5951,7 @@ bool Cmd_SetGameSetting(
     return true;
 }
 
-bool Cmd_GetIniSetting_Execute(
+bool Script::GetINISettingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6298,7 +6009,7 @@ bool Cmd_GetIniSetting_Execute(
     return true;
 }
 
-bool Cmd_SetINISetting(
+bool Script::SetINISettingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6376,7 +6087,7 @@ bool Cmd_SetINISetting(
     return true;
 }
 
-bool Cmd_FadeSFX(
+bool Script::FadeSFXFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6408,7 +6119,7 @@ bool Cmd_FadeSFX(
     return true;
 }
 
-bool Cmd_SetLocationSpecificLoadScreensOnly(
+bool Script::SetLocationSpecificLoadScreensOnlyFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6445,7 +6156,7 @@ bool SetIsLocationSpecificLoadScreensOnly(bool abOnly) {
     return abOnly;
 }
 
-bool Cmd_ShowQuests(
+bool Script::ShowQuestsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6468,7 +6179,7 @@ bool Cmd_ShowQuests(
     return true;
 }
 
-bool Cmd_Show1stPerson(
+bool Script::Show1stPersonFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6507,7 +6218,7 @@ bool Cmd_Show1stPerson(
     return true;
 }
 
-bool Cmd_LoadGame_Execute(
+bool Script::LoadGame(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6536,7 +6247,7 @@ bool Cmd_LoadGame_Execute(
     return true;
 }
 
-bool Cmd_Autosave(
+bool Script::Autosave(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6552,7 +6263,7 @@ bool Cmd_Autosave(
     return true;
 }
 
-bool Cmd_ForceSave(
+bool Script::ForceSave(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6568,7 +6279,7 @@ bool Cmd_ForceSave(
     return true;
 }
 
-bool Cmd_ToggleCellNode(
+bool Script::ToggleCellNode(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6645,7 +6356,7 @@ bool Cmd_ToggleCellNode(
     return true;
 }
 
-bool Cmd_DumpTexturePalette(
+bool Script::DumpTexturePalette(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6827,7 +6538,7 @@ bool Cmd_DumpTexturePalette(
     return true;
 }
 
-bool Cmd_GetItemCount(
+bool Script::GetItemCount(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6851,7 +6562,7 @@ bool Cmd_GetItemCount(
         Script::GetItemCountConditionFunction(apRefObject, pItem, nullptr, afReturnValue);
 }
 
-bool Cmd_SetShowQuestItems(
+bool Script::SetShowQuestItemsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6878,7 +6589,7 @@ bool Cmd_SetShowQuestItems(
     return true;
 }
 
-bool Cmd_ResetHealth(
+bool Script::ResetHealthFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6906,7 +6617,7 @@ bool Cmd_ResetHealth(
     return true;
 }
 
-bool Cmd_GetEquipped(
+bool Script::GetEquippedFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6930,7 +6641,7 @@ bool Cmd_GetEquipped(
         Script::GetEquippedConditionFunction(apRefObject, pItem, nullptr, afReturnValue);
 }
 
-bool GetInWorldspaceFunction(
+bool Script::GetInWorldspace(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6951,10 +6662,10 @@ bool GetInWorldspaceFunction(
                apScriptLocals,
                &pWorldSpace
            ) &&
-        Cmd_GetInWorldspace(apRefObject, pWorldSpace, nullptr, afReturnValue);
+        Script::GetInWorldspaceConditionFunction(apRefObject, pWorldSpace, nullptr, afReturnValue);
 }
 
-bool Cmd_SetCellPublicFlag(
+bool Script::SetCellPublicFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -6985,7 +6696,7 @@ bool Cmd_SetCellPublicFlag(
     return true;
 }
 
-bool GetInSameCellFunction(
+bool Script::GetInSameCell(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7009,7 +6720,7 @@ bool GetInSameCellFunction(
         Script::GetInSameCellConditionFunction(apRefObject, pRef, nullptr, afReturnValue);
 }
 
-bool GetIsClassFunction(
+bool Script::GetIsClass(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7030,10 +6741,10 @@ bool GetIsClassFunction(
                apScriptLocals,
                &pClass
            ) &&
-        Cmd_GetIsClass(apRefObject, pClass, nullptr, afReturnValue);
+        Script::GetIsClassConditionFunction(apRefObject, pClass, nullptr, afReturnValue);
 }
 
-bool Cmd_SetInChargen(
+bool Script::SetChargenValue(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7085,7 +6796,7 @@ bool Cmd_GetInCharGen(
     return true;
 }
 
-bool GetIsRaceFunction(
+bool Script::GetIsRace(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7109,7 +6820,7 @@ bool GetIsRaceFunction(
         Script::GetIsRaceConditionFunction(apRefObject, pRace, nullptr, afReturnValue);
 }
 
-bool GetIsCreatureTypeFunction(
+bool Script::GetIsCreatureType(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7130,10 +6841,10 @@ bool GetIsCreatureTypeFunction(
                apScriptLocals,
                &pType
            ) &&
-        Cmd_GetIsCreatureType(apRefObject, pType, nullptr, afReturnValue);
+        Script::GetIsCreatureTypeConditionFunction(apRefObject, pType, nullptr, afReturnValue);
 }
 
-bool Cmd_SayTo_Execute(
+bool Script::SayToFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7238,7 +6949,7 @@ bool Cmd_SayTo_Execute(
     return true;
 }
 
-bool Cmd_ResetAI(
+bool Script::ResetAIFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7256,7 +6967,7 @@ bool Cmd_ResetAI(
     return true;
 }
 
-bool Cmd_EvaluatePackage_Execute(
+bool Script::EvaluatePackageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7274,7 +6985,7 @@ bool Cmd_EvaluatePackage_Execute(
     return true;
 }
 
-bool Cmd_AddTopic(
+bool Script::AddTopicFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7301,7 +7012,7 @@ bool Cmd_AddTopic(
     return true;
 }
 
-bool Cmd_SetAlert(
+bool Script::SetAlertFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7333,7 +7044,7 @@ bool Cmd_SetAlert(
     return true;
 }
 
-bool au_re_Cmd_GetIsAlerted(
+bool Script::GetAlertFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7346,7 +7057,7 @@ bool au_re_Cmd_GetIsAlerted(
     return Script::GetAlertConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool GetPlantedExplosiveFunction(
+bool Script::GetPlantedExplosiveFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7359,7 +7070,7 @@ bool GetPlantedExplosiveFunction(
     return Script::GetPlantedExplosiveConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_CompleteAllObjectives(
+bool Script::CompleteAllObjectivesFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7386,7 +7097,7 @@ bool Cmd_CompleteAllObjectives(
     return true;
 }
 
-bool Cmd_Look(
+bool Script::LookFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7431,7 +7142,7 @@ bool Cmd_Look(
     return true;
 }
 
-bool Cmd_StopLook_Execute(
+bool Script::StopLookFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7455,7 +7166,7 @@ bool Cmd_StopLook_Execute(
     return true;
 }
 
-bool Cmd_SetSkyParam(
+bool Script::SetSkyParamFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7485,7 +7196,7 @@ bool Cmd_SetSkyParam(
     return true;
 }
 
-char Event_OnAdd(
+char Script::OnAddFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7512,7 +7223,7 @@ char Event_OnAdd(
     return 1;
 }
 
-char Event_OnSell(
+char Script::OnSellFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7539,61 +7250,7 @@ char Event_OnSell(
     return 1;
 }
 
-char Event_OnEquip(
-    SCRIPT_PARAMETER* paramInfo,
-    char* scriptData,
-    TESObjectREFR* thisObj,
-    TESObjectREFR* containingObj,
-    Script* scriptObj,
-    ScriptLocals* eventList,
-    double* afReturnValue,
-    uint32_t* opcodeOffsetPtr
-) {
-    TESForm* pForm = nullptr;
-    if (!Script::ParseParameters(
-            paramInfo,
-            scriptData,
-            *opcodeOffsetPtr,
-            thisObj,
-            containingObj,
-            scriptObj,
-            eventList,
-            &pForm
-        )) {
-        return 0;
-    }
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONEQUIP, thisObj, pForm, eventList, *afReturnValue);
-    return 1;
-}
-
-char Event_OnUnEquip(
-    SCRIPT_PARAMETER* paramInfo,
-    char* scriptData,
-    TESObjectREFR* thisObj,
-    TESObjectREFR* containingObj,
-    Script* scriptObj,
-    ScriptLocals* eventList,
-    double* afReturnValue,
-    uint32_t* opcodeOffsetPtr
-) {
-    TESForm* pForm = nullptr;
-    if (!Script::ParseParameters(
-            paramInfo,
-            scriptData,
-            *opcodeOffsetPtr,
-            thisObj,
-            containingObj,
-            scriptObj,
-            eventList,
-            &pForm
-        )) {
-        return 0;
-    }
-    Script::CheckFlagFunction(SCRIPT_ACTION_ONUNEQUIP, thisObj, pForm, eventList, *afReturnValue);
-    return 1;
-}
-
-char Event_OnDrop(
+char Script::OnDropFunction(
     SCRIPT_PARAMETER* paramInfo,
     void* scriptData,
     TESObjectREFR* thisObj,
@@ -7620,7 +7277,7 @@ char Event_OnDrop(
     return 1;
 }
 
-char Cmd_OnActivate_Execute(
+char Script::OnActivateFunction(
     SCRIPT_PARAMETER* paramInfo,
     void* scriptData,
     TESObjectREFR* thisObj,
@@ -7655,7 +7312,7 @@ char Cmd_OnActivate_Execute(
     return 1;
 }
 
-char Cmd_OnNPCActivate_Execute(
+char Script::OnNPCActivateFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7679,7 +7336,7 @@ char Cmd_OnNPCActivate_Execute(
     return 1;
 }
 
-char Event_OnFire(
+char Script::OnFireFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7693,7 +7350,7 @@ char Event_OnFire(
     return 1;
 }
 
-char Event_OnOpen(
+char Script::OnOpenFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7707,7 +7364,7 @@ char Event_OnOpen(
     return 1;
 }
 
-char Event_OnClose(
+char Script::OnCloseFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7721,7 +7378,7 @@ char Event_OnClose(
     return 1;
 }
 
-char Event_OnGrab(
+char Script::OnGrabFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7735,7 +7392,7 @@ char Event_OnGrab(
     return 1;
 }
 
-char Event_OnRelease(
+char Script::OnReleaseFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7749,7 +7406,7 @@ char Event_OnRelease(
     return 1;
 }
 
-char Event_OnDestructionStageChange(
+char Script::OnDestructionStageChangeFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7780,7 +7437,7 @@ char Event_OnDestructionStageChange(
     return 1;
 }
 
-char Event_OnHit(
+char Script::OnHitFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7807,7 +7464,7 @@ char Event_OnHit(
     return 1;
 }
 
-char Event_OnHitWith(
+char Script::OnHitWithFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7856,7 +7513,7 @@ char Event_OnHitWith(
     return 1;
 }
 
-char Event_OnDeath(
+char Script::OnDeathFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7883,7 +7540,7 @@ char Event_OnDeath(
     return 1;
 }
 
-char Event_OnStartCombat(
+char Script::OnStartCombatFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7910,7 +7567,7 @@ char Event_OnStartCombat(
     return 1;
 }
 
-char Event_OnMurder(
+char Script::OnMurderFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7937,7 +7594,7 @@ char Event_OnMurder(
     return 1;
 }
 
-char Event_OnCombatEnd(
+char Script::OnCombatEndFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -7951,7 +7608,7 @@ char Event_OnCombatEnd(
 }
 
 // Ignores ParseParameters' result.
-char Event_SayToDone(
+char Script::OnSayToDoneFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -7977,7 +7634,7 @@ char Event_SayToDone(
     return 1;
 }
 
-char Event_OnPackageStart(
+char Script::OnPackageStartFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8004,7 +7661,7 @@ char Event_OnPackageStart(
     return 1;
 }
 
-char Event_OnPackageDone(
+char Script::OnPackageEndFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8031,7 +7688,7 @@ char Event_OnPackageDone(
     return 1;
 }
 
-char Event_OnPackageChange(
+char Script::OnPackageChangeFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8058,7 +7715,7 @@ char Event_OnPackageChange(
     return 1;
 }
 
-char Event_OnLoad(
+char Script::OnLoadFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8071,7 +7728,7 @@ char Event_OnLoad(
     return 1;
 }
 
-char Event_OnReset(
+char Script::OnResetFunction(
     int32_t aiParameters,
     int32_t aiCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8084,7 +7741,7 @@ char Event_OnReset(
     return 1;
 }
 
-char Event_OnMagicEffectHit(
+char Script::OnMagicEffectHitFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8111,7 +7768,7 @@ char Event_OnMagicEffectHit(
     return 1;
 }
 
-char Event_OnTrigger(
+char Script::OnTriggerFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8138,7 +7795,7 @@ char Event_OnTrigger(
     return 1;
 }
 
-char Event_OnTriggerEnter(
+char Script::OnTriggerEnterFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8165,7 +7822,7 @@ char Event_OnTriggerEnter(
     return 1;
 }
 
-char Event_OnTriggerLeave(
+char Script::OnTriggerLeaveFunction(
     SCRIPT_PARAMETER* paramInfo,
     char* scriptData,
     TESObjectREFR* thisObj,
@@ -8192,7 +7849,7 @@ char Event_OnTriggerLeave(
     return 1;
 }
 
-bool Cmd_EnablePlayerControls_Execute(
+bool Script::EnablePlayerControlsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8253,7 +7910,7 @@ bool Cmd_EnablePlayerControls_Execute(
     return true;
 }
 
-bool Cmd_DisablePlayerControls_Execute(
+bool Script::DisablePlayerControlsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8314,7 +7971,7 @@ bool Cmd_DisablePlayerControls_Execute(
     return true;
 }
 
-bool GetPlayerControlsDisabledFunction(
+bool Script::GetPlayerControlsDisabledFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8371,8 +8028,9 @@ bool GetPlayerControlsDisabledFunction(
     if (iSneaking) {
         uiFlags |= PlayerCharacter::DPC_SNEAKING;
     }
-    // The flags go in the condition function's first parameter slot, where Cmd_GetPlayerControlsDisabled reads them.
-    Cmd_GetPlayerControlsDisabled(
+    // The flags go in the condition function's first parameter slot, where
+    // Script::GetPlayerControlsDisabledConditionFunction reads them.
+    Script::GetPlayerControlsDisabledConditionFunction(
         nullptr,
         reinterpret_cast<void*>(static_cast<uintptr_t>(uiFlags)),
         nullptr,
@@ -8381,7 +8039,7 @@ bool GetPlayerControlsDisabledFunction(
     return true;
 }
 
-bool Cmd_PickIdle(
+bool Script::PickIdleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8433,7 +8091,7 @@ bool Cmd_PickIdle(
     return true;
 }
 
-bool Cmd_PlayIdle(
+bool Script::PlayIdleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8499,7 +8157,7 @@ bool Cmd_PlayIdle(
     return true;
 }
 
-bool IsWeaponInListFunction(
+bool Script::IsWeaponInListFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8520,23 +8178,10 @@ bool IsWeaponInListFunction(
                apScriptLocals,
                &pList
            ) &&
-        Cmd_IsWeaponInList(apRefObject, pList, nullptr, afReturnValue);
+        Script::IsWeaponInListConditionFunction(apRefObject, pList, nullptr, afReturnValue);
 }
 
-bool IsTorchOutFunction(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    return !apRefObject || Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
-}
-
-bool Cmd_IsFacingUp_Execute(
+bool Script::IsFacingUpFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8549,7 +8194,7 @@ bool Cmd_IsFacingUp_Execute(
     return !apRefObject || Script::IsFacingUpConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_IsLeftUp_Execute(
+bool Script::IsLeftUpFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8566,7 +8211,7 @@ bool Cmd_IsLeftUp_Execute(
     return true;
 }
 
-bool au_re_Cmd_GetKnockedState(
+bool Script::GetKnockedStateFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8583,7 +8228,7 @@ bool au_re_Cmd_GetKnockedState(
     return true;
 }
 
-bool IsWeaponSkillTypeFunction(
+bool Script::IsWeaponSkillTypeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8607,12 +8252,12 @@ bool IsWeaponSkillTypeFunction(
         return false;
     }
     if (apRefObject) {
-        return Cmd_IsWeaponSkillType(apRefObject, pSkill, nullptr, afReturnValue);
+        return Script::IsWeaponSkillTypeConditionFunction(apRefObject, pSkill, nullptr, afReturnValue);
     }
     return true;
 }
 
-bool Cmd_GetCurrentAIPackage_Execute(
+bool Script::GetCurrentAIPackageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8629,7 +8274,7 @@ bool Cmd_GetCurrentAIPackage_Execute(
     return true;
 }
 
-bool au_re_Cmd_IsWaiting(
+bool Script::IsWaitingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8646,7 +8291,7 @@ bool au_re_Cmd_IsWaiting(
     return true;
 }
 
-bool au_re_Cmd_IsIdlePlaying(
+bool Script::IsIdlePlayingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8663,7 +8308,7 @@ bool au_re_Cmd_IsIdlePlaying(
     return true;
 }
 
-bool Cmd_ShowQuestTargets_Execute(
+bool Script::ShowQuestTargetsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8738,7 +8383,7 @@ char* mbsnbcpy_(char* Destination, const char* Source, uint32_t Count) {
     );
 }
 
-bool Cmd_ShowFullQuestLog(
+bool Script::ShowFullQuestLogFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8783,7 +8428,7 @@ bool Cmd_ShowFullQuestLog(
     return true;
 }
 
-bool Cmd_SetPCFactionMurder(
+bool Script::SetPCFactionMurderFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8817,7 +8462,7 @@ bool Cmd_SetPCFactionMurder(
     return true;
 }
 
-bool Cmd_SetPCEnemyofFaction(
+bool Script::SetPlayerEnemyofFactionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8851,7 +8496,7 @@ bool Cmd_SetPCEnemyofFaction(
     return true;
 }
 
-bool Cmd_SetPCFactionAttack(
+bool Script::SetPCFactionAttackFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8885,7 +8530,7 @@ bool Cmd_SetPCFactionAttack(
     return true;
 }
 
-bool Cmd_GetSelf_Execute(
+bool Script::GetSelfFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8912,7 +8557,7 @@ bool Cmd_GetSelf_Execute(
     return true;
 }
 
-bool Cmd_GetCombatTarget_Execute(
+bool Script::GetCombatTargetFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8938,7 +8583,7 @@ bool Cmd_GetCombatTarget_Execute(
     return true;
 }
 
-bool Cmd_GetPackageTarget_Execute(
+bool Script::GetPackageTargetFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8964,7 +8609,7 @@ bool Cmd_GetPackageTarget_Execute(
     return true;
 }
 
-bool Cmd_GetContainer(
+bool Script::GetContainerFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -8987,7 +8632,7 @@ bool Cmd_GetContainer(
     return true;
 }
 
-bool Cmd_GetParentRef(
+bool Script::GetParentRefFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9011,7 +8656,7 @@ bool Cmd_GetParentRef(
     return true;
 }
 
-bool Cmd_GetLinkedRef(
+bool Script::GetLinkedRefFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9035,7 +8680,7 @@ bool Cmd_GetLinkedRef(
     return true;
 }
 
-bool Cmd_GetForceRun(
+bool Script::GetForceRun(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9057,7 +8702,7 @@ bool Cmd_GetForceRun(
     return true;
 }
 
-bool Cmd_SetForceRun(
+bool Script::SetForceRun(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9091,7 +8736,7 @@ bool Cmd_SetForceRun(
     return true;
 }
 
-bool Cmd_GetForceSneak(
+bool Script::GetForceSneak(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9113,7 +8758,7 @@ bool Cmd_GetForceSneak(
     return true;
 }
 
-bool Cmd_SetForceSneak(
+bool Script::SetForceSneak(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9152,7 +8797,7 @@ bool Cmd_SetForceSneak(
     return true;
 }
 
-bool Cmd_AdvLevel_Execute(
+bool Script::AdvanceLevelFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9165,12 +8810,12 @@ bool Cmd_AdvLevel_Execute(
     if (pPlayer) {
         uint16_t usLevel = pPlayer->GetLevel();
         pPlayer->GetActorBase()->SetLevel(usLevel + 1);
-        LevelUpMenu::Create();
+        Interface::CreateLevelUpMenu();
     }
     return true;
 }
 
-bool Cmd_HasMagicEffect_Execute(
+bool Script::HasMagicEffectFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9194,7 +8839,7 @@ bool Cmd_HasMagicEffect_Execute(
         Script::HasMagicEffectConditionFunction(apRefObject, pEffect, nullptr, afReturnValue);
 }
 
-bool IsSpellTargetFunction(
+bool Script::IsSpellTargetFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9218,7 +8863,7 @@ bool IsSpellTargetFunction(
         Script::IsSpellTargetConditionFunction(apRefObject, pSpell, nullptr, afReturnValue);
 }
 
-bool GetSpellUsageNumberFunction(
+bool Script::GetSpellUsageNumberFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9242,7 +8887,7 @@ bool GetSpellUsageNumberFunction(
         Script::GetSpellUsageNumberConditionFunction(apRefObject, pSpell, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_GetVATSMode(
+bool Script::GetVATSModeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9255,7 +8900,7 @@ bool au_re_Cmd_GetVATSMode(
     return Script::GetVATSModeConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool GetVATSTargetHeightFunction(
+bool Script::GetVATSTargetHeightFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9268,7 +8913,7 @@ bool GetVATSTargetHeightFunction(
     return Script::GetVATSTargetHeightConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_SetDefaultOpen(
+bool Script::SetDefaultOpenFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9319,7 +8964,7 @@ bool Cmd_SetDefaultOpen(
     return true;
 }
 
-bool Cmd_ShowRaceMenu_Execute(
+bool Script::ShowRaceMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9341,7 +8986,7 @@ bool Cmd_ShowRaceMenu_Execute(
     return true;
 }
 
-bool Cmd_ShowBarberMenu(
+bool Script::ShowBarberMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9357,7 +9002,7 @@ bool Cmd_ShowBarberMenu(
     return true;
 }
 
-bool Cmd_ShowPlasticSurgeonMenu(
+bool Script::ShowPlasticSurgeonMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9373,7 +9018,7 @@ bool Cmd_ShowPlasticSurgeonMenu(
     return true;
 }
 
-bool Cmd_ShowNameMenu(
+bool Script::ShowNameMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9399,7 +9044,7 @@ bool Cmd_ShowNameMenu(
     return true;
 }
 
-bool Cmd_ShowBarterMenu(
+bool Script::ShowBarterMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9446,14 +9091,14 @@ bool Cmd_ShowBarterMenu(
             }
         }
         if (pRef) {
-            ShowBarterMenu_(pRef, iMode);
+            Interface::CreateBarterMenu(pRef, iMode);
         }
     }
 
     return true;
 }
 
-bool GetRestrainedFunction(
+bool Script::GetRestrainedFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9466,7 +9111,7 @@ bool GetRestrainedFunction(
     return Script::GetRestrainedConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_ForceFlee(
+bool Script::ForceFleeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9522,7 +9167,7 @@ bool Cmd_ForceFlee(
     return true;
 }
 
-bool Cmd_ForceTakeCover(
+bool Script::ForceTakeCoverFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9563,7 +9208,7 @@ bool Cmd_ForceTakeCover(
     return true;
 }
 
-bool au_re_Cmd_GetOffersServicesNow(
+bool Script::GetOffersServiceNowFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9576,7 +9221,7 @@ bool au_re_Cmd_GetOffersServicesNow(
     return Script::GetOffersServiceConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_ModBarterGold(
+bool Script::ModBarterGoldFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9608,7 +9253,7 @@ bool Cmd_ModBarterGold(
 }
 
 // pNPC's barter gold is read for the line even when the reference's base is no NPC.
-bool Cmd_SetBarterGold(
+bool Script::SetBarterGoldFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9644,7 +9289,7 @@ bool Cmd_SetBarterGold(
     return true;
 }
 
-bool au_re_Cmd_GetBarterGold(
+bool Script::GetBarterGoldFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9657,7 +9302,7 @@ bool au_re_Cmd_GetBarterGold(
     return Script::GetBarterGoldConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_SetLevel_Execute(
+bool Script::SetLevelFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9733,7 +9378,7 @@ bool Cmd_SetLevel_Execute(
     return true;
 }
 
-bool au_re_Cmd_IsXBox(
+bool Script::IsXBoxFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9746,7 +9391,7 @@ bool au_re_Cmd_IsXBox(
     return Script::IsXboxConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool au_re_IsPS3(
+bool Script::IsPS3Function(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9759,7 +9404,7 @@ bool au_re_IsPS3(
     return Script::IsPS3ConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool au_re_Cmd_IsPC(
+bool Script::IsPCFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9772,7 +9417,7 @@ bool au_re_Cmd_IsPC(
     return Script::IsPCConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool IsActorUsingATorchFunction(
+bool Script::IsActorUsingATorchFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9785,7 +9430,7 @@ bool IsActorUsingATorchFunction(
     return Script::IsActorUsingATorchConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_ModPCAttribute(
+bool Script::ModPCAttributeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9817,7 +9462,7 @@ bool Cmd_ModPCAttribute(
     return true;
 }
 
-bool Cmd_DamageWeapon(
+bool Script::DamageWeaponFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9852,7 +9497,7 @@ bool Cmd_DamageWeapon(
     return true;
 }
 
-bool Cmd_GetWeaponHealth(
+bool Script::GetWeaponHealthFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9880,7 +9525,7 @@ bool Cmd_GetWeaponHealth(
     return bResult;
 }
 
-bool Cmd_SetCellOwnership(
+bool Script::SetCellOwnershipFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9914,21 +9559,7 @@ bool Cmd_SetCellOwnership(
     return true;
 }
 
-bool au_re_Cmd_SetArgTo0AndReturnTrue_1(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
-    return true;
-}
-
-bool Cmd_SetCellFullName(
+bool Script::SetCellFullNameFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -9961,7 +9592,7 @@ bool Cmd_SetCellFullName(
     return true;
 }
 
-bool Cmd_SetActorFullName(
+bool Script::SetActorFullNameFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10004,7 +9635,7 @@ bool Cmd_SetActorFullName(
     return true;
 }
 
-bool au_re_Cmd_GetIsActorRunning(
+bool Script::IsRunningFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10018,7 +9649,7 @@ bool au_re_Cmd_GetIsActorRunning(
     return true;
 }
 
-bool au_re_Cmd_GetFriendHit(
+bool Script::GetFriendHitFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10032,7 +9663,7 @@ bool au_re_Cmd_GetFriendHit(
     return true;
 }
 
-bool Cmd_IsInCombat_Execute(
+bool Script::IsInCombatFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10046,7 +9677,7 @@ bool Cmd_IsInCombat_Execute(
     return true;
 }
 
-bool Cmd_SetPackDuration_Execute(
+bool Script::SetPackageDurationFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10081,7 +9712,7 @@ bool Cmd_SetPackDuration_Execute(
     return true;
 }
 
-bool Cmd_PlayMagicShaderVisuals_Execute(
+bool Script::PlayMagicShader(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10151,7 +9782,7 @@ bool Cmd_PlayMagicShaderVisuals_Execute(
     return true;
 }
 
-bool Cmd_PlayMagicEffectVisuals(
+bool Script::PlayMagicEffect(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10245,7 +9876,7 @@ bool Cmd_PlayMagicEffectVisuals(
     return true;
 }
 
-bool Cmd_StopMagicShaderVisuals(
+bool Script::StopMagicShader(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10285,7 +9916,7 @@ bool Cmd_StopMagicShaderVisuals(
 
 // The command's parameters are an EffectSetting (a form id the parser resolves) and a float; the effect setting's
 // TESModel (the base subobject at +0x18) gives the model path passed to FinishMagicModelHitEffect.
-bool Cmd_StopMagicEffectVisuals(
+bool Script::StopMagicEffect(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10330,7 +9961,7 @@ bool Cmd_StopMagicEffectVisuals(
     return true;
 }
 
-bool Cmd_PreloadMagicEffect(
+bool Script::PreloadMagicEffect(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10371,7 +10002,7 @@ bool Cmd_PreloadMagicEffect(
     return true;
 }
 
-bool Cmd_SetIgnoreFriendlyHits(
+bool Script::SetIgnoreFriendlyHitsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10401,7 +10032,7 @@ bool Cmd_SetIgnoreFriendlyHits(
     return true;
 }
 
-bool Cmd_GetIgnoreFriendlyHits_Execute(
+bool Script::GetIgnoreFriendlyHitsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10411,7 +10042,12 @@ bool Cmd_GetIgnoreFriendlyHits_Execute(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bool bIgnoreFriendlyHits = Cmd_GetIgnoreFriendlyHits(apRefObject, nullptr, nullptr, afReturnValue);
+    bool bIgnoreFriendlyHits = Script::GetIgnoreFriendlyHitsConditionFunction(
+        apRefObject,
+        nullptr,
+        nullptr,
+        afReturnValue
+    );
     if (Script::bSystemOutput) {
         if (0.0 == afReturnValue) {
             Interface::PrintLine("%s", "Actor counts friendly hits");
@@ -10423,7 +10059,7 @@ bool Cmd_GetIgnoreFriendlyHits_Execute(
     return bIgnoreFriendlyHits;
 }
 
-bool Cmd_SetItemValue(
+bool Script::SetItemValueFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10462,7 +10098,7 @@ bool Cmd_SetItemValue(
     return true;
 }
 
-bool Cmd_SetActorRefraction(
+bool Script::SetActorRefractionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10527,7 +10163,7 @@ bool Cmd_SetActorRefraction(
     return true;
 }
 
-bool Cmd_RunCellTest(
+bool Script::RunCellTest(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10554,7 +10190,7 @@ bool Cmd_RunCellTest(
     return true;
 }
 
-bool Cmd_StartAllQuests(
+bool Script::StartAllQuests(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10575,7 +10211,7 @@ bool Cmd_StartAllQuests(
     return true;
 }
 
-bool Cmd_SetsNewGammaRamp_Execute(
+bool Script::SetGamma(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10602,7 +10238,7 @@ bool Cmd_SetsNewGammaRamp_Execute(
     return true;
 }
 
-bool Cmd_SetMaxAniso(
+bool Script::SetDepthOfField(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10652,7 +10288,7 @@ bool Cmd_SetMaxAniso(
     return true;
 }
 
-bool Cmd_SetTalkingActivatorActor(
+bool Script::SetTalkingActivatorActorFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10681,7 +10317,7 @@ bool Cmd_SetTalkingActivatorActor(
     return true;
 }
 
-bool Cmd_AddPerk_Execute(
+bool Script::AddPerkFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10731,7 +10367,7 @@ bool Cmd_AddPerk_Execute(
     return true;
 }
 
-bool Cmd_RemovePerk(
+bool Script::RemovePerkFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10764,7 +10400,7 @@ bool Cmd_RemovePerk(
     return true;
 }
 
-bool Cmd_HasPerk_Execute(
+bool Script::HasPerkFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10790,7 +10426,7 @@ bool Cmd_HasPerk_Execute(
         Script::HasPerkConditionFunction(apRefObject, pPerk, pParam2, afReturnValue);
 }
 
-bool Cmd_SendSherlockDebugText(
+bool Script::SendSherlockDebugPage(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10833,7 +10469,7 @@ bool Cmd_SendSherlockDebugText(
     return true;
 }
 
-bool Cmd_RewardXP(
+bool Script::RewardExperiencePointsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10860,7 +10496,7 @@ bool Cmd_RewardXP(
     return true;
 }
 
-bool Cmd_RewardKarma(
+bool Script::RewardKarmaFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10887,7 +10523,7 @@ bool Cmd_RewardKarma(
     return true;
 }
 
-bool Cmd_ShowRepairMenu(
+bool Script::ShowRepairMenuFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10904,7 +10540,7 @@ bool Cmd_ShowRepairMenu(
     return true;
 }
 
-bool Cmd_AddNote(
+bool Script::AddNoteFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10933,7 +10569,7 @@ bool Cmd_AddNote(
     return true;
 }
 
-bool Cmd_RemoveNote(
+bool Script::RemoveNoteFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10965,7 +10601,7 @@ bool Cmd_RemoveNote(
     return true;
 }
 
-bool Cmd_AddToFaction(
+bool Script::AddFactionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -10997,7 +10633,7 @@ bool Cmd_AddToFaction(
     return true;
 }
 
-bool Cmd_RemoveFromFaction(
+bool Script::RemoveFactionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11027,7 +10663,7 @@ bool Cmd_RemoveFromFaction(
     return true;
 }
 
-bool Cmd_SetDisposition(
+bool Script::SetDispositionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11064,7 +10700,7 @@ bool Cmd_SetDisposition(
     return true;
 }
 
-bool Cmd_GetHitLocation_Execute(
+bool Script::GetHitLocationFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11081,7 +10717,7 @@ bool Cmd_GetHitLocation_Execute(
     return true;
 }
 
-bool Cmd_GetLastHitCritical_Execute(
+bool Script::GetLastHitCriticalFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11098,7 +10734,7 @@ bool Cmd_GetLastHitCritical_Execute(
     return true;
 }
 
-bool Cmd_IsPC1stPerson_Execute(
+bool Script::IsPC1stPersonFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11115,7 +10751,7 @@ bool Cmd_IsPC1stPerson_Execute(
     return true;
 }
 
-bool Cmd_SetCombatActionCost(
+bool Script::SetCombatActionCostFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11152,7 +10788,7 @@ bool Cmd_SetCombatActionCost(
     return true;
 }
 
-bool Cmd_ToggleCombatDebug(
+bool Script::ToggleCombatDebugFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11377,7 +11013,7 @@ bool Cmd_ToggleCombatDebug(
     return true;
 }
 
-bool Cmd_SetActorsAI(
+bool Script::SetActorsAIFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11418,7 +11054,7 @@ bool Cmd_SetActorsAI(
     return true;
 }
 
-bool Cmd_ClearOwnership(
+bool Script::ClearOwnershipFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11435,7 +11071,7 @@ bool Cmd_ClearOwnership(
     return true;
 }
 
-bool Cmd_ShowInventory(
+bool Script::ShowInventoryFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11565,7 +11201,7 @@ bool Cmd_ShowInventory(
     return true;
 }
 
-bool Cmd_ShowChargenMenuParams(
+bool Script::ShowCharGenMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11593,15 +11229,15 @@ bool Cmd_ShowChargenMenuParams(
         return false;
     }
     if (iSPECIALPoints > 0) {
-        CharGenMenu::Create_(0, iSPECIALPoints, false, true);
+        Interface::CreateCharGenMenu(0, iSPECIALPoints, false, true);
     }
     else if (iTagSkills > 0) {
-        CharGenMenu::Create_(1, iTagSkills, false, true);
+        Interface::CreateCharGenMenu(1, iTagSkills, false, true);
     }
     return true;
 }
 
-bool Cmd_ShowChargenMenuModValues(
+bool Script::ShowCharGenMenuModValues(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11629,15 +11265,15 @@ bool Cmd_ShowChargenMenuModValues(
         return false;
     }
     if (iSPECIALPoints > 0) {
-        CharGenMenu::Create_(0, iSPECIALPoints, true, true);
+        Interface::CreateCharGenMenu(0, iSPECIALPoints, true, true);
     }
     else if (iTagSkills > 0) {
-        CharGenMenu::Create_(1, iTagSkills, true, true);
+        Interface::CreateCharGenMenu(1, iTagSkills, true, true);
     }
     return true;
 }
 
-bool Cmd_SetSPECIALPoints(
+bool Script::SetSPECIALPoints(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11660,11 +11296,11 @@ bool Cmd_SetSPECIALPoints(
         )) {
         return false;
     }
-    CharGenMenu::Create_(0, iMaxPoints, false, true);
+    Interface::CreateCharGenMenu(0, iMaxPoints, false, true);
     return true;
 }
 
-bool Cmd_AddSPECIALPoints(
+bool Script::AddSPECIALPoints(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11687,11 +11323,11 @@ bool Cmd_AddSPECIALPoints(
         )) {
         return false;
     }
-    CharGenMenu::Create_(0, iMaxPoints, true, true);
+    Interface::CreateCharGenMenu(0, iMaxPoints, true, true);
     return true;
 }
 
-bool Cmd_SetTagSkills(
+bool Script::SetTagSkills(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11716,11 +11352,11 @@ bool Cmd_SetTagSkills(
         )) {
         return false;
     }
-    CharGenMenu::Create_(1, iMaxPoints, false, iShowTaggedSkills == 1);
+    Interface::CreateCharGenMenu(1, iMaxPoints, false, iShowTaggedSkills == 1);
     return true;
 }
 
-bool Cmd_AddTagSkills(
+bool Script::AddTagSkills(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11743,11 +11379,11 @@ bool Cmd_AddTagSkills(
         )) {
         return false;
     }
-    CharGenMenu::Create_(1, iMaxPoints, true, true);
+    Interface::CreateCharGenMenu(1, iMaxPoints, true, true);
     return true;
 }
 
-bool Cmd_ShowLockpickMenu(
+bool Script::ShowLockpickMenu(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11768,11 +11404,11 @@ bool Cmd_ShowLockpickMenu(
         apScriptLocals,
         &iLockLevel
     );
-    _ShowLockPickMenu(nullptr, iLockLevel - 1, false);
+    Interface::CreateLockPickMenu(nullptr, iLockLevel - 1, false);
     return true;
 }
 
-bool Cmd_ShowLockpickMenuDebug(
+bool Script::ShowLockpickMenuDebug(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11793,11 +11429,11 @@ bool Cmd_ShowLockpickMenuDebug(
         apScriptLocals,
         &iLockLevel
     );
-    _ShowLockPickMenu(nullptr, iLockLevel - 1, true);
+    Interface::CreateLockPickMenu(nullptr, iLockLevel - 1, true);
     return true;
 }
 
-bool Cmd_ResetPerformanceTimers(
+bool Script::ResetPerformanceTimers(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11811,7 +11447,7 @@ bool Cmd_ResetPerformanceTimers(
     return true;
 }
 
-bool Cmd_ToggleDebugDecal(
+bool Script::ToggleDecalDebug(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11912,7 +11548,7 @@ bool Cmd_ToggleDebugDecal(
     return true;
 }
 
-bool Cmd_SetImageSpaceModifiersEnable(
+bool Script::SetImageSpaceModifiersEnable(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11944,7 +11580,7 @@ bool Cmd_SetImageSpaceModifiersEnable(
     return true;
 }
 
-bool Cmd_IsMoving(
+bool Script::GetIsMovingFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11961,7 +11597,7 @@ bool Cmd_IsMoving(
     return true;
 }
 
-bool Cmd_IsTurning(
+bool Script::GetIsTurningFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11978,7 +11614,7 @@ bool Cmd_IsTurning(
     return true;
 }
 
-bool Cmd_GetAnimAction_Execute(
+bool Script::GetAnimActionFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -11995,7 +11631,7 @@ bool Cmd_GetAnimAction_Execute(
     return true;
 }
 
-bool Cmd_UseWeapon(
+bool Script::UseWeaponFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12052,7 +11688,7 @@ bool Cmd_UseWeapon(
     return true;
 }
 
-bool Cmd_EvaluateSpellConditions(
+bool Script::EvaluateSpellConditionsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12069,7 +11705,7 @@ bool Cmd_EvaluateSpellConditions(
     return true;
 }
 
-bool Cmd_ClearScreenBlood(
+bool Script::ClearScreenBlood(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12083,7 +11719,7 @@ bool Cmd_ClearScreenBlood(
     return true;
 }
 
-bool Cmd_TriggerScreenSplatter(
+bool Script::TriggerScreenSplatter(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12122,7 +11758,7 @@ bool Cmd_TriggerScreenSplatter(
     return true;
 }
 
-bool Cmd_SetScreenSplatterFade(
+bool Script::SetScreenSplatterFade(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12153,7 +11789,7 @@ bool Cmd_SetScreenSplatterFade(
     return true;
 }
 
-bool Cmd_SetScreenSplatterTexture(
+bool Script::SetScreenSplatterTexture(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12184,7 +11820,7 @@ bool Cmd_SetScreenSplatterTexture(
     return true;
 }
 
-bool Cmd_ClearScreenSplatter(
+bool Script::ClearScreenSplatter(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12198,7 +11834,7 @@ bool Cmd_ClearScreenSplatter(
     return true;
 }
 
-bool Cmd_AgeRace_Execute(
+bool Script::AgeRaceFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12252,7 +11888,7 @@ bool Cmd_AgeRace_Execute(
     return true;
 }
 
-bool GetVATSBackAreaFreeFunction(
+bool Script::GetVATSBackAreaFreeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12276,7 +11912,7 @@ bool GetVATSBackAreaFreeFunction(
         Script::GetVATSBackAreaFreeConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool GetVATSFrontAreaFreeFunction(
+bool Script::GetVATSFrontAreaFreeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12304,7 +11940,7 @@ void Set(char abDump) {
     bDumpNextFrame = abDump;
 }
 
-bool GetVATSRightTargetVisibleFunction(
+bool Script::GetVATSRightTargetVisibleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12328,7 +11964,7 @@ bool GetVATSRightTargetVisibleFunction(
         Script::GetVATSRightTargetVisibleConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool GetVATSLeftTargetVisibleFunction(
+bool Script::GetVATSLeftTargetVisibleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12352,7 +11988,7 @@ bool GetVATSLeftTargetVisibleFunction(
         Script::GetVATSLeftTargetVisibleConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool GetVATSBackTargetVisibleFunction(
+bool Script::GetVATSBackTargetVisibleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12376,7 +12012,7 @@ bool GetVATSBackTargetVisibleFunction(
         Script::GetVATSBackTargetVisibleConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool GetVATSFrontTargetVisibleFunction(
+bool Script::GetVATSFrontTargetVisibleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12400,7 +12036,7 @@ bool GetVATSFrontTargetVisibleFunction(
         Script::GetVATSFrontTargetVisibleConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool Cmd_SetCriticalStage(
+bool Script::SetCritStageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12430,7 +12066,7 @@ bool Cmd_SetCriticalStage(
     return true;
 }
 
-bool IsInCriticalStageFunction(
+bool Script::IsInCritStageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12451,10 +12087,10 @@ bool IsInCriticalStageFunction(
                apScriptLocals,
                &pStage
            ) &&
-        Cmd_IsInCriticalStage(apRefObject, pStage, nullptr, afReturnValue);
+        Script::IsInCritStageConditionFunction(apRefObject, pStage, nullptr, afReturnValue);
 }
 
-bool Cmd_Sin(
+bool Script::SinFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12495,7 +12131,7 @@ bool Cmd_Sin(
     return true;
 }
 
-bool Cmd_Cos(
+bool Script::CosFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12536,7 +12172,7 @@ bool Cmd_Cos(
     return true;
 }
 
-bool Cmd_Tan(
+bool Script::TanFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12571,7 +12207,7 @@ bool Cmd_Tan(
     return true;
 }
 
-bool Cmd_Sqrt(
+bool Script::SqrtFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12598,7 +12234,7 @@ bool Cmd_Sqrt(
     return true;
 }
 
-bool Cmd_Log(
+bool Script::LogFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12633,7 +12269,7 @@ bool Cmd_Log(
     return true;
 }
 
-bool Cmd_ShowQuestStages(
+bool Script::ShowQuestStagesFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12687,7 +12323,7 @@ bool Cmd_ShowQuestStages(
     return true;
 }
 
-bool Cmd_SetTaskThreadUpdateSleep(
+bool Script::SetTaskThreadUpdateSleepFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12715,7 +12351,7 @@ bool Cmd_SetTaskThreadUpdateSleep(
     return true;
 }
 
-bool Cmd_AddFormToFormList_Execute(
+bool Script::AddFormToFormListFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12748,45 +12384,7 @@ bool Cmd_AddFormToFormList_Execute(
     return true;
 }
 
-// The leveled list the script names is the TESLeveledList base of a leveled actor (at +0x30); the form it adds is
-// the leveled list's owner as well.
-bool Cmd_AddNPCToLeveledList(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-) {
-    TESLevCharacter* pList = nullptr;
-    TESForm* pForm = nullptr;
-    int32_t iLevel = 0;
-    afReturnValue = 0.0;
-    if (!Script::ParseParameters(
-            apParameters,
-            apCompiledParams,
-            auiOffset,
-            apRefObject,
-            apContainer,
-            apScript,
-            apScriptLocals,
-            &pList,
-            &pForm,
-            &iLevel
-        )) {
-        return false;
-    }
-    if (pList && pForm) {
-        static_cast<TESLeveledList*>(pList)
-            ->AddScriptAddedLeveledObject(pList, static_cast<uint16_t>(iLevel), 1, pForm, nullptr);
-    }
-
-    return true;
-}
-
-bool Cmd_AddItemToLeveledList(
+bool Script::AddItemToLeveledListFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12835,7 +12433,7 @@ bool Cmd_AddItemToLeveledList(
     return true;
 }
 
-bool Cmd_RemapWaterType(
+bool Script::RemapWaterTypeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12876,7 +12474,7 @@ bool Cmd_RemapWaterType(
     return true;
 }
 
-bool Cmd_IsHardcore_Execute(
+bool Script::IsHardcoreFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12889,7 +12487,7 @@ bool Cmd_IsHardcore_Execute(
     return Script::IsHardcoreConditionalFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
-bool Cmd_SetHardcore_Execute(
+bool Script::SetHardcoreFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12925,7 +12523,7 @@ bool Cmd_SetHardcore_Execute(
     return false;
 }
 
-bool Cmd_ObjectUnderReticle_Execute(
+bool Script::ObjectUnderReticleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -12995,7 +12593,7 @@ bool Cmd_ObjectUnderReticle_Execute(
     return true;
 }
 
-bool Cmd_GetDLCCount(
+bool Script::GetDLCCountFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -13040,7 +12638,7 @@ bool Cmd_GetDLCCount(
 }
 
 // The IsDLCInstalled script command: looks for a valid DLC package whose file name matches the parameter.
-bool Cmd_IsDLCInstalled(
+bool Script::IsDLCInstalledFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -13119,10 +12717,6 @@ bool Cmd_SystemSave(
     return true;
 }
 
-int32_t hkGetByteOffset(const void* base, const void* pntr) {
-    return static_cast<int32_t>(static_cast<const char*>(pntr) - static_cast<const char*>(base));
-}
-
 MobDialogueFlagResetter::MobDialogueFlagResetter() : MobIterOperator() {}
 
 void MobDialogueFlagResetter::Operate(MobileObject* apMob) {
@@ -13135,147 +12729,12 @@ void MobDialogueFlagResetter::Operate(MobileObject* apMob) {
     apMob->m_Extra.RemoveExtra(115);
 }
 
-void BSAudioManager::SetIgnoreGlobalTimeMultiplier(bool bIgnore) {
-    bIgnoreGlobalTimeMultiplier = bIgnore;
-}
-
-// The next system group, wrapping within 16 bits and skipping the reserved groups 0..9 (restarts at 10).
-uint32_t bhkCollisionFilter::GetNewSystemGroup() {
-    uiNextGroup = static_cast<uint16_t>(uiNextGroup + 1);
-    if (!uiNextGroup) {
-        uiNextGroup = 10;
-    }
-    return uiNextGroup;
-}
-
-// The hit point: the ray's start interpolated towards its end by the hit fraction.
-void bhkPickData::CalcHitPoint(hkVector4& arPoint) {
-    alignas(16) hkSimdReal kFraction(m_hitFraction);
-    arPoint.setInterpolate4(m_from, m_to, kFraction);
-}
-
-void bhkRagdollController::SetLookIKEnable(bool abEnable) {
-    bEnableLookIK = bInitLookIK && abEnable;
-}
-
-void bhkRagdollController::SetFootIKEnable(bool abEnable) {
-    bEnableFootIK = bInitFootIK && abEnable;
-}
-
-void bhkRagdollController::SetGrabIKEnable(bool abEnable) {
-    bEnableGrabIK = bInitGrabIK && abEnable;
-}
-
-bool bhkRagdollController::QGrabIK() {
-    return bhkRagdollController::bGrabIK.Bool();
-}
-
-void bhkRagdollController::SetGrabIK(bool abEnable) {
-    bhkRagdollController::bGrabIK.Bool() = abEnable;
-}
-
-void bhkRagdollController::SetLookIK(bool abEnable) {
-    bhkRagdollController::bLookIK.Bool() = abEnable;
-}
-
-void bhkRagdollController::SetFootIK(bool abEnable) {
-    bhkRagdollController::bFootIK.Bool() = abEnable;
-}
-
-bool bhkShape::GetMaterialVarType(MATERIAL_VARIANT_TYPE aeType) {
-    return (static_cast<int32_t>(eMaterial) & aeType) != 0;
-}
-
-Font* FontManager::GetFont(int32_t aiIndex) {
-    return pFont[aiIndex];
-}
-
-const char* Tile::GetTypeName() {
-    return "TILE";
-}
-
-const char* TileMenu::GetTypeName() {
-    return "MENU";
-}
-
-const char* TileRect::GetTypeName() {
-    return "RECT";
-}
-
-bool BSShaderAccumulator::GetRenderDecals() {
-    return bRenderDecals;
-}
-
-void BSShaderAccumulator::SetRenderDecals(bool abRenderDecals) {
-    bRenderDecals = abRenderDecals;
-}
-
-void BSShaderAccumulator::ToggleRefractionDebugTexture() {
-    BSShaderAccumulator::bShowRefractionDebugTexture = !BSShaderAccumulator::bShowRefractionDebugTexture;
-}
-
-void BSShaderManager::SetDebugMode(BSShaderManager::etRenderMode aeDebugMode) {
-    usDebugMode = aeDebugMode;
-}
-
-ImageSpaceEffectHDR::ImageSpaceEffectHDR() : pfData(pfDefaultHDRData) {
-    pTextures.SetSize(3u);
-}
-
-// The thirteen shader parameters are the effect's: each is deleted and its slot emptied.
-ImageSpaceEffectHDR::~ImageSpaceEffectHDR() {
-    for (uint32_t i = 0; i < 13; ++i) {
-        if (pEffectParamList.m_pBase[i].m_pObject) {
-            delete pEffectParamList.m_pBase[i].m_pObject;
-            pEffectParamList.SetAt(i, nullptr);
-        }
-    }
-}
-
-float ImageSpaceEffectHDR::GetBrightScale() {
-    return pfData[6];
-}
-
-float ImageSpaceEffectHDR::GetEyeAdaptSpeed() {
-    return pfData[0];
-}
-
-float ImageSpaceEffectHDR::GetTargetLUM() {
-    return pfData[4];
-}
-
-float ImageSpaceEffectHDR::GetUpperLUMClamp() {
-    return pfData[5];
-}
-
-// The HDR getters read one float of the data record each: eye adapt speed [0], blur passes [1], emissive multiplier
-// [3], target luminance [4], upper luminance clamp [5], bright scale [6], bright clamp [7].
-float ImageSpaceEffectHDR::GetEmissiveHDRMult() {
-    return pfData[3];
-}
-
-float ImageSpaceEffectHDR::GetNumBlurPasses() {
-    return pfData[1];
-}
-
-float ImageSpaceEffectHDR::GetBrightClamp() {
-    return pfData[7];
-}
-
-void ShadowSceneNode::ToggleWireframe() {
-    bWireframe = !bWireframe;
-}
-
 bool ActorCause::IsValid() {
     return pActor != nullptr;
 }
 
 bool BGSProjectile::GetHasExplosionDetonates() {
     return IsFlagSet(EXPLOSION_DETONATES);
-}
-
-void BSTaskThread::SetUpdateSleepValue(int32_t aiValue) {
-    BSTaskThread::sUpdateSleepValue = aiValue;
 }
 
 const char* BSFaceGenManager::GetFaceGenExpressionText(BS_FACEGEN_EXPRESSION aeWhich) {
@@ -13355,25 +12814,6 @@ void Script::MatchFaceGeometryBase(TESObjectREFR* apRef, TESObjectREFR* apMatchA
             static_cast<Character*>(apRef)->Character::Reset3D();
         }
     }
-}
-
-bool Script::GetBaseActorValue_Eval(Actor* apActor, ActorValue::Index aeActorValue, int32_t aiArg2, double* apResult) {
-    Actor* pActor = nullptr;
-    if (apActor && apActor->IsActor()) {
-        pActor = apActor;
-    }
-
-    if (pActor) {
-        *apResult = static_cast<double>(pActor->GetBaseActorValue(aeActorValue));
-        if (bSystemOutput) {
-            Interface::PrintLine(
-                "GetBaseActorValue: %s >> %0.2f",
-                ActorValue::GetActorValueScriptName(aeActorValue),
-                *apResult
-            );
-        }
-    }
-    return true;
 }
 
 bool Script::ParseString(
@@ -13673,7 +13113,7 @@ bool Script::GetPCFactionMurderFunction(
         )) {
         return false;
     }
-    Cmd_GetPCFactionMurder(apRefObject, pFaction, nullptr, afReturnValue);
+    Script::GetPCFactionMurderConditionFunction(apRefObject, pFaction, nullptr, afReturnValue);
     return true;
 }
 
@@ -13700,7 +13140,7 @@ bool Script::GetPlayerEnemyofFactionFunction(
         )) {
         return false;
     }
-    Cmd_GetPCEnemyofFaction(apRefObject, pFaction, nullptr, afReturnValue);
+    Script::GetPlayerEnemyofFactionConditionFunction(apRefObject, pFaction, nullptr, afReturnValue);
     return true;
 }
 
@@ -13727,7 +13167,7 @@ bool Script::GetPCFactionAttackFunction(
         )) {
         return false;
     }
-    Cmd_GetPCFactionAttack(apRefObject, pFaction, nullptr, afReturnValue);
+    Script::GetPCFactionAttackConditionFunction(apRefObject, pFaction, nullptr, afReturnValue);
     return true;
 }
 
@@ -13824,7 +13264,7 @@ bool Script::ExistsFunction(
                apScriptLocals,
                &pRef
            ) &&
-        Cmd_Exists(apRefObject, pRef, nullptr, afReturnValue);
+        Script::ExistsConditionFunction(apRefObject, pRef, nullptr, afReturnValue);
 }
 
 void Script::MoveToFunctionBase(TESObjectREFR* apMoveRef, TESObjectREFR* apTargetRef, float afX, float afY, float afZ) {
@@ -15878,7 +15318,7 @@ bool Script::GameModeFunction(
     return true;
 }
 
-char Script::ScriptEffectStart(
+char Script::ScriptEffectStartFunction(
     SCRIPT_PARAMETER* apParameters,
     char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -16923,7 +16363,7 @@ bool Script::ToggleSafeZoneFunction(
     return true;
 }
 
-bool Script::SetAllReachable(
+bool Script::TestDegradeFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -17568,7 +17008,7 @@ bool Script::GetNoRumorsFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    int8_t bNoRumors = Script::GetNoRumors(apRefObject, nullptr, nullptr, afReturnValue);
+    int8_t bNoRumors = Script::GetNoRumorsConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (bSystemOutput) {
         Interface::PrintLine("GetNoRumors >> %0.2f", afReturnValue);
     }
@@ -17825,7 +17265,7 @@ bool Script::GetRadiationLevelFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Script::GetRadiationLevel(apRefObject, nullptr, nullptr, afReturnValue);
+    return Script::GetRadiationLevelConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
 }
 
 bool Script::GetMapMarkerVisibleFunction(
@@ -19812,7 +19252,7 @@ bool Script::SaveWorldFunction(
     return true;
 }
 
-bool Script::ToggleMenus(
+bool Script::ToggleMenusFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20004,7 +19444,7 @@ bool Script::SetVelFunction(
     return true;
 }
 
-bool Script::ShowViewerStrings(
+bool Script::ShowViewerStringsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20059,7 +19499,7 @@ bool Script::ShowViewerStrings(
     return true;
 }
 
-bool Script::ToggleLODLand(
+bool Script::ToggleLODLandFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20188,7 +19628,7 @@ bool Script::SetLODObjectDistanceFunction(
     return true;
 }
 
-bool Script::HighlightBodyPart(
+bool Script::HighlightBodyPartFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20227,7 +19667,7 @@ bool Script::HighlightBodyPart(
     return true;
 }
 
-bool Script::HighlightAdditionalReference(
+bool Script::HighlightAdditionalReferenceFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20266,7 +19706,7 @@ bool Script::HighlightAdditionalReference(
     return true;
 }
 
-bool Script::DeactivateAllHighlights(
+bool Script::DeactivateAllHighlightsFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -20496,7 +19936,7 @@ bool Script::ToggleFlyCam(
     return true;
 }
 
-bool Script::ToggleNavMesh(
+bool Script::ToggleNavMeshFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -21072,7 +20512,7 @@ bool Script::SetFogDepthFunction(
     return true;
 }
 
-bool Script::SetImageSpaceGlowParamFunction(
+bool Script::SetClipDistFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -21616,7 +21056,7 @@ bool Script::StartCombatFunction(
     return true;
 }
 
-bool Script::AddSpell_Execute(
+bool Script::AddSpellFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22018,7 +21458,7 @@ bool Script::ShowQuestVarsFunction(
     return true;
 }
 
-bool Script::ShowAnim(
+bool Script::ShowAnimFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22244,7 +21684,7 @@ bool Script::DisableFunction(
     return true;
 }
 
-bool Script::SaveGame_Execute(
+bool Script::SaveGame(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22273,7 +21713,7 @@ bool Script::SaveGame_Execute(
     return true;
 }
 
-bool Script::CopySaves(
+bool Script::CopySaveGames(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22490,7 +21930,7 @@ bool Script::GetTalkedToPCParam(
         Script::GetTalkedToPCConditionFunction(nullptr, pActor, nullptr, afReturnValue);
 }
 
-bool Script::SetStage(
+bool Script::SetStageFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22544,7 +21984,7 @@ bool Script::GetIsCurrentWeatherFunction(
                apScriptLocals,
                &pWeather
            ) &&
-        Cmd_GetIsCurrentWeather(apRefObject, pWeather, nullptr, afReturnValue);
+        Script::GetIsCurrentWeatherConditionFunction(apRefObject, pWeather, nullptr, afReturnValue);
 }
 
 bool Script::GetLockLevelFunction(
@@ -22605,7 +22045,7 @@ bool Script::SameFaction(
                apScriptLocals,
                &pTarget
            ) &&
-        Cmd_SameFaction(apRefObject, pTarget, nullptr, afReturnValue);
+        Script::SameFactionConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
 bool Script::SameRace(
@@ -22629,7 +22069,7 @@ bool Script::SameRace(
                apScriptLocals,
                &pTarget
            ) &&
-        Cmd_SameRace(apRefObject, pTarget, nullptr, afReturnValue);
+        Script::SameRaceConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
 bool Script::SameSex(
@@ -22653,7 +22093,7 @@ bool Script::SameSex(
                apScriptLocals,
                &pTarget
            ) &&
-        Cmd_SameSex(apRefObject, pTarget, nullptr, afReturnValue);
+        Script::SameSexConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
 bool Script::SameRaceAsPC(
@@ -22666,7 +22106,7 @@ bool Script::SameRaceAsPC(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Cmd_SameRace(apRefObject, pPlayer, nullptr, afReturnValue);
+    return Script::SameRaceConditionFunction(apRefObject, pPlayer, nullptr, afReturnValue);
 }
 
 bool Script::SameSexAsPC(
@@ -22679,7 +22119,7 @@ bool Script::SameSexAsPC(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    return Cmd_SameSex(apRefObject, pPlayer, nullptr, afReturnValue);
+    return Script::SameSexConditionFunction(apRefObject, pPlayer, nullptr, afReturnValue);
 }
 
 bool Script::GetQuestCompleted(
@@ -22703,7 +22143,7 @@ bool Script::GetQuestCompleted(
                apScriptLocals,
                &pQuest
            ) &&
-        Cmd_GetQuestCompleted(apRefObject, pQuest, nullptr, afReturnValue);
+        Script::GetQuestCompletedConditionFunction(apRefObject, pQuest, nullptr, afReturnValue);
 }
 
 bool Script::GetStage(
@@ -22827,7 +22267,7 @@ bool Script::GetPCIsClass(
                apScriptLocals,
                &pClass
            ) &&
-        Cmd_GetIsClass(pPlayer, pClass, nullptr, afReturnValue);
+        Script::GetIsClassConditionFunction(pPlayer, pClass, nullptr, afReturnValue);
 }
 
 bool Script::GetPCIsRace(
@@ -22902,7 +22342,7 @@ bool Script::GetShouldAttack(
         Script::GetShouldAttackConditionFunction(apRefObject, pTarget, nullptr, afReturnValue);
 }
 
-bool Script::GetInCellParam(
+bool Script::GetInCell(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -22926,7 +22366,7 @@ bool Script::GetInCellParam(
         Script::GetInCellConditionFunction(apRefObject, pCell, nullptr, afReturnValue);
 }
 
-bool Script::GetInCell(
+bool Script::GetInCellParam(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -23390,7 +22830,7 @@ bool Script::SayFunction(
     return true;
 }
 
-bool Script::PlayVATSCameras(
+bool Script::PlayVATSCamerasFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -23426,7 +22866,7 @@ bool Script::PlayVATSCameras(
     return true;
 }
 
-bool Script::ShowQuestLog(
+bool Script::ShowQuestLogFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -24057,7 +23497,7 @@ bool Script::GetPCExpelledFunction(
         )) {
         return false;
     }
-    Cmd_GetPCExpelled(apRefObject, pFaction, nullptr, afReturnValue);
+    Script::GetPCExpelledConditionFunction(apRefObject, pFaction, nullptr, afReturnValue);
     return true;
 }
 
@@ -24464,7 +23904,7 @@ bool Script::GetPCMiscStat(
         )) {
         return false;
     }
-    Cmd_GetPCMiscStat(apRefObject, pStat, nullptr, afReturnValue);
+    Script::GetPCMiscStatConditionFunction(apRefObject, pStat, nullptr, afReturnValue);
     return true;
 }
 
@@ -24602,10 +24042,10 @@ bool Script::ToggleFogOfWar(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    char cFogOfWar = GetIsMapMenuFogOfWar();
-    ToggleMapFogOfWar(cFogOfWar == 0);
+    char cFogOfWar = Interface::GetFogOfWarEnabled();
+    Interface::SetFogOfWarEnabled(cFogOfWar == 0);
     if (bSystemOutput) {
-        const char* pState = GetIsMapMenuFogOfWar() ? "ENABLED" : "DISABLED";
+        const char* pState = Interface::GetFogOfWarEnabled() ? "ENABLED" : "DISABLED";
         Interface::PrintLine("Fog of war - %s.", pState);
     }
     return true;
@@ -24684,7 +24124,7 @@ bool Script::SendCrimeAlarmFunction(
     return true;
 }
 
-bool Script::ForceGroupStrategy(
+bool Script::ForceCombatGroupStrategyFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -25073,7 +24513,7 @@ bool Script::GetIsObjectTypeFunction(
         );
 }
 
-bool Script::MarkForDelete(
+bool Script::MarkForDeleteFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -25694,7 +25134,7 @@ bool Script::GetConcussedFunction(
                apScriptLocals,
                &pParam1
            ) &&
-        Cmd_GetConcussed(apRefObject, pParam1, nullptr, afReturnValue);
+        Script::GetConcussedConditionFunction(apRefObject, pParam1, nullptr, afReturnValue);
 }
 
 bool Script::SetVATSTargetFunction(
@@ -26058,7 +25498,7 @@ bool Script::SetPCCanUsePowerArmorFunction(
     return true;
 }
 
-bool Script::GetReputationThreshold(
+bool Script::GetReputationThresholdFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -26149,7 +25589,7 @@ bool Script::SetTaskThreadSleepFunction(
     return true;
 }
 
-bool Script::IsImageSpaceActive(
+bool Script::IsImageSpaceActiveFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -26197,7 +25637,7 @@ bool Script::IsImageSpaceActive(
     return true;
 }
 
-bool Script::ResetXP_Execute(
+bool Script::ResetXPFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -26226,7 +25666,7 @@ bool Script::ResetXP_Execute(
     return false;
 }
 
-bool Script::PlaceAtReticle(
+bool Script::PlaceAtReticleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -26463,8 +25903,8 @@ bool Script::ToggleFullHelp(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    ::ToggleFullHelp();
-    const char* pState = GetIsFullHelp() ? "shown." : "hidden.";
+    Interface::ToggleFullHelp();
+    const char* pState = Interface::GetFullHelp() ? "shown." : "hidden.";
     Interface::PrintLine("Toggle Full Help %s", pState);
     return true;
 }
@@ -27039,7 +26479,7 @@ bool Script::IsPlayersLastRiddenHorseFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    bool bRetVal = Cmd_SetArgTo0AndReturnTrue(apRefObject, nullptr, nullptr, afReturnValue);
+    bool bRetVal = Script::IsPlayersLastRiddenHorseConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
     if (bSystemOutput) {
         Interface::PrintLine("Actor players last ridden horse >> %0.2f", afReturnValue);
     }
@@ -27228,7 +26668,7 @@ bool Script::GetDefaultOpenFunction(
     double& afReturnValue,
     uint32_t& auiOffset
 ) {
-    if (!Cmd_GetDefaultOpen(apRefObject, nullptr, nullptr, afReturnValue)) {
+    if (!Script::GetDefaultOpenConditionFunction(apRefObject, nullptr, nullptr, afReturnValue)) {
         return false;
     }
     if (bSystemOutput) {
@@ -27279,7 +26719,7 @@ bool Script::GetCellOwnershipFunction(
     if (!pOwner) {
         pOwner = pPlayer->GetObjectReference();
     }
-    Cmd_IsCellOwner(apRefObject, pCell, pOwner, afReturnValue);
+    Script::GetCellOwnershipConditionFunction(apRefObject, pCell, pOwner, afReturnValue);
     return true;
 }
 
@@ -27409,12 +26849,12 @@ bool Script::GetFactionRelationFunction(
         return false;
     }
     if (apRefObject && pActor) {
-        return Cmd_GetFactionRelation(apRefObject, pActor, nullptr, afReturnValue);
+        return Script::GetFactionRelationConditionFunction(apRefObject, pActor, nullptr, afReturnValue);
     }
     return true;
 }
 
-bool Script::IsLastIdlePlayedFunction(
+bool Script::IsLastPlayedIdleFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -27438,7 +26878,7 @@ bool Script::IsLastIdlePlayedFunction(
         return false;
     }
     if (apRefObject && pIdle) {
-        return Cmd_IsLastIdlePlayed(apRefObject, pIdle, nullptr, afReturnValue);
+        return Script::IsLastPlayedIdleConditionFunction(apRefObject, pIdle, nullptr, afReturnValue);
     }
     return true;
 }
@@ -27464,7 +26904,9 @@ bool Script::GetIsAlignmentFunction(
                apScriptLocals,
                &eAlignment
            ) &&
-        Cmd_GetIsAlignment(apRefObject, eAlignment, nullptr, afReturnValue);
+        Script::GetIsAlignmentConditionFunction(
+            apRefObject, reinterpret_cast<void*>(static_cast<uintptr_t>(eAlignment)), nullptr, afReturnValue
+        );
 }
 
 bool Script::GetVATSRightAreaFreeFunction(
@@ -27743,45 +27185,1341 @@ bool Main::QFaderToBlackVisible() {
     return bFaderToBlackVisible;
 }
 
-const NiPixelFormat* NiTexture::RendererData::GetPixelFormat() {
-    return &m_kPixelFormat;
-}
-
-void NiTexturingProperty::Map::SetTexture(NiTexture* pkTexture) {
-    m_spTexture = pkTexture;
-}
-
-// Allocate the base map only when its slot is empty, then call the texture setter.
-void NiTexturingProperty::SetBaseTexture(NiTexture* pkTexture) {
-    Map* pkMap = m_kMaps[BASE_INDEX];
-    if (!pkMap) {
-        pkMap = ::new Map;
-        m_kMaps.SetAt(BASE_INDEX, pkMap);
+bool Script::ToggleBordersFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    bBordersOn ^= 1u;
+    if (!TES::pInstance->TES::GetInterior()) {
+        TES::pInstance->ShowLandBorders(bBordersOn);
     }
-    pkMap->SetTexture(pkTexture);
+    if (bSystemOutput) {
+        if (bBordersOn) {
+            Interface::PrintLine("Borders -> %s", "On");
+        }
+        else {
+            Interface::PrintLine("Borders -> %s", "Off");
+        }
+    }
+    return true;
 }
 
-// Returns the bytes from m_next to m_end, reading m_end first.
-int32_t hkStackMemory::getFreeStackSize() {
-    void* pEnd = m_end;
-    char* pNext = m_next;
-    return hkGetByteOffset(pNext, pEnd);
+bool Script::ReloadShaders(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    BSShaderManager::ShaderErrorCallback pOldCallback = BSShaderManager::GetShaderErrorCallback();
+    BSShaderManager::SetShaderErrorCallback(&ConsoleShaderError);
+    BSShaderManager::ReloadShaders();
+    BSShaderManager::SetShaderErrorCallback(pOldCallback);
+    return true;
 }
 
-// Checks the free size (the assert's call, the result unused), then moves m_next past the block.
-void* hkStackMemory::allocateStack(int32_t numBytes, const char* what) {
-    getFreeStackSize();
-    char* pCurrent = m_next;
-    m_next = hkAddByteOffset(pCurrent, numBytes);
-    return pCurrent;
+bool Script::RefreshINIFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    int8_t cPrefINIPath[264];
+    int8_t cCustomINIPath[264];
+    int8_t cINIPath[268];
+    if (pAppININame) {
+        const char* pPersonalPath = BSUtilities::GetPersonalPath();
+        BSstrcpy(static_cast<char*>(static_cast<void*>(cINIPath)), 0x104u, pPersonalPath);
+        BSstrcat(static_cast<char*>(static_cast<void*>(cINIPath)), 0x104u, pAppININame);
+        INISettingCollection* pCollection = SettingT<INISettingCollection>::GetCollection();
+        pCollection->ReadSettingsFromFile(static_cast<const char*>(static_cast<const void*>(cINIPath)));
+    }
+    if (pAppCustomININame) {
+        const char* pPersonalPath = BSUtilities::GetPersonalPath();
+        BSstrcpy(static_cast<char*>(static_cast<void*>(cCustomINIPath)), 0x104u, pPersonalPath);
+        BSstrcat(static_cast<char*>(static_cast<void*>(cCustomINIPath)), 0x104u, pAppCustomININame);
+        INISettingCollection* pCollection = SettingT<INISettingCollection>::GetCollection();
+        pCollection->ReadSettingsFromFile(static_cast<const char*>(static_cast<const void*>(cCustomINIPath)));
+    }
+    if (pAppPrefININame) {
+        const char* pPersonalPath = BSUtilities::GetPersonalPath();
+        BSstrcpy(static_cast<char*>(static_cast<void*>(cPrefINIPath)), 0x104u, pPersonalPath);
+        BSstrcat(static_cast<char*>(static_cast<void*>(cPrefINIPath)), 0x104u, pAppPrefININame);
+        INIPrefSettingCollection* pCollection = SettingT<INIPrefSettingCollection>::GetCollection();
+        pCollection->ReadSettingsFromFile(static_cast<const char*>(static_cast<const void*>(cPrefINIPath)));
+    }
+    Interface::PrintLine("The in-game settings have been refreshed from the Fallout.ini file.");
+    return true;
 }
 
-void hkStackMemory::deallocateStack(void* p) {
-    m_next = static_cast<char*>(p);
+bool Script::DebugCombatPlanFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    if (apRefObject->IsActor()) {
+        CombatController* pCombatController = static_cast<Actor*>(apRefObject)->GetCombatController();
+        if (pCombatController) {
+            pCombatController->DebugCombatPlan();
+        }
+    }
+    return true;
 }
 
-void hkStackMemory::initMemory(void* p, int32_t size) {
-    m_start.m_storage = p;
-    m_next = static_cast<char*>(p);
-    m_end.m_storage = hkAddByteOffset<char>(static_cast<char*>(p), size);
+bool Script::DumpNiUpdatesFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    Set(1);
+    Interface::CloseConsole();
+    return true;
+}
+
+bool Script::MessageFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    BGSMessage* pMessage = nullptr;
+    void* pUnused = nullptr;
+    if (!ParseParameters(
+            apParameters,
+            apCompiledParams,
+            auiOffset,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &pMessage,
+            &pUnused
+        )) {
+        return false;
+    }
+    if (!pMessage) {
+        return false;
+    }
+
+    alignas(BSStringT<char>) uint8_t aTextStorage[sizeof(BSStringT<char>)];
+    BSStringT<char>* pText = ::new (aTextStorage) BSStringT<char>;
+    // The chunk is 'DESC' as a little-endian constant.
+    TESDescription* pDescription = pMessage;
+    const char* pDescriptionText = pDescription->GetDescription(nullptr, DESC_ID);
+    if (!ParseString(
+            apParameters,
+            apCompiledParams,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &afReturnValue,
+            &auiOffset,
+            pDescriptionText,
+            pText
+        )) {
+        pText->~BSStringT<char>();
+        return false;
+    }
+
+    ClearButtonPressed();
+    if (apRefObject && !apRefObject->GetTemporary()) {
+        m_iButtonOwner = apRefObject->GetFormID();
+    }
+    else if (apScript) {
+        m_iButtonOwner = apScript->GetFormID();
+    }
+    else {
+        pText->~BSStringT<char>();
+        return false;
+    }
+
+    int32_t iButton = 0;
+    BSSimpleList<MESSAGEBOX_BUTTON*>* pNode = pMessage->GetButtonList();
+    bool bNoButtonShown = true;
+    const char* apButtons[10];
+    ourMemset(apButtons, 0, sizeof(apButtons));
+    while (pNode && pNode->GetItem() && iButton < 10) {
+        bool bDispositionFailure;
+        if (pNode->GetItem()->Conditions.IsTrueFull(pPlayer, nullptr, &bDispositionFailure, false)) {
+            apButtons[iButton] = pNode->GetItem()->Text.String();
+            bNoButtonShown = false;
+        }
+        else {
+            apButtons[iButton] = " ";
+        }
+        ++iButton;
+        pNode = pNode->GetNext();
+    }
+    if (bNoButtonShown) {
+        apButtons[0] = "OK";
+    }
+
+    if (pMessage->GetIsMessageBox()) {
+        TESFullName* pFullName = pMessage;
+        const char* pTitle = pFullName->GetFullName();
+        // The text is passed through an identity function, which returns it unchanged.
+        const char* pMessageText = NavMeshInfo::GetCellOrCoords(const_cast<char*>(pText->String()), 0);
+        Interface::CreateMessageMenu(
+            pMessageText,
+            nullptr,
+            pTitle,
+            &Script::HandleMessageMenu,
+            0,
+            0x17,
+            0.0f,
+            0.0f,
+            apButtons[0],
+            apButtons[1],
+            apButtons[2],
+            apButtons[3],
+            apButtons[4],
+            apButtons[5],
+            apButtons[6],
+            apButtons[7],
+            apButtons[8],
+            apButtons[9],
+            static_cast<const char*>(nullptr)
+        );
+    }
+    else if (pText->GetLength()) {
+        const char* pIconName;
+        if (pMessage->GetIcon()) {
+            pIconName = pMessage->GetIcon()->GetTextureName();
+        }
+        else {
+            pIconName = nullptr;
+        }
+        // Widens the display time to a 64-bit integer before rounding it to float.
+        float fSeconds = static_cast<float>(static_cast<int64_t>(static_cast<uint64_t>(pMessage->GetDisplayTime())));
+        const char* pMessageText = NavMeshInfo::GetCellOrCoords(const_cast<char*>(pText->String()), 0);
+        Interface::ShowMessage(pMessageText, 0, pIconName, nullptr, fSeconds, false);
+    }
+    pText->~BSStringT<char>();
+    return true;
+}
+
+bool Script::GetWeaponAnimTypeFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    if (apRefObject) {
+        return Script::GetWeaponAnimTypeConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    }
+
+    return true;
+}
+
+bool Script::SetOpenStateFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    int32_t iOpen = 0;
+    if (!Script::ParseParameters(
+            apParameters,
+            apCompiledParams,
+            auiOffset,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &iOpen
+        )) {
+        return false;
+    }
+    if (apRefObject) {
+        if (iOpen) {
+            if (BGSOpenCloseForm::GetOpenState(apRefObject) > BGSOpenCloseForm::OBJECT_OPENING) {
+                apRefObject->Activate(nullptr, false, nullptr, 1);
+            }
+            apRefObject->SetLastFinishedSequence("Open");
+        }
+        else {
+            if (BGSOpenCloseForm::GetOpenState(apRefObject) < BGSOpenCloseForm::OBJECT_CLOSED) {
+                apRefObject->Activate(nullptr, false, nullptr, 1);
+            }
+            apRefObject->SetLastFinishedSequence("Close");
+        }
+        ExtraDataList* pExtra = apRefObject->TESObjectREFR::GetExtra();
+        pExtra->RemoveSavedAnimation();
+    }
+    return true;
+}
+
+bool Script::TriggerHUDShudderFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    float fUnused;
+    float fIntensity = 500.0f;
+    float fDuration = 0.10000000149011612f;
+    float fFrequency = 0.05000000074505806f;
+    if (!Script::ParseParameters(
+            apParameters,
+            apCompiledParams,
+            auiOffset,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &fIntensity,
+            &fDuration,
+            &fFrequency,
+            &fUnused
+        )) {
+        return false;
+    }
+    FOHUDEffectManager* pHUDEffects = Interface::GetHUDEffects();
+    pHUDEffects->TriggerShudder(fIntensity, fDuration, fFrequency);
+    return true;
+}
+
+bool Script::GetOwnerLastTargetFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    afReturnValue = 0.0;
+    if (apContainer && apContainer->IsActor()) {
+        Actor* pActor = static_cast<Actor*>(apContainer);
+        HitData* pLastTargetInfo = pActor->GetLastAttackHitData();
+        if (pLastTargetInfo && pLastTargetInfo->pTarget) {
+            uint32_t uiFormID = pLastTargetInfo->pTarget->TESForm::GetFormID();
+            Script::PutNumericIDInDouble(uiFormID, afReturnValue);
+        }
+    }
+
+    return true;
+}
+
+// Opens the recipe menu for the calling reference's vendor: the actor itself, or the speaker of a talking activator
+// (the reference's own base object, or the one its mobile object talks through).
+bool Script::ShowRecipeMenu(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    TESForm* pCategory = nullptr;
+    Script::ParseParameters(
+        apParameters,
+        apCompiledParams,
+        auiOffset,
+        apRefObject,
+        apContainer,
+        apScript,
+        apScriptLocals,
+        &pCategory
+    );
+    if (apRefObject) {
+        MobileObject* pMobile = nullptr;
+        TESObjectREFR* pVendor = nullptr;
+        if (apRefObject->IsMobileObject()) {
+            pMobile = static_cast<MobileObject*>(apRefObject);
+        }
+        else {
+            BGSTalkingActivator* pActivator = dynamic_cast<BGSTalkingActivator*>(apRefObject->GetObjectReference());
+            pVendor = pActivator ? pActivator->GetTempRef() : nullptr;
+        }
+        if (pMobile) {
+            if (pMobile->IsActor()) {
+                pVendor = pMobile;
+            }
+            else if (pMobile->IsTalkingActivator()) {
+                // Takes the talking activator's base object as a BGSTalkingActivator without a check.
+                pVendor = static_cast<BGSTalkingActivator*>(pMobile->GetTalkingActivator()->GetObjectReference())
+                              ->GetTempRef();
+            }
+        }
+        if (pVendor) {
+            Interface::CreateRecipeMenu(pVendor, pCategory);
+        }
+    }
+    return true;
+}
+
+// The winnings level (0-4, quarters of the casino's maximum winnings) the player has reached at a casino.
+bool Script::GetCasinoWinningsLevel(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
+    TESCasino* apCasino[2];
+    // apCasino[0] starts null (a departure): ParseParameters can return before writing it (a null parameter list,
+    // a reference code other than 'r'), and the exe then tests it unset.
+    apCasino[0] = nullptr;
+    apCasino[1] = nullptr;
+    Script::ParseParameters(
+        apParameters,
+        apCompiledParams,
+        auiOffset,
+        apRefObject,
+        apContainer,
+        apScript,
+        apScriptLocals,
+        &apCasino[0]
+    );
+    TESCasino* pCasino = apCasino[0];
+    if (!pCasino) {
+        return false;
+    }
+    for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
+         pNode = pNode->m_pkNext) {
+        if (pNode->m_item->casinoID == pCasino->GetFormID()) {
+            int32_t iMaxWinnings = pCasino->data.iMaxWinnings;
+            int32_t iTotalWinnings = pNode->m_item->iTotalWinnings;
+            afReturnValue = 0.0;
+            for (int32_t i = 0; i < 4; ++i) {
+                if (static_cast<double>(iTotalWinnings) >=
+                    static_cast<double>(iMaxWinnings) * (static_cast<double>(i + 1) * 0.25)) {
+                    afReturnValue = static_cast<double>(i + 1);
+                }
+            }
+        }
+    }
+    return true;
+}
+
+// Sets the player's winnings level (0-4) at a casino and its winnings to that many quarters of the casino's maximum.
+bool Script::SetCasinoWinningsLevel(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    // The casino's slot and the zeroed slot after it, which ParseParameters is passed with it (call 1's frame bytes).
+    TESCasino* apCasino[2];
+    int32_t iLevel;
+    // apCasino[0] starts null (a departure): ParseParameters can return before writing it (a null parameter list,
+    // a reference code other than 'r'), and the exe then tests it unset.
+    apCasino[0] = nullptr;
+    apCasino[1] = nullptr;
+    iLevel = 0;
+    Script::ParseParameters(
+        apParameters,
+        apCompiledParams,
+        auiOffset,
+        apRefObject,
+        apContainer,
+        apScript,
+        apScriptLocals,
+        &apCasino[0],
+        &iLevel
+    );
+    TESCasino* pCasino = apCasino[0];
+    if (!pCasino) {
+        return false;
+    }
+    for (BSSimpleList<CasinoData*>* pNode = pPlayer->GetCasinoDataList(); pNode && pNode->m_item;
+         pNode = pNode->m_pkNext) {
+        if (pNode->m_item->casinoID == pCasino->GetFormID() && iLevel >= 0 && iLevel <= 4) {
+            int32_t iMaxWinnings = pCasino->data.iMaxWinnings;
+            pNode->m_item->iWinningLevel = static_cast<int16_t>(iLevel);
+            int32_t iTotalWinnings = static_cast<int32_t>(
+                static_cast<double>(iLevel) * 0.25 * static_cast<double>(iMaxWinnings)
+            );
+            pNode->m_item->iTotalWinnings = iTotalWinnings;
+        }
+    }
+    return true;
+}
+
+bool Script::UnlockChallengeFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    TESChallenge* pChallenge = nullptr;
+    Script::ParseParameters(
+        apParameters,
+        apCompiledParams,
+        auiOffset,
+        apRefObject,
+        apContainer,
+        apScript,
+        apScriptLocals,
+        &pChallenge
+    );
+    if (!pChallenge) {
+        return false;
+    }
+    TESChallengeManager::UnlockChallenge(pChallenge);
+    return true;
+}
+
+bool Script::DisableHardcoreTracking(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    if (pPlayer) {
+        pPlayer->ClearsHardcoreFlag();
+    }
+    return true;
+}
+
+bool Script::IsAlwaysHardcoreFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return Script::IsAlwaysHardcoreConditionalFunction(apRefObject, nullptr, nullptr, afReturnValue);
+}
+
+bool Script::RemoveRecurringFromChallengeFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    TESChallenge* pChallenge = nullptr;
+    Script::ParseParameters(
+        apParameters,
+        apCompiledParams,
+        auiOffset,
+        apRefObject,
+        apContainer,
+        apScript,
+        apScriptLocals,
+        &pChallenge
+    );
+    if (!pChallenge) {
+        return false;
+    }
+    pChallenge->RemoveRecurringFromChallenge(1);
+    return true;
+}
+
+char Script::ActorOnEquipFunction(
+    SCRIPT_PARAMETER* paramInfo,
+    char* scriptData,
+    TESObjectREFR* thisObj,
+    TESObjectREFR* containingObj,
+    Script* scriptObj,
+    ScriptLocals* eventList,
+    double* afReturnValue,
+    uint32_t* opcodeOffsetPtr
+) {
+    TESForm* pForm = nullptr;
+    if (!Script::ParseParameters(
+            paramInfo,
+            scriptData,
+            *opcodeOffsetPtr,
+            thisObj,
+            containingObj,
+            scriptObj,
+            eventList,
+            &pForm
+        )) {
+        return 0;
+    }
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONEQUIP, thisObj, pForm, eventList, *afReturnValue);
+    return 1;
+}
+
+char Script::OnEquipFunction(
+    SCRIPT_PARAMETER* paramInfo,
+    char* scriptData,
+    TESObjectREFR* thisObj,
+    TESObjectREFR* containingObj,
+    Script* scriptObj,
+    ScriptLocals* eventList,
+    double* afReturnValue,
+    uint32_t* opcodeOffsetPtr
+) {
+    TESForm* pForm = nullptr;
+    if (!Script::ParseParameters(
+            paramInfo,
+            scriptData,
+            *opcodeOffsetPtr,
+            thisObj,
+            containingObj,
+            scriptObj,
+            eventList,
+            &pForm
+        )) {
+        return 0;
+    }
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONEQUIP, thisObj, pForm, eventList, *afReturnValue);
+    return 1;
+}
+
+char Script::ActorOnUnequipFunction(
+    SCRIPT_PARAMETER* paramInfo,
+    char* scriptData,
+    TESObjectREFR* thisObj,
+    TESObjectREFR* containingObj,
+    Script* scriptObj,
+    ScriptLocals* eventList,
+    double* afReturnValue,
+    uint32_t* opcodeOffsetPtr
+) {
+    TESForm* pForm = nullptr;
+    if (!Script::ParseParameters(
+            paramInfo,
+            scriptData,
+            *opcodeOffsetPtr,
+            thisObj,
+            containingObj,
+            scriptObj,
+            eventList,
+            &pForm
+        )) {
+        return 0;
+    }
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONUNEQUIP, thisObj, pForm, eventList, *afReturnValue);
+    return 1;
+}
+
+char Script::OnUnequipFunction(
+    SCRIPT_PARAMETER* paramInfo,
+    char* scriptData,
+    TESObjectREFR* thisObj,
+    TESObjectREFR* containingObj,
+    Script* scriptObj,
+    ScriptLocals* eventList,
+    double* afReturnValue,
+    uint32_t* opcodeOffsetPtr
+) {
+    TESForm* pForm = nullptr;
+    if (!Script::ParseParameters(
+            paramInfo,
+            scriptData,
+            *opcodeOffsetPtr,
+            thisObj,
+            containingObj,
+            scriptObj,
+            eventList,
+            &pForm
+        )) {
+        return 0;
+    }
+    Script::CheckFlagFunction(SCRIPT_ACTION_ONUNEQUIP, thisObj, pForm, eventList, *afReturnValue);
+    return 1;
+}
+
+bool Script::BeginTrace(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::CalcPathToPointFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::CastFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::DebugMilesPS3Function(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::DisableLinkedPathPointsFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::DumpMasterFileSeekData(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::EnableLinkedPathPointsFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::EvalActorTextures(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ExportBetaComment(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ForceFileCacheFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ForceRSXCrashFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::GetIsClassDefaultFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::GetIsMyClassDefaultFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::IgnoreRenderPass(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ModPCSkillFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::RunMemoryPass(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::SetCasinoCheatLevel(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::SetHDRParamFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::SetImageSpaceGlowParamFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ShowClassMenu(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ShowSpellmakingMenu(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ShowSurgeryMenu(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::StartMasterFileSeekData(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleActorMover(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleBoundVisGeometry(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleHDRDebugFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleMultibound(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::TogglePathlinesFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleSPURenderBatchFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleSPUTransformUpdateFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ToggleScreenBloodTest(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::TrapUpdateFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::SetDepthOfFieldRange(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    if (Script::bSystemOutput) {
+        Interface::PrintLine("This function is no longer supported");
+    }
+    return true;
+}
+
+bool Script::SetTargetDOF(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    if (Script::bSystemOutput) {
+        Interface::PrintLine("This function is no longer supported");
+    }
+    return true;
+}
+
+bool Script::IsShieldOutFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return !apRefObject || Script::IsShieldOutConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+}
+
+bool Script::IsTorchOutFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return !apRefObject || Script::IsTorchOutConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+}
+
+bool Script::GetPersuasionNumberFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return Script::GetPersuasionNumberConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+}
+
+bool Script::GetTotalPersuasionNumberFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return Script::GetTotalPersuasionNumberConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+}
+
+bool Script::GetPlayerHasLastRiddenHorseFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    Script::GetPlayerHasLastRiddenHorseConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
+}
+
+bool Script::IsHorseStolenFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    Script::IsHorseStolenConditionFunction(apRefObject, nullptr, nullptr, afReturnValue);
+    return true;
+}
+
+// The leveled list the script names is the TESLeveledList base of a leveled creature; the form it adds is the
+// leveled list's owner as well.
+bool Script::AddCreatureToLeveledListFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    TESLevCreature* pList = nullptr;
+    TESForm* pForm = nullptr;
+    int32_t iLevel = 0;
+    afReturnValue = 0.0;
+    if (!Script::ParseParameters(
+            apParameters,
+            apCompiledParams,
+            auiOffset,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &pList,
+            &pForm,
+            &iLevel
+        )) {
+        return false;
+    }
+    if (pList && pForm) {
+        static_cast<TESLeveledList*>(pList)
+            ->AddScriptAddedLeveledObject(pList, static_cast<uint16_t>(iLevel), 1, pForm, nullptr);
+    }
+
+    return true;
+}
+
+// The leveled list the script names is the TESLeveledList base of a leveled actor; the form it adds is the
+// leveled list's owner as well.
+bool Script::AddNPCToLeveledListFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    TESLevCharacter* pList = nullptr;
+    TESForm* pForm = nullptr;
+    int32_t iLevel = 0;
+    afReturnValue = 0.0;
+    if (!Script::ParseParameters(
+            apParameters,
+            apCompiledParams,
+            auiOffset,
+            apRefObject,
+            apContainer,
+            apScript,
+            apScriptLocals,
+            &pList,
+            &pForm,
+            &iLevel
+        )) {
+        return false;
+    }
+    if (pList && pForm) {
+        static_cast<TESLeveledList*>(pList)
+            ->AddScriptAddedLeveledObject(pList, static_cast<uint16_t>(iLevel), 1, pForm, nullptr);
+    }
+
+    return true;
+}
+
+bool Script::PrintTrackedCellsFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::ClearTrackedCellsFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
+}
+
+bool Script::EnableCellTrackingFunction(
+    const SCRIPT_PARAMETER* apParameters,
+    const char* apCompiledParams,
+    TESObjectREFR* apRefObject,
+    TESObjectREFR* apContainer,
+    Script* apScript,
+    ScriptLocals* apScriptLocals,
+    double& afReturnValue,
+    uint32_t& auiOffset
+) {
+    return true;
 }

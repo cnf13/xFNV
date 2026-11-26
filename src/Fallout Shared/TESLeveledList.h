@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSRandom.h"
 #include "BSCore/BSSimpleList.h"
 #include "Fallout Shared/BaseFormComponent.h"
 
@@ -10,9 +11,6 @@ class TESContainer;
 class TESForm;
 class TESGlobal;
 class TESObjectREFR;
-
-// The next unsigned random number of the BSRandom singleton.
-uint32_t Random();
 
 // One entry of a leveled list: the form, how many and from which level.
 struct LEVELED_OBJECT {

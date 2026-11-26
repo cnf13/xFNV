@@ -13,6 +13,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSCore/Xenon/BSThread_Xenon.h"
 #include "BSHavok/HavokThreadMemoryStruct.h"
@@ -33,7 +34,8 @@
 #include "BSMain/MessageHandler.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/ThreadSafeStructures.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderManager.h"
@@ -62,7 +64,6 @@
 #include "Fallout Shared/BGSTalkingActivator.h"
 #include "Fallout Shared/BGSTextureSet.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
-#include "Fallout Shared/BSTaskThread.h"
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/ContainerItemExtra.h"
@@ -72,7 +73,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/GridCell.h"
@@ -81,7 +81,6 @@
 #include "Fallout Shared/Havok/FOCollisionListener.h"
 #include "Fallout Shared/InventoryChanges.h"
 #include "Fallout Shared/KFModel.h"
-#include "Fallout Shared/LockFreeMap.h"
 #include "Fallout Shared/Magic/EffectSetting.h"
 #include "Fallout Shared/Magic/EffectSettingCollection.h"
 #include "Fallout Shared/Magic/MagicItem.h"
@@ -197,7 +196,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -223,8 +221,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVertexColorProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiZBufferProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
@@ -477,24 +477,6 @@ LoadedFile::~LoadedFile() {
     ourFree(pFileName);
     if (pFile) {
         delete pFile;
-    }
-}
-
-// Spins until the loaded-file lock is free, then takes the reference under it.
-void LoadedFile::IncRefCount() {
-    while (!LSAccessCrit.TryLock()) {}
-    NiAtomicIncrement(iRefCount);
-    LSAccessCrit.Unlock();
-}
-
-void LoadedFile::DecRefCount() {
-    while (!LoadedFile::LSAccessCrit.TryLock()) {
-        ;
-    }
-    NiAtomicDecrement(iRefCount);
-    LoadedFile::LSAccessCrit.Unlock();
-    if (!iRefCount && this) {
-        delete this;
     }
 }
 
@@ -1693,25 +1675,8 @@ bool MLGetFlag4(uint8_t aFlags) {
     return (aFlags & 4) != 0;
 }
 
-// Allocates a thread-local storage index: only calls the TlsAlloc import and returns its
-// result.
-uint32_t BSTlsAlloc() {
-    return TlsAlloc();
-}
-
-// Frees a TLS index: only calls the TlsFree import and returns its result.
-void BSTlsFree(uint32_t aiTlsIndex) {
-    TlsFree(aiTlsIndex);
-}
-
 bool MLGetFlag_8(uint8_t aFlags) {
     return (aFlags & 8) != 0;
-}
-
-bool CompareAndSwapEx(int32_t* apDestination, int32_t aiExchange, int32_t aiCompare) {
-    bool bExchanged = BSAtomicCompareExchange(apDestination, aiCompare, aiExchange) == aiCompare;
-    InitializationFlow();
-    return bExchanged;
 }
 
 // The byte difference is shifted right by 2, so a difference that is not a multiple of 4 rounds down; C++ pointer
@@ -1749,10 +1714,6 @@ void MLSetFlag_32(char abSet, uint8_t* apFlags) {
     else {
         *apFlags &= ~0x20u;
     }
-}
-
-int32_t SetTlsValue(uint32_t aiTlsIndex, void* apValue) {
-    return TlsSetValue(aiTlsIndex, apValue);
 }
 
 QueuedTree::QueuedTree(TESObjectREFR* apRef, IO_TASK_PRIORITY aePriority) : QueuedReference(apRef, aePriority) {}
@@ -3846,110 +3807,6 @@ void ModelLoader::ResumeCallback() {
     pModelLoader->ResumeBackgroundCloning();
 }
 
-int32_t BSstrnicmp(const char* apString1, const char* apString2, uint32_t aiCount) {
-    return _strnicmp(apString1, apString2, aiCount);
-}
-
-bhkRigidBody* bhkCollisionObject::GetRigidBody() {
-    return spWorldObject;
-}
-
-bhkCollisionObject* bhkCollisionObject::GetbhkCollisionObject(NiAVObject* apObject) {
-    return static_cast<bhkCollisionObject*>(
-        NiObject::DynamicCastStatic(&bhkCollisionObject::ms_RTTI, apObject->NiAVObject::GetCollisionObject())
-    );
-}
-
-hkReferencedObject* bhkRefObject::GethkObject() const {
-    return phkObject;
-}
-
-hkpWorldObject* bhkWorldObject::Gethk() {
-    return static_cast<hkpWorldObject*>(phkObject);
-}
-
-IOTask::IOTask(IO_TASK_PRIORITY aePriority) {
-    SetIOTaskPriority(aePriority);
-}
-
-// The key: file index 3, the next offset, the task's priority and the low 16 bits of the next counter, fetched in the
-// order counter, priority, offset.
-void IOTask::GenerateKey() {
-    uint16_t sCounter = GetNextCounter();
-    uint8_t cPriority = GetPriority();
-    uint32_t iOffset = GetNextOffset();
-    SetKey(3, iOffset, cPriority, sCounter);
-}
-
-void IOTask::SetKey(char acFileIndex, uint32_t aiOffset, uint8_t acPriority, uint16_t asCounter) {
-    uint64_t uiPriorityBits = static_cast<uint64_t>(acPriority) << 16;
-    Key = static_cast<int64_t>(
-        (static_cast<uint64_t>(Key) & 0xFFFFFFFF00000000ull) |
-        static_cast<uint64_t>(static_cast<uint32_t>(asCounter | (uiPriorityBits | aiOffset << 24)))
-    );
-    Key = static_cast<int64_t>(
-        (static_cast<uint64_t>(Key) & 0xFFFFFFFFull) |
-        (static_cast<uint64_t>(static_cast<uint32_t>(
-             (static_cast<uint32_t>(uiPriorityBits >> 32) | (static_cast<uint64_t>(aiOffset) >> 8 | acFileIndex << 24))
-         ))
-         << 32)
-    );
-}
-
-uint8_t IOTask::GetPriority() {
-    return IOTask::GetPriorityFromKey(Key);
-}
-
-void IOTask::SetPriority(uint8_t acPriority) {
-    Key = (static_cast<uint64_t>(acPriority) << 16) +
-        ((static_cast<uint64_t>(static_cast<uint32_t>(Key >> 32)) << 32) | static_cast<uint32_t>(Key & 0xFF00FFFFu));
-}
-
-void QueuedFile::NotifyChildFinished(QueuedFile* apChild) {
-    pChildren->AddFinishedChild();
-    CheckFinished();
-}
-
-void QueuedFile::SetParent(QueuedFile* apParent) {
-    this->spParent = apParent;
-    if (this->spParent) {
-        this->spParent->AddChild(this);
-    }
-}
-
-bool QueuedFile::GetAllChildrenFinished() {
-    if (!pChildren) {
-        return true;
-    }
-    uint32_t uiSize = pChildren->GetSize();
-    return uiSize == pChildren->GetChildCountFinished();
-}
-
-uint32_t QueuedFile::GetChildCount() {
-    if (pChildren) {
-        return pChildren->GetSize();
-    }
-
-    return 0;
-}
-
-uint32_t QueuedChildren::GetChildCountFinished() {
-    return iNumChildrenFinished;
-}
-
-void QueuedChildren::AddFinishedChild() {
-    NiAtomicIncrement(iNumChildrenFinished);
-}
-
-int32_t Archive::GetRuntimeID() const {
-    return m_iRuntimeID;
-}
-
-// iSize without its flag bits.
-uint32_t BSFileEntry::Size() {
-    return iSize & 0x3FFFFFFF;
-}
-
 TESObjectANIO* AnimIdle::GetAnimObject(int32_t aiIndex) {
     return pAnimObj[aiIndex];
 }
@@ -3957,73 +3814,6 @@ TESObjectANIO* AnimIdle::GetAnimObject(int32_t aiIndex) {
 // Tests the master-particle-system flag in the addon data.
 bool BGSAddonNode::IsMasterParticleSystem() {
     return (Data.cFlags & ADDON_DATA::FLAG_MASTER_PARTICLE_SYSTEM) != 0;
-}
-
-// The thread is created suspended (StartThread resumes it); aiProcessor is deliberately unused.
-BSTaskThread::BSTaskThread(uint32_t aiProcessor, const char* apThreadName)
-  : Semaphore(0, std::numeric_limits<int32_t>::max()), PauseSemaphore(1, 1) {
-    hThreadHandle = new BSSystemThread(&BSTaskThreadProc, this, true);
-    iThreadID = hThreadHandle->Id();
-    if (apThreadName) {
-        hThreadHandle->SetName(apThreadName);
-    }
-    HavokThreadMemory.pHavokThreadRouter = nullptr;
-    HavokThreadMemory.pHavokThreadStackBuffer = nullptr;
-    HavokThreadMemory.iThreadID = iThreadID;
-}
-
-// The semaphores close their own handles. The thread is suspended (at its next wait: BSSystemThread) and closed.
-BSTaskThread::~BSTaskThread() {
-    hThreadHandle->Suspend();
-    delete hThreadHandle;
-}
-
-void BSTaskThread::Sleep() {
-    SignalTask();
-    WaitPauseSemaphore();
-}
-
-void BSTaskThread::SignalTask() {
-    if (!Semaphore.iCount) {
-        Semaphore.Signal();
-    }
-}
-
-void BSTaskThread::StartThread() {
-    hThreadHandle->Resume();
-}
-
-void BSTaskThread::SignalPauseSemaphore() {
-    PauseSemaphore.Signal();
-}
-
-void BSTaskThread::Resume() {
-    SignalTask();
-    SignalPauseSemaphore();
-}
-
-void BSTaskThread::WaitTask() {
-    Semaphore.Wait();
-}
-
-void BSTaskThread::WaitPauseSemaphore() {
-    PauseSemaphore.Wait();
-}
-
-void BSTaskThread::SetPauseSleepEnabled(bool abEnable) {
-    BSTaskThread::sDoPauseSleep = abEnable;
-}
-
-void BSTaskThread::SetPauseSleepValue(int32_t aiValue) {
-    BSTaskThread::sPauseSleepValue = aiValue;
-}
-
-void BSTaskThread::SetUpdateSleepEnabled(bool abEnable) {
-    BSTaskThread::sDoUpdateSleep = abEnable;
-}
-
-void BSTaskThread::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
 }
 
 BIPOBJECT* BipedAnim::GetBipObject(BIPED_OBJECT aeBipedObject) {
@@ -4078,42 +3868,13 @@ void KFModel::InitSequence(const char* apFilename) {
                 spSequence->SetName(kName);
             }
         }
-        // A KFModel's sequence is always a BSAnimGroupSequence (CreateSequenceFromFile wraps it in one); the field
-        // holds it as an NiControllerSequence.
-        spAnimGroup = static_cast<TESAnimGroup*>(
-            BSAnimGroupSequence::InitAnimGroup(static_cast<BSAnimGroupSequence*>(spSequence.m_pObject), apFilename)
-        );
+        spAnimGroup = TESAnimGroup::LoadAnimGroup(spSequence.m_pObject, apFilename);
         if (NiObject::IsKindOf_0(&BSAnimGroupSequence::ms_RTTI, spSequence.m_pObject)) {
             static_cast<BSAnimGroupSequence*>(GetSequence())->BSAnimGroupSequence::SetAnimGroup(spAnimGroup.m_pObject);
         }
         NiFixedString kName(apFilename);
         spSequence->SetName(kName);
     }
-}
-
-InterfacedClass::InterfacedClass() {}
-
-InterfacedClass::~InterfacedClass() {}
-
-// The calling thread's interface for apInterfacedClass: the next table slot, the interface it is handed, its thread id
-// and the thread's TLS value.
-InterfacedClass::BaseInterface* ThreadSpecificInterfaceManager::AddInterface(InterfacedClass* apInterfacedClass) {
-    InterfacedClass::BaseInterface* pInterface = nullptr;
-    uint32_t uiThread = static_cast<uint32_t>(NiAtomicIncrement(const_cast<int32_t&>(uiThreadCount)) - 1);
-    if (uiThread < uiMaxThreads) {
-        pInterface = apInterfacedClass->AllocateInterface(uiThread);
-        pInterfaces[uiThread].pInterface = pInterface;
-        pInterfaces[uiThread].iThreadID = BSGetCurrentThreadID();
-        SetTlsValue(uiTLSIndex, pInterface);
-    }
-    return pInterface;
-}
-
-// The lock-free queues and maps pass node pointers to CompareAndSwapEx.
-bool CompareAndSwapEx(void* volatile* apDestination, void* apExchange, void* apCompare) {
-    bool bExchanged = BSAtomicCompareExchange(apDestination, apCompare, apExchange) == apCompare;
-    InitializationFlow();
-    return bExchanged;
 }
 
 QueuedReplacementKF::QueuedReplacementKF(
@@ -4309,131 +4070,4 @@ void TESObjectREFR::SetBackgroundLoadingRef(TESObjectREFR* apRef, NiAVObject* ap
 void TESObjectREFR::ClearBackgroundLoadingRef() {
     pBackgroundLoadingRef = nullptr;
     pBackgroundLoading3D = nullptr;
-}
-
-NiAVObjectPalette* NiControllerManager::GetObjectPalette() {
-    return m_spObjectPalette;
-}
-
-void NiControllerSequence::SetName(const NiFixedString& kName) {
-    m_kName.Assign(kName);
-}
-
-PRIORITY_STATE BSDegradePriority::QState() {
-    return static_cast<PRIORITY_STATE>(cState);
-}
-
-bool BSEntryMap::GetAt(const BSFileEntry* apEntry, NiPointer<NiTexture>& arTexture) {
-    uint32_t uiIndex = KeyToHashIndex(apEntry);
-    return GetAt(uiIndex, apEntry, arTexture);
-}
-
-// The key's address is the hash (as Gamebryo's NiTPointerMap hashes pointer keys).
-uint32_t BSEntryMap::KeyToHashIndex(const BSFileEntry* apKey) {
-    return static_cast<uint32_t>((reinterpret_cast<uintptr_t>(apKey) >> 4) % 1001);
-}
-
-const char* NiFixedString::GetHandleString() const {
-    return NiGlobalStringTable::GetString(m_kHandle);
-}
-
-NiFixedString& NiFixedString::Assign(const NiFixedString& kString) {
-    if (m_kHandle != kString.m_kHandle) {
-        NiGlobalStringTable::GlobalStringHandle kHandle = kString.m_kHandle;
-        NiGlobalStringTable::IncHandleRefCount(kHandle);
-        NiGlobalStringTable::DecHandleRefCount(m_kHandle);
-        m_kHandle = kHandle;
-    }
-    return *this;
-}
-
-NiGeometryData* NiGeometry::GetModelData() const {
-    return m_spModelData;
-}
-
-void NiGeometryData::SetCompressFlags(uint32_t uiCompressFlags) {
-    m_ucCompressFlags = static_cast<uint8_t>(uiCompressFlags);
-}
-
-NiObject* NiObject::DynamicCastMember(const NiRTTI* pkRTTI) const {
-    return IsKindOfMember(pkRTTI) ? const_cast<NiObject*>(this) : nullptr;
-}
-
-bool NiObject::IsExactKindOf(const NiRTTI* pkRTTI) const {
-    return GetRTTI() == pkRTTI;
-}
-
-// Static NiObject::DynamicCast: null for a null object, else the member DynamicCast.
-NiObject* NiObject::DynamicCastStatic(const NiRTTI* pkRTTI, const NiObject* pkObject) {
-    if (!pkObject) {
-        return nullptr;
-    }
-    return pkObject->DynamicCastMember(pkRTTI);
-}
-
-NiShadeProperty* NiPropertyState::GetShade() {
-    return static_cast<NiShadeProperty*>(m_aspProps[NiProperty::SHADE].m_pObject);
-}
-
-BSDegradePriority* NiTexture::RendererData::QDegradePriority() {
-    return &DegradePriorityRange;
-}
-
-// The degrade state of the texture's renderer data, 0 without one.
-PRIORITY_STATE NiTexture::QState() {
-    if (!GetRendererData()) {
-        return PS_NONE;
-    }
-    return GetRendererData()->QDegradePriority()->QState();
-}
-
-NiTexture::RendererData* NiTexture::GetRendererData() {
-    return m_pkRendererData;
-}
-
-void NiTexture::SetLoadMethod(uint32_t aiLoadMethod) {
-    RendererData::iLoadMethod = static_cast<int32_t>(aiLoadMethod);
-}
-
-uint32_t NiTexture::QLoadMethod() {
-    return static_cast<uint32_t>(RendererData::iLoadMethod);
-}
-
-NiUpdateData::NiUpdateData(float afTime, bool abUpdateControllers, bool abParallelUpdate)
-  : fTime(afTime), bUpdateControllers(abUpdateControllers), bParallelUpdate(abParallelUpdate), bFoundParticles(false),
-    bFoundMorphController(false), bSceneGraphChange(false) {}
-
-NiVertexColorProperty* NiVertexColorProperty::GetDefault() {
-    return ms_spDefault;
-}
-
-NiZBufferProperty* NiZBufferProperty::GetDefault() {
-    return ms_spDefault;
-}
-
-// The empty string's handle has no reference count. The count is raw memory, the untyped word GetRealBufferStart
-// returns, incremented through the int32_t NiAtomicIncrement.
-void NiGlobalStringTable::IncHandleRefCount(GlobalStringHandle& arHandle) {
-    if (arHandle != NULL_STRING) {
-        const char* pcBuffer = GetRealBufferStart(arHandle);
-        NiAtomicIncrement(*reinterpret_cast<int32_t*>(const_cast<char*>(pcBuffer)));
-    }
-}
-
-void NiStream::SaveLinkID(const NiObject* pkObject) {
-    uint32_t uiLinkID = GetLinkIDFromObject(pkObject);
-    NiStreamSaveBinary(*this, uiLinkID);
-}
-
-uint32_t NiStream::GetObjectCount() {
-    return m_kTopObjects.GetSize();
-}
-
-NiObject* NiStream::GetObjectAt(uint32_t i) {
-    NiPointer<NiObject>& spObject = m_kTopObjects.GetAt(i);
-    return spObject;
-}
-
-NiTimeController* NiTimeController::GetNext() {
-    return m_spNext;
 }

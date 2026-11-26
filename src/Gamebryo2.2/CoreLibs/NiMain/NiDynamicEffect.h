@@ -50,3 +50,7 @@ public:
     static NiRTTI ms_RTTI;
     static inline int32_t ms_iNextIndex = 1;
 };
+
+inline void NiDynamicEffect::IncRevisionID() {
+    ++m_uiRevID;
+}

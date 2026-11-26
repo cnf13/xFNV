@@ -67,6 +67,6 @@ extern SettingT<GameSettingCollection> fUpdateInterval;
 // "iLowDamp", default 50.
 extern SettingT<GameSettingCollection> iLowDamp;
 
-extern SettingT<GameSettingCollection> gs_iHighDamp;
+extern SettingT<GameSettingCollection> iHighDamp;
 
-extern SettingT<GameSettingCollection> gs_iCollFreq;
+extern SettingT<GameSettingCollection> iCollFreq;

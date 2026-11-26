@@ -1,7 +1,7 @@
 #include "Fallout Shared/TeleportData.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSWorldLocation.h"
 #include "Fallout Shared/ExtraDataList.h"
@@ -19,13 +19,13 @@
 
 // Swaps the door ID and the six position and rotation floats read from a big-endian file; the flags are left alone.
 void FILE_TELEPORT_DATA::Endian() {
-    ENDIAN(iLinkedDoorID, false);
-    ENDIAN(position.x, false);
-    ENDIAN(position.y, false);
-    ENDIAN(position.z, false);
-    ENDIAN(rotation.x, false);
-    ENDIAN(rotation.y, false);
-    ENDIAN(rotation.z, false);
+    BSEndian(iLinkedDoorID, false);
+    BSEndian(position.x, false);
+    BSEndian(position.y, false);
+    BSEndian(position.z, false);
+    BSEndian(rotation.x, false);
+    BSEndian(rotation.y, false);
+    BSEndian(rotation.z, false);
 }
 
 DoorTeleportData::DoorTeleportData()
@@ -144,7 +144,7 @@ void DoorTeleportData::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
 }
 
 // The door's form ID goes through a local and is stored as is in pLinkedDoor; it is resolved later.
-void DoorTeleportData::LoadGameTES() {
+void DoorTeleportData::LoadGame() {
     pSaveLoadGameOLD->LoadGameDataOLD(&position, sizeof(position));
     pSaveLoadGameOLD->LoadGameDataOLD(&rotation, sizeof(rotation));
     uint32_t uiDoorID;

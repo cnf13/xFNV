@@ -11,6 +11,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSCore/ScrapHeap.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -18,11 +19,9 @@
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkEntityListener.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkShape.h"
-#include "BSHavok/bhkTrapListener.h"
 #include "BSHavok/bhkWindListener.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldM.h"
@@ -35,7 +34,6 @@
 #include "BSMain/BSOcclusionPlane.h"
 #include "BSMain/BSPortal.h"
 #include "BSMain/BSPortalGraph.h"
-#include "BSMain/BSPortalSharedNode.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/BSStream.h"
 #include "BSMain/BSUtilities.h"
@@ -43,7 +41,7 @@
 #include "BSMain/IOManager.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSRenderedTexture.h"
@@ -128,6 +126,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -242,7 +241,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParticles.h"
@@ -267,6 +265,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -309,7 +308,7 @@ NiPointer<bhkWorldM> TESObjectCELL::spExteriorWorld;
 SettingT<INISettingCollection> bUseMultibounds("bUseMultibounds:General", true);
 SettingT<INISettingCollection> bDefaultCOCPlacement("bDefaultCOCPlacement:General", false);
 SettingT<GameSettingCollection> TESObjectCELL::sDefaultCellName("sDefaultCellName", "Wilderness");
-SettingT<GameSettingCollection> gs_iHoursToRespawnCell("iHoursToRespawnCell", 72);
+SettingT<GameSettingCollection> TESObjectCELL::iHoursToRespawnCell("iHoursToRespawnCell", 72);
 TESObjectCELL::QueuedParticleUpdateList TESObjectCELL::QueuedParticleUpdates;
 
 using QueuedChildAttachMap_t = TESObjectCELL::QueuedChildAttachMapType;
@@ -7314,7 +7313,7 @@ int32_t TESObjectCELL::GetCoord(int32_t aiX, int32_t aiY) {
 }
 
 uint32_t TESObjectCELL::GetHoursToRespawnCell() {
-    return gs_iHoursToRespawnCell.UInt();
+    return TESObjectCELL::iHoursToRespawnCell.UInt();
 }
 
 void TESObjectCELL::KillStatics() {
@@ -8376,60 +8375,6 @@ bool TESObjectCELL::EnumReferencesCloseToPointFromInterior(
     return !bDone;
 }
 
-bool bhkRagdollController::QRagdollAnim() {
-    return bhkRagdollController::bRagdollAnim.Bool();
-}
-
-// The threading-check mark is empty in the game's build, so MarkForWrite and UnMarkForWrite compile to one function.
-void bhkWorld::MarkForWrite() {
-    ahkpWorld* pw = **this;
-    if (pw) {
-        pw->markForWrite();
-    }
-}
-
-void bhkWorld::UnMarkForWrite() {
-    ahkpWorld* pw = **this;
-    if (pw) {
-        pw->unmarkForWrite();
-    }
-}
-
-void bhkWorld::AddEntityListener(bhkEntityListener* apListener) {
-    ahkpWorld* pw = **this;
-    if (pw) {
-        MarkForWrite();
-        pw->addEntityListener(apListener);
-        UnMarkForWrite();
-    }
-    pEntityListenerA.pushBack(static_cast<hkpEntityListener*>(apListener));
-}
-
-void bhkWorld::AddContactListener(hkpContactListener* apListener) {
-    ahkpWorld* pw = **this;
-    if (pw) {
-        MarkForWrite();
-        pw->addContactListener(apListener);
-        UnMarkForWrite();
-    }
-}
-
-// The listener hears entities through the entity listeners and phantoms through its hkpPhantomListener base.
-void bhkWorld::AddTrapListener(bhkTrapListener* apListener) {
-    AddEntityListener(apListener);
-    ahkpWorld* pw = **this;
-    if (pw) {
-        MarkForWrite();
-        pw->addPhantomListener(apListener);
-        UnMarkForWrite();
-    }
-    pTrapListener = apListener;
-}
-
-float BSFadeNode::GetBoundRadius() {
-    return fBoundRadius;
-}
-
 TESForm* BGSEncounterZone::QOwnerForm() {
     return Data.pZoneOwner;
 }
@@ -8475,14 +8420,6 @@ TESWeather* TESRegion::GetCurrentWeather() {
     return pCurrentWeather;
 }
 
-hkVector4& NI2HKNS(hkVector4& arhkV, const NiPoint3& arNiP) {
-    arhkV(0) = arNiP.x;
-    arhkV(1) = arNiP.y;
-    arhkV(2) = arNiP.z;
-    arhkV(3) = 0.0;
-    return arhkV;
-}
-
 bool TESForm::GetReflectedByAutoWater() {
     return ((iFormFlags & kFormFlags_ReflectedByAutoWater) != 0);
 }
@@ -8506,21 +8443,4 @@ bool TESObjectREFR::HasRandomSound() {
 
 const char* TESWorldSpace::GetCanopyShadowTextureName() {
     return CanopyShadowTexture.GetTextureName();
-}
-
-// The constructor deliberately leaves the sphere unset and ignores both arguments.
-BSNiBound::BSNiBound(uint16_t asFlags, uint16_t asLevel) {}
-
-// An object without a world bound gets a zeroed BSNiBound (flags 0x100, level 0), set through SetBound.
-void NiAVObject::CreateBoundIfNone() {
-    if (m_kWorldBound) {
-        return;
-    }
-    BSNiBound* pkBound = ::new BSNiBound(0x100, 0);
-    SetBound(pkBound);
-    m_kWorldBound->SetCenterAndRadius(NiPoint3::ZERO, 0.0f);
-}
-
-NiAccumulator* NiRenderer::GetSorter() {
-    return m_spAccum;
 }

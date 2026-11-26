@@ -1,6 +1,6 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameSubBuffer.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/TESForm.h"
@@ -44,7 +44,7 @@ void BGSLoadGameSubBuffer::LoadAnimation(TESForm* apForm) {
                 pAnimation = pRef->GetAnimation();
             }
             if (pAnimation) {
-                pAnimation->LoadGameBGS(pLoadBuffer);
+                pAnimation->LoadGame(pLoadBuffer);
             }
             else {
                 uint32_t uiFormID = pRef->GetFormID();
@@ -77,7 +77,7 @@ void BGSLoadGameSubBuffer::LoadHavokData(TESForm* apForm) {
     TESObjectREFR* pRef = static_cast<TESObjectREFR*>(apForm);
     BGSLoadFormBuffer* pLoadBuffer = Create(pRef);
     if (pRef->IsReference()) {
-        pRef->LoadHavokDataBGS(pLoadBuffer);
+        pRef->LoadHavokData(pLoadBuffer);
     }
     else {
         uint32_t uiFormID = pRef->GetFormID();

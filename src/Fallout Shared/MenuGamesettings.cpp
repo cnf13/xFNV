@@ -1,8 +1,10 @@
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/MenuGameSettings.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESNPC.h"
 #include "Fallout/Interface/Interface.h"
@@ -55,8 +57,8 @@ SettingT<GameSettingCollection> sRemoveItemfromInventory("sRemoveItemfromInvento
 SettingT<GameSettingCollection> sEquipItemOnPlayer("sEquipItemOnPlayer", "was equipped");
 SettingT<GameSettingCollection> sScrollEquipped("sScrollEquipped", " equipped.");
 SettingT<GameSettingCollection> sUnequipItemOnPlayer("sUnequipItemOnPlayer", "was unequipped");
-SettingT<GameSettingCollection> gs_sQuestAddedText("sQuestAddedText", "Quest added");
-SettingT<GameSettingCollection> gs_sQuestCompletedText("sQuestCompletedText", "Quest completed");
+SettingT<GameSettingCollection> sQuestAdded("sQuestAddedText", "Quest added");
+SettingT<GameSettingCollection> sQuestCompleted("sQuestCompletedText", "Quest completed");
 static SettingT<GameSettingCollection> sQuestUpdated("sQuestUpdatedText", "Quest updated");
 SettingT<GameSettingCollection> sQuestFailed("sQuestFailed", "Quest FAILED");
 SettingT<GameSettingCollection> sContinue("sContinue", "Continue");
@@ -332,7 +334,7 @@ SettingT<GameSettingCollection> fWorldMapMarkerMinSize("fWorldMapMarkerMinSize",
 SettingT<GameSettingCollection> fWorldMapMarkerMaxSize("fWorldMapMarkerMaxSize", 50.0f);
 SettingT<GameSettingCollection> fWorldQuestMarkerMinSize("fWorldQuestMarkerMinSize", 30.0f);
 SettingT<GameSettingCollection> fWorldQuestMarkerMaxSize("fWorldQuestMarkerMaxSize", 60.0f);
-SettingT<GameSettingCollection> gs_fWorldfPlayerCursorMinSize("fWorldfPlayerCursorMinSize", 40.0f);
+SettingT<GameSettingCollection> fWorldPlayerCursorMinSize("fWorldfPlayerCursorMinSize", 40.0f);
 SettingT<GameSettingCollection> fWorldPlayerCursorMaxSize("fWorldPlayerCursorMaxSize", 70.0f);
 SettingT<GameSettingCollection> fLocalMapMinZoom("fLocalMapMinZoom", 0.1f);
 SettingT<GameSettingCollection> fLocalMapMaxZoom("fLocalMapMaxZoom", 0.9f);
@@ -340,7 +342,7 @@ SettingT<GameSettingCollection> fLocalMapMarkerMinSize("fLocalMapMarkerMinSize",
 SettingT<GameSettingCollection> fLocalMapMarkerMaxSize("fLocalMapMarkerMaxSize", 75.0f);
 SettingT<GameSettingCollection> fLocalQuestMarkerMinSize("fLocalQuestMarkerMinSize", 40.0f);
 SettingT<GameSettingCollection> fLocalQuestMarkerMaxSize("fLocalQuestMarkerMaxSize", 75.0f);
-SettingT<GameSettingCollection> gs_fLocalfPlayerCursorMinSize("fLocalfPlayerCursorMinSize", 40.0f);
+SettingT<GameSettingCollection> fLocalPlayerCursorMinSize("fLocalfPlayerCursorMinSize", 40.0f);
 SettingT<GameSettingCollection> fLocalPlayerCursorMaxSize("fLocalPlayerCursorMaxSize", 70.0f);
 SettingT<INISettingCollection> fPopUpBackgroundOpacity("fPopUpBackgroundOpacity:Interface", 1.0f);
 SettingT<INISettingCollection> fMenuBackgroundOpacity("fMenuBackgroundOpacity:Interface", 0.8f);
@@ -814,7 +816,7 @@ SettingT<GameSettingCollection> sVatsUnarmedAttackGround("sVatsUnarmedAttackGrou
 SettingT<GameSettingCollection> sCWheelTitle("sCWheelTitle", "Companion Commands");
 SettingT<GameSettingCollection> sCWheelBeAggressive("sCWheelBeAggressive", "Be Aggressive");
 SettingT<GameSettingCollection> sCWheelBePassive("sCWheelBePassive", "Be Passive");
-SettingT<GameSettingCollection> gs_sCWheelUseStimpak("sCWheelUseStimpak", "Use Stimpak");
+SettingT<GameSettingCollection> sCWheelUseStimPack("sCWheelUseStimpak", "Use Stimpak");
 SettingT<GameSettingCollection> sCWheelWaitHere("sCWheelWaitHere", "Wait Here");
 SettingT<GameSettingCollection> sCWheelFollowMe("sCWheelFollowMe", "Follow Me");
 SettingT<GameSettingCollection> sCWheelTalkTo("sCWheelTalkTo", "Talk To");
@@ -892,10 +894,10 @@ SettingT<GameSettingCollection> sTwoToOneText("sTwoToOneText", "2 to 1");
 SettingT<GameSettingCollection> sFirstDozenText("sFirstDozenText", "First Dozen");
 SettingT<GameSettingCollection> sSecondDozenText("sSecondDozenText", "2nd Dozen");
 SettingT<GameSettingCollection> sThirdDozenText("sThirdDozenText", "3rd Dozen");
-SettingT<GameSettingCollection> gs_sBlacktext("sBlacktext", "Black");
+SettingT<GameSettingCollection> sBlackText("sBlacktext", "Black");
 SettingT<GameSettingCollection> sRedText("sRedText", "Red");
 SettingT<GameSettingCollection> sEvenText("sEvenText", "Even");
-SettingT<GameSettingCollection> gs_sOddtext("sOddtext", "Odd");
+SettingT<GameSettingCollection> sOddText("sOddtext", "Odd");
 SettingT<GameSettingCollection> sPlaceBetText("sPlaceBetText", "Place Bet");
 SettingT<GameSettingCollection> sRemoveBetText("sRemoveBetText", "Remove Bet");
 SettingT<GameSettingCollection> sTotalBetText("sTotalBetText", "Total Bet: ");
@@ -911,10 +913,10 @@ SettingT<GameSettingCollection> sSpinText("sSpinText", "Spin");
 SettingT<GameSettingCollection> sPayoutListText("sPayoutListText", "Payout List");
 SettingT<GameSettingCollection> sCurrentBetText("sCurrentBetText", "Current Bet: ");
 SettingT<GameSettingCollection> sChipCountText("sChipCountText", "Chips: ");
-SettingT<GameSettingCollection> sCasinoEarningsText("sCasinoEarningsText", "Earnings: ");
+SettingT<GameSettingCollection> sEarningsText("sCasinoEarningsText", "Earnings: ");
 SettingT<GameSettingCollection> sIncreaseBetText("sIncreaseBetText", "Increase Bet");
 SettingT<GameSettingCollection> sDecreaseBetText("sDecreaseBetText", "Decrease Bet");
-SettingT<GameSettingCollection> gs_sBetMax("sBetMax", "Bet Max");
+SettingT<GameSettingCollection> sBetMaxText("sBetMax", "Bet Max");
 SettingT<GameSettingCollection> sGamblingBannedText("sGamblingBannedText",
 	"You have been banned from gambling at this casino.");
 SettingT<GameSettingCollection> sGamblingBrokeText("sGamblingBrokeText",
@@ -1124,7 +1126,7 @@ SettingT<GameSettingCollection> sChemsAddicted("sChemsAddicted", "You have becom
 SettingT<GameSettingCollection> sChemsWithdrawal("sChemsWithdrawal", "You are suffering from %s withdrawal.");
 SettingT<GameSettingCollection> sNoTalkUnConscious("sNoTalkUnConscious", " is unconscious.");
 SettingT<GameSettingCollection> sNoTalkFleeing("sNoTalkFleeing", " is fleeing for their life.");
-SettingT<GameSettingCollection> gs_sNoPickPocketAgain("sNoPickPocketAgain", " has already caught you.");
+SettingT<GameSettingCollection> sNoPickpocketAgain("sNoPickPocketAgain", " has already caught you.");
 SettingT<GameSettingCollection> sNoChildUse("sNoChildUse", "Children cannot use that.");
 SettingT<GameSettingCollection> sNoSitOnOwnedFurniture("sNoSitOnOwnedFurniture", "You cannot sit on owned furniture.");
 SettingT<GameSettingCollection> sServeTimeQuestion("sServeTimeQuestion", "Do you just want to serve your time?");

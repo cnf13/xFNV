@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Collide/Shape/Compound/Tree/Mopp/Modifiers/hkpRemoveTerminalsMoppModifierClass.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"

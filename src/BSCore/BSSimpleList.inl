@@ -1,4 +1,5 @@
 
+#include "BSCore/NewOverloads.h"
 #include "xfnv/Compiler.h"
 class BSPortal;
 

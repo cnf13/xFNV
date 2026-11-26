@@ -2,6 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Interface/ListBox.h"
@@ -101,6 +102,8 @@ public:
     // Closes the container menu that is up.
     static void Close();
     static uint32_t GetClassStatic();
+    // The mode of the open container menu, 0 without one.
+    static uint32_t GetContainerMode();
     static void ForceContainerUpdate();
     static void operator delete(void* apMemory) {
         ourFree(apMemory);
@@ -134,3 +137,11 @@ public:
     static inline ContainerMenu* pMe;
     static inline char bMouseOverEnabled = 1;
 };
+
+inline uint32_t ContainerMenu::GetContainerMode() {
+    if (ContainerMenu::pMe) {
+        return ContainerMenu::pMe->eContainerMode;
+    }
+
+    return 0;
+}

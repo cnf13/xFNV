@@ -8,6 +8,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkRagdollController.h"
@@ -20,8 +21,6 @@
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"
@@ -56,7 +55,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModelExtraData.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/FaceGenNpcData.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -81,6 +79,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -199,6 +198,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/exception.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
@@ -213,7 +213,7 @@
 
 // The game settings this file defines, with their IDs and values, in their initialization order.
 BSSimpleList<TESNPC*> TESNPC::CharGenPresetFaceList;
-SettingT<GameSettingCollection> gs_fNPCGeneticVariation("fNPCGeneticVariation", 0.5f);
+SettingT<GameSettingCollection> TESNPC::fNPCGeneticVariation("fNPCGeneticVariation", 0.5f);
 SettingT<GameSettingCollection> TESNPC::iVampirismAgeOffset("iVampirismAgeOffset", 20);
 SettingT<GameSettingCollection> fAttributeClassPrimaryBonus("fAttributeClassPrimaryBonus", 5.0f);
 SettingT<GameSettingCollection> fAttributeClassSecondaryBonus("fAttributeClassSecondaryBonus", 5.0f);
@@ -452,7 +452,7 @@ bool TESNPC::Load(TESFile* apFile) {
                 apFile->GetChunkData(pfloats, imemsize);
                 for (uint32_t i = 0; i < static_cast<uint32_t>(isize); ++i) {
                     if (apFile->QEndian()) {
-                        ENDIAN(pfloats[i], false);
+                        BSEndian(pfloats[i], false);
                     }
                     RaceFaceOffsetCoord[etype][esymm][i][0] = pfloats[i];
                 }
@@ -547,7 +547,7 @@ bool TESNPC::Load(TESFile* apFile) {
                     // LoadWord reads into a signed word; the face number is the same 2 bytes, unsigned.
                     apFile->LoadWord(reinterpret_cast<int16_t*>(&sLastRaceFaceNum));
                     if (apFile->QEndian()) {
-                        ENDIAN(sLastRaceFaceNum, false);
+                        BSEndian(sLastRaceFaceNum, false);
                     }
                 }
                 break;
@@ -1369,7 +1369,7 @@ bool TESNPC::Activate(
                             !pactor->GetGhost()) {
                             if (!pactor->IsKnockedOut()) {
                                 if (pactor->pCurrentProcess->GetPickpocketed()) {
-                                    const char* pMessage = gs_sNoPickPocketAgain.String();
+                                    const char* pMessage = sNoPickpocketAgain.String();
                                     std::sprintf(msg, "%s %s", pactor->GetFullName(), pMessage);
                                     Interface::ShowMessage(
                                         msg,
@@ -2201,7 +2201,7 @@ TESNPC::GetHeadPartModTextureFileName(RACE_HEAD_PART aePart, char* apFileName, u
 
 void TESNPC::GetHeadPartModTexture(RACE_HEAD_PART aePart, NiPointer<NiTexture>& aspTexture) {
     char acFileName[0x104];
-    if (BSFaceGenManager::bLoadFaceGenHeadEGTFiles.Bool() || this == pPlayer->GetObjectReference()) {
+    if (bLoadFaceGenHeadEGTFiles.Bool() || this == pPlayer->GetObjectReference()) {
         aspTexture = nullptr;
     }
     else if (aePart >= 1) {
@@ -3015,7 +3015,7 @@ void TESNPC::RandomizeHead(bool abKeepAge, bool abKeepGender, bool abKeepHairLen
     BSFaceGenManager::InitFaceGenCoord(&kOffsetCoord);
     TESActorBase::SEX eSex = GetSex();
     FR2MatrixVTC<float>(*pMeanFaceCoord)[2][2] = pFormRace->GetMeanFaceCoord(eSex);
-    BSFaceGenManager::RandomizeFaceGenetic(gs_fNPCGeneticVariation.Float(), pMeanFaceCoord, &kFaceCoord);
+    BSFaceGenManager::RandomizeFaceGenetic(TESNPC::fNPCGeneticVariation.Float(), pMeanFaceCoord, &kFaceCoord);
     float fGeoAge = BSFaceGenManager::GetFaceCoordAttribute(kFaceCoord, FANATT_AGE, FANTYPE_GEO);
     float fTexAge = BSFaceGenManager::GetFaceCoordAttribute(kFaceCoord, FANATT_AGE, FANTYPE_TEX);
     if (abKeepAge) {
@@ -3425,10 +3425,6 @@ void TESNPC::FillCharGenPresetList(TESRace* apRace, TESActorBase::SEX aeSex, BSS
     }
 }
 
-void bhkRagdollController::SetLookAtMaxAngle(bhkRagdollController::LookIKBone aeBone, float afMaxAngle) {
-    BoneParamA[aeBone].fLookAtMaxAngle = afMaxAngle;
-}
-
 BIPOBJECT* BipedAnim::QBufferedObjects() {
     return this->bufferedObjects;
 }
@@ -3493,14 +3489,4 @@ bool TESRace::GetFaceGenTexturing() {
 
 NiFixedString* FixedStrings::QSkin() {
     return FixedStrings::pSkin;
-}
-
-// Allocate the base map only when its slot is empty.
-void NiTexturingProperty::SetBaseFilterMode(FilterMode eMode) {
-    Map* pkMap = m_kMaps[BASE_INDEX];
-    if (!pkMap) {
-        pkMap = ::new Map;
-        m_kMaps.SetAt(BASE_INDEX, pkMap);
-    }
-    pkMap->SetFilterMode(eMode);
 }

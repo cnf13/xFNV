@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCullingProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"

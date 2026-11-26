@@ -2,6 +2,9 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/BSBlastNode.h"
+#include "BSShader/BSShaderManager.h"
+#include "BSShader/BSShaderNoLightingProperty.h"
+#include "BSShader/BSShaderProperty.h"
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
@@ -12,7 +15,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -28,6 +30,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 NiRTTI NiNode::ms_RTTI("NiNode", &NiAVObject::ms_RTTI);
@@ -944,4 +947,16 @@ bool NiNode::IsLeftFacingUp(NiAVObject* apObject, char* apString) {
 
 NiObject* NiNode::CreateObject() {
     return new NiNode;
+}
+
+// KEEP: unregistered. With a null apNode the return value is whatever the frame setup left in the return register:
+// the address of the function's exception registration record on the stack. src cannot express that return (the
+// strict check DIFFs on it, checkbody 29d4f0babe86).
+void NiNode::SetWireframe(NiNode* apNode) {
+    if (apNode) {
+        BSShaderNoLightingProperty* pProperty = new BSShaderNoLightingProperty;
+        pProperty->SetFlag(BSShaderProperty::BSSP_FLAG_WIREFRAME, true);
+        apNode->AttachProperty(pProperty);
+        BSShaderManager::PrepareObject(apNode, false, false);
+    }
 }

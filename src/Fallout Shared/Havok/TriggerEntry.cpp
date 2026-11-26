@@ -1,7 +1,7 @@
 #include "Fallout Shared/Havok/TriggerEntry.h"
 
 #include "BSCore/BSList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectREFR.h"

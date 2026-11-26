@@ -405,10 +405,34 @@ void ImageSpaceEffectHDR::SetParams(float* apfData) {
     pfData = apfData;
 }
 
-// Cmd_ClearAdaptedLight calls this directly.
+// Script::ClearAdaptedLight calls this directly.
 void ImageSpaceEffectHDR::ClearAdaptedLight() {
     if (kAdaptedLight.GetTexture()) {
         kAdaptedLight.ReturnRenderedTexture();
         kAdaptedLight.ClearTexture();
     }
+}
+
+ImageSpaceEffectHDR::ImageSpaceEffectHDR() : pfData(pfDefaultHDRData) {
+    pTextures.SetSize(3u);
+}
+
+// The thirteen shader parameters are the effect's: each is deleted and its slot emptied.
+ImageSpaceEffectHDR::~ImageSpaceEffectHDR() {
+    for (uint32_t i = 0; i < 13; ++i) {
+        if (pEffectParamList.m_pBase[i].m_pObject) {
+            delete pEffectParamList.m_pBase[i].m_pObject;
+            pEffectParamList.SetAt(i, nullptr);
+        }
+    }
+}
+
+// The HDR getters read one float of the data record each: eye adapt speed [0], blur passes [1], emissive multiplier
+// [3], target luminance [4], upper luminance clamp [5], bright scale [6], bright clamp [7].
+float ImageSpaceEffectHDR::GetEmissiveHDRMult() {
+    return pfData[3];
+}
+
+float ImageSpaceEffectHDR::GetNumBlurPasses() {
+    return pfData[1];
 }

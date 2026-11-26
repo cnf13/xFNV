@@ -2,8 +2,9 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
+#include "BSMain/XINISetting.h"
 #include "BSSystem/Archive.h"
 #include "BSSystem/BSArchive.h"
 #include "BSSystem/BSHash.h"
@@ -309,11 +310,4 @@ uint32_t TESModel::GetModelLength(TESForm* apObj) {
     }
 
     return 0;
-}
-
-// The group's master archive from the first set, else from the second.
-Archive* ArchiveManager::GetMasterArchive(ARCHIVE_TYPE_INDEX aeTypeIndex) {
-    NiPointer<Archive>& spMaster = spMasterArchives[0][aeTypeIndex] ? spMasterArchives[0][aeTypeIndex]
-                                                                    : spMasterArchives[1][aeTypeIndex];
-    return spMaster;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 
 class hkBallAndSocketConstraintCinfo;
 

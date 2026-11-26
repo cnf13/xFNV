@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 
@@ -132,4 +133,4 @@ extern SettingT<INISettingCollection> uLoadedAreaNonActorMemoryBudgetCap;
 extern SettingT<INISettingCollection> fMaxMsUsagePerFrame;
 extern SettingT<INISettingCollection> uCityLODBudgetAdjustment;
 
-extern SettingT<INISettingCollection> gs_uLightExcessGeometry_BudgetCaps;
+extern SettingT<INISettingCollection> uLightExcessGeometryBudgetCap;

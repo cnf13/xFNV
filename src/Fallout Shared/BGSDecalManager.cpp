@@ -3,7 +3,6 @@
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkConvert.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkUtilFunctions.h"
 #include "BSHavok/bhkWorld.h"
@@ -11,7 +10,9 @@
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/BSOcclusionQuery.h"
 #include "BSMain/BSUtilities.h"
+#include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderManager.h"
@@ -27,8 +28,8 @@
 #include "Fallout Shared/DecalData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/DecalCaster.h"
-#include "Fallout Shared/Havok/SpecificItemCollector.h"
 #include "Fallout Shared/Renderer.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESForm.h"
@@ -53,7 +54,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
@@ -70,6 +70,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVisibleArray.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -91,29 +92,21 @@ namespace bhkConvert {} // namespace bhkConvert
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> BGSDecalManager::fDecalLifetime("fDecalLifetime:Display", 10.0f);
-SettingT<RendererSettingCollection> gs_iMaxDecalsPerFrame_Display("iMaxDecalsPerFrame:Display", 10);
+SettingT<RendererSettingCollection> BGSDecalManager::iMaxDecalsPerFrame("iMaxDecalsPerFrame:Display", 10);
 SettingT<RendererSettingCollection> BGSDecalManager::iMaxSkinDecalsPerFrame("iMaxSkinDecalsPerFrame:Display", 3);
-SettingT<RendererSettingCollection> gs_uMaxDecals_Decals("uMaxDecals:Decals", 100);
-SettingT<INISettingCollection> gs_uMaxSkinDecals_Decals("uMaxSkinDecals:Decals", 24u);
+SettingT<RendererSettingCollection> BGSDecalManager::iMaxDecals("uMaxDecals:Decals", 100);
+SettingT<INISettingCollection> BGSDecalManager::iMaxSkinDecals("uMaxSkinDecals:Decals", 24u);
 SettingT<INISettingCollection> BGSDecalManager::iMaxSkinDecalPerActor("uMaxSkinDecalPerActor:Decals", 3u);
-SettingT<INISettingCollection> gs_bProfileDecals_Decals("bProfileDecals:Decals", false);
+SettingT<INISettingCollection> BGSDecalManager::bProfileDecals("bProfileDecals:Decals", false);
 SettingT<INISettingCollection> BGSDecalManager::bDebugDecals("bDebugDecals:Decals", false);
-SettingT<INISettingCollection> gs_bDecalOcclusionQuery_Decals("bDecalOcclusionQuery:Decals", true);
+SettingT<INISettingCollection> BGSDecalManager::bDecalOcclusionQuery("bDecalOcclusionQuery:Decals", true);
 SettingT<INISettingCollection> BGSDecalManager::bDecalMultithreaded("bDecalMultithreaded:Decals", false);
-SettingT<INISettingCollection> gs_bDecals_Decals("bDecals:Decals", true);
-SettingT<INISettingCollection> gs_bSkinnedDecals_Decals("bSkinnedDecals:Decals", true);
+SettingT<INISettingCollection> BGSDecalManager::bDecals("bDecals:Decals", true);
+SettingT<INISettingCollection> BGSDecalManager::bSkinnedDecals("bSkinnedDecals:Decals", true);
 SettingT<GameSettingCollection> fSprayDecalsDistance("fSprayDecalsDistance", 64.0f);
 SettingT<GameSettingCollection> fSprayDecalsGravity("fSprayDecalsGravity", 128.0f);
 SettingT<GameSettingCollection> iSprayDecalsDebug("iSprayDecalsDebug", 0);
 NiPointer<NiAVObject> BGSDecalManager::spDebugDecalBox;
-
-int32_t BSSM_ShaderPropertyIsLighting(NiShadeProperty* apShaderProp) {
-    if (!apShaderProp) {
-        return 0;
-    }
-    int32_t iShaderPropertyType = apShaderProp->GetShaderPropertyType();
-    return iShaderPropertyType >= 1 && iShaderPropertyType <= 12;
-}
 
 BGSDecalManager::BGSDecalManager()
   : spQueryTexture(nullptr), PendingSimpleDecalList(), DecalEmitterList(), spQueryAccum(nullptr),
@@ -255,12 +248,12 @@ void BGSDecalManager::AddDecal(
     );
     bClearQueryTexture = true;
     if (aeDecalType == BGSDecalManager::DECAL_TYPE_SIMPLE) {
-        if (gs_bDecals_Decals.Bool() && arDecalData.pAVObj && !arDecalData.pAVObj->GetNoDecals()) {
+        if (BGSDecalManager::bDecals.Bool() && arDecalData.pAVObj && !arDecalData.pAVObj->GetNoDecals()) {
             NiPoint3 kEyePos = pPlayer->GetLocationOnReference();
             float fDist = (arDecalData.pOrigin - kEyePos).Length();
             double fTicksPerMicrosecond = 1000.0;
             Start.u.LowPart = 0;
-            if (gs_bProfileDecals_Decals.Bool()) {
+            if (BGSDecalManager::bProfileDecals.Bool()) {
                 QueryPerformanceFrequency(&TicksPerSecond);
                 fTicksPerMicrosecond = static_cast<double>(TicksPerSecond.QuadPart) * 1e-06;
                 QueryPerformanceCounter(&Start);
@@ -271,7 +264,7 @@ void BGSDecalManager::AddDecal(
                 }
                 AddGeometryDecalRecurse(arDecalData);
             }
-            if (gs_bProfileDecals_Decals.Bool()) {
+            if (BGSDecalManager::bProfileDecals.Bool()) {
                 QueryPerformanceCounter(&End);
                 int64_t iTicks = End.QuadPart - Start.QuadPart;
                 BSsprintf(
@@ -286,24 +279,24 @@ void BGSDecalManager::AddDecal(
         }
     }
     else if (aeDecalType == BGSDecalManager::DECAL_TYPE_PROJECTED) {
-        if (gs_bSkinnedDecals_Decals.Bool() && arDecalData.pAVObj && !arDecalData.pAVObj->GetNoDecals()) {
+        if (BGSDecalManager::bSkinnedDecals.Bool() && arDecalData.pAVObj && !arDecalData.pAVObj->GetNoDecals()) {
             NiPoint3 kEyePos = pPlayer->GetLocationOnReference();
             NiBound kBound = arDecalData.pAVObj->GetWorldBound();
             double dDistance = (kBound.m_kCenter - kEyePos).Length();
             float fDist = dDistance - kBound.m_fRadius;
             if ((static_cast<double>(fDist) <= Renderer::GetSkinnedDecalLODStart() &&
-                 BGSDecalManager::iSkinnedDecalCount < gs_uMaxSkinDecals_Decals.UInt()) ||
+                 BGSDecalManager::iSkinnedDecalCount < BGSDecalManager::iMaxSkinDecals.UInt()) ||
                 abForceAdd) {
                 AddProjectedDecalRecurse(arDecalData);
             }
             else if (
-                BGSDecalManager::iSkinnedDecalCount >= gs_uMaxSkinDecals_Decals.UInt() &&
+                BGSDecalManager::iSkinnedDecalCount >= BGSDecalManager::iMaxSkinDecals.UInt() &&
                 BGSDecalManager::bDebugDecals.Bool()
             ) {
-                Warning("DECAL: Reached Max Skin Decal Limit! : %d", gs_uMaxSkinDecals_Decals.Int());
+                Warning("DECAL: Reached Max Skin Decal Limit! : %d", BGSDecalManager::iMaxSkinDecals.Int());
             }
         }
-        else if (gs_bSkinnedDecals_Decals.Bool() && arDecalData.pObjRefr) {
+        else if (BGSDecalManager::bSkinnedDecals.Bool() && arDecalData.pObjRefr) {
             NiPoint3 kEyePos = pPlayer->GetLocationOnReference();
             NiBound kBound = arDecalData.pObjRefr->Get3D()->GetWorldBound();
             double dDistance = (kBound.m_kCenter - kEyePos).Length();
@@ -313,19 +306,19 @@ void BGSDecalManager::AddDecal(
             if (pNode && !pAVObject->GetNoDecals()) {
                 arDecalData.pAVObj = pNode;
                 if ((static_cast<double>(fDist) <= Renderer::GetSkinnedDecalLODStart() &&
-                     BGSDecalManager::iSkinnedDecalCount < gs_uMaxSkinDecals_Decals.UInt()) ||
+                     BGSDecalManager::iSkinnedDecalCount < BGSDecalManager::iMaxSkinDecals.UInt()) ||
                     abForceAdd) {
                     AddProjectedDecalRecurse(arDecalData);
                 }
                 else if (
-                    BGSDecalManager::iSkinnedDecalCount >= gs_uMaxSkinDecals_Decals.UInt() &&
+                    BGSDecalManager::iSkinnedDecalCount >= BGSDecalManager::iMaxSkinDecals.UInt() &&
                     BGSDecalManager::bDebugDecals.Bool()
                 ) {
-                    Warning("DECAL: Reached Max Skin Decal Limit! : %d", gs_uMaxSkinDecals_Decals.Int());
+                    Warning("DECAL: Reached Max Skin Decal Limit! : %d", BGSDecalManager::iMaxSkinDecals.Int());
                 }
             }
         }
-        else if (gs_bDecals_Decals.Bool()) {
+        else if (BGSDecalManager::bDecals.Bool()) {
             arDecalData.pDirection.Unitize();
             if (!BGSDecalManager::pDecalCaster) {
                 float fSize = BSMAX(arDecalData.fDecalHeight, arDecalData.fDecalWidth);
@@ -373,7 +366,7 @@ void BGSDecalManager::AddDecal(
     }
     else if (
         aeDecalType == BGSDecalManager::DECAL_TYPE_PERMENANT_SIMPLE &&
-        gs_bDecals_Decals.Bool() &&
+        BGSDecalManager::bDecals.Bool() &&
         arDecalData.pAVObj &&
         !arDecalData.pAVObj->GetNoDecals()
     ) {
@@ -383,7 +376,7 @@ void BGSDecalManager::AddDecal(
 }
 
 bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) {
-    if (BGSDecalManager::iDecalsThisFrame < gs_iMaxDecalsPerFrame_Display.Int()) {
+    if (BGSDecalManager::iDecalsThisFrame < BGSDecalManager::iMaxDecalsPerFrame.Int()) {
         if (arDecalData.pAVObj) {
             const char* pName = arDecalData.pAVObj->m_kName.GetHandleString();
             if (pName &&
@@ -469,7 +462,7 @@ bool BGSDecalManager::AddGeometryDecalRecurse(DECAL_CREATION_DATA& arDecalData) 
                 pdecal = new BSTempEffectSimpleDecal(pdecalnode, BGSDecalManager::fDecalLifetime, arDecalData);
                 NiTriStrips* ptristrips = static_cast<NiTriStrips*>(arDecalData.pAVObj);
                 if (ptristrips->GetActiveTriangleCount() > 1000u &&
-                    gs_bDecalOcclusionQuery_Decals.Bool() &&
+                    BGSDecalManager::bDecalOcclusionQuery.Bool() &&
                     arDecalData.bUseOcclusionQuery) {
                     pdecal->bOcclusionQuery = true;
                     pdecal->bClearQueryTexture = bClearQueryTexture;
@@ -889,68 +882,6 @@ DECAL_CREATION_DATA::DECAL_CREATION_DATA()
     cSubTex(0), bPermanent(false), bUseOcclusionQuery(true), bUseParallaxOcclusion(false), bAlphaTesting(true),
     bAlphaBlending(false), ucParallaxOcclusionMaxPasses(0), bModelSpace(false), bForceFade(false), bTwoSided(false) {}
 
-bhkPickData::bhkPickData()
-  : hkLength(hkVector4::getZero()), pCache(nullptr), pCloseCollector(nullptr), pAllCollector(nullptr),
-    bPickFailed(false) {}
-
-const hkVector4& bhkPickData::GethkTo() {
-    CalcTo();
-    return m_to;
-}
-
-void bhkPickData::SetFrom(const hkVector4& arFrom) {
-    m_from = arFrom;
-}
-
-void bhkPickData::SetAllCollector(hkpAllRayHitCollector* apCollector) {
-    pAllCollector = apCollector;
-    pCloseCollector = nullptr;
-}
-
-void bhkPickData::SetClosestCollector(hkpClosestRayHitCollector* apCollector) {
-    pCloseCollector = static_cast<SpecificItemCollector*>(apCollector);
-    pAllCollector = nullptr;
-}
-
-bool bhkPickData::GetPickFailed() {
-    return bPickFailed;
-}
-
-void bhkPickData::SetLength(const hkVector4& arLength) {
-    hkLength = arLength;
-}
-
-void bhkPickData::SetTo(const hkVector4& arTo) {
-    SetLength(hkVector4::getZero());
-    m_to = arTo;
-}
-
-void bhkPickData::SetFilter(CFilter aiFilter) {
-    m_filterInfo = aiFilter;
-}
-
-void bhkPickData::NiSetFrom(const NiPoint3& arFrom) {
-    hkVector4 hkv;
-    this->SetFrom(NI2HK(hkv, arFrom));
-}
-
-void bhkPickData::NiSetTo(const NiPoint3& arTo) {
-    hkVector4 kTo;
-    SetTo(NI2HK(kTo, arTo));
-}
-
-// Builds the hit point in a Havok vector and converts it back to game units.
-void bhkPickData::NiCalcHitPoint(NiPoint3& arPoint) {
-    hkVector4 kPoint;
-    CalcHitPoint(kPoint);
-    HK2NI(arPoint, kPoint);
-}
-
-void bhkPickData::NiSetLength(const NiPoint3& arLength) {
-    hkVector4 kHkLength;
-    SetLength(NI2HK(kHkLength, arLength));
-}
-
 BGSDecalEmitter::BGSDecalEmitter(
     BSTempEffectParticle* apParticleData,
     BGSImpactData* apImpactData,
@@ -1133,18 +1064,7 @@ void DecalCaster::SetCollision(COL_LAYER aeLayer, bool abEnable) {
 
 // The fDecalLOD0:Display setting.
 float Renderer::GetDecalLODStart() {
-    return gs_fDecalLOD0_Display;
-}
-
-NiPoint3& HK2NINS(NiPoint3& arNiP, const hkVector4& arhkV) {
-    arNiP.x = arhkV.getSimdAt(0);
-    arNiP.y = arhkV.getSimdAt(1);
-    arNiP.z = arhkV.getSimdAt(2);
-    return arNiP;
-}
-
-float NI2HK(float afValue) {
-    return bhkConvert::fBS2HkScaleSC * afValue;
+    return Renderer::fDecalLODStart;
 }
 
 float BSTempEffect::GetLifetime() {
@@ -1169,71 +1089,4 @@ void BSTempEffectGeometryDecal::SetDecalParent(NiNode* apNode) {
 
 NiFixedString& FixedStrings::QSkinnedDecalNode() {
     return *Skinned_Decal_Node;
-}
-
-float NiAVObject::GetWorldScale() {
-    return m_kWorld.m_fScale;
-}
-
-uint32_t NiAVObject::GetNoDecals() {
-    return GetFlag(NiAVObject::NO_DECALS);
-}
-
-const NiRect<float>& NiCamera::GetViewPort() const {
-    return m_kPort;
-}
-
-// The products are rounded to float before the three-float constructor runs, and z is computed first.
-NiPoint3 NiPoint3::ComponentProduct(const NiPoint3& p0, const NiPoint3& p1) {
-    float fZ = p0.z * p1.z;
-    float fY = p0.y * p1.y;
-    float fX = p0.x * p1.x;
-    return NiPoint3(fX, fY, fZ);
-}
-
-uint32_t NiRenderer::LockCount() {
-    return m_kRendererLock.GetCurrentLockCount();
-}
-
-bool NiRenderer::GetInsideFrameState() {
-    return m_eFrameState == FRAMESTATE_INSIDE_FRAME || m_eFrameState == FRAMESTATE_INSIDE_OFFSCREEN_FRAME;
-}
-
-bool NiRenderer::Check_RenderTargetGroupActive(const char*, bool bExpectedValue) {
-    return GetInsideFrameState() && m_bRenderTargetGroupActive == bExpectedValue;
-}
-
-// The release build's lock count is always 0.
-uint32_t NiCriticalSection::GetCurrentLockCount() {
-    return 0;
-}
-
-hkpWorldRayCastInput::hkpWorldRayCastInput() : m_enableShapeCollectionFilter(false), m_filterInfo(0) {}
-
-hkpWorldRayCastOutput::hkpWorldRayCastOutput() : m_rootCollidable(nullptr) {}
-
-hkpWorldRayCastOutput::hkpWorldRayCastOutput(const hkpWorldRayCastOutput& __that)
-  : hkpShapeRayCastOutput(&__that), m_rootCollidable(__that.m_rootCollidable) {}
-
-void hkpAllRayHitCollector::reset() {
-    m_hits.clear();
-    hkpRayHitCollector::reset();
-}
-
-const hkArray<hkpWorldRayCastOutput, hkContainerHeapAllocator>& hkpAllRayHitCollector::getHits() const {
-    return m_hits;
-}
-
-hkpRayHitCollector::hkpRayHitCollector() {
-    reset();
-}
-
-hkpRayHitCollector::~hkpRayHitCollector() {}
-
-hkpShapeRayCastCollectorOutput::hkpShapeRayCastCollectorOutput() : m_hitFraction(1.0f), m_extraInfo(-1) {}
-
-hkpShapeRayCastCollectorOutput* hkpShapeRayCastCollectorOutput::hkpShapeRayCastCollectorOutput_() {
-    this->~hkpShapeRayCastCollectorOutput();
-    ::new (this) hkpShapeRayCastCollectorOutput;
-    return this;
 }

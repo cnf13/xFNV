@@ -8,6 +8,9 @@
 #include "BSCore/BSTFreeList.h"
 #include "BSCore/BSTStaticFreeList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/ThreadSafeStructures.h"
+#include "BSMain/XINISetting.h"
 #include "BSSystem/BSTMessageQueue.h"
 #include "BSSystem/BSTasklet.h"
 #include "BSSystem/BSTaskletData.h"
@@ -17,7 +20,6 @@
 #include "BSSystem/Win32/BSWin32TaskletData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/InventoryChanges.h"
-#include "Fallout Shared/LockFreeMap.h"
 #include "Fallout Shared/Pathfinding/ActorPathingMessage.h"
 #include "Fallout Shared/Pathfinding/NavMeshEdgeLocation.h"
 #include "Fallout Shared/Pathfinding/NavMeshRender.h"
@@ -662,16 +664,6 @@ void PathManagerImpl::SendMessageTo(const PathingMessage& aMsg) {
 
 void PathManagerImpl::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-void BSTaskletData::TaskYield() {
-    bYielding = true;
-}
-
-void BSTaskletGroup::WaitForCompletion(bool abPoll) {
-    if (pData && !pData->QComplete()) {
-        pData->WaitForCompletion(abPoll);
-    }
 }
 
 ActorPathingMessage& ActorPathingMessage::operator=(const ActorPathingMessage& aMsg) {

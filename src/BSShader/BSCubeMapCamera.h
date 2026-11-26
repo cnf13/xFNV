@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSShader/BSRenderedTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderedCubeMap.h"
 

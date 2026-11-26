@@ -3,7 +3,6 @@
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkEntityListener.h"
-#include "BSHavok/bhkTrapListener.h"
 #include "BSHavok/bhkWorld.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"

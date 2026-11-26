@@ -42,3 +42,5 @@ hkResult hkStreamReader::seek(int32_t offset, SeekWhence whence) {
 int32_t hkStreamReader::tell() const {
     return (-1);
 }
+
+hkStreamReader::~hkStreamReader() {}

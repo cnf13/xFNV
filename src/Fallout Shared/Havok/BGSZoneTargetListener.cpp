@@ -1,6 +1,7 @@
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkShapeCollection.h"

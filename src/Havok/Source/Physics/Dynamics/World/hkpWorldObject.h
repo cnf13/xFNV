@@ -167,3 +167,7 @@ extern hkTypeInfo hkpPropertyValueTypeInfo;
 extern hkTypeInfo hkpPropertyTypeInfo;
 extern hkClass hkpPropertyValueClass;
 extern hkClass hkpPropertyClass;
+
+inline hkpWorldObject* hkGetWorldObject(const hkpCollidable* collidable) {
+    return static_cast<hkpWorldObject*>(collidable->getOwner());
+}

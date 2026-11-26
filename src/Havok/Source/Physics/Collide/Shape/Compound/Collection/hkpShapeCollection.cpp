@@ -222,3 +222,5 @@ void hkpShapeCollection::initWeldingInfo(hkpWeldingUtility::WeldingType weldingT
 void hkpShapeCollection::setWeldingInfo(uint32_t key, int16_t weldingInfo) {
     ;
 }
+
+hkpShapeCollection::~hkpShapeCollection() {}

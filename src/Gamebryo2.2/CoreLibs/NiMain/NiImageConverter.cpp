@@ -3,7 +3,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDevImageConverter.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNIFImageReader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"

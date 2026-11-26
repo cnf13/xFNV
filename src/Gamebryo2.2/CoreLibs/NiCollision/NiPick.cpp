@@ -1,6 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiPick.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiCollisionTraversals.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"

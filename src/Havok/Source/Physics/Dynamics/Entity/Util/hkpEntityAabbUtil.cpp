@@ -15,44 +15,6 @@
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 
-// The left index climbs past the pairs below the middle one and the right index drops past those above it; the
-// recursion takes the left part, the loop the right one.
-int32_t hkAlgorithm::quickSortRecursive(hkValueIndexPair* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    hkAlgorithm::less<hkValueIndexPair> cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = d;
-        int32_t j = aiHigh;
-        const hkValueIndexPair str = apArr[(d + j) >> 1];
-        do {
-            while (cmpLess(apArr[i], str)) {
-                i++;
-            }
-            while (cmpLess(str, apArr[j])) {
-                j--;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                hkValueIndexPair tmp = apArr[j];
-                apArr[j] = apArr[i];
-                apArr[i] = tmp;
-            }
-            --j;
-            ++i;
-        }
-        while (i <= j);
-        if (d < j) {
-            j = hkAlgorithm::quickSortRecursive(apArr, d, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return j;
-        }
-        d = i;
-    }
-}
-
 void hkpEntityAabbUtil::entityBatchInvalidateAabb(hkpEntity* const* entityBatch, int32_t numEntities) {
     int32_t i;
     hkpCollidable::BoundingVolumeData* p_m_boundingVolumeData;
@@ -163,7 +125,7 @@ void hkpEntityAabbUtil::entityBatchRecalcAabb(
                         pairs[k].m_index = k;
                         pairs[k].m_value = childAabbs[k].m_min[0];
                     }
-                    hkAlgorithm::quickSortRecursive(pairs, 0, numChildShapes - 1, static_cast<uint8_t>(0));
+                    hkAlgorithm::quickSort(pairs, numChildShapes);
                 }
                 else if (numChildShapes == 1) {
                     pairs[0].m_index = 0;

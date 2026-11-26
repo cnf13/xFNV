@@ -1,5 +1,6 @@
 #include "SDK/FaceGen/algs.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/FaceGen/StrContainers.h"
 #include "SDK/FaceGen/algs.hpp"
 #include "SDK/FaceGen/assert.hpp"

@@ -24,8 +24,6 @@ public:
         int32_t aiCount
     ) override;
     using TESForm::Save;
+    static SettingT<GameSettingCollection> sFloraSuccessMessage;
+    static SettingT<GameSettingCollection> sFloraFailureMessage;
 };
-
-extern SettingT<GameSettingCollection> gs_sFloraSuccessMessage;
-
-extern SettingT<GameSettingCollection> gs_sFloraFailureMessage;

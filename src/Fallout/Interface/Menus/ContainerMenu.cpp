@@ -7,6 +7,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Font.h"
@@ -189,7 +190,7 @@ void ContainerMenu::DoEnter(int32_t aiID, Tile* apTarget) {
                 }
                 ContainerMenu::pCurrItem = plbCurrListbox->GetHighlightedData();
                 if (ContainerMenu::pCurrItem) {
-                    InventoryMenu::SetupItemDataTile(ContainerMenu::pCurrItem, pTiles[13]);
+                    Interface::PopulateItemStatsDisplay(ContainerMenu::pCurrItem, pTiles[13]);
                     pTiles[13]->Set(4003, 1);
                     const char* pcIconOne = ContainerMenu::pCurrItem->GetIconOne(nullptr);
                     pTiles[12]->Set(4044, pcIconOne, true);
@@ -570,7 +571,7 @@ void ContainerMenu::DisplayContainerMenuSubtitle(BSStringT<char> asText, BSSound
         pactor = dynamic_cast<Actor*>(ContainerMenu::pMe->pContainerRef);
     }
     if (asText.GetLength() &&
-        (gs_bGeneralSubtitles_Gameplay.Bool() || (pactor && static_cast<uint8_t>(pactor->GetShowSubtitles())))) {
+        (bGeneralSubtitles.Bool() || (pactor && static_cast<uint8_t>(pactor->GetShowSubtitles())))) {
         Tile* pTile = Tile::GetTileByName(ContainerMenu::pMe->pMenu, "CM_Subtitle");
         if (pTile) {
             pTile->Set(Tile::kTileValue_String, asText.pString, true);

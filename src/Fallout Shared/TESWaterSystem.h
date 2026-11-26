@@ -340,4 +340,13 @@ public:
     static SettingT<INISettingCollection> iAnimFPS;
     static SettingT<INISettingCollection> fNearWaterUnderFreq;
     static SettingT<INISettingCollection> fNearWaterUnderVolMult;
+    static SettingT<RendererSettingCollection> bUseWaterReflectionBlur;
+    static SettingT<RendererSettingCollection> iWaterBlurAmount;
+    static SettingT<INISettingCollection> bReflectExplosions;
+    static SettingT<INISettingCollection> bForceHighDetailLandReflections;
+    static SettingT<INISettingCollection> fWadingWaterQuadSize;
+    static SettingT<INISettingCollection> fWaterGroupHeightRange;
+    static SettingT<INISettingCollection> uMaxExteriorWaterReflections;
+    static SettingT<INISettingCollection> uMaxInteriorWaterReflections;
+    static SettingT<INISettingCollection> bUseBulletWaterDisplacements;
 };

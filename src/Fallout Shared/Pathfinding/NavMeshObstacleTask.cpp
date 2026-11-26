@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSTaskletData.h"
 #include "BSSystem/Win32/BSWin32TaskletData.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
@@ -286,19 +287,6 @@ int32_t ObstacleTaskData::SortOperationsFunction(const void* apOp1, const void* 
         }
     }
     return iResult;
-}
-
-BSTaskletData::BSTaskletData() : bYielding(false) {}
-
-BSTaskletData::~BSTaskletData() {}
-
-// The default task always runs.
-bool BSTaskletData::OnStartup() {
-    return true;
-}
-
-void BSTaskletData::operator delete(void* apMemory) {
-    ourFree(apMemory);
 }
 
 // The tasklets' timer (+0x1A1).

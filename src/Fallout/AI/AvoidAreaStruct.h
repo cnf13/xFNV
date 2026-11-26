@@ -12,7 +12,7 @@ class TESObjectSTAT;
 struct AvoidAreaStruct {
     AvoidAreaStruct();
 
-    bool LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer);
+    bool LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Saves the avoid node, fTimeExpire, afRadiationLevel and the two forms' IDs; HighProcess::SaveGame calls it on
     // each pListOfAvoidAreas item.

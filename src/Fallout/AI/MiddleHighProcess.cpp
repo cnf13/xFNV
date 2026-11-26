@@ -5,6 +5,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkBlendController.h"
@@ -22,7 +23,7 @@
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
 #include "BSShader/ShadowSceneNode.h"
@@ -595,7 +596,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                         break;
                     }
                     case PROCEDURE_SLEEP: {
-                        Interface::GetConsoleSelection();
+                        Interface::GetPickREFR();
                         break;
                     }
                     case PROCEDURE_EAT: {
@@ -780,7 +781,7 @@ void MiddleHighProcess::Update(MobileObject* apRef) {
                             char cDay = appCalendar.GetDay();
                             pActor->SetRunOnceExtraPackage(pPack, cDay);
                         }
-                        Interface::GetConsoleSelection();
+                        Interface::GetPickREFR();
                         if (!pPack->GetPackageSchedule()->PSData.iDuration) {
                             SetTarget(nullptr);
                             if (GetRunOncePackage()) {
@@ -3928,7 +3929,7 @@ void MiddleHighProcess::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     if (pActor && apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_ANIMATION)) {
         uint32_t uiAnimPosition = apSaveGameBuffer->StartVariableSizedValue();
         uint32_t uiAnimStart = apSaveGameBuffer->GetBufferPosition();
-        pAnimation->SaveGameBGS(apSaveGameBuffer);
+        pAnimation->SaveGame(apSaveGameBuffer);
         uint32_t uiAnimEnd = apSaveGameBuffer->GetBufferPosition();
         apSaveGameBuffer->SaveVariableSizedValue(uiAnimEnd - uiAnimStart, uiAnimPosition);
     }
@@ -4360,7 +4361,7 @@ void MiddleHighProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobi
     pCurrentSpell = reinterpret_cast<MagicItem*>(static_cast<uintptr_t>(iCurrentSpellID));
     pSaveLoadGameOLD->LoadNumericID(&iDesiredTargetID, 4u);
     pDesiredTarget = reinterpret_cast<MagicTarget*>(static_cast<uintptr_t>(iDesiredTargetID));
-    ActiveEffect::LoadActiveEffectListTES(pActiveEffectList, pActor);
+    ActiveEffect::LoadActiveEffectList(pActiveEffectList, pActor);
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
         pSaveLoadGameOLD->LoadGameDataOLD(&bDoneOnce, sizeof(bDoneOnce));
     }
@@ -4516,7 +4517,7 @@ void MiddleHighProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
             pList = pList->m_pkNext;
         }
     }
-    RunOncePackage.InitLoadGameBGS(apLoadGameBuffer);
+    RunOncePackage.InitLoadGame(apLoadGameBuffer);
     ActiveEffect::InitLoadActiveEffectList(apLoadGameBuffer, pActiveEffectList);
     if (pCurrentFurniture) {
         if (pCurrentFurniture->GetObjectReference()->GetFormType() == FURN_ID) {
@@ -4620,7 +4621,7 @@ void MiddleHighProcess::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, Mobi
     if (pProcess->GetRunOncePackage() && (aiFlags & 0) != 0)
     // The second test masks with 0, so the package's TES init never runs.
     {
-        RunOncePackage.InitLoadGameTES(aiFlags, aiOldFlags);
+        RunOncePackage.InitLoadGame(aiFlags, aiOldFlags);
     }
 
     // Each stored pointer's value is passed as the numeric form ID to resolve: the field holds the ID as untyped
@@ -4846,7 +4847,7 @@ void MiddleHighProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         pProcess->SetCurrentTorch(nullptr);
         pCurrentWeaponEffect = nullptr;
     }
-    RunOncePackage.RevertBGS(apLoadGameBuffer);
+    RunOncePackage.Revert(apLoadGameBuffer);
     Actor* pActor = apLoadGameBuffer->GetActor();
     if (pActor) {
         pProcess->SetSitSleepState(pActor, SIT_SLEEP_NORMAL, nullptr, 0x7F);
@@ -4942,11 +4943,11 @@ void MiddleHighProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
     }
     // The test masks with 0, so the package's TES revert never runs.
     if ((aiFlags & 0) != 0) {
-        RunOncePackage.RevertTES(aiFlags);
+        RunOncePackage.Revert(aiFlags);
     }
     if (pSaveLoadGameOLD->IsUnk048Zero()) {
         if ((aiFlags & CHANGE_REFR_ANIMATION) != 0 && pAnimation) {
-            pAnimation->RevertTES(pmob);
+            pAnimation->Revert(pmob);
         }
         ActiveEffect::RevertActiveEffectList(
             static_cast<BSSimpleList<ActiveEffect*>*>(static_cast<void*>(pActiveEffectList)),
@@ -8725,10 +8726,6 @@ bool MiddleHighProcess::EvaluateReferenceforSitSleep(TESObjectREFR* apRef, void*
         MiddleHighTempRefListChairBed.AddHead(apRef);
     }
     return false;
-}
-
-void bhkCharacterController::SetSupportNormal(const hkVector4& arNormal) {
-    hkSupportNorm = arNormal;
 }
 
 bool MagicSystem::CheckFlareFlag(FlareType aeFlareType, uint32_t aiFlareFlags) {

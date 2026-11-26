@@ -5,6 +5,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
@@ -343,7 +344,7 @@ Tile* MenuManager::ReloadMenu(int32_t aiMenuClass) {
                         return LoadingMenu::Create(nullptr, true, false);
                     }
                     case 1027: {
-                        return LevelUpMenu::CreateMenu();
+                        return LevelUpMenu::Create();
                     }
                     case 1008: {
                         ContainerMenu* pContainer = dynamic_cast<ContainerMenu*>(Menu::GetMenuByClass(1008));

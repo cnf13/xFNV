@@ -10,7 +10,7 @@
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
@@ -185,12 +185,4 @@ void hkTriangleShapeCinfo::Scale(float afScale) {
     m_vertexC.fY = m_vertexC.fY * afScale;
     m_vertexC.fZ = m_vertexC.fZ * afScale;
     m_vertexC.fW = afScale * m_vertexC.fW;
-}
-
-// Assumes hkpConvexShape's constructor from the shape type and the radius (the SDK's).
-hkpTriangleShape::hkpTriangleShape(const hkVector4& v0, const hkVector4& v1, const hkVector4& v2, float radius)
-  : hkpConvexShape(HK_SHAPE_TRIANGLE, radius), m_weldingInfo(0), m_isExtruded(0), m_vertexA(v0), m_vertexB(v1),
-    m_vertexC(v2) {
-    m_weldingType = hkpWeldingUtility::WELDING_TYPE_NONE;
-    m_extrusion.setZero4();
 }

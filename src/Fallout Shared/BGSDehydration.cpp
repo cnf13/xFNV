@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSDehydration.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSPlaceableWater.h"
 #include "Fallout Shared/Magic/SpellItem.h"
@@ -54,8 +54,8 @@ bool BGSDehydrationStage::Load(TESFile* apFile) {
 }
 
 void BGSDehydrationStageData::Endian() {
-    ENDIAN(iH20, false);
-    ENDIAN(pSickness, false);
+    BSEndian(iH20, false);
+    BSEndian(pSickness, false);
 }
 
 void BGSDehydrationStageData::Clear() {
@@ -243,9 +243,4 @@ BGSDehydrationStage** BGSDehydrationStage::AllocateStages(uint32_t aiStagesCount
         ppStages[i] = nullptr;
     }
     return ppStages;
-}
-
-// The engine's memcpy wrapper: it forwards to the CRT memcpy and returns its result.
-void* ourMemcpy(void* apDest, const void* apSrc, size_t aCount) {
-    return rt::memcpy(apDest, apSrc, aCount);
 }

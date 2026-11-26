@@ -1,12 +1,12 @@
 #include "Fallout Shared/Havok/TESArrowTargetListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkEntityListener.h"
 #include "BSHavok/bhkRigidBody.h"
+#include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/CombatFormulas.h"
-#include "Fallout Shared/Havok/bhkArrowTargetListener.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Fallout/AI/Combat/Projectile.h"
@@ -180,12 +180,4 @@ void TESArrowTargetListener::RemoveArrowTarget(hkVector4& aArrowCenterOfMassWorl
         ourFree(pGroup);
         TargetList.Remove(pGroup);
     }
-}
-
-bhkArrowTargetListener::bhkArrowTargetListener() : bhkEntityListener(0) {}
-
-bhkArrowTargetListener::~bhkArrowTargetListener() {}
-
-void bhkArrowTargetListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
 }

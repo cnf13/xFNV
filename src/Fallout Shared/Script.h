@@ -3,6 +3,7 @@
 #include "BSCore/BSCriticalSection.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/TESForm.h"
 
@@ -25,23 +26,6 @@ class TESQuest;
 
 enum COMPILER_NAME : int32_t;
 
-bool Cmd_GetIsCurrentWeather(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_IsWeaponSkillType(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_SameFactionAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-// Whether apRefObject and the actor apParam1 share a faction, into afReturnValue. apRefObject counts only when it is an
-// actor; apParam1 is read as an actor without a test. Cmd_SameFactionAsPC passes the player.
-bool Cmd_SameFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-// Stores 0 in afReturnValue and returns true: a condition function,
-// typed by its table slot.
-bool Cmd_SetArgTo0AndReturnTrue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_SameRaceAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_SameSexAsPC(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_SameRace(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_SameSex(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_IsWeaponInList(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_GetDefaultOpen(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_GetFactionRelation(TESObjectREFR* apRefObject, Actor* apParam1, void* apParam2, double& afReturnValue);
-bool Cmd_IsLastIdlePlayed(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
 void ClearPendingReferenceLists();
 
 // Header of a script's compiled data blob.
@@ -212,7 +196,7 @@ public:
     // The GetBaseActorValue evaluation; it passes aeActorValue on to Actor::GetBaseActorValue and
     // ActorValue::GetActorValueScriptName as their ActorValue::Index.
     static bool
-    GetBaseActorValue_Eval(Actor* apActor, ActorValue::Index aeActorValue, int32_t aiArg2, double* apResult);
+    GetBaseActorValueConditionFunction(Actor* apActor, ActorValue::Index aeActorValue, int32_t aiArg2, double* apResult);
     // The GetAlarmed condition.
     static bool
     GetAlarmedConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
@@ -225,7 +209,7 @@ public:
     static bool
     GetThreatRatioConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
     // The GetRadiationLevel condition.
-    static bool GetRadiationLevel(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetRadiationLevelConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
     // The IsCombatTarget condition.
     static bool
     IsCombatTargetConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
@@ -707,7 +691,7 @@ public:
         BSStringT<char>* apOut
     );
     // The ShowMessage script command: shows a message form as a message box with its buttons, or as a HUD message.
-    static bool ShowMessage(
+    static bool MessageFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -1429,7 +1413,7 @@ public:
     );
 
     // Script opcode: 1 while the current script effect has started.
-    static char ScriptEffectStart(
+    static char ScriptEffectStartFunction(
         SCRIPT_PARAMETER* apParameters,
         char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -1822,7 +1806,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool GetNoRumors(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetNoRumorsConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
     static bool RevertWorld(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
@@ -1853,7 +1837,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool TriggerHUDShudder(
+    static bool TriggerHUDShudderFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -1873,7 +1857,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool GetWeaponAnimType(
+    static bool GetWeaponAnimTypeFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -1913,7 +1897,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool DebugCombatPlan(
+    static bool DebugCombatPlanFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2092,7 +2076,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool SetAllReachable(
+    static bool TestDegradeFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2802,7 +2786,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool DumpNiUpdates(
+    static bool DumpNiUpdatesFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2813,7 +2797,7 @@ public:
         uint32_t& auiOffset
     );
     static void RemoveDelayedScriptActionReference(TESObjectREFR* apRef);
-    static bool RefreshINI(
+    static bool RefreshINIFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2823,7 +2807,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool SetOpenState(
+    static bool SetOpenStateFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2883,7 +2867,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool RefreshShaders(
+    static bool ReloadShaders(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -2913,7 +2897,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ToggleBorders(
+    static bool ToggleBordersFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3298,7 +3282,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ToggleMenus(
+    static bool ToggleMenusFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3358,7 +3342,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ShowViewerStrings(
+    static bool ShowViewerStringsFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3368,7 +3352,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ToggleLODLand(
+    static bool ToggleLODLandFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3388,7 +3372,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool HighlightBodyPart(
+    static bool HighlightBodyPartFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3398,7 +3382,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool HighlightAdditionalReference(
+    static bool HighlightAdditionalReferenceFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3408,7 +3392,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool DeactivateAllHighlights(
+    static bool DeactivateAllHighlightsFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3458,7 +3442,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ToggleNavMesh(
+    static bool ToggleNavMeshFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3568,7 +3552,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool SetImageSpaceGlowParamFunction(
+    static bool SetClipDistFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3658,7 +3642,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool AddSpell_Execute(
+    static bool AddSpellFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3699,7 +3683,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ShowAnim(
+    static bool ShowAnimFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3729,7 +3713,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool SaveGame_Execute(
+    static bool SaveGame(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3739,7 +3723,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool CopySaves(
+    static bool CopySaveGames(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3799,7 +3783,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool SetStage(
+    static bool SetStageFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3979,7 +3963,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool GetInCellParam(
+    static bool GetInCell(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -3989,7 +3973,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool GetInCell(
+    static bool GetInCellParam(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4109,7 +4093,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool PlayVATSCameras(
+    static bool PlayVATSCamerasFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4119,7 +4103,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ShowQuestLog(
+    static bool ShowQuestLogFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4449,7 +4433,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ForceGroupStrategy(
+    static bool ForceCombatGroupStrategyFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4539,7 +4523,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool MarkForDelete(
+    static bool MarkForDeleteFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4770,7 +4754,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool GetReputationThreshold(
+    static bool GetReputationThresholdFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4800,7 +4784,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool IsImageSpaceActive(
+    static bool IsImageSpaceActiveFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4810,7 +4794,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool ResetXP_Execute(
+    static bool ResetXPFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -4820,7 +4804,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool PlaceAtReticle(
+    static bool PlaceAtReticleFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -5271,7 +5255,7 @@ public:
         double& afReturnValue,
         uint32_t& auiOffset
     );
-    static bool IsLastIdlePlayedFunction(
+    static bool IsLastPlayedIdleFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,
@@ -5342,6 +5326,4300 @@ public:
         uint32_t& auiOffset
     );
     static bool GetChallengeCompletedFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static char OnActivateFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        void* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        void* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnAddFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnDropFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        void* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnSayToDoneFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnHitFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnHitWithFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnDeathFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnMurderFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnCombatEndFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnPackageStartFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnPackageEndFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnPackageChangeFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnLoadFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnMagicEffectHitFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnSellFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnTriggerFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnStartCombatFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnTriggerEnterFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnTriggerLeaveFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnResetFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnOpenFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnCloseFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnGrabFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnReleaseFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    static char OnDestructionStageChangeFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnFireFunction(
+        int32_t aiParameters,
+        int32_t aiCompiledParams,
+        TESObjectREFR* apRefObject,
+        int32_t aiContainer,
+        int32_t aiScript,
+        ScriptLocals* apScriptLocals,
+        double* afReturnValue
+    );
+    // The script event signature: reads thisObj and afReturnValue.
+    static char OnNPCActivateFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static bool ShowQuestsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleCombatStatsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleCollisionGeometryFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowFullScenegraphFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool Show1stPersonFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool HelpFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTerminalMenuPosFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool MovePipboyKnobFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CenterOnCellFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetGameSettingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetINISettingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetINISettingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CenterOnExteriorFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleHighProcess(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleLowProcess(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleMiddleLowProcess(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleMiddleHighProcess(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SpeakSoundFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleCellNode(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleConversationStatsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowFullQuestLogFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DumpTexturePalette(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CenterOnWorldFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddFaceAnimNoteFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PlayerSpellBook(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PrintAILists(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowQuestTargetsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool LoadGame(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TestAllCellsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RenderTestCellFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RenderTestHereFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool OutputMemContexts(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTargetRefractionFire(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowHeadTrackTarget(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetSkyParamFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowPivotFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetDebugTextFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleLiteBriteFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowWhoDetectsPlayer(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleCombatAI(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModifyWaterShader(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModifyWaterShaderShallowColor(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModifyWaterShaderDeepColor(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModifyWaterShaderReflectionColor(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RunCellTest(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StartAllQuests(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetGamma(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SendSherlockDebugPage(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DamageWeaponFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetWeaponHealthFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetDepthOfField(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCombatActionCostFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleCombatDebugFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowInventoryFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResetPerformanceTimers(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleDecalDebug(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetImageSpaceModifiersEnable(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleTestLight(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool OutputTextureUseMap(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearScreenBlood(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResetAllTerminals(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CloseAllMenusFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetConsoleOutputFileFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TestRaceSexTerminalFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DrawSkeleton(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTaskThreadUpdateSleepFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EnableWeaponModFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleProjectileDebugFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetLockedFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsMovingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsTurningFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetLOSFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveSpellFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetInSameCell(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetDisabledFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    // Whether apRefObject and the actor apParam1 share a faction, into afReturnValue. apRefObject counts only when it
+    // is an actor; apParam1 is read as an actor without a test. Script::SameFactionAsPCConditionFunction passes the
+    // player.
+    static bool
+    SameFactionConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    SameRaceConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    SameSexConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetDetected(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetItemCount(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SayToFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetScriptVariableConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool StartQuestFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StopQuestFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetQuestRunning(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsClass(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    // apRefObject is read as a reference: the body calls TESObjectREFR::GetObjectReference
+    // on it and Script::GetPCIsClassConditionFunction passes the player.
+    static bool
+    GetIsClassConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetIsRace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DropItemFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddTopicFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetAlertFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetAlertFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool LookFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StopLookFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EvaluatePackageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EnablePlayerControlsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DisablePlayerControlsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlayerControlsDisabledFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlayerControlsDisabledConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool PickIdleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsActionRefFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsFacingUpFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetKnockedStateFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsWeaponSkillTypeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsWeaponSkillTypeConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetCurrentAIPackageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsWaitingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsIdlePlayingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CompleteQuestFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetMinorCrimeCountFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetMajorCrimeCountFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetAggroRadiusViolatedFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetEnemyFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetAllyFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StartSandmanFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StartCannibalFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool HasBeenEatenFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetFatiguePercentageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetPCIsClassConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    GetPCIsRaceConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    GetPCIsSexConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    GetPCInFactionConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool SameFactionAsPC(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    SameFactionAsPCConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    SameRaceAsPCConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    SameSexAsPCConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool ModFactionRank(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool KillActorFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResurrectActorFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetWeatherPercentFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsCurrentWeatherConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetIsCurrentPackageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetSizeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveMeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DropMeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetFactionReaction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetFactionReaction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModFactionReaction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveAllItemsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsActorDetected(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetEquippedFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCellPublicFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetPCExpelledConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetPCFactionMurderConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetPCFactionMurderFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlayerEnemyofFactionConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetPlayerEnemyofFactionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPCFactionAttackConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetPCFactionAttackFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetSelfFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetContainerFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetForceRun(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetForceRun(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetForceSneak(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetForceSneak(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AdvanceLevelFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool HasMagicEffectFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetDefaultOpenConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool SetDefaultOpenFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowRaceMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetAnimActionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowNameMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsSpellTargetFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSModeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetSandmanFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetCannibalFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetChargenValue(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetCombatTargetFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPackageTargetFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSTargetHeightFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetGhostFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetGhostFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EquipItemFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool UnEquipItemFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetClassFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetRestrainedFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceFleeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsPlayableRace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetOffersServiceNowFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetGameSettingFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetActiveWeather(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceTakeCoverFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModBarterGoldFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetBarterGoldFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetBarterGoldFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModPCAttributeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetParentRefFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetBaseActorValueFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetOwnershipFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetOwnershipConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool SetOwnershipFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetCellOwnershipConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        TESForm* apParam2,
+        double& afReturnValue
+    );
+    static bool SetCellOwnershipFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCellFullNameFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetActorFullNameFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsLeftUpFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsRunningFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetFriendHitFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsInCombatFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetPackageDurationFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PlayMagicShader(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PlayMagicEffect(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StopMagicShader(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StopMagicEffect(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResetCellFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceWeather(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsActorUsingATorchFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetLevelFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsXBoxFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetInWorldspace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetInWorldspaceConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    GetPCMiscStatConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool ModScaleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool KillAllActorsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DispelFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DispelAllSpellsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DuplicateAllItemsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EssentailDeathReloadFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetShowQuestItemsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResetHealthFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetIgnoreFriendlyHitsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIgnoreFriendlyHitsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIgnoreFriendlyHitsConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetActorRefractionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetItemValueFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ReleaseWeatherOverride(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool Autosave(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsActorFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsEssentialFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PreloadMagicEffect(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPlayerMovingIntoNewSpaceFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetTimeDeadFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetLinkedRefFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DamageObjectFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTalkingActivatorActorFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowBarterMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddPerkFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RewardExperiencePointsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowRepairMenuFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddNoteFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveNoteFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddFactionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveFactionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetDispositionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowComputersInterface(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetHitLocationFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPC1stPersonFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetActorsAIFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearOwnershipFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetCauseofDeathFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsWeaponInListFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    IsWeaponInListConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool PlayIdleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ApplyImageSpaceModifier(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool FriendDispositionBoostFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCellImageSpace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowCharGenMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool UseWeaponFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EvaluateSpellConditionsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    ExistsConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetObjectiveCompletedConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetImageSpace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemovePerkFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DisableAllActors(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsFormTypeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlantedExplosiveFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CompleteAllObjectivesFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetHealthPercentageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ExitGame(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsCreatureType(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsCreatureTypeConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool ShowWarningFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TriggerEnterFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DisableNavMesh(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EnableNavMesh(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool HasPerkFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetFactionRelationConditionFunction(
+        TESObjectREFR* apRefObject,
+        Actor* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool IsLastPlayedIdleConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool SetPlayerTeammateFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlayerTeammateFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool OpenTeammateContainerFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearFactionPlayerEnemyFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowLockpickMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearDestructionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CastImmediateOnSelfFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    // apParam1 holds the alignment (TESActorBaseData::ALIGNMENT) as a pointer-sized value.
+    static bool
+    GetIsAlignmentConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool ResetQuestFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetQuestDelayFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool FireWeaponFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AgeRaceFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetConcussedConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool ShowBarberMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowPlasticSurgeonMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetWeaponHealthPercFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModWeaponHealthPercFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowCharGenMenuModValues(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ResetAIFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetRumbleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetNoActivationSound(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetLastHitCriticalFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetLocationSpecificLoadScreensOnlyFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RewardKarmaFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSBackAreaFreeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSFrontAreaFreeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsLockBrokenFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPS3Function(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPCFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSRightTargetVisibleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSLeftTargetVisibleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSBackTargetVisibleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetVATSFrontTargetVisibleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCritStageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsInCritStageFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    IsInCritStageConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool RemoveFromAllFactionsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetXPForNextLevelFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowLockpickMenuDebug(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceSave(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetSPECIALPoints(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddSPECIALPoints(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTagSkills(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddTagSkills(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SinFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CosFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TanFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SqrtFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool LogFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AbsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetQuestCompletedConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool IsGoreDisabledFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool FadeSFXFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowQuestStagesFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetSpellUsageNumberFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddFormToFormListFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddItemToLeveledListFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemapWaterTypeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetReputationFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddReputationFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveReputationFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddReputationExactFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveReputationExactFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool
+    GetReputationConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    // apParam2 holds the reputation type (ReputationType) as a pointer-sized value.
+    static bool
+    GetReputationPctConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetReputationThresholdConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool TriggerScreenSplatter(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearScreenSplatter(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetScreenSplatterTexture(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetScreenSplatterFade(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowTraitSelectMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveAllTypedItemsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsHardcoreFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetHardcoreFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DetonatePlacedExplosivesFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetOwnerLastTargetFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowRecipeMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowSlotMachineMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowBlackJackMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowRouletteMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetForceHitReactionFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetForceHitReactionConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool ShowCaravanMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool AddCardToPlayer(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetCasinoWinningsLevel(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCasinoWinningsLevel(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool UnlockChallengeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPlayerInRegion(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsPlayerInRegionConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool ObjectUnderReticleFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowTraitMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DisableHardcoreTracking(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsAlwaysHardcoreFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RemoveRecurringFromChallengeFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetDLCCountFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsDLCInstalledFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static char ActorOnEquipFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnEquipFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char ActorOnUnequipFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static char OnUnequipFunction(
+        SCRIPT_PARAMETER* paramInfo,
+        char* scriptData,
+        TESObjectREFR* thisObj,
+        TESObjectREFR* containingObj,
+        Script* scriptObj,
+        ScriptLocals* eventList,
+        double* afReturnValue,
+        uint32_t* opcodeOffsetPtr
+    );
+    static bool BeginTrace(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CalcPathToPointFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool CastFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DebugMilesPS3Function(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DisableLinkedPathPointsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool DumpMasterFileSeekData(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EnableLinkedPathPointsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EvalActorTextures(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ExportBetaComment(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceFileCacheFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ForceRSXCrashFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsClassDefaultFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsMyClassDefaultFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IgnoreRenderPass(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ModPCSkillFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool RunMemoryPass(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetCasinoCheatLevel(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetHDRParamFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetImageSpaceGlowParamFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowClassMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowSpellmakingMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ShowSurgeryMenu(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool StartMasterFileSeekData(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleActorMover(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleBoundVisGeometry(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleHDRDebugFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleMultibound(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TogglePathlinesFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleSPURenderBatchFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleSPUTransformUpdateFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ToggleScreenBloodTest(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool TrapUpdateFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetDepthOfFieldRange(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool SetTargetDOF(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsShieldOutFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsTorchOutFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetIsClassDefaultConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetIsMyClassDefaultConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetPersuasionNumberConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetPlayerHasLastRiddenHorseConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool GetTotalPersuasionNumberConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool
+    IsHorseStolenConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool IsPlayersLastRiddenHorseConditionFunction(
+        TESObjectREFR* apRefObject,
+        void* apParam1,
+        void* apParam2,
+        double& afReturnValue
+    );
+    static bool
+    IsShieldOutConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool
+    IsTorchOutConditionFunction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue);
+    static bool GetPersuasionNumberFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetTotalPersuasionNumberFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool GetPlayerHasLastRiddenHorseFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool IsHorseStolenFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    // The leveled list the script names is the TESLeveledList base of a leveled creature; the form it adds is the
+    // leveled list's owner as well.
+    static bool AddCreatureToLeveledListFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    // The leveled list the script names is the TESLeveledList base of a leveled actor; the form it adds is the
+    // leveled list's owner as well.
+    static bool AddNPCToLeveledListFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool PrintTrackedCellsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool ClearTrackedCellsFunction(
+        const SCRIPT_PARAMETER* apParameters,
+        const char* apCompiledParams,
+        TESObjectREFR* apRefObject,
+        TESObjectREFR* apContainer,
+        Script* apScript,
+        ScriptLocals* apScriptLocals,
+        double& afReturnValue,
+        uint32_t& auiOffset
+    );
+    static bool EnableCellTrackingFunction(
         const SCRIPT_PARAMETER* apParameters,
         const char* apCompiledParams,
         TESObjectREFR* apRefObject,

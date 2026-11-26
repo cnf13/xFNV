@@ -45,3 +45,5 @@ public:
 
 // The class's reflection record.
 extern hkClass hkpShapeCollectionFilterClass;
+
+inline hkpShapeCollectionFilter::~hkpShapeCollectionFilter() {}

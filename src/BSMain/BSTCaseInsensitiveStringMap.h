@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
 
 #include <cctype>

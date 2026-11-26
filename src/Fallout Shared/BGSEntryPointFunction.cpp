@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/MessageHandler.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -623,7 +623,7 @@ bool BGSEntryPointFunctionDataLeveledList::Load(TESFile* apFile) {
     uint32_t iFormID = 0;
     apFile->GetChunkData(&iFormID, 0);
     if (apFile->QEndian()) {
-        ENDIAN(iFormID, false);
+        BSEndian(iFormID, false);
     }
     pLeveledList = reinterpret_cast<TESLevItem*>(static_cast<uintptr_t>(iFormID));
     return true;
@@ -689,7 +689,7 @@ bool BGSEntryPointFunctionDataOneValue::Load(TESFile* apFile) {
     }
     apFile->GetChunkData(&fValue, 0);
     if (apFile->QEndian()) {
-        ENDIAN(fValue, false);
+        BSEndian(fValue, false);
     }
     return true;
 }
@@ -700,8 +700,8 @@ float BGSEntryPointFunctionDataOneValue::GetValue() {
 
 // Both values swapped for a big-endian file.
 void TwoValues::Endian() {
-    ENDIAN(fValue1, false);
-    ENDIAN(fValue2, false);
+    BSEndian(fValue1, false);
+    BSEndian(fValue2, false);
 }
 
 BGSEntryPointFunctionDataTwoValue::BGSEntryPointFunctionDataTwoValue()

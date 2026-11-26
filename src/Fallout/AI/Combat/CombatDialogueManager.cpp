@@ -1,6 +1,7 @@
 #include "Fallout/AI/Combat/CombatDialogueManager.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/BaseProcess.h"

@@ -11,6 +11,7 @@
 #include "Fallout Shared/Magic/EffectSetting.h"
 #include "Fallout Shared/Magic/EffectSettingCollection.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESHealthForm.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/PlayerCharacter.h"
@@ -24,10 +25,6 @@
 static SettingT<GameSettingCollection> sMagicCostliestEffectRequires("sMagicCostliestEffectRequires", "Requires ");
 static SettingT<GameSettingCollection> sMagicCostliestEffectSkillOf("sMagicCostliestEffectSkillOf", " Skill of ");
 static SettingT<GameSettingCollection> sMagicSchool("sMagicSchool", "Magic School");
-
-int32_t BSvsprintf(char* apString1, const char* apFormat, va_list aList) {
-    return std::vsprintf(apString1, apFormat, aList);
-}
 
 EffectItemList::EffectItemList() : BSSimpleList<EffectItem*>(), iHostileCount(0) {}
 
@@ -54,7 +51,7 @@ float EffectItemList::GetCost(Actor* apActor) {
     return 0.0f;
 }
 
-void EffectItemList::GetEffectsString(char* apBuffer, uint32_t auiSize) {
+void EffectItemList::BuildMenuString(char* apBuffer, uint32_t auiSize) {
     bool bDispositionFailure = false;
     StatsMenu::StatusDataList kStatusList;
     bool bMedicine = IsMedicine();
@@ -560,29 +557,6 @@ bool EffectItemList::HasScript(Script* apScript) {
         pIter = pNext ? static_cast<EffectItemList*>(pNext) : nullptr;
     }
     return bFound;
-}
-
-// The format's arguments are passed on as a va_list; the formatter's count is returned unchanged.
-int32_t BSsprintf(char* apString1, int32_t aiSize, const char* apFormat, ...) {
-    va_list vList;
-    va_start(vList, apFormat);
-    int32_t iResult = vsprintf_s(apString1, aiSize, apFormat, vList);
-    va_end(vList);
-    return iResult;
-}
-
-// strcpy_s's result (0 or an errno) is returned unchanged.
-int32_t BSstrcpy(char* apString1, int32_t aiSize, const char* apString2) {
-    return strcpy_s(apString1, aiSize, apString2);
-}
-
-int32_t BSstrcat(char* apString1, int32_t aiSize, const char* apString2) {
-    return strcat_s(apString1, aiSize, apString2);
-}
-
-// Rounds in the current floating-point rounding mode, not by truncation.
-int32_t FloatToInt(float someFloat) {
-    return NiFastFloatToInt(someFloat);
 }
 
 bool EffectSetting::IsDisabled() {

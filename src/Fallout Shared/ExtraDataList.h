@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSCoreUtils.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/BSStringT.h"
@@ -99,9 +100,6 @@ struct WORLD_LOCATION;
 
 template <class TKEY, class TVAL>
 class NiTMap;
-
-// The calling thread's id (GetCurrentThreadId).
-uint32_t BSGetCurrentThreadID();
 
 using D3DLOCKED_RECT = struct _D3DLOCKED_RECT;
 
@@ -376,7 +374,7 @@ public:
     // Saves the list's extra data.
     void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
     // Resolves the list's form IDs after a TES-format load; the reference and its base object are passed along.
-    void InitLoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags, TESObjectREFR* apRef, TESBoundObject* apBaseObject);
+    void InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, TESObjectREFR* apRef, TESBoundObject* apBaseObject);
     // Finishes the list's TES-format load for apRef.
     void FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, TESObjectREFR* apRef);
     // Writes the list's extra data chunks into the form record being saved.
@@ -954,7 +952,7 @@ public:
     void AddGuard(Actor* apActor);
     ExtraNavMeshPortal* GetNavMeshPortal();
     void DuplicateExtraListForContainer(ExtraDataList* apCopy);
-    void LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer);
+    void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     void GetWeaponIdleSound(BSSoundHandle& result);
     void SetWeaponIdleSound(const BSSoundHandle& afSound);
     void GetActivateLoopSound(BSSoundHandle& result);

@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkBvTreeShape.h"
 #include "BSHavok/bhkMoppBvTreeShape.h"
@@ -13,7 +14,7 @@
 #include "BSMain/MessageHandler.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderNoLightingProperty.h"
 #include "BSShader/ShadowLightShader.h"
@@ -24,11 +25,9 @@
 #include "Fallout Shared/Distant Terrain System/BGSTerrainChunk.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainNode.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/HavokError.h"
 #include "Fallout Shared/ModelLoader.h"
-#include "Fallout Shared/NiGeometryDataIteratorNiColorA.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESChildCell.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -55,8 +54,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -67,6 +66,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiVBBlock.h"
@@ -89,47 +89,41 @@
 #include <limits>
 
 NiPointer<NiTexturingProperty> TESObjectLAND::spTexturingProperty;
-SettingT<INISettingCollection> gs_fLandTextureTilingMult_Landscape("fLandTextureTilingMult:Landscape", 2.0f);
+SettingT<INISettingCollection> fLandTextureTilingMult("fLandTextureTilingMult:Landscape", 2.0f);
 static SettingT<INISettingCollection> bPreventSafetyCheck("bPreventSafetyCheck:Landscape", false);
 static SettingT<INISettingCollection> bCurrentCellOnly("bCurrentCellOnly:Landscape", false);
-SettingT<INISettingCollection> gs_iMaxGrassTypesPerTexure_Grass("iMaxGrassTypesPerTexure:Grass", 2);
-SettingT<INISettingCollection> gs_iGrassDensityEvalSize_Grass("iGrassDensityEvalSize:Grass", 2);
-SettingT<INISettingCollection> gs_fTexturePctThreshold_Grass("fTexturePctThreshold:Grass", 0.3f);
-SettingT<INISettingCollection> gs_iLandBorder1R_Landscape("iLandBorder1R:Landscape", 255);
-SettingT<INISettingCollection> gs_iLandBorder1G_Landscape("iLandBorder1G:Landscape", 255);
-SettingT<INISettingCollection> gs_iLandBorder1B_Landscape("iLandBorder1B:Landscape", 0);
-SettingT<INISettingCollection> gs_iLandBorder2R_Landscape("iLandBorder2R:Landscape", 0);
-SettingT<INISettingCollection> gs_iLandBorder2G_Landscape("iLandBorder2G:Landscape", 0);
-SettingT<INISettingCollection> gs_iLandBorder2B_Landscape("iLandBorder2B:Landscape", 0);
+SettingT<INISettingCollection> iMaxGrassTypesPerTexture("iMaxGrassTypesPerTexure:Grass", 2);
+SettingT<INISettingCollection> iGrassDensityEvalSize("iGrassDensityEvalSize:Grass", 2);
+SettingT<INISettingCollection> fTexturePctThreshold("fTexturePctThreshold:Grass", 0.3f);
+SettingT<INISettingCollection> iLandBorder1R("iLandBorder1R:Landscape", 255);
+SettingT<INISettingCollection> iLandBorder1G("iLandBorder1G:Landscape", 255);
+SettingT<INISettingCollection> iLandBorder1B("iLandBorder1B:Landscape", 0);
+SettingT<INISettingCollection> iLandBorder2R("iLandBorder2R:Landscape", 0);
+SettingT<INISettingCollection> iLandBorder2G("iLandBorder2G:Landscape", 0);
+SettingT<INISettingCollection> iLandBorder2B("iLandBorder2B:Landscape", 0);
 SettingT<INISettingCollection>
-    gs_sDefaultLandDiffuseTexture_Landscape("sDefaultLandDiffuseTexture:Landscape", "DirtWasteland01.dds");
+    TESObjectLAND::sDefaultLandDiffuseTexture("sDefaultLandDiffuseTexture:Landscape", "DirtWasteland01.dds");
 SettingT<INISettingCollection>
-    gs_sDefaultLandNormalTexture_Landscape("sDefaultLandNormalTexture:Landscape", "DirtWasteland01_N.dds");
-int32_t TESObjectLAND::iGrassEvalSize = gs_iGrassDensityEvalSize_Grass.Int();
-
-// The m_kBound field is read directly from the model data (the exe's shared getter has another class's offset, which
-// differs with 8-byte pointers).
-NiBound& NiGeometry::GetModelBound() {
-    return this->m_spModelData->m_kBound;
-}
+    TESObjectLAND::sDefaultLandNormalTexture("sDefaultLandNormalTexture:Landscape", "DirtWasteland01_N.dds");
+int32_t TESObjectLAND::iGrassEvalSize = iGrassDensityEvalSize.Int();
 
 // The quadrant byte needs no swap.
 void FILE_TEX_DATA::Endian() {
-    ENDIAN(iTextureID, false);
-    ENDIAN(sIndex, false);
+    BSEndian(iTextureID, false);
+    BSEndian(sIndex, false);
 }
 
 void FILE_TEX_VERT_DATA::Endian() {
-    ENDIAN(iVertIndex, false);
-    ENDIAN(fPercent, false);
+    BSEndian(iVertIndex, false);
+    BSEndian(fPercent, false);
 }
 
 void OBJ_LAND::Endian() {
-    ENDIAN(iFlags, false);
+    BSEndian(iFlags, false);
 }
 
 void FILE_HEIGHT_DATA::Endian() {
-    ENDIAN(fOffset, false);
+    BSEndian(fOffset, false);
 }
 
 TESObjectLAND::TESObjectLAND()
@@ -1080,16 +1074,16 @@ void TESObjectLAND::DrawLandBorder(bool bShow) {
                                 lineidx = ix;
                             }
                             if (lineidx % 2) {
-                                float fB = static_cast<double>(gs_iLandBorder1B_Landscape.Int()) / 255.0;
-                                float fG = static_cast<double>(gs_iLandBorder1G_Landscape.Int()) / 255.0;
-                                float fR = static_cast<double>(gs_iLandBorder1R_Landscape.Int()) / 255.0;
+                                float fB = static_cast<double>(iLandBorder1B.Int()) / 255.0;
+                                float fG = static_cast<double>(iLandBorder1G.Int()) / 255.0;
+                                float fR = static_cast<double>(iLandBorder1R.Int()) / 255.0;
                                 kOddColor = NiColorA(fR, fG, fB, 1.0f);
                                 pColor = &kOddColor;
                             }
                             else {
-                                float fB = static_cast<double>(gs_iLandBorder2B_Landscape.Int()) / 255.0;
-                                float fG = static_cast<double>(gs_iLandBorder2G_Landscape.Int()) / 255.0;
-                                float fR = static_cast<double>(gs_iLandBorder2R_Landscape.Int()) / 255.0;
+                                float fB = static_cast<double>(iLandBorder2B.Int()) / 255.0;
+                                float fG = static_cast<double>(iLandBorder2G.Int()) / 255.0;
+                                float fR = static_cast<double>(iLandBorder2R.Int()) / 255.0;
                                 kEvenColor = NiColorA(fR, fG, fB, 1.0f);
                                 pColor = &kEvenColor;
                             }
@@ -2187,13 +2181,13 @@ char TESObjectLAND::CalculateGrassParams() {
     if (!pLoadedData) {
         return 0;
     }
-    float fthreshold = gs_fTexturePctThreshold_Grass.Float();
+    float fthreshold = fTexturePctThreshold.Float();
     double dclamped = fthreshold < 0.0 ? 0.0 : fthreshold;
     fthreshold = dclamped;
     dclamped = fthreshold > 1.0 ? 0.9 : fthreshold;
     fthreshold = dclamped;
-    int32_t iMaxGrassTypesPerTexure = gs_iMaxGrassTypesPerTexure_Grass.Int();
-    TESObjectLAND::iGrassEvalSize = gs_iGrassDensityEvalSize_Grass.Int();
+    int32_t iMaxGrassTypesPerTexure = iMaxGrassTypesPerTexture.Int();
+    TESObjectLAND::iGrassEvalSize = iGrassDensityEvalSize.Int();
     if (TESObjectLAND::iGrassEvalSize != 1 &&
         TESObjectLAND::iGrassEvalSize != 2 &&
         TESObjectLAND::iGrassEvalSize != 4 &&
@@ -3610,9 +3604,9 @@ void TESObjectLAND::InitializeStatics() {
         198
     );
     TESObjectLAND::pDefTextTexSet = new BGSTextureSet;
-    BSsprintf(acPath, 260, "Landscape\\%s", gs_sDefaultLandDiffuseTexture_Landscape.String());
+    BSsprintf(acPath, 260, "Landscape\\%s", TESObjectLAND::sDefaultLandDiffuseTexture.String());
     TESObjectLAND::pDefTextTexSet->SetBGSTextureFilename(BGSTextureSet::TEXTYPE_BASE, acPath);
-    BSsprintf(acPath, 260, "Landscape\\%s", gs_sDefaultLandNormalTexture_Landscape.String());
+    BSsprintf(acPath, 260, "Landscape\\%s", TESObjectLAND::sDefaultLandNormalTexture.String());
     TESObjectLAND::pDefTextTexSet->SetBGSTextureFilename(BGSTextureSet::TEXTYPE_NORMAL, acPath);
     pDataHandler->pObjectList->lnk_Remove(TESObjectLAND::pDefTextTexSet);
     pTexture = new TESLandTexture;
@@ -3649,7 +3643,7 @@ void TESObjectLAND::InitializeStatics() {
             TESObjectLAND::pDefTriListBLOCK[itrivert++] = ival;
         }
     }
-    float ftilescalar = gs_fLandTextureTilingMult_Landscape.Float();
+    float ftilescalar = fLandTextureTilingMult.Float();
     if (ftilescalar == 0.0) {
         Warning("DEFAULT: INI setting fLandTextureTilingMult cannot be 0.");
         ftilescalar = 16.0f;
@@ -3709,74 +3703,4 @@ TESObjectLAND::LoadedLandData::~LoadedLandData() {}
 
 COORD_DATA::COORD_DATA() {}
 
-hkMoppBvTreeShapeCinfo::hkMoppBvTreeShapeCinfo() : m_code(nullptr), fScale(1.0f) {}
-
-NiDX9ShaderDeclaration* ShadowLightShader::GetLandShaderDecl() {
-    return spSplatTexturingShaderDecl;
-}
-
 TESGrassAreaParam::TESGrassAreaParam() : kGrassParam() {}
-
-// The cross product, unitized; a length not above 1e-6 (or NaN) gives the zero vector. The length is compared against
-// the double widening of 1e-6f.
-NiPoint3 NiPoint3::UnitCross(const NiPoint3& pt) const {
-    NiPoint3 kCross(y * pt.z - z * pt.y, z * pt.x - x * pt.z, x * pt.y - y * pt.x);
-    float fLength = kCross.Length();
-    if (fLength > 9.999999974752427e-07) {
-        return kCross / fLength;
-    }
-    return NiPoint3(0.0f, 0.0f, 0.0f);
-}
-
-void NiTexturingProperty::SetBaseMap(NiTexturingProperty::Map* pkMap) {
-    NiTexturingProperty::Map* pkOld = m_kMaps[BASE_INDEX];
-    if (pkMap != pkOld) {
-        delete pkOld;
-        m_kMaps.SetAt(BASE_INDEX, pkMap);
-    }
-}
-
-NiVBChip* NiVBChip::Create(
-    NiVBBlock* pkBlock,
-    IDirect3DVertexBuffer9* pkVB,
-    uint32_t uiOffset,
-    uint32_t uiSize,
-    uint32_t uiIndex
-) {
-    NiVBChip* pkChip;
-    pkChip = new NiVBChip;
-    if (pkChip) {
-        pkChip->m_uiIndex = uiIndex;
-        pkChip->m_pkBlock = pkBlock;
-        pkChip->m_pkVB = pkVB;
-        pkChip->m_uiOffset = uiOffset;
-        pkChip->m_uiSize = uiSize;
-        pkChip->m_uiLockFlags = 0;
-    }
-    return pkChip;
-}
-
-// An empty code at a zero offset and scale, not built yet.
-hkpMoppCode::hkpMoppCode() {
-    m_info.m_offset.setZero4();
-    m_buildType.m_storage = BUILD_NOT_SET;
-}
-
-// The code's bytes go with m_data.
-hkpMoppCode::~hkpMoppCode() {}
-
-const hkClass& hkpMoppCode::staticClass() {
-    return hkpMoppCodeClass;
-}
-
-void hkMemoryAllocator::bufFreeArray(void* p, int32_t numElem) {
-    bufFree(p, numElem);
-}
-
-hkBaseObject::hkBaseObject() {}
-
-hkBaseObject::~hkBaseObject() {}
-
-void hkBaseObject::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}

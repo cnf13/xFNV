@@ -1,5 +1,6 @@
 #include "Fallout Shared/DecalData.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 
@@ -75,12 +76,12 @@ void DecalData::Destruct(DecalData* apThis) {}
 // The sizes, then the parallax scale before the depth and shininess, then the colour. The parallax pass and flag bytes
 // need no swap.
 void DECAL_DATA_DATA::Endian() {
-    ENDIAN(fDecalMinWidth, false);
-    ENDIAN(fDecalMaxWidth, false);
-    ENDIAN(fDecalMinHeight, false);
-    ENDIAN(fDecalMaxHeight, false);
-    ENDIAN(fParallaxScale, false);
-    ENDIAN(fDepth, false);
-    ENDIAN(fShininess, false);
-    ENDIAN(iColor, false);
+    BSEndian(fDecalMinWidth, false);
+    BSEndian(fDecalMaxWidth, false);
+    BSEndian(fDecalMinHeight, false);
+    BSEndian(fDecalMaxHeight, false);
+    BSEndian(fParallaxScale, false);
+    BSEndian(fDepth, false);
+    BSEndian(fShininess, false);
+    BSEndian(iColor, false);
 }

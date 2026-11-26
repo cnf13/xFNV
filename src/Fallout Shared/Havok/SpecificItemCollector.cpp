@@ -1,6 +1,6 @@
 #include "Fallout Shared/Havok/SpecificItemCollector.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "Fallout/AI/MobileObject.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCollidable.h"
@@ -58,40 +58,4 @@ void SpecificItemCollector::SetMinHitFraction(float afValue) {
 
 void SpecificItemCollector::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-void bhkCollisionFilter::SetCollisionFlags(COL_LAYER aeLayer, uint64_t aiFlags) {
-    if (aeLayer >= L_CAMERA) {
-        bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
-            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFF00000000ull) |
-            (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags)))
-        );
-        bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
-            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFFull) |
-            (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags >> 32)) << 32)
-        );
-    }
-}
-
-hkpClosestRayHitCollector::hkpClosestRayHitCollector() {
-    reset();
-}
-
-// Keeps the hit when it is closer than the one held: the hit's output, its shape keys and its root collidable, and
-// the hit's fraction as the new early-out fraction.
-void hkpClosestRayHitCollector::addRayHit(const hkpCdBody& cdBody, const hkpShapeRayCastCollectorOutput& hitInfo) {
-    if (m_rayHit.m_hitFraction > static_cast<double>(hitInfo.m_hitFraction)) {
-        static_cast<hkpShapeRayCastCollectorOutput&>(m_rayHit) = hitInfo;
-        hkpRayHitCollector::shapeKeysFromCdBody(m_rayHit.m_shapeKeys, 8, cdBody);
-        // m_rootCollidable is not const because the game code that uses it takes it non-const, hence the const_cast.
-        m_rayHit.m_rootCollidable = const_cast<hkpCollidable*>(cdBody.getRootCollidable());
-        m_earlyOutHitFraction = hitInfo.m_hitFraction;
-    }
-}
-
-hkpClosestRayHitCollector::~hkpClosestRayHitCollector() {}
-
-void hkpClosestRayHitCollector::reset() {
-    m_rayHit.reset();
-    hkpRayHitCollector::reset();
 }

@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"

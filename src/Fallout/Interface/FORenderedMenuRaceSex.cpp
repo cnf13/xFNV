@@ -7,7 +7,7 @@
 #include "BSDevices/Controls.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Tile.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderManager.h"
@@ -172,8 +172,8 @@ void FORenderedMenuRaceSex::Initialize() {
     bFakeDistortActive = false;
     double dTime = static_cast<double>(appTimer.iLastTime);
     int32_t iRandom = rt::rand();
-    fNextFakeDistortTime = static_cast<double>(iRandom % gs_iDistortMaxInterval_InterfaceFX.Int()) + dTime;
-    fFakeDistortDuration = gs_fDistortDuration_InterfaceFX.Float();
+    fNextFakeDistortTime = static_cast<double>(iRandom % iDefaultDistortMaxInterval.Int()) + dTime;
+    fFakeDistortDuration = fDefaultDistortDuration.Float();
     NiColorA newcolor(0.0f, 0.0f, 0.0f, 0.0f);
     if (SystemColorManager::GetInstance()->GetColor(3, newcolor)) {
         SetTintColor(newcolor);
@@ -261,7 +261,7 @@ void FORenderedMenuRaceSex::Initialize() {
     fr.m_fTop = dTan * fHeightByWidth * faspectDelta;
     fr.m_bOrtho = false;
     pcam->SetViewFrustum(fr);
-    NiCamera::HandleEyeFinityFOVScale(pcam, fRenderedTerminalFOV.Float());
+    HandleEyeFinityFOVScale(pcam, fRenderedTerminalFOV.Float());
     NiUpdateData UpdateData2(0.0f, false, false);
     pcam->Update(UpdateData2);
     SetCamera(pcam);
@@ -426,8 +426,8 @@ void FORenderedMenuRaceSex::DoEffect(
     bool bApplyEffects = false;
     if (bApplyEffects) {
         ImageSpaceEffectTV::fPulse = fPulseCurrentBrighten;
-        ImageSpaceEffectTV::fDistortVerticalScale = gs_fDistortVerticalScale_InterfaceFX.Float();
-        ImageSpaceEffectTV::fDistortVerticalPosition = gs_fDistortHorizontalScale_InterfaceFX.Float();
+        ImageSpaceEffectTV::fDistortVerticalScale = fDefaultDistortVerticalScale.Float();
+        ImageSpaceEffectTV::fDistortVerticalPosition = fDefaultDistortHorizontalScale.Float();
         ImageSpaceEffectTV::fDistortHorizontalScale = fDistortPos;
         NiColorA kResult;
         ImageSpaceEffectTV::Tint = *GetTintColor(&kResult);
@@ -441,8 +441,8 @@ void FORenderedMenuRaceSex::DoEffect(
         ImageSpaceEffectTV::Tint = kTint;
     }
     if (bFakeDistortActive && bApplyEffects) {
-        ImageSpaceEffectTV::fFakeDistortVerticalScale = gs_fDistortVerticalScale_InterfaceFX.Float();
-        ImageSpaceEffectTV::fFakeDistortVerticalPosition = gs_fDistortHorizontalScale_InterfaceFX.Float();
+        ImageSpaceEffectTV::fFakeDistortVerticalScale = fDefaultDistortVerticalScale.Float();
+        ImageSpaceEffectTV::fFakeDistortVerticalPosition = fDefaultDistortHorizontalScale.Float();
         ImageSpaceEffectTV::fFakeDistortHorizontalScale = fFakeDistortPosition;
     }
     else {
@@ -457,10 +457,10 @@ void FORenderedMenuRaceSex::DoEffect(
 
 void FORenderedMenuRaceSex::UpdateFakeDistort(float afTime) {
     fFakeDistortPosition = (afTime - fFakeDistortStartTime) / fFakeDistortDuration;
-    if (fFakeDistortPosition > gs_fDistortVerticalScale_InterfaceFX.Float() + 1.0) {
+    if (fFakeDistortPosition > fDefaultDistortVerticalScale.Float() + 1.0) {
         bFakeDistortActive = false;
         int32_t iRandom = rt::rand();
-        fNextFakeDistortTime = static_cast<double>(iRandom % gs_iDistortMaxInterval_InterfaceFX.Int()) + afTime;
+        fNextFakeDistortTime = static_cast<double>(iRandom % iDefaultDistortMaxInterval.Int()) + afTime;
     }
 }
 
@@ -485,10 +485,6 @@ void FORenderedMenuRaceSex::TriggerFakeDistort() {
     bFakeDistortActive = true;
     fFakeDistortStartTime = static_cast<float>(appTimer.GetTime());
     fFakeDistortPosition = 0.0f;
-}
-
-Controls* Controls::GetInstance() {
-    return Controls::pInstance;
 }
 
 void RaceSexMenu::SetPlayerNode(NiNode* apNode) {

@@ -5,6 +5,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/BSNoise1D.h"
@@ -1093,7 +1094,7 @@ void SurgeryMenu::Draw3DElements() {
         BSCullingProcess* pCuller = Main::GetWorldSceneGraph()->pCuller;
         pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         NiCamera* pcam = SurgeryMenu::sp3DCamera.m_pObject;
-        NiCamera::HandleEyeFinityFOVScale(pcam, 0.15f);
+        HandleEyeFinityFOVScale(pcam, 0.15f);
         ShadowSceneNode* pssnode = BSShaderManager::GetShadowSceneNode(1);
         NiPointer<BSShaderAccumulator> spaccum(InterfaceManager::Instance()->Get3dAccumulator());
         pCuller->SetAccumulator(spaccum.m_pObject);

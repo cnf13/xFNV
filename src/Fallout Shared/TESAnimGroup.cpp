@@ -3,11 +3,12 @@
 #include "BSAudio/BSWin32Audio.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESBipedModelForm.h"
+#include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESObjectARMO.h"
 #include "Fallout Shared/TESObjectWEAP.h"
 #include "Fallout Shared/TESScriptFunctions.h"
@@ -18,9 +19,9 @@
 #include "Fallout/Audio/ImpactMixer.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiTextKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiTextKeyExtraData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/string.h"
 
 #include <cstdint>
@@ -829,7 +830,7 @@ AnimGroupInfoArray animGroupInfo{
     {"JumpLandRight", false, AGS_MOVEMENT, AGAT_START_STOP, {AGA_START, AGA_STOP, AGA_NONE}}
 };
 
-char* GetNextLineInString(char* Str) {
+char* TESAnimGroup::GetTextKey(char* Str) {
     char* pcLine;
     for (pcLine = std::strchr(Str, 10); pcLine && *pcLine && (*pcLine == 13 || *pcLine == 10); ++pcLine) {
         ;
@@ -841,7 +842,7 @@ char* GetNextLineInString(char* Str) {
     return nullptr;
 }
 
-void GetMoveHandAndPowerArmorTypeFromAnimName(
+void TESAnimGroup::ParseAnimGroupFilename(
     const char* apPath,
     ANIM_GROUP_MOVE_ENUM* aeMove,
     ANIM_GROUP_WEAPON_ENUM* aeWeapon,
@@ -871,6 +872,436 @@ void GetMoveHandAndPowerArmorTypeFromAnimName(
             }
         }
     }
+}
+
+TESAnimGroup* TESAnimGroup::LoadAnimGroup(NiControllerSequence* apSequence, const char* apFilename) {
+    uint32_t uiNumKeys;
+    int32_t iIndex;
+    char cNonAccumName[68];
+    char bNoteProblem = 0;
+    TESAnimGroup* pAnimGroup = nullptr;
+    ANIM_GROUP_ENUM eGroupType = ANIM_GROUP_NONE;
+    int32_t iActionSlot = 0;
+    bool bPowerArmor = false;
+    ANIM_GROUP_MOVE_ENUM emove = AGM_NONE;
+    ANIM_GROUP_WEAPON_ENUM eWeapon = AGW_NONE;
+    MessageHandler::IncDisableWarningCount(true);
+    const char* pcRootName = apSequence->GetAccumRootName().GetHandleString();
+    uint32_t uiRootIndex = -1;
+    uint32_t uiNonAccumIndex = -1;
+    BSsprintf(cNonAccumName, 64, "%s NonAccum", pcRootName);
+    for (iIndex = 0; iIndex < apSequence->m_uiArraySize; ++iIndex) {
+        char pcObjectName[264];
+        apSequence->GetObjectNameAt(iIndex, pcObjectName);
+        if (pcObjectName[0]) {
+            if (BSstricmp(pcRootName, pcObjectName)) {
+                if (!BSstricmp(cNonAccumName, pcObjectName)) {
+                    uiNonAccumIndex = iIndex;
+                }
+            }
+            else {
+                uiRootIndex = iIndex;
+            }
+        }
+        else {
+            Warning("No object name at index %i for sequence '%s'.", iIndex, apSequence->m_kName.GetHandleString());
+        }
+        if (uiRootIndex != -1 && uiNonAccumIndex != -1) {
+            uint8_t ucPriority = apSequence->GetPriority(uiRootIndex);
+            apSequence->SetPriority(uiNonAccumIndex, ucPriority);
+            break;
+        }
+    }
+    ParseAnimGroupFilename(apFilename, &emove, &eWeapon, &bPowerArmor);
+    if (apSequence && apSequence->GetTextKeys()) {
+        NiTextKey* pKeys = apSequence->GetTextKeys()->GetKeys(uiNumKeys);
+        for (iIndex = 0; iIndex < uiNumKeys; ++iIndex) {
+            NiFixedString kText(pKeys[iIndex].m_kText);
+            float fKeyTime = pKeys[iIndex].m_fTime;
+            if (kText.Bool()) {
+                if (!_strnicmp(kText.GetHandleString(), "prn:", 4u)) {
+                    if (kText.GetHandleString()[4] == 32) {
+                        pAnimGroup->SetParentRootNode(kText.GetHandleString() + 5);
+                    }
+                    else {
+                        pAnimGroup->SetParentRootNode(kText.GetHandleString() + 4);
+                    }
+                }
+                else {
+                    char cKeyText[264];
+                    BSstrcpy(cKeyText, 260, kText.GetHandleString());
+                    char* pTextKey = cKeyText;
+                    while (pTextKey && BSstrlen(pTextKey)) {
+                        if (*pTextKey == 13) {
+                            pTextKey = GetTextKey(pTextKey);
+                        }
+                        uint32_t uiTagLength = BSstrlen(NiControllerSequence::pMorphTag);
+                        if (!_strnicmp(pTextKey, NiControllerSequence::pMorphTag, uiTagLength)) {
+                            if (!pAnimGroup->cMorphKey) {
+                                pAnimGroup->cMorphKey = pTextKey[2];
+                            }
+                        }
+                        else if (!_strnicmp(pTextKey, "BlendIn:", 8u)) {
+                            char cBlendInFrames;
+                            if (pTextKey[8] == 32) {
+                                cBlendInFrames = std::atoi(pTextKey + 9);
+                            }
+                            else {
+                                cBlendInFrames = std::atoi(pTextKey + 8);
+                            }
+                            pAnimGroup->cBlendInFrames = cBlendInFrames;
+                        }
+                        else if (!_strnicmp(pTextKey, "BlendOut:", 9u)) {
+                            char cBlendOutFrames;
+                            if (pTextKey[9] == 32) {
+                                cBlendOutFrames = std::atoi(pTextKey + 10);
+                            }
+                            else {
+                                cBlendOutFrames = std::atoi(pTextKey + 9);
+                            }
+                            pAnimGroup->SetBlendOutFrames(static_cast<uint8_t>(cBlendOutFrames));
+                        }
+                        else if (!_strnicmp(pTextKey, "Blend:", 6u)) {
+                            uint8_t ucBlendFrames;
+                            if (pTextKey[6] == 32) {
+                                ucBlendFrames = std::atoi(pTextKey + 7);
+                            }
+                            else {
+                                ucBlendFrames = std::atoi(pTextKey + 6);
+                            }
+                            pAnimGroup->SetBlend(ucBlendFrames);
+                        }
+                        else if (!_strnicmp(pTextKey, "Decal:", 6u)) {
+                            uint8_t ucDecal;
+                            if (pTextKey[6] == 32) {
+                                ucDecal = std::atoi(pTextKey + 7);
+                            }
+                            else {
+                                ucDecal = std::atoi(pTextKey + 6);
+                            }
+                            pAnimGroup->SetDecal(ucDecal);
+                        }
+                        else if (
+                            !_strnicmp(pTextKey, "Sound:", BSstrlen("Sound:")) ||
+                            !_strnicmp(pTextKey, "Enum:", BSstrlen("Enum:"))
+                        ) {
+                            bool bEnum = _strnicmp(pTextKey, "Enum:", BSstrlen("Enum:")) == 0;
+                            if (pAnimGroup) {
+                                char* pKeyValue;
+                                char cKeyValue[268];
+                                char* pcr = std::strchr(pTextKey, 13);
+                                if (pcr) {
+                                    *pcr = 0;
+                                }
+                                if (bEnum) {
+                                    pKeyValue = &pTextKey[BSstrlen("Enum: ")];
+                                }
+                                else {
+                                    pKeyValue = &pTextKey[BSstrlen("Sound: ")];
+                                }
+                                BSstrcpy(cKeyValue, 260, pKeyValue);
+                                char* pVolume = nullptr;
+                                char* pPitch = nullptr;
+                                char* pSeparator = std::strchr(cKeyValue, 44);
+                                if (pSeparator) {
+                                    pVolume = pSeparator + 1;
+                                }
+                                else {
+                                    pSeparator = std::strchr(cKeyValue, 32);
+                                    if (pSeparator) {
+                                        pVolume = pSeparator + 1;
+                                    }
+                                }
+                                if (pSeparator) {
+                                    *pSeparator = 0;
+                                }
+                                if (pVolume) {
+                                    while (*pVolume == 32) {
+                                        ++pVolume;
+                                    }
+                                    pSeparator = std::strchr(pVolume, 44);
+                                    if (pSeparator) {
+                                        pPitch = pSeparator + 1;
+                                    }
+                                    else {
+                                        pSeparator = std::strchr(pVolume, 32);
+                                        if (pSeparator) {
+                                            pPitch = pSeparator + 1;
+                                        }
+                                    }
+                                    if (pSeparator) {
+                                        *pSeparator = 0;
+                                    }
+                                }
+                                char bBadNote = 0;
+                                if (bEnum) {
+                                    ANIM_ENUM i;
+                                    for (i = ANIM_ENUM_LEFT;
+                                         i < ANIM_ENUM_COUNT && BSstricmp(animEnumNames[i], cKeyValue);
+                                         i = static_cast<ANIM_ENUM>(i + 1)) {
+                                        ;
+                                    }
+                                    if (i >= ANIM_ENUM_COUNT) {
+                                        bBadNote = 1;
+                                    }
+                                    else {
+                                        uint32_t uiEnumData = iIndex | (pTextKey - cKeyText) << 8;
+                                        uint32_t uiSoundCount = pAnimGroup->soundCount;
+                                        pAnimGroup->SetSoundCount(uiSoundCount + 1);
+                                        pAnimGroup->SetSoundTime(uiSoundCount, fKeyTime);
+                                        pAnimGroup->SetSoundEnum(uiSoundCount, i, uiEnumData);
+                                    }
+                                }
+                                else {
+                                    TESSound* pSound = pDataHandler->GetSound(cKeyValue);
+                                    if (pSound) {
+                                        int32_t iSoundID = pSound->iFormID;
+                                        BSWin32Audio* pAudio = static_cast<BSWin32Audio*>(&BSAudio::QInstance());
+                                        pAudio->PrecacheSoundFromID(iSoundID, 0);
+                                        uint32_t uiSoundCount = pAnimGroup->soundCount;
+                                        pAnimGroup->SetSoundCount(uiSoundCount + 1);
+                                        pAnimGroup->SetSoundTime(uiSoundCount, fKeyTime);
+                                        pAnimGroup->SetSoundObject(uiSoundCount, pSound);
+                                        if (pVolume && *pVolume) {
+                                            float fVolume = std::atof(pVolume);
+                                            pAnimGroup->SetSoundVolume(uiSoundCount, fVolume);
+                                        }
+
+                                        if (pPitch) {
+                                            float fPitch = std::atof(pPitch);
+                                            pAnimGroup->SetSoundPitch(uiSoundCount, fPitch);
+                                        }
+                                    }
+                                    else {
+                                        bBadNote = 1;
+                                    }
+                                }
+                                if (bBadNote) {
+                                    float fFrame = fKeyTime * 30.0;
+                                    Warning(
+                                        "ANIMATION: Bad note string \"%s\" frame %d in \"%s\".",
+                                        pTextKey,
+                                        FloatToInt(fFrame),
+                                        apFilename
+                                    );
+                                    bNoteProblem = 1;
+                                }
+                                if (pcr) {
+                                    *pcr = 13;
+                                }
+                            }
+                        }
+                        else {
+                            ANIM_GROUP_ENUM aeType;
+                            for (aeType = ANIM_GROUP_IDLE; aeType < ANIM_GROUP_COUNT;
+                                 aeType = static_cast<ANIM_GROUP_ENUM>(aeType + 1)) {
+                                if (eGroupType != ANIM_GROUP_NONE) {
+                                    aeType = eGroupType;
+                                }
+                                const char* pcGroupName = animGroupInfo[aeType].pName;
+                                if (!BSstricmp(apSequence->m_kName.GetHandleString(), pcGroupName)) {
+                                    eGroupType = aeType;
+                                    uint32_t uiAction = animGroupInfo[aeType].eActions[iActionSlot];
+                                    if (uiAction != -1) {
+                                        if (aeType == ANIM_GROUP_SPECIAL_IDLE && iActionSlot == 1) {
+                                            uint32_t uiNameLength = BSstrlen(
+                                                animGroupActionNames[3][animGroupInfo[aeType].eAction]
+                                            );
+                                            if (!_strnicmp(
+                                                    pTextKey,
+                                                    animGroupActionNames[3][animGroupInfo[aeType].eAction],
+                                                    uiNameLength
+                                                )) {
+                                                uiAction = 3;
+                                                iActionSlot = 3;
+                                            }
+                                        }
+                                        if (animGroupInfo[aeType].eAction == AGAT_ATTACK && iActionSlot == 2) {
+                                            uint32_t uiNameLength = BSstrlen(
+                                                animGroupActionNames[3][animGroupInfo[aeType].eAction]
+                                            );
+                                            if (!_strnicmp(
+                                                    pTextKey,
+                                                    animGroupActionNames[3][animGroupInfo[aeType].eAction],
+                                                    uiNameLength
+                                                )) {
+                                                uiAction = 3;
+                                                iActionSlot = 3;
+                                            }
+                                        }
+                                        uint32_t uiNameLength = BSstrlen(
+                                            animGroupActionNames[uiAction][animGroupInfo[aeType].eAction]
+                                        );
+                                        if (!_strnicmp(
+                                                pTextKey,
+                                                animGroupActionNames[uiAction][animGroupInfo[aeType].eAction],
+                                                uiNameLength
+                                            )) {
+                                            if (!pAnimGroup) {
+                                                if (aeType == ANIM_GROUP_SPECIAL_IDLE) {
+                                                    pAnimGroup = new TESAnimGroup(aeType);
+                                                }
+                                                else {
+                                                    pAnimGroup = new TESAnimGroup(
+                                                        TESAnimGroup::AnimGroup(emove, eWeapon, aeType, bPowerArmor)
+                                                    );
+                                                }
+                                            }
+                                            if (fKeyTime > -1.0) {
+                                                pAnimGroup->SetTime(uiAction, fKeyTime);
+                                            }
+                                            if (animGroupInfo[aeType].eAction == AGAT_LOOP &&
+                                                apSequence->m_eCycleType) {
+                                                if (animGroupInfo[aeType].eSectionLayer != AGS_MOVEMENT) {
+                                                    Warning(
+                                                        "ANIMATION: '%s' should be a looping "
+                                                        "animation.",
+                                                        apFilename
+                                                    );
+                                                    bNoteProblem = 1;
+                                                }
+                                            }
+                                            else if (
+                                                animGroupInfo[aeType].eAction != AGAT_LOOP &&
+                                                apSequence->m_eCycleType == NiControllerSequence::CYCLE_LOOP
+                                            ) {
+                                                Warning(
+                                                    "ANIMATION: '%s' should NOT be a "
+                                                    "looping animation.",
+                                                    apFilename
+                                                );
+                                                bNoteProblem = 1;
+                                            }
+                                            ++iActionSlot;
+                                        }
+                                        else if (
+                                            iActionSlot == 5 || animGroupInfo[aeType].eActions[iActionSlot] == AGA_NONE
+                                        ) {
+                                            char* pcr = std::strchr(pTextKey, 13);
+                                            if (pcr) {
+                                                *pcr = 0;
+                                            }
+                                            float fFrame = fKeyTime * 30.0;
+                                            Warning(
+                                                "ANIMATION: Bad note string \"%s\" frame "
+                                                "%d in \"%s\".",
+                                                pTextKey,
+                                                FloatToInt(fFrame),
+                                                apFilename
+                                            );
+                                            if (pcr) {
+                                                *pcr = 13;
+                                            }
+                                            bNoteProblem = 1;
+                                        }
+                                    }
+                                    break;
+                                }
+                                if (aeType == eGroupType) {
+                                    break;
+                                }
+                            }
+                            if (aeType == ANIM_GROUP_COUNT) {
+                                Warning(
+                                    "ANIMATION: AnimGroup unable to find sequence '%s' in "
+                                    "model '%s'.",
+                                    apSequence->m_kName.GetHandleString(),
+                                    apFilename
+                                );
+                                bNoteProblem = 1;
+                                pTextKey = nullptr;
+                                iIndex = uiNumKeys;
+                            }
+                        }
+                        if (pTextKey) {
+                            pTextKey = GetTextKey(pTextKey);
+                        }
+                    }
+                }
+            }
+            else {
+                Warning(
+                    "ANIMATION: AnimGroup empty note key at time %.2f in sequence '%s' in model '%s'.",
+                    fKeyTime,
+                    apSequence->m_kName.GetHandleString(),
+                    apFilename
+                );
+                bNoteProblem = 1;
+            }
+        }
+        if (pAnimGroup) {
+            double dEndTime;
+            pAnimGroup->FillPriorityArray(apSequence);
+            ANIM_GROUP_ACTION groupAction = AGA_STOP;
+            switch (animGroupInfo[pAnimGroup->GetType()].eAction) {
+                case AGAT_ATTACK_POWER:
+                case AGAT_LOOPING_RELOAD: {
+                    dEndTime = pAnimGroup->GetTime(AGA_SPECIAL_IDLE_LOOP_STOP);
+                    break;
+                }
+                case AGAT_ATTACK: {
+                    double dLoopStopTime = pAnimGroup->GetTime(AGA_SPECIAL_IDLE_LOOP_STOP);
+                    if (pAnimGroup->GetTime(AGA_STOP) > dLoopStopTime) {
+                        pAnimGroup->SetTime(2u, pAnimGroup->GetTime(AGA_STOP));
+                    }
+                    [[fallthrough]];
+                }
+                case AGAT_ATTACK_THROW: {
+                    dEndTime = pAnimGroup->GetTime(AGA_ATTACK_STOP);
+                    break;
+                }
+                case AGAT_SPECIAL_IDLE_LOOP: {
+                    double dStopTime = pAnimGroup->GetTime(AGA_STOP);
+                    if (pAnimGroup->GetTime(AGA_START) > dStopTime) {
+                        pAnimGroup->SetTime(1u, pAnimGroup->GetTime(AGA_START));
+                    }
+                    double dLoopStopTime = pAnimGroup->GetTime(AGA_SPECIAL_IDLE_LOOP_STOP);
+                    if (pAnimGroup->GetTime(AGA_STOP) >= dLoopStopTime) {
+                        pAnimGroup->SetTime(2u, pAnimGroup->GetTime(AGA_SPECIAL_IDLE_STOP));
+                    }
+                    [[fallthrough]];
+                }
+                case AGAT_ATTACK_MINE:
+                case AGAT_ATTACK_SPIN: {
+                    dEndTime = pAnimGroup->GetTime(AGA_SPECIAL_IDLE_STOP);
+                    break;
+                }
+                case AGAT_EQUIP:
+                case AGAT_UNEQUIP: {
+                    groupAction = AGA_SPECIAL_IDLE_LOOP_STOP;
+                    [[fallthrough]];
+                }
+                default: {
+                    dEndTime = pAnimGroup->GetTime(groupAction);
+                    break;
+                }
+            }
+            if (pAnimGroup->GetTime(AGA_START) >= dEndTime) {
+                Warning(
+                    "ANIMATION: (%s) End frame is less than or equal to Start frame in \"%s\".",
+                    animGroupInfo[pAnimGroup->GetType()].pName,
+                    apFilename
+                );
+                bNoteProblem = 1;
+            }
+            if (pAnimGroup->cBlendFrames && (pAnimGroup->cBlendInFrames || pAnimGroup->cBlendOutFrames)) {
+                Warning(
+                    "ANIMATION: (%s) too many blend values in \"%s\". Blend %d, BlendIn %d, BlendOut %d",
+                    animGroupInfo[pAnimGroup->GetType()].pName,
+                    apFilename,
+                    pAnimGroup->cBlendFrames,
+                    pAnimGroup->cBlendInFrames,
+                    pAnimGroup->cBlendOutFrames
+                );
+                bNoteProblem = 1;
+            }
+        }
+    }
+    MessageHandler::IncDisableWarningCount(false);
+    if (bNoteProblem) {
+        Warning("ANIMATION: Animation group note problem. See %s file.", MessageHandler::GetWarningFileName());
+    }
+    return pAnimGroup;
 }
 
 TESAnimGroup::TESAnimGroup(uint16_t asType)
@@ -1318,10 +1749,12 @@ void TESAnimGroup::SetParentRootNode(const char* apName) {
     pParentName = apName;
 }
 
-void TESAnimGroup::SetupPriorities(BSAnimGroupSequence* apSequence) {
+// A KFModel's sequence is always a BSAnimGroupSequence (CreateSequenceFromFile wraps it in one).
+void TESAnimGroup::FillPriorityArray(NiControllerSequence* apSequence) {
     for (int32_t i = 0; i < 8; ++i) {
         if (pSoundPriorityBoneName[i]) {
-            cSectionPriority[i] = apSequence->GetPriority(pSoundPriorityBoneName[i], nullptr);
+            cSectionPriority[i] =
+                static_cast<BSAnimGroupSequence*>(apSequence)->GetPriority(pSoundPriorityBoneName[i], nullptr);
         }
     }
 }

@@ -1,16 +1,21 @@
 #pragma once
 
+#include "BSCore/BSSimpleList.h"
+#include "BSCore/BSString.h"
+#include "BSMain/BSTCaseInsensitiveStringMap.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.h"
+
 #include <stdint.h>
 
 class BlendSettingCollection;
 class GameSettingCollection;
 class INIPrefSettingCollection;
 class INISettingCollection;
-class RegSettingCollection;
-class RendererSettingCollection;
-
 template <class T>
 class NiTPrimitiveArray;
+class RegSettingCollection;
+class RendererSettingCollection;
+class TESFile;
 
 // A named configuration value: a union of the supported value types plus the setting's key.
 class Setting {
@@ -105,8 +110,7 @@ public:
 template <class T>
 class SettingT : public Setting {
 public:
-    // Each constructor stores the key and value, then registers the setting in its collection. Defined in
-    // Setting.cpp and instantiated there for every collection: the collections' headers include this one.
+    // Each constructor stores the key and value, then registers the setting in its collection.
     SettingT(const char* apID, Info aValue);
     SettingT(const char* apID, bool abValue);
     SettingT(const char* apID, float afValue);
@@ -148,90 +152,133 @@ public:
 template <class T>
 inline T* SettingT<T>::pCollection;
 
+template <class T>
+SettingT<T>::SettingT(const char* apID, Info aValue) : Setting(apID, aValue) {
+    GetCollection()->Add(this);
+}
+
+template <class T>
+SettingT<T>::SettingT(const char* apID, bool abValue) : Setting(apID, abValue) {
+    GetCollection()->Add(this);
+}
+
+template <class T>
+SettingT<T>::SettingT(const char* apID, float afValue) : Setting(apID, afValue) {
+    GetCollection()->Add(this);
+}
+
+template <class T>
+SettingT<T>::SettingT(const char* apID, int32_t aiValue) : Setting(apID, Info{.i = aiValue}) {
+    GetCollection()->Add(this);
+}
+
+template <class T>
+SettingT<T>::SettingT(const char* apID, uint32_t aiValue) : Setting(apID, Info{.uint = aiValue}) {
+    GetCollection()->Add(this);
+}
+
+template <class T>
+SettingT<T>::SettingT(const char* apID, const char* apString)
+  : Setting(apID, Info{.str = const_cast<char*>(apString)}) {
+    GetCollection()->Add(this);
+}
+
+// Unregisters the setting from its collection.
+template <class T>
+SettingT<T>::~SettingT() {
+    GetCollection()->Remove(this);
+}
+
+// Called on the setting's raw storage: does the Info constructor's work (Setting's constructor, SettingT's vtable, the
+// registration in the collection) by running that constructor in place.
+template <class T>
+void SettingT<T>::InitString(const char* apName, Setting::Info aValue) {
+    ::new (this) SettingT(apName, aValue);
+}
+
+// The collection, created on first use.
+template <class T>
+T* SettingT<T>::GetCollection() {
+    InitCollection();
+    return pCollection;
+}
+
+// Creates the collection in the engine's heap the first time it is needed.
+template <class T>
+void SettingT<T>::InitCollection() {
+    if (!pCollection) {
+        pCollection = new T();
+    }
+}
+
+template <class T>
+SettingT<T>& SettingT<T>::operator=(int32_t aiValue) {
+    SetInt(aiValue);
+    return *this;
+}
+
+template <class T>
+SettingT<T>& SettingT<T>::operator=(bool abValue) {
+    Setting::operator=(abValue);
+    return *this;
+}
+
+template <class T>
+SettingT<T>& SettingT<T>::operator=(float afValue) {
+    Setting::operator=(afValue);
+    return *this;
+}
+
+template <class T>
+SettingT<T>& SettingT<T>::operator=(const char* apString) {
+    Setting::operator=(apString);
+    return *this;
+}
+
+template <class T>
+bool SettingT<T>::operator==(bool abValue) {
+    return IsEqual(abValue);
+}
+
+template <class T>
+bool SettingT<T>::operator==(int32_t aiValue) {
+    return Setting::operator==(aiValue);
+}
+
 // Settings built with SettingT's constructors in their files' dynamic initialisers.
-extern SettingT<INISettingCollection> gs_bShowLoadingAreaMessage_General;
-extern SettingT<INISettingCollection> gs_bSelectivePurgeUnusedOnFastTravel_BackgroundLoad;
-extern SettingT<GameSettingCollection> gs_iLevCharLevelDifferenceMax;
-extern SettingT<GameSettingCollection> gs_iLevCreaLevelDifferenceMax;
-extern SettingT<GameSettingCollection> gs_iLevItemLevelDifferenceMax;
-extern SettingT<GameSettingCollection> gs_fCreatureCalcCombat;
+extern SettingT<INISettingCollection> bShowLoadingAreaMessage;
+extern SettingT<GameSettingCollection> fCreatureCalcCombat;
 
-// Settings built with SettingT<INISettingCollection>'s float and bool constructors in Renderer.cpp's dynamic
-// initialisers.
-extern SettingT<INISettingCollection> gs_fDecalLOD0_Display;
-extern SettingT<INISettingCollection> gs_bDoAmbientPass_Display;
-extern SettingT<INISettingCollection> gs_bDoDiffusePass_Display;
-extern SettingT<INISettingCollection> gs_bDoSpecularPass_Display;
-extern SettingT<INISettingCollection> gs_bDoTexturePass_Display;
+extern SettingT<GameSettingCollection> fConfidenceFoolhardy;
+extern SettingT<GameSettingCollection> fConfidenceAverage;
+extern SettingT<GameSettingCollection> fConfidenceBrave;
+extern SettingT<GameSettingCollection> fConfidenceCautious;
+extern SettingT<GameSettingCollection> fConfidenceCowardly;
 
-// BSFadeNode's fLODMultTrees; BSFadeNode.cpp's initialiser builds it with SettingT<INISettingCollection>'s float
-// constructor.
-extern SettingT<INISettingCollection> gs_fLODMultTrees_LOD;
+extern SettingT<INISettingCollection> bUseLinear;
+extern SettingT<INISettingCollection> bUseQuadratic;
+extern SettingT<INISettingCollection> bUseConstant;
 
-// Variable names use the gs_ prefix; a ":Section" suffix of a setting name is spelled _Section.
-extern SettingT<GameSettingCollection> gs_fConfidenceFoolhardy;
-extern SettingT<GameSettingCollection> gs_fConfidenceAverage;
-extern SettingT<GameSettingCollection> gs_fConfidenceBrave;
-extern SettingT<GameSettingCollection> gs_fConfidenceCautious;
-extern SettingT<GameSettingCollection> gs_fConfidenceCowardly;
+extern SettingT<GameSettingCollection> sBetMaxText;
 
-// The [LightAttenuation] ini settings: each is constructed by SettingT<INISettingCollection>'s constructors and
-// destroyed by its destructor at exit.
-extern SettingT<INISettingCollection> gs_fLinearRadiusMult_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_bOutQuadInLin_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_bUseLinear_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_fConstantValue_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_bUseQuadratic_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_fQuadraticValue_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_uLinearMethod_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_bUseConstant_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_fQuadraticRadiusMult_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_uQuadraticMethod_bLightAttenuation;
-extern SettingT<INISettingCollection> gs_fLinearValue_bLightAttenuation;
+extern SettingT<INISettingCollection> fPulseRate;
+extern SettingT<INISettingCollection> fVATSPulseRadius;
+extern SettingT<INISettingCollection> fVATSBurstDuration;
+extern SettingT<INISettingCollection> fVATSDistortVerticalScale;
+extern SettingT<INISettingCollection> fVATSScanDuration;
+extern SettingT<INISettingCollection> fVATSBurstIntensity;
+extern SettingT<INISettingCollection> iVATSDistortMaxInterval;
+extern SettingT<INISettingCollection> fVATSScanVerticalScale;
+extern SettingT<INISettingCollection> fVATSPulseIntensity;
+extern SettingT<INISettingCollection> fVATSPulseRate;
 
-extern SettingT<GameSettingCollection> gs_sBetMax;
-
-// These are constructed with SettingT<GameSettingCollection>'s float constructor.
-extern SettingT<GameSettingCollection> gs_fLeafRustleTimeScale;
-extern SettingT<GameSettingCollection> gs_fLeafRockSpeedSwayInfluence;
-extern SettingT<GameSettingCollection> gs_fLeafRustleSpeedSwayInfluence;
-extern SettingT<GameSettingCollection> gs_fLeafRustleAmountSwayInfluence;
-extern SettingT<GameSettingCollection> gs_fLeafRockAmountSwayInfluence;
-extern SettingT<GameSettingCollection> gs_fTreeNearDistanceBase;
-extern SettingT<GameSettingCollection> gs_fTreeSizeConversion;
-
-extern SettingT<INISettingCollection> gs_bEnableTrees_SpeedTree;
-extern SettingT<INISettingCollection> gs_fTreeForceCS_SpeedTree;
-extern SettingT<INISettingCollection> gs_fTreeForceBranchDimming_SpeedTree;
-extern SettingT<INISettingCollection> gs_fTreeForceLeafDimming_SpeedTree;
-extern SettingT<INISettingCollection> gs_fTreeForceMinBudAngle_SpeedTree;
-extern SettingT<INISettingCollection> gs_fTreeForceMaxBudAngle_SpeedTree;
-
-extern SettingT<INISettingCollection> gs_fPulseRate_InterfaceFX;
-extern SettingT<INISettingCollection> gs_fPulseRadius_VATS;
-extern SettingT<INISettingCollection> gs_fBurstDuration_VATS;
-extern SettingT<INISettingCollection> gs_fDistortVerticalScale_VATS;
-extern SettingT<INISettingCollection> gs_fScanModeDuration_VATS;
-extern SettingT<INISettingCollection> gs_fBurstIntensity_VATS;
-extern SettingT<INISettingCollection> gs_iDistortMaxInterval_VATS;
-extern SettingT<INISettingCollection> gs_fScanModeVerticalScale_VATS;
-extern SettingT<INISettingCollection> gs_fPulseIntensity_VATS;
-extern SettingT<INISettingCollection> gs_fPulseRate_VATS;
-extern SettingT<INISettingCollection> gs_fASFadeOutTime_Audio;
-
-extern SettingT<INIPrefSettingCollection> gs_fGamma_Display;
-
-// Variable names use the gs_ prefix; a ":Section" suffix of a setting name is spelled _Section.
-extern SettingT<GameSettingCollection> gs_fGrenadeHighArcSpeedPercentage;
-extern SettingT<GameSettingCollection> gs_fAVDCarryWeightsBase;
-extern SettingT<GameSettingCollection> gs_fSpeechDelay;
-extern SettingT<GameSettingCollection> gs_fTreeFarDistanceBase;
-extern SettingT<GameSettingCollection> gs_iUpdateGroups;
-extern SettingT<INIPrefSettingCollection> gs_iKillCamera_GamePlay;
-extern SettingT<GameSettingCollection> gs_iHoursToRespawnCell;
+extern SettingT<GameSettingCollection> fGrenadeHighArcSpeedMult;
+extern SettingT<GameSettingCollection> fAVDCarryWeightBase;
+extern SettingT<GameSettingCollection> iNumGroups;
+extern SettingT<INIPrefSettingCollection> iKillCamera;
 
 // The lip distance and the general-subtitle switch of the dialogue sound callback.
-extern SettingT<INIPrefSettingCollection> gs_bGeneralSubtitles_Gameplay;
+extern SettingT<INIPrefSettingCollection> bGeneralSubtitles;
 
 namespace LOD {
     namespace iFadeNodeMinNearDistance {
@@ -239,3 +286,219 @@ namespace LOD {
         uint32_t Get();
     } // namespace iFadeNodeMinNearDistance
 } // namespace LOD
+
+inline uint32_t MakeRGBA(uint32_t aiRed, uint32_t aiGreen, uint32_t aiBlue, uint32_t aiAlpha) {
+    return (aiRed << 24) | (static_cast<uint8_t>(aiGreen) << 16) | (static_cast<uint8_t>(aiBlue) << 8) |
+        static_cast<uint8_t>(aiAlpha);
+}
+
+// The warning printer the setting collections report duplicate keys through: it passes 1, the format and its arguments
+// as the va_list to SettingWarningV and returns that.
+int32_t SettingWarning(const char* apMessage, ...);
+// The va_list form, compiled empty: it returns 0. apArgs is the va_list, a pointer to the first variadic argument.
+int32_t SettingWarningV(int32_t aiType, const char* apMessage, char* apArgs);
+
+// Base of the setting stores (game settings, INI files): a backing file name and the open file handle. Root of the
+// collection hierarchy.
+class SettingCollection {
+public:
+    SettingCollection();
+    virtual ~SettingCollection();
+
+    virtual void Add(Setting* apSetting) = 0;
+    // Removes apSetting from the store.
+    virtual void Remove(Setting* apSetting) = 0;
+    // Fills apStrings with the settings' viewer strings.
+    virtual uint32_t GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) = 0;
+    // Writes rSetting to the store.
+    virtual bool WriteSetting(Setting& rSetting) = 0;
+    // Reads rSetting from the store.
+    virtual bool ReadSetting(Setting& rSetting) = 0;
+    // Opens the store: this base's opens nothing and returns false.
+    virtual bool Open(bool abWrite);
+    // Closes the store; this base's version returns true.
+    virtual bool Close();
+    // Writes every setting: this base's only says whether the store is open (pHandle not null). The derived
+    // WriteSettings call it qualified.
+    virtual bool WriteSettings();
+    // Reads every setting; this base's version only says whether the store is open (pHandle not null).
+    virtual bool ReadSettings();
+
+    // Reads every setting from the file apFileName, under the game setting memory context; false when it does not
+    // open (SettingCollection<Setting>::ReadSettingsFromFile).
+    bool ReadSettingsFromFile(const char* apFileName);
+    // Writes every setting to the collection's own file: opens pSettingFile, runs the virtual WriteSettings and
+    // closes it; false when there is no file name or it does not open.
+    bool WriteSettingsToFile();
+    // Copies apFileName into pSettingFile; null clears it (SettingCollection<Setting>::SetFileName).
+    void SetFileName(const char* apFileName);
+    // Sets the file path to apPath and opens it through the virtual Open with abWrite.
+    bool OpenPath(const char* apPath, bool abWrite);
+    void SetFileHandle(void* apHandle);
+
+    static void operator delete(void* apMemory);
+
+    char pSettingFile[260];
+    void* pHandle;
+};
+
+// A collection that keeps its settings in a linked list.
+class SettingCollectionList : public SettingCollection {
+public:
+    SettingCollectionList();
+
+    // SettingCollectionList<Setting>::GetViewerStrings.
+    uint32_t GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) override;
+    // SettingCollectionList<Setting>::Add.
+    void Add(Setting* apSetting) override;
+    // Unlinks apSetting from SettingsA (SettingCollectionList<Setting>::Remove).
+    void Remove(Setting* apSetting) override;
+    // Writes every setting through the virtual WriteSetting (the INI and registry collections share it).
+    bool WriteSettings() override;
+    // Reads every setting through the virtual ReadSetting under the game setting memory context; the INI and registry
+    // collections share it.
+    bool ReadSettings() override;
+    ~SettingCollectionList() override;
+
+    // The list of settings.
+    BSSimpleList<Setting*>* Head();
+    // The setting named apID, or null.
+    Setting* GetPtr(const char* apID);
+    BSSimpleList<Setting*>* Next(BSSimpleList<Setting*>* apList);
+    bool Get(const char* apID, Setting*& arpGS);
+
+    BSSimpleList<Setting*> SettingsA;
+};
+
+// The read and the close go through the virtual ReadSettings and Close.
+inline bool SettingCollection::ReadSettingsFromFile(const char* apFileName) {
+    alignas(AutoMemContext) uint8_t aucContext[sizeof(AutoMemContext)];
+    AutoMemContext* pContext = reinterpret_cast<AutoMemContext*>(aucContext);
+    ::new (aucContext)
+        AutoMemContext(MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 413);
+    bool bOpened = OpenPath(apFileName, false);
+    if (bOpened) {
+        ReadSettings();
+        Close();
+    }
+    pContext->~AutoMemContext();
+    return bOpened;
+}
+
+inline SettingCollection::SettingCollection() : pHandle(nullptr) {
+    pSettingFile[0] = 0;
+}
+
+inline bool SettingCollection::WriteSettings() {
+    return pHandle != nullptr;
+}
+
+inline bool SettingCollection::ReadSettings() {
+    return pHandle != nullptr;
+}
+
+inline void SettingCollection::SetFileName(const char* apFileName) {
+    if (apFileName) {
+        BSstrcpy(pSettingFile, 260, apFileName);
+    }
+    else {
+        pSettingFile[0] = 0;
+    }
+}
+
+// The map of settings by name that a setting collection keeps after SettingCollection's fields.
+class SettingCollectionMap : public SettingCollection {
+public:
+    SettingCollectionMap(uint32_t aiMapSize);
+
+    // Fills apStrings with every setting's viewer string; returns how many were added.
+    uint32_t GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) override;
+    // Adds apSetting to the map under its key; a key already there is reported through SettingWarning.
+    void Add(Setting* apSetting) override;
+    // Removes apSetting's key from the map.
+    void Remove(Setting* apSetting) override;
+    // Writes every setting of the map through the virtual WriteSetting.
+    bool WriteSettings() override;
+    // Reads every setting of the map through the virtual ReadSetting, under the game setting memory context.
+    bool ReadSettings() override;
+    ~SettingCollectionMap() override;
+
+    // The map of settings by name, without regard to case, so `setgs ixpbase` finds iXPBase.
+    BSTCaseInsensitiveStringMap<Setting*> Settings;
+};
+
+// The settings' viewer strings, one per setting in the collection's map; returns how many were added.
+inline uint32_t SettingCollectionMap::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 569);
+    uint32_t uiCount = 0;
+    const char* pKey;
+    Setting* pSetting;
+    NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
+    while (pkPos) {
+        Settings.GetNext(pkPos, pKey, pSetting);
+        if (pSetting) {
+            pSetting->GetViewerStrings(apStringsA);
+            ++uiCount;
+        }
+    }
+    return uiCount;
+}
+
+inline void SettingCollectionMap::Add(Setting* apSetting) {
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 539);
+    if (apSetting && apSetting->pKey) {
+        Setting* pExisting;
+        if (Settings.GetAt(apSetting->pKey, pExisting)) {
+            SettingWarning(
+                "DEFAULT: Setting key '%s' already used in map.\nSetting keys must be unique.\n",
+                apSetting->pKey
+            );
+        }
+        else {
+            Settings.SetAt(apSetting->pKey, apSetting);
+        }
+    }
+}
+
+inline void SettingCollectionMap::Remove(Setting* apSetting) {
+    if (apSetting && apSetting->pKey) {
+        Settings.RemoveAt(apSetting->pKey);
+    }
+}
+
+// Writes every setting of the map through the virtual WriteSetting; true when the store is open and every write
+// succeeded.
+inline bool SettingCollectionMap::WriteSettings() {
+    bool bResult = SettingCollection::WriteSettings();
+    if (bResult) {
+        const char* pKey;
+        Setting* pSetting;
+        NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
+        while (pkPos) {
+            Settings.GetNext(pkPos, pKey, pSetting);
+            if (pSetting) {
+                bResult &= WriteSetting(*pSetting);
+            }
+        }
+    }
+    return bResult;
+}
+
+// Reads every setting of the map through the virtual ReadSetting, under the game setting memory context; true when the
+// store is open and every read succeeded.
+inline bool SettingCollectionMap::ReadSettings() {
+    AutoMemContext kContext(MEM_CONTEXT_GAMESETTING, true, "..\\BSMain\\Setting.h", 632);
+    bool bResult = SettingCollection::ReadSettings();
+    if (bResult) {
+        const char* pKey;
+        Setting* pSetting;
+        NiTMapItem<const char*, Setting*>* pkPos = Settings.GetFirstPos();
+        while (pkPos) {
+            Settings.GetNext(pkPos, pKey, pSetting);
+            if (pSetting) {
+                bResult &= ReadSetting(*pSetting);
+            }
+        }
+    }
+    return bResult;
+}

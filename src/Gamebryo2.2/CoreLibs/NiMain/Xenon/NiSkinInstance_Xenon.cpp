@@ -11,7 +11,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -54,3 +54,14 @@ void NiSkinInstance::UpdateModelBound(NiBound& arBound) {
 	kWorldToSkin = m_spSkinData->m_kRootParentToSkin * kWorldToSkin;
 	arBound.Update(kWorldToSkin);
 }
+
+void NiSkinInstance::Deform(
+    [[maybe_unused]] NiGeometryDataIteratorNiPoint3* pkSrcVertex,
+    [[maybe_unused]] NiGeometryDataIteratorNiBlendWeights* pkWeights,
+    [[maybe_unused]] NiGeometryDataIteratorNiBlendIndices* pkIndices,
+    [[maybe_unused]] NiGeometryDataIteratorNiPoint3* pkSrcNormal,
+    [[maybe_unused]] uint32_t uiVertices,
+    [[maybe_unused]] NiPoint3* pkDstVertex,
+    [[maybe_unused]] NiPoint3* pkDstNormal,
+    [[maybe_unused]] uint32_t uiStride
+) {}

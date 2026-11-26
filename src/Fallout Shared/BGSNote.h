@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BGSPickupPutdownSounds.h"
 #include "Fallout Shared/TESFullName.h"
 #include "Fallout Shared/TESIcon.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cstdint>
 
@@ -220,3 +220,135 @@ public:
     static NiPixelFormat RGBA32;
     static NiPixelFormat RGBA64;
 };
+
+inline bool NiPixelFormat::operator==(const NiPixelFormat& kOther) const {
+    if (kOther.m_eFormat != m_eFormat) {
+        return false;
+    }
+    if (kOther.m_uFlags != m_uFlags) {
+        return false;
+    }
+    if (kOther.m_eTiling != m_eTiling) {
+        return false;
+    }
+    if (kOther.m_ucBitsPerPixel != m_ucBitsPerPixel) {
+        return false;
+    }
+    const uint32_t uiOtherHint = kOther.m_uiRendererHint;
+    const uint32_t uiHint = m_uiRendererHint;
+    if (uiOtherHint != uiHint && uiHint != 0xFFFFFFFFu && uiOtherHint != 0xFFFFFFFFu) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < static_cast<int32_t>(NUM_COMPS); ++i) {
+        if (kOther.m_akComponents[i].m_eComponent != m_akComponents[i].m_eComponent ||
+            kOther.m_akComponents[i].m_eRepresentation != m_akComponents[i].m_eRepresentation ||
+            kOther.m_akComponents[i].m_ucBitsPerComponent != m_akComponents[i].m_ucBitsPerComponent ||
+            kOther.m_akComponents[i].m_bSigned != m_akComponents[i].m_bSigned) {
+            return false;
+        }
+    }
+    return true;
+}
+
+inline bool NiPixelFormat::operator!=(const NiPixelFormat& kOther) const {
+    if (kOther.m_eFormat != m_eFormat) {
+        return true;
+    }
+    if (kOther.m_uFlags != m_uFlags) {
+        return true;
+    }
+    if (kOther.m_eTiling != m_eTiling) {
+        return true;
+    }
+    if (kOther.m_ucBitsPerPixel != m_ucBitsPerPixel) {
+        return true;
+    }
+    const uint32_t uiOtherHint = kOther.m_uiRendererHint;
+    const uint32_t uiHint = m_uiRendererHint;
+    if (uiOtherHint != uiHint && uiHint != 0xFFFFFFFFu && uiOtherHint != 0xFFFFFFFFu) {
+        return true;
+    }
+
+    for (int32_t i = 0; i < static_cast<int32_t>(NUM_COMPS); ++i) {
+        if (kOther.m_akComponents[i].m_eComponent != m_akComponents[i].m_eComponent ||
+            kOther.m_akComponents[i].m_eRepresentation != m_akComponents[i].m_eRepresentation ||
+            kOther.m_akComponents[i].m_ucBitsPerComponent != m_akComponents[i].m_ucBitsPerComponent ||
+            kOther.m_akComponents[i].m_bSigned != m_akComponents[i].m_bSigned) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// The mask is shifted logically (unsigned) after reversing the four bytes. Shift counts are explicitly masked so that
+// component widths above 32 behave as the game's shifts do.
+inline uint32_t NiPixelFormat::GetMask(Component eComp) const {
+    uint32_t uiShift = 0;
+    uint32_t uiComponent = 0;
+    for (; uiComponent < NUM_COMPS; ++uiComponent) {
+        if (m_akComponents[uiComponent].m_eComponent == eComp) {
+            break;
+        }
+        uiShift += m_akComponents[uiComponent].m_ucBitsPerComponent;
+    }
+    if (uiComponent == NUM_COMPS) {
+        return 0;
+    }
+
+    const uint8_t ucBits = m_akComponents[uiComponent].m_ucBitsPerComponent;
+    if (ucBits == 0) {
+        return 0;
+    }
+
+    uint32_t uiMask = 0;
+    for (uint32_t uiBit = ucBits - 1; uiBit != 0; --uiBit) {
+        uiMask += 1u << (uiBit & 31);
+    }
+    uiMask = (uiMask + 1) << (uiShift & 31);
+    if ((m_uFlags & LITTLE_ENDIAN_MASK) == 0) {
+        uiMask = (uiMask >> 24) | ((uiMask >> 8) & 0xFF00u) | ((uiMask << 8) & 0xFF0000u) | (uiMask << 24);
+        uiMask >>= (32u - m_ucBitsPerPixel) & 31;
+    }
+    return uiMask;
+}
+
+inline uint8_t NiPixelFormat::GetBits(Component eComp) const {
+    for (const NiComponentSpec& kComponent : m_akComponents) {
+        if (kComponent.m_eComponent == eComp) {
+            return kComponent.m_ucBitsPerComponent;
+        }
+    }
+    return 0;
+}
+
+inline bool NiPixelFormat::GetComponent(
+    uint32_t uiWhichComponent,
+    Component& areComponent,
+    Representation& eRep,
+    uint8_t& ucBPC,
+    bool& bSigned
+) const {
+    const NiComponentSpec& kComponent = m_akComponents[uiWhichComponent];
+    bSigned = kComponent.m_bSigned;
+    ucBPC = kComponent.m_ucBitsPerComponent;
+    eRep = kComponent.m_eRepresentation;
+    const Component eComponent = kComponent.m_eComponent;
+    areComponent = eComponent;
+    return eComponent != COMP_EMPTY;
+}
+
+inline uint32_t NiPixelFormat::GetNumComponents() const {
+    uint32_t result = 0;
+    for (const NiPixelFormat::NiComponentSpec* i = m_akComponents; i->m_eComponent != NiPixelFormat::COMP_EMPTY; ++i) {
+        if (++result >= 4) {
+            return 4;
+        }
+    }
+    return result;
+}
+
+inline int32_t NiPixelFormat::GetPalettized() const {
+    NiPixelFormat::Format m_eFormat = this->m_eFormat;
+    return m_eFormat == NiPixelFormat::FORMAT_PAL || m_eFormat == NiPixelFormat::FORMAT_PALALPHA;
+}

@@ -51,3 +51,9 @@ public:
     // hkSingleton<hkFileSystem>::s_instance.
     static inline hkFileSystem* s_instance;
 };
+
+inline hkFileSystem::hkFileSystem() {}
+
+inline hkResult hkFileSystem::listDirectory(const char* basePath, hkFileSystem::DirectoryListing& listingOut) {
+    return HK_FAILURE;
+}

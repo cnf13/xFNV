@@ -238,9 +238,3 @@ bool NavMeshSearchSLPoint::CheckPointOnGoalCircle(
     aOutValidPoint = arLocatiom;
     return true;
 }
-
-NiPoint2& NiPoint2::operator*=(float fScalar) {
-    x = x * fScalar;
-    y = y * fScalar;
-    return *this;
-}

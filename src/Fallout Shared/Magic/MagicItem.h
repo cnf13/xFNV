@@ -75,16 +75,16 @@ public:
     static inline int32_t iSummonedCreatureLoadedCount;
 };
 
-extern SettingT<GameSettingCollection> gs_sMagicCastSilenced;
+extern SettingT<GameSettingCollection> sMagicCastSilenced;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastMultipleBoundEffects;
+extern SettingT<GameSettingCollection> sMagicCastMultipleBoundEffects;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastOKText;
+extern SettingT<GameSettingCollection> sMagicCastOKText;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastInsufficientSkill;
+extern SettingT<GameSettingCollection> sMagicCastInsufficientSkill;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastPowerUsed;
+extern SettingT<GameSettingCollection> sMagicCastPowerUsed;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastInsufficientMagicka;
+extern SettingT<GameSettingCollection> sMagicCastInsufficientMagicka;
 
-extern SettingT<GameSettingCollection> gs_sMagicCastRangedUnderwater;
+extern SettingT<GameSettingCollection> sMagicCastRangedUnderwater;

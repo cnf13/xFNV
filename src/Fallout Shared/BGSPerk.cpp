@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMenu/Tile.h"
 #include "Fallout Shared/BGSAbilityPerkEntry.h"
@@ -637,7 +637,7 @@ bool BGSAbilityPerkEntry::Load(TESFile* apFile) {
             uint32_t iFormID = 0;
             apFile->GetChunkData(&iFormID, 0);
             if (apFile->QEndian()) {
-                ENDIAN(iFormID, false);
+                BSEndian(iFormID, false);
             }
             pAbility = reinterpret_cast<SpellItem*>(static_cast<uintptr_t>(iFormID));
         }
@@ -949,7 +949,7 @@ BGSPerkEntry* BGSPerkEntry::CreatePerkEntryOfType(PERK_ENTRY_TYPE aePerkEntryTyp
 }
 
 void QuestPerkEntryData::Endian() {
-    ENDIAN(pQuest, false);
+    BSEndian(pQuest, false);
 }
 
 BGSQuestPerkEntry::BGSQuestPerkEntry() {

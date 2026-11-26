@@ -13,7 +13,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9ShaderDeclaration.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgram.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
@@ -148,7 +148,7 @@ void SpeedTreeFrondShader::CreateConstantMaps() {
             m_spVertexConstantMap
                 ->AddEntry("Tree Dimmer", 0x10000004u, 0, 16u, 1u, "", 4u, 4u, &BSShaderManager::fTreeDimmer, false);
         }
-        SpeedTreeShader_SetShaderConstants(m_spVertexConstantMap.m_pObject, 17u);
+        SpeedTreeShader::SetShaderConstants(m_spVertexConstantMap.m_pObject, 17u);
     }
 }
 

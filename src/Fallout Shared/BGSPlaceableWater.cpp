@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/Animation.h"
@@ -111,8 +112,8 @@ void BGSPlaceableWaterData::Clear() {
 }
 
 void BGSPlaceableWaterData::Endian() {
-    ENDIAN(ulFlags, false);
-    ENDIAN(pWaterType, false);
+    BSEndian(ulFlags, false);
+    BSEndian(pWaterType, false);
 }
 
 void BGSPlaceableWaterData::Initialize() {
@@ -122,8 +123,8 @@ void BGSPlaceableWaterData::Initialize() {
 
 void BGSPlaceableWaterData::EndianFromFile() {
     // Only the low 16 bits of the flags are swapped.
-    ENDIAN(usFlags, false);
-    ENDIAN(pWaterType, false);
+    BSEndian(usFlags, false);
+    BSEndian(pWaterType, false);
 }
 
 BGSPlaceableWater::BGSPlaceableWater() {

@@ -17,3 +17,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline const NiRTTI* NiFragmentShaderInstanceDescriptor::GetRTTI() const {
+    return &NiFragmentShaderInstanceDescriptor::ms_RTTI;
+}

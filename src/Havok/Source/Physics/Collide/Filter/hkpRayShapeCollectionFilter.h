@@ -22,5 +22,7 @@ public:
     static void operator delete(void* apMemory);
 };
 
+inline hkpRayShapeCollectionFilter::~hkpRayShapeCollectionFilter() {}
+
 // The class's reflection record.
 extern hkClass hkpRayShapeCollectionFilterClass;

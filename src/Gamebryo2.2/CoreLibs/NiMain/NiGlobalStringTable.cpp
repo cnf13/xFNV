@@ -177,3 +177,21 @@ const char* NiGlobalStringTable::GetRealBufferStart(GlobalStringHandle& kHandle)
 void NiGlobalStringTable::FreeUnusedStrings() {
     NiGlobalStringTable::ms_pkTable->FreeStrings();
 }
+
+// The empty string's handle has no reference count. The count is raw memory, the untyped word GetRealBufferStart
+// returns; it is decremented through the int32_t NiAtomicDecrement.
+void NiGlobalStringTable::DecHandleRefCount(GlobalStringHandle& arHandle) {
+    if (arHandle != NULL_STRING) {
+        const char* pcBuffer = GetRealBufferStart(arHandle);
+        NiAtomicDecrement(*reinterpret_cast<int32_t*>(const_cast<char*>(pcBuffer)));
+    }
+}
+
+// The empty string's handle has no reference count. The count is raw memory, the untyped word GetRealBufferStart
+// returns, incremented through the int32_t NiAtomicIncrement.
+void NiGlobalStringTable::IncHandleRefCount(GlobalStringHandle& arHandle) {
+    if (arHandle != NULL_STRING) {
+        const char* pcBuffer = GetRealBufferStart(arHandle);
+        NiAtomicIncrement(*reinterpret_cast<int32_t*>(const_cast<char*>(pcBuffer)));
+    }
+}

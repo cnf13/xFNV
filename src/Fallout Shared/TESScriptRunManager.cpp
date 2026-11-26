@@ -2,6 +2,7 @@
 
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTaskManager.h"
 #include "Fallout Shared/Expression.h"

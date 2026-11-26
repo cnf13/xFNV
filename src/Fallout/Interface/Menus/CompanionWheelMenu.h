@@ -2,6 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 
@@ -95,4 +96,4 @@ public:
     static inline CompanionWheelMenu* pMe;
 };
 
-extern SettingT<GameSettingCollection> gs_sCWheelUseStimpak;
+extern SettingT<GameSettingCollection> sCWheelUseStimPack;

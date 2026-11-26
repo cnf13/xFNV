@@ -1,17 +1,8 @@
 #pragma once
 
-#include "BSHavok/bhkSerializable.h"
 #include "Fallout/AI/Combat/Projectile.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
-#include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
 
 #include <stdint.h>
-
-class hkpConstraintData;
-class hkpConstraintMotor;
-class hkpEntity;
-class NiCloningProcess;
-class NiStream;
 
 // A missile projectile: one that flies along a ballistic or straight path. Only some of its entry points are declared.
 class MissileProjectile : public Projectile {
@@ -83,37 +74,4 @@ public:
     bool bWaitingToInitialize3D;
     float fStickTime;
     float fLocalRot;
-};
-
-// The creation info of the constraint that ties a missile to the entity it hit: the constraint data, its priority and
-// the two entities.
-class hkConstraintCinfo : public hkSerializableCinfo {
-public:
-    hkConstraintCinfo();
-    virtual ~hkConstraintCinfo();
-
-    virtual void CloneData(hkpConstraintData* apData, NiCloningProcess&);
-    virtual void LoadBinary(NiStream& arStream);
-    virtual void SaveBinary(NiStream& arStream);
-    virtual uint32_t CreateData();
-    virtual void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings);
-
-    // Stores the entity wrapped by apEntity (null for none) as entity B.
-    void SetEntityB(bhkEntity* apEntity);
-    // Stores the entity wrapped by apEntity (null for none) as entity A.
-    void SetEntityA(bhkEntity* apEntity);
-    void SetEntities(bhkEntity* apEntityA, bhkEntity* apEntityB);
-    void SetData(hkpConstraintData* apData);
-    // Reads a motor from the stream, null when it holds none; the caller owns the reference.
-    class hkpConstraintMotor* LoadMotor(NiStream& arStream);
-    void SaveMotor(hkpConstraintMotor* apMotor, NiStream& arStream);
-
-    static void operator delete(void* apMemory) {
-        ourFree(apMemory);
-    }
-
-    hkpConstraintData* pData;
-    hkpConstraintInstance::ConstraintPriority ePriority;
-    hkpEntity* pEntityA;
-    hkpEntity* pEntityB;
 };

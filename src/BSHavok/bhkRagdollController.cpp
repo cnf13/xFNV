@@ -15,7 +15,6 @@
 #include "BSHavok/bhkLimitedHingeConstraint.h"
 #include "BSHavok/bhkMalleableConstraint.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkPoseArray.h"
 #include "BSHavok/bhkRagdollShareData.h"
 #include "BSHavok/bhkRefObject.h"
@@ -38,7 +37,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -49,6 +47,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Havok/Source/Animation/Animation/Ik/FootPlacement/hkaFootPlacementIkSolver.h"
 #include "Havok/Source/Animation/Animation/Ik/LookAt/hkaLookAtIkSolver.h"
@@ -134,23 +133,23 @@ SettingT<INISettingCollection>
     bhkRagdollController::fSnapMaxAngularDistance("fSnapMaxAngularDistance:RagdollAnim", 1.0f);
 SettingT<INISettingCollection> bhkRagdollController::fMaxTrackingDist("fMaxTrackingDist:LookIK", 1500.0f);
 SettingT<INISettingCollection> bhkRagdollController::fMinTrackingDist("fMinTrackingDist:LookIK", 12.0f);
-SettingT<INISettingCollection> gs_fAngleMax_LookIK("fAngleMax:LookIK", 3.5f);
-SettingT<INISettingCollection> gs_fAngleMaxEase_LookIK("fAngleMaxEase:LookIK", 1.0f);
+SettingT<INISettingCollection> bhkRagdollController::fAngleMax("fAngleMax:LookIK", 3.5f);
+SettingT<INISettingCollection> bhkRagdollController::fAngleMaxEase("fAngleMaxEase:LookIK", 1.0f);
 SettingT<INISettingCollection> bhkRagdollController::fEaseAngleShutOff("fEaseAngleShutOff:LookIK", 0.5f);
-SettingT<INISettingCollection> gs_fOnOffGain_FootIK("fOnOffGain:FootIK", 0.01f);
-SettingT<INISettingCollection> gs_fGroundAscendingGain_FootIK("fGroundAscendingGain:FootIK", 0.35f);
-SettingT<INISettingCollection> gs_fGroundDescendingGain_FootIK("fGroundDescendingGain:FootIK", 0.3f);
-SettingT<INISettingCollection> gs_fFootRaisedGain_FootIK("fFootRaisedGain:FootIK", 0.2f);
-SettingT<INISettingCollection> gs_fFootPlantedGain_FootIK("fFootPlantedGain:FootIK", 1.0f);
+SettingT<INISettingCollection> bhkRagdollController::fOnOffGain("fOnOffGain:FootIK", 0.01f);
+SettingT<INISettingCollection> bhkRagdollController::fGroundAscendingGain("fGroundAscendingGain:FootIK", 0.35f);
+SettingT<INISettingCollection> bhkRagdollController::fGroundDescendingGain("fGroundDescendingGain:FootIK", 0.3f);
+SettingT<INISettingCollection> bhkRagdollController::fFootRaisedGain("fFootRaisedGain:FootIK", 0.2f);
+SettingT<INISettingCollection> bhkRagdollController::fFootPlantedGain("fFootPlantedGain:FootIK", 1.0f);
 SettingT<INISettingCollection> bhkRagdollController::bFootPlacementOn("bFootPlacementOn:FootIK", true);
-SettingT<INISettingCollection> gs_fOriginalGroundHeightMS_FootIK("fOriginalGroundHeightMS:FootIK", -0.11f);
-SettingT<INISettingCollection> gs_fAnkleOffset_FootIK("fAnkleOffset:FootIK", 0.2f);
-SettingT<INISettingCollection> gs_fPelvisUpDownBias_FootIK("fPelvisUpDownBias:FootIK", 0.75f);
+SettingT<INISettingCollection> bhkRagdollController::fOriginalGroundHeightMS("fOriginalGroundHeightMS:FootIK", -0.11f);
+SettingT<INISettingCollection> bhkRagdollController::fAnkleOffset("fAnkleOffset:FootIK", 0.2f);
+SettingT<INISettingCollection> bhkRagdollController::fPelvisUpDownBias("fPelvisUpDownBias:FootIK", 0.75f);
 SettingT<INISettingCollection> bhkRagdollController::fPelvisOffsetDamping("fPelvisOffsetDamping:FootIK", 0.2f);
 SettingT<INISettingCollection> bhkRagdollController::fVertErrorGain("fVertErrorGain:FootIK", 0.5f);
 SettingT<INISettingCollection> bhkRagdollController::iNumFramesFootEaseOut("iNumFramesFootEaseOut:FootIK", 30);
 SettingT<INISettingCollection> bhkRagdollController::fControllerTetherLen("fControllerTetherLen:FootIK", 6.0f);
-SettingT<INISettingCollection> gs_fMaxStepVertError_FootIK("fMaxStepVertError:FootIK", 3.5f);
+SettingT<INISettingCollection> bhkRagdollController::fMaxStepVertError("fMaxStepVertError:FootIK", 3.5f);
 SettingT<INISettingCollection> bhkRagdollController::fMaxFootCastMilliSec("fMaxFootCastMilliSec:FootIK", 0.6f);
 SettingT<INISettingCollection> bhkRagdollController::fDriveGain("fDriveGain:GrabIK", 0.25f);
 SettingT<INISettingCollection> bhkRagdollController::uiFeedbackTimeout("uiFeedbackTimeout:RagdollFeedback", 1500u);
@@ -623,7 +622,7 @@ void bhkRagdollController::InitFootIK(BSSimpleArray<const char*, 1024>& arboneNa
     if (!bextractResults) {
         return;
     }
-    setupData.m_originalGroundHeightMS = gs_fOriginalGroundHeightMS_FootIK.uValue.f;
+    setupData.m_originalGroundHeightMS = bhkRagdollController::fOriginalGroundHeightMS.uValue.f;
     setupData.m_skeleton = pskeleton;
     setupData.m_worldUpDirectionWS.set(0.0f, 0.0f, 1.0f, 0.0f);
     setupData.m_modelUpDirectionMS = setupData.m_worldUpDirectionWS;
@@ -1428,11 +1427,11 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
     kInput.m_worldFromModel.m_rotation = arWorldFromModel.m_rotation;
     kInput.m_worldFromModel.m_scale = arWorldFromModel.m_scale;
     const bool bResetWeight = bResetSolverWeight;
-    kInput.m_onOffGain = bResetWeight ? 1.0f : gs_fOnOffGain_FootIK.uValue.f;
-    kInput.m_groundAscendingGain = gs_fGroundAscendingGain_FootIK.uValue.f;
-    kInput.m_groundDescendingGain = gs_fGroundDescendingGain_FootIK.uValue.f;
-    kInput.m_footRaisedGain = gs_fFootRaisedGain_FootIK.uValue.f;
-    kInput.m_footPlantedGain = gs_fFootPlantedGain_FootIK.uValue.f;
+    kInput.m_onOffGain = bResetWeight ? 1.0f : bhkRagdollController::fOnOffGain.uValue.f;
+    kInput.m_groundAscendingGain = bhkRagdollController::fGroundAscendingGain.uValue.f;
+    kInput.m_groundDescendingGain = bhkRagdollController::fGroundDescendingGain.uValue.f;
+    kInput.m_footRaisedGain = bhkRagdollController::fFootRaisedGain.uValue.f;
+    kInput.m_footPlantedGain = bhkRagdollController::fFootPlantedGain.uValue.f;
     kInput.m_footPlacementOn = !bResetWeight && !bEaseOutFootIK;
     kInput.m_raycastInterface = this;
 
@@ -1531,7 +1530,7 @@ void bhkRagdollController::DoFootIK(hkQsTransform& arWorldFromModel) {
     if (bUseCurrAnkleTransf) {
         bUseCurrAnkleTransf = false;
     }
-    const float fBias = bDownCastFoot ? 1.0f : gs_fPelvisUpDownBias_FootIK.uValue.f;
+    const float fBias = bDownCastFoot ? 1.0f : bhkRagdollController::fPelvisUpDownBias.uValue.f;
     const float fMinError = hkMath::min2(LegInfoA.m_data[0].fResultError, LegInfoA.m_data[1].fResultError);
     const float fMaxError = hkMath::max2(LegInfoA.m_data[0].fResultError, LegInfoA.m_data[1].fResultError);
     const bool bEaseOut = bEaseOutFootIK;
@@ -1866,10 +1865,10 @@ float bhkRagdollController::LimitBoneRot(bhkRagdollController::LookIKBone aeBone
         fdiffAngle = adjRot.getAngle();
         float fAngleMax;
         if (bEaseOutLookIK) {
-            fAngleMax = gs_fAngleMaxEase_LookIK.uValue.f;
+            fAngleMax = bhkRagdollController::fAngleMaxEase.uValue.f;
         }
         else {
-            fAngleMax = gs_fAngleMax_LookIK.uValue.f;
+            fAngleMax = bhkRagdollController::fAngleMax.uValue.f;
         }
         if (fdiffAngle > fAngleMax * 0.01745329238474369) {
             fdiffAngle = fAngleMax * 0.01745329238474369;
@@ -2654,7 +2653,7 @@ bool bhkRagdollController::ExtractBipedSetupData(
     pfootCapsuleInfo->m_vertexB.ToHK(cEndFoot);
     hkVector4 cEndFootFromAnkle;
     cEndFootFromAnkle.setSub4(cStartFoot, cEndFoot);
-    float fAnklAdj = gs_fAnkleOffset_FootIK.Float() + cAnklPos(0);
+    float fAnklAdj = bhkRagdollController::fAnkleOffset.Float() + cAnklPos(0);
 
     arSetupData.m_kneeAxisLS = cAxis;
     arSetupData.m_kneeAxisLS.normalize3();
@@ -2664,7 +2663,7 @@ bool bhkRagdollController::ExtractBipedSetupData(
         cEndFootFromAnkle.setZero4();
     }
     arSetupData.m_footEndLS = cEndFootFromAnkle;
-    arSetupData.m_minAnkleHeightMS = -gs_fMaxStepVertError_FootIK.Float();
+    arSetupData.m_minAnkleHeightMS = -bhkRagdollController::fMaxStepVertError.Float();
     arSetupData.m_maxAnkleHeightMS = pfootCapsuleInfo->m_vertexA.fX * 2.0 +
         (pcalfCapsuleInfo->m_vertexA.fX - pcalfCapsuleInfo->m_vertexB.fX) + fAnklAdj;
     arSetupData.m_footPlantedAnkleHeightMS = pfootCapsuleInfo->m_vertexA.fX;
@@ -3090,95 +3089,6 @@ hkQsTransform& NI2HK(hkQsTransform& arhkQ, const NiTransform& arNiQ) {
     return arhkQ;
 }
 
-hkaRaycastInterface::~hkaRaycastInterface() {}
-
-// The filtered cast hits nothing here: it returns false without reading its arguments.
-hkBool hkaRaycastInterface::castRay(
-    const hkVector4& fromWS,
-    const hkVector4& toWS,
-    uint32_t collisionFilterInfo,
-    float& hitFractionOut,
-    hkVector4& normalWS
-) {
-    hkBool kResult;
-    kResult.m_bool = 0;
-    return kResult;
-}
-
-void hkaRaycastInterface::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
-hkaSkeletonMapperUtils::Params::Params(const hkaSkeletonMapperUtils::Params& other)
-  : m_skeletonA(other.m_skeletonA), m_skeletonB(other.m_skeletonB), m_compareNames(other.m_compareNames),
-    m_positionMatchTolerance(other.m_positionMatchTolerance), m_rotationMatchTolerance(other.m_rotationMatchTolerance),
-    m_userChains(), m_userMappingsAtoB(), m_userMappingsBtoA(), m_autodetectSimple(other.m_autodetectSimple),
-    m_autodetectChains(other.m_autodetectChains), m_mappingType(other.m_mappingType),
-    m_motionParams(other.m_motionParams) {
-    m_userChains = other.m_userChains;
-    m_userMappingsAtoB = other.m_userMappingsAtoB;
-    m_userMappingsBtoA = other.m_userMappingsBtoA;
-}
-
-hkaSkeletonMapperUtils::Params* hkaSkeletonMapperUtils::Params::Init() {
-    m_positionMatchTolerance = 0.0f;
-    m_skeletonA = nullptr;
-    m_rotationMatchTolerance = 0.5235987901687622f;
-    m_skeletonB = nullptr;
-    m_compareNames = nullptr;
-    m_userChains.m_data = nullptr;
-    m_userChains.m_size = 0;
-    m_userChains.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG;
-    m_userMappingsAtoB.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
-    m_userMappingsAtoB.m_data = nullptr;
-    m_userMappingsAtoB.m_size = 0;
-    m_userMappingsBtoA.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
-    m_userMappingsBtoA.m_data = nullptr;
-    m_userMappingsBtoA.m_size = 0;
-    m_autodetectSimple.m_bool = 1;
-    m_autodetectChains.m_bool = 1;
-    m_mappingType.m_storage = 0;
-    m_motionParams.m_extractedMotionFactorA = 1.0f;
-    m_motionParams.m_extractedMotionFactorB = 1.0f;
-    m_motionParams.m_mode.m_storage = 0;
-    m_motionParams.m_extractedMotionBoneA = 0;
-    m_motionParams.m_extractedMotionBoneB = 0;
-    return this;
-}
-
-void hkaSkeletonMapperUtils::Params::Free() {
-    hkMemoryAllocator* m_heap = hkMemoryRouter::getInstance().m_heap;
-    int32_t m_capacityAndFlags = m_userMappingsBtoA.m_capacityAndFlags;
-    m_userMappingsBtoA.m_size = 0;
-    if (m_capacityAndFlags >= 0) {
-        m_heap->bufFree(m_userMappingsBtoA.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * m_capacityAndFlags);
-    }
-    m_userMappingsBtoA.m_data = nullptr;
-    m_userMappingsBtoA.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* v4 = hkMemoryRouter::getInstance().m_heap;
-    int32_t v5 = m_userMappingsAtoB.m_capacityAndFlags;
-    m_userMappingsAtoB.m_size = 0;
-    if ((v5 & hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG) == 0) {
-        v4->bufFree(m_userMappingsAtoB.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * v5);
-    }
-    m_userMappingsAtoB.m_data = nullptr;
-    m_userMappingsAtoB.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
-    hkMemoryAllocator* v6 = hkMemoryRouter::getInstance().m_heap;
-    int32_t v7 = m_userChains.m_capacityAndFlags;
-    m_userChains.m_size = 0;
-    if ((v7 & hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG) == 0) {
-        v6->bufFree(m_userChains.begin(), sizeof(hkaSkeletonMapperUtils::UserChain) * v7);
-    }
-    m_userChains.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG;
-    m_userChains.m_data = nullptr;
-}
-
-void hkaPose::operator delete(void* apMemory) {
-    if (apMemory) {
-        hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkaPose));
-    }
-}
-
 // The type info's finish-loaded-object callback for hkaSkeleton: runs its finish constructor.
 void finishLoadedObjecthkaSkeleton(void* p, int32_t finishing) {
     if (p) {
@@ -3186,10 +3096,6 @@ void finishLoadedObjecthkaSkeleton(void* p, int32_t finishing) {
         flag.m_finishing = finishing;
         ::new (p) hkaSkeleton(flag);
     }
-}
-
-const hkClass& hkaSkeleton::staticClass() {
-    return hkaSkeletonClass;
 }
 
 float hkMath::acos(float r) {
@@ -3205,4 +3111,56 @@ float hkMath::acos(float r) {
         return 3.1415927f;
     }
     return v3;
+}
+
+bool RagdollFeedbackData::Compare(RagdollFeedbackData* apOther) {
+    uint32_t iSize = DynamicBoneIdxA.iSize;
+    bool bret = false;
+    if (iSize != apOther->DynamicBoneIdxA.iSize) {
+        return true;
+    }
+    int32_t i = 0;
+    if (iSize) {
+        while (!bret) {
+            bret = DynamicBoneIdxA.pBuffer[i] != apOther->DynamicBoneIdxA.pBuffer[i];
+            if (++i >= iSize) {
+                break;
+            }
+        }
+        if (bret) {
+            return true;
+        }
+    }
+    if (bEnabled != apOther->bEnabled ||
+        apOther->SystemData.fKeyDynIntrp != SystemData.fKeyDynIntrp ||
+        apOther->SystemData.fHeirGain != SystemData.fHeirGain ||
+        apOther->SystemData.fPosGain != SystemData.fPosGain ||
+        apOther->SystemData.fVelGain != SystemData.fVelGain ||
+        apOther->SystemData.fAccGain != SystemData.fAccGain ||
+        apOther->SystemData.fSnapGain != SystemData.fSnapGain ||
+        apOther->SystemData.fVelDamp != SystemData.fVelDamp ||
+        apOther->SystemData.fSnapMaxLinVel != SystemData.fSnapMaxLinVel ||
+        apOther->SystemData.fSnapMaxAngVel != SystemData.fSnapMaxAngVel ||
+        apOther->SystemData.fSnapMaxLinDist != SystemData.fSnapMaxLinDist ||
+        apOther->SystemData.fSnapMaxAngDist != SystemData.fSnapMaxAngDist ||
+        apOther->SystemData.fPosMaxLinVel != SystemData.fPosMaxLinVel ||
+        SystemData.uiImpulseMult1 != apOther->SystemData.uiImpulseMult1 ||
+        SystemData.uiImpulseMult2 != apOther->SystemData.uiImpulseMult2 ||
+        apOther->SystemData.fPosMaxAngVel != SystemData.fPosMaxAngVel) {
+        return true;
+    }
+    return bret;
+}
+
+RagdollFeedbackData::~RagdollFeedbackData() {}
+
+void RagdollFeedbackData::Init() {
+    bEnabled = false;
+    SystemData = RagdollFeedbackData::RagdollFeedbackSystemData();
+    DynamicBoneIdxA.~BSSimpleArray<int16_t, 1024>();
+    ::new (&DynamicBoneIdxA) BSSimpleArray<int16_t, 1024>;
+}
+
+void* bhkRagdollController::operator new(size_t blocksize) {
+    return MemoryManager::Instance().Allocate(blocksize);
 }

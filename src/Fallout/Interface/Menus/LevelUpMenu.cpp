@@ -7,7 +7,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileMenu.h"
@@ -439,15 +439,7 @@ int32_t LevelUpMenu::GetClassStatic() {
     return 1027;
 }
 
-// Both failing paths return null: a null Instance(), or bFirstInit not set.
 Tile* LevelUpMenu::Create() {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
-        return LevelUpMenu::CreateMenu();
-    }
-    return nullptr;
-}
-
-Tile* LevelUpMenu::CreateMenu() {
     Tile* pOldMenu = Menu::GetMenuByClass(1027);
     InterfaceManager* pManager = InterfaceManager::Instance();
     if (pOldMenu) {

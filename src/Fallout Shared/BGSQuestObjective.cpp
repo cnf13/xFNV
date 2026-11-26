@@ -6,6 +6,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Pathfinding/TeleportPath.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESFile.h"

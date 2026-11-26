@@ -2,6 +2,7 @@
 
 #include "BSShader/BSTextureManager.h"
 #include "BSShader/ImageSpaceEffectDepthOfField.h"
+#include "BSShader/ImageSpaceEffectMenuBG.h"
 #include "BSShader/ImageSpaceEffectRadialBlur.h"
 #include "BSShader/ImageSpaceTexture.h"
 #include "Fallout/Misc/Main.h"
@@ -439,3 +440,23 @@ public:
     static inline ImageSpaceParameterData DefaultParameterData{};
     static inline bool bUseSunbeams;
 };
+
+inline ImageSpaceEffect* ImageSpaceManager::GetEffect(ImageSpaceManager::EffectID aiIndex) {
+    return pEffectList[aiIndex];
+}
+
+inline void ImageSpaceManager::EnablePartialRender(bool abEnable, NiScreenElements* apPartialScreenGeometry) {
+    bEnablePartialRender = abEnable;
+    spPartialScreenTriShape = apPartialScreenGeometry;
+}
+
+// NEEDS: ImageSpaceEffectMenuBG and its ImageSpaceEffect base need typed class declarations for GetEffect's
+// base-to-derived conversion before calling SetBlendEnabled.
+inline void ImageSpaceManager::SetMenuBGBlendEnabled(bool abEnabled) {
+    ImageSpaceEffectMenuBG* pEffect = static_cast<ImageSpaceEffectMenuBG*>(GetEffect(EFFECT_MENU_BG));
+    pEffect->SetBlendEnabled(abEnabled);
+}
+
+inline void ImageSpaceManager::SetMenuBGBlendValue(float afStrength) {
+    static_cast<ImageSpaceEffectMenuBG*>(GetEffect(EFFECT_MENU_BG))->SetBlendValue(afStrength);
+}

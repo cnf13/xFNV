@@ -20,8 +20,6 @@ class DECAL_CREATION_DATA;
 struct DecalVertex;
 class NiTriShapeData;
 
-double BSMAX_0(double adA, float afB);
-
 // A vertex of the decal geometry and its index in the temporary vertex array.
 struct DecalVertex {
     DecalVertex();
@@ -144,5 +142,3 @@ public:
 };
 
 NiSmartPointer(BSTempEffectSimpleDecal);
-
-extern SettingT<RendererSettingCollection> gs_uMaxDecals_Decals;

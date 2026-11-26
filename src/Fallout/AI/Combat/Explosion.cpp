@@ -7,18 +7,17 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionObject.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkFilteredCdBodyCollector.h"
 #include "BSHavok/bhkLiquidAction.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
 #include "BSHavok/bhkShapeCollection.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
-#include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkUtilFunctions.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSCloningProcess.h"
@@ -133,23 +132,6 @@
 #include <cstdint>
 #include <limits>
 
-namespace hkAlgorithm {} // namespace hkAlgorithm
-
-// The SDK's hkAlgorithm::quickSort for the root contact points.
-// KEEP: src cannot express it exactly. The exe passes its comparator's byte on to quickSortRecursive (movzx; push at
-// 0x9b2eac), whose parameter is the empty hkAlgorithm::less<hkpRootCdPoint>: clang writes no bytes of an empty class
-// argument, so src's slot holds other bytes.
-void quickSortRootCdPoints(hkpRootCdPoint* apArray, int32_t aiSize, uint8_t aiLess) {
-    if (aiSize > 1) {
-        hkAlgorithm::quickSortRecursive<hkpRootCdPoint, hkAlgorithm::less<hkpRootCdPoint>>(
-            apArray,
-            0,
-            aiSize - 1,
-            hkAlgorithm::less<hkpRootCdPoint>()
-        );
-    }
-}
-
 Explosion::ExplosionTarget::ExplosionTarget()
   : pRef(nullptr), bHitWeakPoint(false), bMobile(false), bProcessed(false) {}
 
@@ -224,7 +206,7 @@ Explosion::~Explosion() {
     spActorCause = nullptr;
     delete pCaster;
     // Removes this explosion's node from the water group's explosion list.
-    if (gs_bReflectExplosions_Water.Bool()) {
+    if (TESWaterSystem::bReflectExplosions.Bool()) {
         NiTListItem<TESObjectREFR*>* pPos = PlaceableWaterGroup::ExplosionsList.m_pkHead;
         NiTListItem<TESObjectREFR*>* pFoundPos = nullptr;
         while (pPos && !pFoundPos) {
@@ -600,7 +582,7 @@ void Explosion::Initialize() {
     if (bCreateProcess) {
         ReferenceProcessLists.AddReference(this, PROCESS_TYPE_HIGH, false, false, nullptr);
     }
-    if (gs_bReflectExplosions_Water.Bool()) {
+    if (TESWaterSystem::bReflectExplosions.Bool()) {
         TESObjectREFR* pRef = this;
         PlaceableWaterGroup::ExplosionsList.AddHead(pRef);
     }
@@ -1821,101 +1803,6 @@ Explosion* Explosion::SpawnExplosion(
         }
     }
     return pexplosion;
-}
-
-// The comparator is a zeroed hkAlgorithm::less<hkpRootCdPoint>, passed as its byte (quickSortRootCdPoints's aiLess).
-void hkAlgorithm::quickSort(hkpRootCdPoint* pArr, int32_t iSize) {
-    quickSortRootCdPoints(pArr, iSize, 0);
-}
-
-void bhkRigidBody::ApplyLinearImpulse(const hkVector4& arImpulse) {
-    hkpRigidBody* pBody = **this;
-    if (pBody) {
-        MarkWrite();
-        pBody->applyLinearImpulse(arImpulse);
-        UnMarkWrite();
-    }
-}
-
-void bhkRigidBody::ApplyAngularImpulse(const hkVector4& arImpulse) {
-    hkpRigidBody* pBody = **this;
-    if (pBody) {
-        MarkWrite();
-        pBody->applyAngularImpulse(arImpulse);
-        UnMarkWrite();
-    }
-}
-
-void bhkRigidBody::ApplyAngularImpulse(const NiPoint3& arImpulse) {
-    hkVector4 hkImpulse;
-    this->ApplyAngularImpulse(NI2HK(hkImpulse, arImpulse));
-}
-
-hkArray<hkpSimpleShapePhantom::CollisionDetail, hkContainerHeapAllocator>&
-bhkSimpleShapePhantom::GetCollisionDetails() {
-    return static_cast<hkpSimpleShapePhantom*>(**this)->getCollisionDetails();
-}
-
-bhkTransform& bhkTransform::NI2HK(const NiTransform& arNiTran) {
-    Rot.NI2HKNS(arNiTran.m_Rotate);
-    Trans.NI2HK(arNiTran.m_Translate);
-    return *this;
-}
-
-bhkVector4& bhkVector4::NI2HKNS(const NiPoint3& arSrc) {
-    fX = arSrc.x;
-    fY = arSrc.y;
-    fZ = arSrc.z;
-    fW = 0.0f;
-    return *this;
-}
-
-void hkMemoryAllocator::freeHandlePairBuffer(void* p, int32_t numElem) {
-    bufFree(p, sizeof(hkpBroadPhaseHandlePair) * numElem);
-}
-
-// The SDK's form: raw byte arithmetic on the handle's address, where the owner sits m_ownerOffset bytes away.
-void* hkpTypedBroadPhaseHandle::getOwner() const {
-    return const_cast<char*>(reinterpret_cast<const char*>(this) + m_ownerOffset);
-}
-
-hkpFixedBufferCdPointCollector::hkpFixedBufferCdPointCollector(hkpRootCdPoint* buffer, int32_t capacity)
-  : m_pointsArrayBase{buffer}, m_nextFreePoint{buffer}, m_capacity{capacity}, m_numPoints{0} {}
-
-hkpFixedBufferCdPointCollector::~hkpFixedBufferCdPointCollector() {}
-
-void hkpFixedBufferCdPointCollector::addCdPoint(const hkpCdPoint& event) {
-    g_FixedBufferCdPointCollectorAddCdPointCallbackFunc(event, this);
-}
-
-const hkpRootCdPoint* hkpFixedBufferCdPointCollector::getHits() const {
-    return m_pointsArrayBase;
-}
-
-int32_t hkpFixedBufferCdPointCollector::getNumHits() const {
-    return m_numPoints;
-}
-
-hkBool hkpFixedBufferCdPointCollector::hasHit() {
-    return m_numPoints > 0;
-}
-
-void hkpFixedBufferCdPointCollector::operator delete(void* p) {
-    if (p) {
-        hkMemoryRouter::getInstance().m_heap->blockFree(p, sizeof(hkpFixedBufferCdPointCollector));
-    }
-}
-
-// Each column goes through one NiPoint3.
-bhkMatrix3& bhkMatrix3::NI2HKNS(const NiMatrix3& arSrc) {
-    NiPoint3 kCol;
-    arSrc.GetCol(0, kCol);
-    Col0.NI2HKNS(kCol);
-    arSrc.GetCol(1, kCol);
-    Col1.NI2HKNS(kCol);
-    arSrc.GetCol(2, kCol);
-    Col2.NI2HKNS(kCol);
-    return *this;
 }
 
 // hkAllocateStack<hkpRootCdPoint>: HK_NEXT_MULTIPLE_OF(128, n * sizeof(hkpRootCdPoint)), in int arithmetic as the

@@ -9,9 +9,10 @@
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/ScreenCustomSplatter.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
@@ -25,11 +26,11 @@
 NiRTTI BSFaceGenAnimationData::ms_RTTI("BSFaceGenAnimationData", &NiExtraData::ms_RTTI);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fExpressionChangePerSec("fExpressionChangePerSec", 2.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fExpressionStrengthAdd("fExpressionStrengthAdd", 1.0f);
-SettingT<GameSettingCollection> gs_fSpeechDelay("fSpeechDelay", 0.0f);
-SettingT<GameSettingCollection> gs_fBlinkDownTime("fBlinkDownTime", 0.2f);
-SettingT<GameSettingCollection> gs_fBlinkUpTime("fBlinkUpTime", 0.17f);
-SettingT<GameSettingCollection> gs_fBlinkDelayMin("fBlinkDelayMin", 1.5f);
-SettingT<GameSettingCollection> gs_fBlinkDelayMax("fBlinkDelayMax", 4.0f);
+SettingT<GameSettingCollection> BSFaceGenAnimationData::fSpeechDelay("fSpeechDelay", 0.0f);
+SettingT<GameSettingCollection> BSFaceGenAnimationData::fBlinkDownTime("fBlinkDownTime", 0.2f);
+SettingT<GameSettingCollection> BSFaceGenAnimationData::fBlinkUpTime("fBlinkUpTime", 0.17f);
+SettingT<GameSettingCollection> BSFaceGenAnimationData::fBlinkDelayMin("fBlinkDelayMin", 1.5f);
+SettingT<GameSettingCollection> BSFaceGenAnimationData::fBlinkDelayMax("fBlinkDelayMax", 4.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackSpeed("fTrackSpeed", 2.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackXY("fTrackXY", 60.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackMinZ("fTrackMinZ", -60.0f);
@@ -41,29 +42,48 @@ SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackDeadZoneZ("fTrackD
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackFudgeXY("fTrackFudgeXY", 0.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackFudgeZ("fTrackFudgeZ", 0.0f);
 SettingT<GameSettingCollection> BSFaceGenAnimationData::fTrackJustAcquiredDuration("fTrackJustAcquiredDuration", 2.0f);
-SettingT<GameSettingCollection> gs_fLookDownDisableBlinkingAmt("fLookDownDisableBlinkingAmt", 0.25f);
-SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionHappy("fEyePitchMaxOffsetEmotionHappy", 0.15f);
-SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionHappy("fEyePitchMinOffsetEmotionHappy", -0.05f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionHappy("fEyeHeadingMaxOffsetEmotionHappy", 0.2f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionHappy("fEyeHeadingMinOffsetEmotionHappy", -0.2f);
-SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionSad("fEyePitchMaxOffsetEmotionSad", -0.05f);
-SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionSad("fEyePitchMinOffsetEmotionSad", -0.15f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionSad("fEyeHeadingMaxOffsetEmotionSad", 0.4f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionSad("fEyeHeadingMinOffsetEmotionSad", -0.4f);
-SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionAngry("fEyePitchMaxOffsetEmotionAngry", 0.15f);
-SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionAngry("fEyePitchMinOffsetEmotionAngry", -0.05f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionAngry("fEyeHeadingMaxOffsetEmotionAngry", 0.1f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionAngry("fEyeHeadingMinOffsetEmotionAngry", -0.1f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fLookDownDisableBlinkingAmt("fLookDownDisableBlinkingAmt", 0.25f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionHappy("fEyePitchMaxOffsetEmotionHappy", 0.15f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMinOffsetEmotionHappy("fEyePitchMinOffsetEmotionHappy", -0.05f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionHappy("fEyeHeadingMaxOffsetEmotionHappy", 0.2f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionHappy("fEyeHeadingMinOffsetEmotionHappy", -0.2f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionSad("fEyePitchMaxOffsetEmotionSad", -0.05f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMinOffsetEmotionSad("fEyePitchMinOffsetEmotionSad", -0.15f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionSad("fEyeHeadingMaxOffsetEmotionSad", 0.4f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionSad("fEyeHeadingMinOffsetEmotionSad", -0.4f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionAngry("fEyePitchMaxOffsetEmotionAngry", 0.15f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMinOffsetEmotionAngry("fEyePitchMinOffsetEmotionAngry", -0.05f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionAngry("fEyeHeadingMaxOffsetEmotionAngry", 0.1f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionAngry("fEyeHeadingMinOffsetEmotionAngry", -0.1f);
 SettingT<GameSettingCollection>
     BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionFear("fEyePitchMaxOffsetEmotionFear", 0.0f);
 SettingT<GameSettingCollection>
     BSFaceGenAnimationData::fEyePitchMinOffsetEmotionFear("fEyePitchMinOffsetEmotionFear", 0.0f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionFear("fEyeHeadingMaxOffsetEmotionFear", 0.5f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionFear("fEyeHeadingMinOffsetEmotionFear", -0.5f);
-SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionNeutral("fEyePitchMaxOffsetEmotionNeutral", 0.15f);
-SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionNeutral("fEyePitchMinOffsetEmotionNeutral", -0.05f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionNeutral("fEyeHeadingMaxOffsetEmotionNeutral", 0.2f);
-SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionNeutral("fEyeHeadingMinOffsetEmotionNeutral", -0.2f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionFear("fEyeHeadingMaxOffsetEmotionFear", 0.5f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionFear("fEyeHeadingMinOffsetEmotionFear", -0.5f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionNeutral("fEyePitchMaxOffsetEmotionNeutral", 0.15f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyePitchMinOffsetEmotionNeutral("fEyePitchMinOffsetEmotionNeutral", -0.05f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionNeutral("fEyeHeadingMaxOffsetEmotionNeutral", 0.2f);
+SettingT<GameSettingCollection>
+    BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionNeutral("fEyeHeadingMinOffsetEmotionNeutral", -0.2f);
 
 BSFaceGenAnimationData::BSFaceGenAnimationData()
   : NiExtraData(Tag()), pTargetExpressionData(nullptr), CurrentTargetExpressionData(BS_FG_MORPH_EXPRESSION, 15u),
@@ -677,27 +697,30 @@ bool BSFaceGenAnimationData::Update(float afTime) {
     if (BSFaceGenManager::GetUseProceduralEyeBlinking() &&
         !bDead &&
         SpeechModifierKeyframeList.IsEmpty() &&
-        gs_fBlinkDownTime.Float() > 0.0 &&
-        gs_fBlinkUpTime.Float() > 0.0 &&
-        gs_fBlinkDelayMin.Float() > 0.0) {
-        if (gs_fBlinkDelayMin.Float() <= static_cast<double>(gs_fBlinkDelayMax.Float())) {
-            if (gs_fLookDownDisableBlinkingAmt.Float() > static_cast<double>(fLookDown)) {
+        BSFaceGenAnimationData::fBlinkDownTime.Float() > 0.0 &&
+        BSFaceGenAnimationData::fBlinkUpTime.Float() > 0.0 &&
+        BSFaceGenAnimationData::fBlinkDelayMin.Float() > 0.0) {
+        if (BSFaceGenAnimationData::fBlinkDelayMin.Float() <=
+            static_cast<double>(BSFaceGenAnimationData::fBlinkDelayMax.Float())) {
+            if (BSFaceGenAnimationData::fLookDownDisableBlinkingAmt.Float() > static_cast<double>(fLookDown)) {
                 // ResetQuantityArray fills 17 modifier quantities and AddModifiersKeyframe reads them.
                 float apQuantities[BS_FG_MODIFIER_COUNT];
-                float fBlinkDelayRange = gs_fBlinkDelayMax.Float() - gs_fBlinkDelayMin.Float();
+                float fBlinkDelayRange = BSFaceGenAnimationData::fBlinkDelayMax.Float() -
+                    BSFaceGenAnimationData::fBlinkDelayMin.Float();
                 BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 0.0f;
                 apQuantities[1] = 0.0f;
-                float fBlinkDelay = RandomFloat0To1() * fBlinkDelayRange + gs_fBlinkDelayMin.Float();
+                float fBlinkDelay = RandomFloat0To1() * fBlinkDelayRange +
+                    BSFaceGenAnimationData::fBlinkDelayMin.Float();
                 AddModifiersKeyframe(apQuantities, fBlinkDelay);
                 BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 1.0f;
                 apQuantities[1] = 1.0f;
-                AddModifiersKeyframe(apQuantities, gs_fBlinkDownTime.Float());
+                AddModifiersKeyframe(apQuantities, BSFaceGenAnimationData::fBlinkDownTime.Float());
                 BSFaceGenManager::ResetQuantityArray(apQuantities, 17u, false);
                 apQuantities[0] = 0.0f;
                 apQuantities[1] = 0.0f;
-                AddModifiersKeyframe(apQuantities, gs_fBlinkUpTime.Float());
+                AddModifiersKeyframe(apQuantities, BSFaceGenAnimationData::fBlinkUpTime.Float());
             }
         }
     }
@@ -991,11 +1014,11 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
                 }
                 else {
                     fExpressionEyeOffsetTimer = RandomFloat(0.5f, 1.5f);
-                    float fMaxOffset = gs_fEyePitchMaxOffsetEmotionAngry;
-                    float fMinOffset = gs_fEyePitchMinOffsetEmotionAngry;
+                    float fMaxOffset = BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionAngry;
+                    float fMinOffset = BSFaceGenAnimationData::fEyePitchMinOffsetEmotionAngry;
                     fExpressionEyeOffsetPitch = RandomFloat(fMinOffset, fMaxOffset);
-                    fMaxOffset = gs_fEyeHeadingMaxOffsetEmotionAngry;
-                    fMinOffset = gs_fEyeHeadingMinOffsetEmotionAngry;
+                    fMaxOffset = BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionAngry;
+                    fMinOffset = BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionAngry;
                     fExpressionEyeOffsetHeading = RandomFloat(fMinOffset, fMaxOffset);
                 }
                 break;
@@ -1008,8 +1031,8 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
                     fExpressionEyeOffsetHeading = 0.0f;
                 }
                 else {
-                    float fMaxOffset = gs_fEyeHeadingMaxOffsetEmotionFear;
-                    float fMinOffset = gs_fEyeHeadingMinOffsetEmotionFear;
+                    float fMaxOffset = BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionFear;
+                    float fMinOffset = BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionFear;
                     fExpressionEyeOffsetHeading = RandomFloat(fMinOffset, fMaxOffset);
                 }
                 break;
@@ -1023,11 +1046,11 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
                 }
                 else {
                     fExpressionEyeOffsetTimer = RandomFloat(0.5f, 1.5f);
-                    float fMaxOffset = gs_fEyePitchMaxOffsetEmotionHappy;
-                    float fMinOffset = gs_fEyePitchMinOffsetEmotionHappy;
+                    float fMaxOffset = BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionHappy;
+                    float fMinOffset = BSFaceGenAnimationData::fEyePitchMinOffsetEmotionHappy;
                     fExpressionEyeOffsetPitch = RandomFloat(fMinOffset, fMaxOffset);
-                    fMaxOffset = gs_fEyeHeadingMaxOffsetEmotionHappy;
-                    fMinOffset = gs_fEyeHeadingMinOffsetEmotionHappy;
+                    fMaxOffset = BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionHappy;
+                    fMinOffset = BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionHappy;
                     fExpressionEyeOffsetHeading = RandomFloat(fMinOffset, fMaxOffset);
                 }
                 break;
@@ -1041,11 +1064,11 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
                     fExpressionEyeOffsetPitch = 0.0f;
                 }
                 else {
-                    float fMaxOffset = gs_fEyePitchMaxOffsetEmotionSad;
-                    float fMinOffset = gs_fEyePitchMinOffsetEmotionSad;
+                    float fMaxOffset = BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionSad;
+                    float fMinOffset = BSFaceGenAnimationData::fEyePitchMinOffsetEmotionSad;
                     fExpressionEyeOffsetPitch = RandomFloat(fMinOffset, fMaxOffset);
-                    fMaxOffset = gs_fEyeHeadingMaxOffsetEmotionSad;
-                    fMinOffset = gs_fEyeHeadingMinOffsetEmotionSad;
+                    fMaxOffset = BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionSad;
+                    fMinOffset = BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionSad;
                     fExpressionEyeOffsetHeading = RandomFloat(fMinOffset, fMaxOffset);
                 }
                 break;
@@ -1058,11 +1081,11 @@ void BSFaceGenAnimationData::ModifyEyeHeadingAndPitchBasedOnExpression(
                 }
                 else {
                     fExpressionEyeOffsetTimer = RandomFloat(0.5f, 1.5f);
-                    float fMaxOffset = gs_fEyePitchMaxOffsetEmotionNeutral;
-                    float fMinOffset = gs_fEyePitchMinOffsetEmotionNeutral;
+                    float fMaxOffset = BSFaceGenAnimationData::fEyePitchMaxOffsetEmotionNeutral;
+                    float fMinOffset = BSFaceGenAnimationData::fEyePitchMinOffsetEmotionNeutral;
                     fExpressionEyeOffsetPitch = RandomFloat(fMinOffset, fMaxOffset);
-                    fMaxOffset = gs_fEyeHeadingMaxOffsetEmotionNeutral;
-                    fMinOffset = gs_fEyeHeadingMinOffsetEmotionNeutral;
+                    fMaxOffset = BSFaceGenAnimationData::fEyeHeadingMaxOffsetEmotionNeutral;
+                    fMinOffset = BSFaceGenAnimationData::fEyeHeadingMinOffsetEmotionNeutral;
                     fExpressionEyeOffsetHeading = RandomFloat(fMinOffset, fMaxOffset);
                 }
                 break;
@@ -1183,7 +1206,7 @@ float BSFaceGenAnimationData::GetExpressionStrengthAddPerSec() {
 }
 
 float BSFaceGenAnimationData::GetSpeechDelay() {
-    return gs_fSpeechDelay.Float();
+    return BSFaceGenAnimationData::fSpeechDelay.Float();
 }
 
 void BSFaceGenAnimationData::GetTrackDeadZoneXYMinMax(float& afMinOut, float& afMaxOut) {
@@ -1226,25 +1249,4 @@ const NiFixedString& BSFaceGenAnimationData::Tag() {
 
 bool BSFaceGenManager::GetUseProceduralEyeBlinking() {
     return bUseProceduralEyeBlinking;
-}
-
-// NaN in any component compares as unequal.
-bool NiQuaternion::operator!=(const NiQuaternion& q) const {
-    int32_t iNotEqual;
-    if (m_fW != q.m_fW) {
-        iNotEqual = 1;
-    }
-    else if (m_fX != q.m_fX) {
-        iNotEqual = 1;
-    }
-    else if (m_fY != q.m_fY) {
-        iNotEqual = 1;
-    }
-    else if (m_fZ != q.m_fZ) {
-        iNotEqual = 1;
-    }
-    else {
-        iNotEqual = 0;
-    }
-    return iNotEqual != 0;
 }

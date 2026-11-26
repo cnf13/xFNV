@@ -1,6 +1,7 @@
 #pragma once
 
 // AudioMarkerInfo (the AudioMarker member's type) is defined there.
+#include "BSCore/NewOverloads.h"
 #include "Fallout/AI/PlayerCharacter.h"
 
 // The audio marker data a buoy marker reference carries. Only some of its members are declared.

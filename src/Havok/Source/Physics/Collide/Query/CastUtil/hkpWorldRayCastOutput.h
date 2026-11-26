@@ -32,3 +32,14 @@ struct hkpWorldRayCastOutput : hkpShapeRayCastOutput {
 
     hkpCollidable* m_rootCollidable;
 };
+
+inline hkpWorldRayCastOutput& hkpWorldRayCastOutput::operator=(const hkpWorldRayCastOutput& __that) {
+    hkpShapeRayCastOutput::operator=(__that);
+    m_rootCollidable = __that.m_rootCollidable;
+    return *this;
+}
+
+inline hkpWorldRayCastOutput::hkpWorldRayCastOutput() : m_rootCollidable(nullptr) {}
+
+inline hkpWorldRayCastOutput::hkpWorldRayCastOutput(const hkpWorldRayCastOutput& __that)
+  : hkpShapeRayCastOutput(&__that), m_rootCollidable(__that.m_rootCollidable) {}

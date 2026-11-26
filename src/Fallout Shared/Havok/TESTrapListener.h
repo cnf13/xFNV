@@ -1,6 +1,7 @@
 #pragma once
 
-#include "BSHavok/bhkTrapListener.h"
+#include "BSCore/NewOverloads.h"
+#include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
 
 class hkpEntity;

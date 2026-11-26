@@ -137,3 +137,8 @@ inline int32_t resetColor_guard;
 // Sixteen zero bytes between kHairTint and kLODLandParams that no code references.
 using unused_0_t = uint32_t[4];
 inline unused_0_t unused_0{};
+
+inline void BSShaderLightingProperty::SetShaderConstant(int32_t aiConstant, NiColorA aValue) {
+    // The table holds NiPoint4s; the four floats of the NiColorA are copied as they are.
+    pShaderLightConstants[aiConstant] = NiPoint4{aValue.r, aValue.g, aValue.b, aValue.a};
+}

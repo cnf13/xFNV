@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Thread/JobQueue/hkJobQueue.h"
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/QueryUtils/hkAabbTreeQueryUtils.h"
 #include "Havok/Source/Common/Internal/Collide/Tree/AabbTree/hkAabbTree.h"

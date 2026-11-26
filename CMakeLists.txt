@@ -108,12 +108,50 @@ add_subdirectory(external)
 add_subdirectory(src/platform)
 add_subdirectory(src/xfnv)
 
-# The game: every .cpp under src/ outside platform/ and xfnv/, which are the libraries above. Its own objects, not a
-# library, so that a file nothing references still reaches the program with its static initialisers.
-file(GLOB_RECURSE XFNV_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cpp")
-list(FILTER XFNV_SOURCES EXCLUDE REGEX "^${CMAKE_SOURCE_DIR}/src/(platform|xfnv)/")
-add_executable(FalloutNV WIN32 ${XFNV_SOURCES})
-target_link_libraries(FalloutNV PRIVATE xfnv_game_options xfnv_debugheap xfnv_dinput_sdl xfnv_bink SDL3::Headers)
+# The game: every .cpp under src/ outside platform/ and xfnv/, which are the libraries above, in a library per
+# folder: Gamebryo's NiSystem, NiMain, NiAnimation, NiParticle, NiCollision, NiXenonRenderer and NiDX9Renderer;
+# BSCore, BSSystem, BSSystemUtilities, BSMain, BSShader, BSHavok, BSAudio, BSDevices, BSMenu and BSMovie; Havok,
+# SpeedTree and FaceGen; and SDK, the rest of src/SDK (the C runtime's pieces, DirectShow's base classes). Fallout and
+# Fallout Shared are the program's own sources. Each is an object library, not a static one, so that a file nothing
+# references still reaches the program with its static initialisers.
+#
+# Header code: these files hold the instantiations of header-only templates over the game's types, so they are the
+# program's sources.
+set(XFNV_PROGRAM_HEADER_CODE
+    BSCore/BSList.cpp BSCore/BSScrapArray.cpp BSCore/BSSimpleArray.cpp BSCore/BSSimpleList.cpp BSCore/BSTFreeList.cpp
+    BSSystem/BSTMessageQueue.cpp Gamebryo2.2/CoreLibs/NiMain/NiTArray.cpp Gamebryo2.2/CoreLibs/NiMain/NiTLargeArray.cpp
+    Gamebryo2.2/CoreLibs/NiMain/NiTMap.cpp Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.cpp
+    Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.cpp Gamebryo2.2/CoreLibs/NiMain/NiTPool.cpp
+    Gamebryo2.2/CoreLibs/NiMain/NiTStringMap.cpp)
+list(TRANSFORM XFNV_PROGRAM_HEADER_CODE PREPEND "${CMAKE_SOURCE_DIR}/src/")
+set(XFNV_GAME_LIBRARIES)
+set(XFNV_CLAIMED ${XFNV_PROGRAM_HEADER_CODE})
+# A library of every .cpp under the folders of src/ given, less those an earlier library or the program claimed.
+function(xfnv_game_library NAME)
+    set(SOURCES)
+    foreach(DIR IN LISTS ARGN)
+        file(GLOB_RECURSE FOUND CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/${DIR}/*.cpp")
+        list(APPEND SOURCES ${FOUND})
+    endforeach()
+    list(REMOVE_ITEM SOURCES ${XFNV_CLAIMED})
+    add_library(${NAME} OBJECT ${SOURCES})
+    target_link_libraries(${NAME} PRIVATE xfnv_game_options SDL3::Headers)
+    set(XFNV_GAME_LIBRARIES ${XFNV_GAME_LIBRARIES} ${NAME} PARENT_SCOPE)
+    set(XFNV_CLAIMED ${XFNV_CLAIMED} ${SOURCES} PARENT_SCOPE)
+endfunction()
+foreach(LIB NiSystem NiMain NiAnimation NiParticle NiCollision NiXenonRenderer NiDX9Renderer)
+    xfnv_game_library(${LIB} Gamebryo2.2/CoreLibs/${LIB})
+endforeach()
+foreach(LIB BSCore BSSystem BSSystemUtilities BSMain BSShader BSHavok BSAudio BSDevices BSMenu BSMovie Havok SpeedTree)
+    xfnv_game_library(${LIB} ${LIB})
+endforeach()
+xfnv_game_library(FaceGen SDK/FaceGen)
+xfnv_game_library(SDK SDK)
+file(GLOB_RECURSE XFNV_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/Fallout/*.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Fallout Shared/*.cpp")
+add_executable(FalloutNV WIN32 ${XFNV_SOURCES} ${XFNV_PROGRAM_HEADER_CODE})
+target_link_libraries(FalloutNV PRIVATE ${XFNV_GAME_LIBRARIES} xfnv_game_options xfnv_debugheap xfnv_dinput_sdl
+    xfnv_bink SDL3::Headers)
 # An option is defined for the files that test it and no others: switching one recompiles only those.
 function(xfnv_option OPTION)
     set_property(SOURCE ${ARGN} APPEND PROPERTY COMPILE_DEFINITIONS "${OPTION}=$<BOOL:${${OPTION}}>")

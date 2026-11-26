@@ -11,9 +11,6 @@ class hkpCollisionDispatcher;
 class hkpCollisionInput;
 class hkpContactMgr;
 
-// Sorts the keys between low and high in place.
-void quickSortRecursive(uint32_t* keys, int32_t low, int32_t high, int32_t unused);
-
 // The agent between a bounding volume tree shape and another shape that keeps its child agents in a stream (an agent
 // track) and caches the queried AABB.
 class hkpBvTreeStreamAgent : public hkpCollisionAgent {

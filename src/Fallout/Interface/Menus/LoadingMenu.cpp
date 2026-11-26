@@ -8,11 +8,13 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
@@ -104,15 +106,15 @@ LoadingMenu::WelcomeScreenSettings LoadingMenu::pWelcomeScreensA = {
     SettingT<INISettingCollection>("sWelcomeScreen4:Loading", "loading_screen_legal"),
     SettingT<INISettingCollection>("sMainMenuBackground:Loading", "main_background"),
 };
-SettingT<INISettingCollection> gs_sTitleMusic_Loading("sTitleMusic:Loading", "MainTitle");
+SettingT<INISettingCollection> LoadingMenu::sTitleMusic("sTitleMusic:Loading", "MainTitle");
 SettingT<INISettingCollection>
     LoadingMenu::sInitialSound("sInitialSound:Loading", "fx\\ui\\loadscreen\\initial\\ui_loadscreen_initial.wav");
 SettingT<INISettingCollection> LoadingMenu::iMaxScreens("iMaxScreens:Loading", 4);
 SettingT<INISettingCollection> LoadingMenu::iMaxScreens_MainMenu("iMaxScreens_MainMenu:Loading", 20);
 SettingT<INISettingCollection> LoadingMenu::fLoadingTextUpdateInterval("fLoadingTextUpdateInterval:Loading", 10.0f);
-SettingT<INISettingCollection> gs_fLoadingBkgdUpdateInterval_Loading("fLoadingBkgdUpdateInterval:Loading", 10.0f);
-SettingT<INISettingCollection> gs_fMainMenuBkgdUpdateInterval_Loading("fMainMenuBkgdUpdateInterval:Loading", 10.0f);
-SettingT<INISettingCollection> gs_fLoadingInitUpdateInterval_Loading("fLoadingInitUpdateInterval:Loading", 4.0f);
+SettingT<INISettingCollection> LoadingMenu::fLoadingBkgdUpdateInterval("fLoadingBkgdUpdateInterval:Loading", 10.0f);
+SettingT<INISettingCollection> LoadingMenu::fMainMenuBkgdUpdateInterval("fMainMenuBkgdUpdateInterval:Loading", 10.0f);
+SettingT<INISettingCollection> LoadingMenu::fLoadingInitUpdateInterval("fLoadingInitUpdateInterval:Loading", 4.0f);
 SettingT<INISettingCollection> LoadingMenu::iNumLocationSpecificScreens("iNumLocationSpecificScreens:Loading", 1);
 
 LoadingMenuThread::LoadingMenuThread() : bFlagSuspend(false), bFlagSuspended(false), bExit(false) {
@@ -439,7 +441,7 @@ void LoadingMenu::Update() {
             if (!BSstrlen(BGSMoviePlayer::sMainMenuMovieIntro.String())) {
                 char cfilename[64];
                 ourMemset(cfilename, 0, 64u);
-                BSsprintf(cfilename, 64, "Data\\Music\\Special\\%s.mp3", gs_sTitleMusic_Loading.String());
+                BSsprintf(cfilename, 64, "Data\\Music\\Special\\%s.mp3", LoadingMenu::sTitleMusic.String());
                 FalloutAudio::SetMainMenuMusic(true);
                 FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename, 0, true, true, 0.0f, 0);
                 FalloutAudioMedia::MediaMenuUnPause();
@@ -452,7 +454,7 @@ void LoadingMenu::Update() {
     else {
         char cfilename[64];
         ourMemset(cfilename, 0, 64u);
-        BSsprintf(cfilename, 64, "Data\\Music\\Special\\%s.mp3", gs_sTitleMusic_Loading.String());
+        BSsprintf(cfilename, 64, "Data\\Music\\Special\\%s.mp3", LoadingMenu::sTitleMusic.String());
         FalloutAudio::SetMainMenuMusic(true);
         FalloutAudioMedia::MediaOpen(MEDIA_MAINMENU, cfilename, 0, true, true, 0.0f, 0);
         FalloutAudioMedia::MediaMenuUnPause();
@@ -684,7 +686,7 @@ void LoadingMenu::_Create(TESForm* apLocation) {
     }
     HUDMainMenu::SetMenuMode(HUDMainMenu::HMM_LOAD);
     HUDMainMenu::SetInfoForRef(nullptr, false, false);
-    HUDMainMenu::HandleHealthbarForCrosshairActor_(nullptr);
+    Interface::SetCrosshairTargetType(nullptr);
     if (pPlayer && !pMoviePlayer->GetPlayingSequence()) {
         pMoviePlayer->Stop();
     }
@@ -1336,13 +1338,13 @@ void LoadingMenu::AddCandidates(BSSimpleArray<TESLoadScreen*, 1024>& aCandidateL
 void LoadingMenu::NextSwap() {
     float fInterval;
     if (StartMenu::MainMenuIsActive()) {
-        fInterval = gs_fMainMenuBkgdUpdateInterval_Loading;
+        fInterval = LoadingMenu::fMainMenuBkgdUpdateInterval;
     }
     else if (LoadingMenu::bInitialLoad) {
-        fInterval = gs_fLoadingInitUpdateInterval_Loading;
+        fInterval = LoadingMenu::fLoadingInitUpdateInterval;
     }
     else {
-        fInterval = gs_fLoadingBkgdUpdateInterval_Loading;
+        fInterval = LoadingMenu::fLoadingBkgdUpdateInterval;
     }
     uiNextBackgroundSwap = static_cast<int64_t>(fInterval * 1000.0) + BSGetTickCount();
 }

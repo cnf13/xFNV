@@ -4,7 +4,7 @@
 #include "BSDevices/Xenon/XControls.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/Misc/Main.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
@@ -1272,15 +1272,6 @@ void Controls::ForceControllerButton(GAMEPAD_BUTTON aeButton) {
             }
         }
     }
-}
-
-void Controls::InitializeInstance(HINSTANCE__* hinst) {
-    Controls* oSInputGlobals;
-    if (Controls::pInstance) {
-        delete Controls::pInstance;
-    }
-    oSInputGlobals = new Controls(hinst);
-    Controls::pInstance = oSInputGlobals;
 }
 
 int32_t CALLBACK DIEnumDevicesCallback(const DIDEVICEINSTANCEA* lpddi, void* apRef) {

@@ -2,6 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/Menus/HackingText.h"
@@ -128,7 +129,7 @@ public:
     void Prepare(uint32_t aiWordsWant);
     // Writes ausVal as "0x" and four hex digits to apResult.
     void MakeHexString(uint16_t ausVal, char* apResult);
-    void SetupWordTiles();
+    void MakePasswordFile();
     // Recurses over aGrid's sub-grids (MakeSubGrid) to bound the guesses needed; Prepare passes its local Grid.
     uint32_t GetGuaranteedPossible(const Grid& aGrid);
     void DoIntro();

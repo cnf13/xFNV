@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
 // A 3x3 rotation (or general linear) matrix, row-major: m_pEntry[row][column].
@@ -115,4 +116,28 @@ inline NiPoint3 operator*(const NiPoint3& pt, const NiMatrix3& mat) {
     const float fY = pt.x * mat.m_pEntry[0][1] + pt.y * mat.m_pEntry[1][1] + pt.z * mat.m_pEntry[2][1];
     const float fX = pt.x * mat.m_pEntry[0][0] + pt.y * mat.m_pEntry[1][0] + pt.z * mat.m_pEntry[2][0];
     return NiPoint3(fX, fY, fZ);
+}
+
+inline NiMatrix3* NiMatrix3::Inverse(NiMatrix3* apResult) const {
+    NiMatrix3 kInverse;
+    if (!Inverse(kInverse)) {
+        kInverse.MakeZero();
+    }
+    *apResult = kInverse;
+    return apResult;
+}
+
+inline void NiMatrix3::MakeZRotationQ(float fAngle) {
+    float cs;
+    float sn;
+    NiSinCosQ(fAngle, &sn, &cs);
+    m_pEntry[0][0] = cs;
+    m_pEntry[0][1] = sn;
+    m_pEntry[0][2] = 0.0;
+    m_pEntry[1][0] = -sn;
+    m_pEntry[1][1] = cs;
+    m_pEntry[1][2] = 0.0;
+    m_pEntry[2][0] = 0.0;
+    m_pEntry[2][1] = 0.0;
+    m_pEntry[2][2] = 1.0;
 }

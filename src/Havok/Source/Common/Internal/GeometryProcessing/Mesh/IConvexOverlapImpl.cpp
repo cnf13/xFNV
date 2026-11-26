@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/Mesh/IConvexOverlapImpl.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/Mesh/hkgpMesh.h"
 
 IConvexOverlapImpl::~IConvexOverlapImpl() {}

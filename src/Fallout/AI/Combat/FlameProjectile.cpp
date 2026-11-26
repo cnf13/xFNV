@@ -3,7 +3,6 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/BGSProjectile.h"
 #include "Fallout Shared/GlobalFunc.h"

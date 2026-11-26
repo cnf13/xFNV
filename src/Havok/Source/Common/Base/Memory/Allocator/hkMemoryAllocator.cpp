@@ -51,3 +51,17 @@ bool hkMemoryAllocator::canAllocSingleBlock(int32_t numBytes) {
 void hkMemoryAllocator::bufFreePointers(void* p, int32_t numElem) {
     bufFree(p, sizeof(void*) * numElem);
 }
+
+hkMemoryAllocator::~hkMemoryAllocator() {}
+
+void hkMemoryAllocator::bufFreeRayCastOutputs(void* p, int32_t numElem) {
+    bufFree(p, sizeof(hkpWorldRayCastOutput) * numElem);
+}
+
+void hkMemoryAllocator::bufFreeArray(void* p, int32_t numElem) {
+    bufFree(p, numElem);
+}
+
+void hkMemoryAllocator::freeHandlePairBuffer(void* p, int32_t numElem) {
+    bufFree(p, sizeof(hkpBroadPhaseHandlePair) * numElem);
+}

@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSSleepDeprevation.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSPlaceableWater.h"
 #include "Fallout Shared/Magic/SpellItem.h"
@@ -63,8 +63,8 @@ bool BGSSleepDeprevationStage::Load(TESFile* apFile) {
 }
 
 void BGSSleepDeprevationStageData::Endian() {
-    ENDIAN(iSleep, false);
-    ENDIAN(pSickness, false);
+    BSEndian(iSleep, false);
+    BSEndian(pSickness, false);
 }
 
 void BGSSleepDeprevationStageData::Clear() {

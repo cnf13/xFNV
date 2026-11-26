@@ -20,3 +20,7 @@ public:
 
     static inline NiSystemDesc* ms_pkSystemDesc;
 };
+
+inline bool NiSystemDesc::IsLittleEndian() const {
+    return true;
+}

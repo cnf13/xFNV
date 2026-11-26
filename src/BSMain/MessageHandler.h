@@ -84,7 +84,7 @@ public:
     static void AddToWarningQueue();
     static void DisplayAssertQueue();
     static void DisplayWarningQueue();
-    static int32_t QWarningContext();
+    static WARNING_TYPES QWarningContext();
 
     // The handler is the static one set up by InitSDM (the constructor's abStatic); Close deletes the
     // handler only when this is false.
@@ -114,3 +114,33 @@ public:
     // The calling thread's warning count, which QWarningCount/SetWarningCount read and write.
     static inline thread_local int32_t iWarningCount;
 };
+
+inline WARNING_TYPES MessageHandler::QWarningContext() {
+    return BSCoreMessage::sCurrentWarningContext;
+}
+
+// The engine's printf-style warning printer. It is compiled empty: it reads no argument and returns 0.
+inline int32_t Warning(const char* apMessage, ...) {
+    return 0;
+}
+
+// The engine's start-up log, called printf-style. It is an empty function in this build, so its callers pass anything
+// from no argument to a message and its values.
+inline void InitializationFlow(...) {}
+
+// The same empty printer as Warning, called with a warning category first.
+template <class... A>
+int32_t Warning([[maybe_unused]] WARNING_TYPES aWarningContext, const char* apMessage, A... vList) {
+    // The C-variadic printer reads no argument (it returns 0), so the category is not passed on.
+    return Warning(apMessage, vList...);
+}
+
+inline void MessageHandler::SetYesToAll(bool abTF) {
+    bYesToAll = abTF;
+}
+
+inline void MessageHandler::Close() {
+    if (MessageHandler::pHandler && !MessageHandler::pHandler->bStatic && MessageHandler::pHandler) {
+        delete MessageHandler::pHandler;
+    }
+}

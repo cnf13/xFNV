@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/DecalData.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESModel.h"

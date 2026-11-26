@@ -115,9 +115,6 @@ public:
     static bool LoadFinalMasterXML();
     // Registers the tile menu of a menu class in xMenuList.
     static void SetMenuByClass(int32_t aiClass, Tile* apTile);
-    // True when the menu's tiles scale by the resolution ratio: its tile menu's id is &pipboymenu; (0x70) or its
-    // class is &RaceSexMenu; (0x40C), &HackingMenu; (0x41F) or &ComputersMenu; (0x421). False without a tile menu.
-    static bool ShouldScaleByResolutionRatio(Menu* apMenu);
     static void operator delete(void* apMemory);
     // Creates the interned "Tileptr" fixed string a tile's extra data is named with.
     static void InitSDM();

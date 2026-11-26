@@ -217,7 +217,7 @@ void BSTexturePalette::Unlock() {
 }
 
 void BSTexturePalette::SetCheckPurgedList(bool abCheck) {
-    bCheckPurgedTextureList = abCheck;
+    BSTexturePalette::bCheckPurgedListS = abCheck;
 }
 
 void BSTexturePalette::SetMaxTexturesToPurge(int32_t aNumTextures) {
@@ -607,4 +607,9 @@ void BSEntryMap::SetAt(const BSFileEntry* apEntry, BSTexMapItem* apValue) {
         pItemA[iindex] = nullptr;
     }
     ++iCount;
+}
+
+bool BSEntryMap::GetAt(const BSFileEntry* apEntry, NiPointer<NiTexture>& arTexture) {
+    uint32_t uiIndex = KeyToHashIndex(apEntry);
+    return GetAt(uiIndex, apEntry, arTexture);
 }

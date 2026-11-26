@@ -1,15 +1,16 @@
 #include "Fallout Shared/TESActorBaseData.h"
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSVoiceType.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/InventoryChanges.h"
 #include "Fallout Shared/Pathfinding/PathManager.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFaction.h"
@@ -166,22 +167,22 @@ SettingT<GameSettingCollection> sKarmicTitleEvil29("sKarmicTitleEvil29", "Scourg
 SettingT<GameSettingCollection> sKarmicTitleEvil30("sKarmicTitleEvil30", "Scourge of Humanity");
 
 void FACTION_RANK::Endian() {
-    ENDIAN(pFaction, false);
+    BSEndian(pFaction, false);
 }
 
-// Swaps every field: the dwords with ENDIAN<long>, the shorts with ENDIAN<short>, in field
+// Swaps every field: the dwords with BSEndian<long>, the shorts with BSEndian<short>, in field
 // order.
 void ACTOR_BASE_DATA::Endian() {
-    ENDIAN(iActorBaseFlags, false);
-    ENDIAN(usFatigue, false);
-    ENDIAN(usBartergold, false);
-    ENDIAN(sLevel, false);
-    ENDIAN(usCalcLevelMin, false);
-    ENDIAN(usCalcLevelMax, false);
-    ENDIAN(usSpeedMult, false);
-    ENDIAN(fKarma, false);
-    ENDIAN(usBaseDisposition, false);
-    ENDIAN(sTemplateUseFlags, false);
+    BSEndian(iActorBaseFlags, false);
+    BSEndian(usFatigue, false);
+    BSEndian(usBartergold, false);
+    BSEndian(sLevel, false);
+    BSEndian(usCalcLevelMin, false);
+    BSEndian(usCalcLevelMax, false);
+    BSEndian(usSpeedMult, false);
+    BSEndian(fKarma, false);
+    BSEndian(usBaseDisposition, false);
+    BSEndian(sTemplateUseFlags, false);
 }
 
 TESActorBaseData::TESActorBaseData() {
@@ -793,7 +794,7 @@ void TESActorBaseData::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 // Saves the old save format: a block header and a size slot when the save uses blocks, the base data when flagged,
 // then the count and the faction ranks (each faction's form ID and rank). The block size is patched in afterwards.
-void TESActorBaseData::SaveGameTES(uint32_t aiFlags) {
+void TESActorBaseData::SaveGame(uint32_t aiFlags) {
     uint32_t iFormID;
     uint8_t cRank;
     uint16_t usCount;
@@ -871,7 +872,7 @@ void TESActorBaseData::SaveGameTES(uint32_t aiFlags) {
 
 // Loads the old save format: a block header and size when the save uses blocks, the base data when flagged, then
 // the faction ranks. The block's end is checked against its size afterwards, with a warning on an underrun or overrun.
-void TESActorBaseData::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
+void TESActorBaseData::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     uint8_t cRank;
     uint32_t uiFormID;
     uint16_t usCount;

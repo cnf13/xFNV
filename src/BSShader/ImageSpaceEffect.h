@@ -101,3 +101,7 @@ public:
 inline void NiIncRefCount(ImageSpaceEffect*) {}
 
 inline void NiDecRefCount(ImageSpaceEffect*) {}
+
+inline void ImageSpaceEffect::SetActive(bool abActive) {
+    bIsActive = abActive;
+}

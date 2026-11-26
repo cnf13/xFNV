@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/ListBox.h"
@@ -135,6 +136,10 @@ public:
     static void ClearCount128();
     // SetCurrentTab on the open map menu, if any.
     static void SetCurrentMapPage(uint8_t aucTab);
+    // Sets the fog of war on the open map menu.
+    static void SetFogOfWar(bool abFogOfWar);
+    // Whether the map menu shows the fog of war; true without a map menu.
+    static bool QFogOfWar();
     // True when apObjective's quest is not the quest the map menu shows.
     static bool IsQuestMapMenuSelectedQuest(BGSQuestObjective* apObjective);
     static bool ShouldRenderLocalMap();
@@ -272,12 +277,22 @@ inline int32_t mapMarkerIndex;
 inline int32_t g_lastMapMenuScrollTime;
 inline int32_t iLastWaveformScrollTime;
 
-extern SettingT<GameSettingCollection> gs_fLocalfPlayerCursorMinSize;
+extern SettingT<GameSettingCollection> fLocalPlayerCursorMinSize;
 
-extern SettingT<GameSettingCollection> gs_fWorldfPlayerCursorMinSize;
+extern SettingT<GameSettingCollection> fWorldPlayerCursorMinSize;
 
 extern SettingT<INIPrefSettingCollection> bShowQuestMarkers;
 
 // sChallengeKill, sChallengeDamage and sChallengeOther.
 using g_challengeStringsArray_t = SettingT<GameSettingCollection>* [3];
 extern g_challengeStringsArray_t g_challengeStringsArray;
+
+inline bool MapMenu::QFogOfWar() {
+    return !MapMenu::pMe || MapMenu::pMe->bFogOfWarEnabled;
+}
+
+inline void MapMenu::SetFogOfWar(bool abFogOfWar) {
+    if (MapMenu::pMe) {
+        MapMenu::pMe->bFogOfWarEnabled = abFogOfWar;
+    }
+}

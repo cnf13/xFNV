@@ -4,8 +4,10 @@
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Reflection/hkTypeInfo.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/hkpShapeCollection.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Tree/hkpBvTreeShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Misc/Bv/hkpBvShape.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeType.h"
 
 class hkpMoppCode;
@@ -80,3 +82,8 @@ public:
 extern hkClass hkMoppBvTreeShapeBaseClass;
 extern hkClass hkpMoppBvTreeShapeClass;
 extern hkTypeInfo hkpMoppBvTreeShapeTypeInfo;
+
+// The SDK's inline body; the child container's getChild is a trivial accessor.
+inline const hkpShapeCollection* hkpMoppBvTreeShape::getShapeCollection() const {
+    return static_cast<const hkpShapeCollection*>(m_child.m_childShape);
+}

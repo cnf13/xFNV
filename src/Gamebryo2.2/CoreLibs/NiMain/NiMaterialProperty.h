@@ -72,3 +72,7 @@ public:
     // The index the next material gets (the constructors take it with an interlocked increment).
     static inline int32_t ms_iNextIndex = 1;
 };
+
+inline void NiMaterialProperty::SetAmbientColor(const NiColor& c) {}
+
+inline void NiMaterialProperty::SetDiffuseColor(const NiColor& c) {}

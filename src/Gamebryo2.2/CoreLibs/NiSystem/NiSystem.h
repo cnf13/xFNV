@@ -89,7 +89,10 @@ uint32_t NiAtomicDecrement(uint32_t& auiValue);
 // Case-insensitive compare (the CRT's _stricmp).
 int32_t NiStricmp(const char* s1, const char* s2);
 // strcpy_s into pcDest of stDestSize bytes.
-char* NiStrcpy(char* pcDest, size_t stDestSize, const char* pcSrc);
+inline char* NiStrcpy(char* pcDest, size_t stDestSize, const char* pcSrc) {
+    strcpy_s(pcDest, stDestSize, pcSrc);
+    return pcDest;
+}
 // strncpy_s of at most stCount characters of pcSrc into pcDest of stDestSize bytes; returns pcDest.
 char* NiStrncpy(char* pcDest, size_t stDestSize, const char* pcSrc, size_t stCount);
 uint32_t XInputGetState(uint32_t dwUserIndex, _XINPUT_STATE* pXInputState);
@@ -279,3 +282,21 @@ extern "C" DECLSPEC_IMPORT int32_t WINAPI mmioRead(HMMIO hmmio, char* pch, int32
 extern "C" DECLSPEC_IMPORT uint32_t WINAPI mmioAscend(HMMIO hmmio, _MMCKINFO* pmmcki, uint32_t fuAscend);
 extern "C" DECLSPEC_IMPORT uint32_t WINAPI mmioGetInfo(HMMIO hmmio, _MMIOINFO* pmmioinfo, uint32_t fuInfo);
 extern "C" DECLSPEC_IMPORT uint32_t WINAPI mmioAdvance(HMMIO hmmio, _MMIOINFO* pmmioinfo, uint32_t fuAdvance);
+
+// Formats into pcDest with the CRT's vsnprintf, then always terminates the last byte (vsnprintf returns -1 without
+// terminating when the text does not fit); returns 1 without writing for a zero size.
+inline int32_t NiSprintf(char* pcDest, size_t stDestSize, const char* pcFormat, ...) {
+    if (stDestSize == 0) {
+        return 1;
+    }
+    va_list kArgs;
+    va_start(kArgs, pcFormat);
+    int32_t iRet = vsprintf_s(pcDest, stDestSize, pcFormat, kArgs);
+    pcDest[stDestSize - 1] = '\0';
+    return iRet;
+}
+
+inline char* NiStrncpy(char* pcDest, size_t stDestSize, const char* pcSrc, size_t stCount) {
+    strncpy_s(pcDest, stDestSize, pcSrc, stCount);
+    return pcDest;
+}

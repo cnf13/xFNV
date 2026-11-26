@@ -8,7 +8,7 @@
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -163,22 +163,4 @@ NiTexturingProperty* TESRegionDataLandscape::GetDefaultFullMaskTextureProp() {
 void TESRegionDataLandscape::ClearDefaultTextureProps() {
     TESRegionDataLandscape::spDefaultFullMaskTextureProp = static_cast<NiTexturingProperty*>(nullptr);
     TESRegionDataLandscape::spDefaultEmptyMaskTextureProp = static_cast<NiTexturingProperty*>(nullptr);
-}
-
-// MarkAsChanged advances the revision ID once.
-void NiPixelData::MarkAsChanged() {
-    ++m_uiRevID;
-}
-
-NiTexture::FormatPrefs::FormatPrefs()
-  : m_ePixelLayout(PIX_DEFAULT), m_eAlphaFmt(ALPHA_DEFAULT), m_eMipMapped(MIP_DEFAULT) {}
-
-// Sets the base map's clamp mode, creating the base map when there is none.
-void NiTexturingProperty::SetBaseClampMode(ClampMode eMode) {
-    Map* pkBaseMap = m_kMaps[0];
-    if (!pkBaseMap) {
-        pkBaseMap = ::new Map;
-        m_kMaps.SetAt(0, pkBaseMap);
-    }
-    pkBaseMap->SetClampMode(eMode);
 }

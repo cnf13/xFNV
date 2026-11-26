@@ -2,6 +2,7 @@
 
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSBlastNode.h"
 #include "BSMain/BSBound.h"
 #include "BSMain/BSDamageStage.h"
@@ -28,7 +29,6 @@
 #include "BSMain/NiBSBoneLODController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSTexturePalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -42,6 +42,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiPath.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/string.h"

@@ -11,3 +11,14 @@ public:
     void Start();
     void Stop();
 };
+
+inline BSPerformanceTimer::BSPerformanceTimer(
+    const char* apSystem,
+    const char* apName,
+    bool abDisplayPerFrame,
+    bool abGlobalReset
+) {}
+
+inline void BSPerformanceTimer::Start() {}
+
+inline void BSPerformanceTimer::Stop() {}

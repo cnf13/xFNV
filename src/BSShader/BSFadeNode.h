@@ -142,4 +142,19 @@ public:
     static MinNearDistanceSetting iMinNearDistance;
     static inline MaxAlphaAccessFunc pMaxAlphaAccessFunc{};
     static inline float fMaxFadeIncrement = 0.1f;
+    // BSFadeNode's fLODMultTrees; BSFadeNode.cpp's initialiser builds it with SettingT<INISettingCollection>'s float
+    // constructor.
+    static SettingT<INISettingCollection> fLODMultTrees;
 };
+
+inline void BSFadeNode::SetIgnoreFade(bool abIgnoreFade) {
+    NiAVObject::SetIgnoreFade(abIgnoreFade);
+}
+
+inline float BSFadeNode::GetBoundRadius() {
+    return fBoundRadius;
+}
+
+inline bool BSFadeNode::IsVisible() {
+    return static_cast<uint8_t>(GetIgnoreFade()) || (!BSFadeNode::bFadeEnabled || fCurrentFade > 0.0);
+}

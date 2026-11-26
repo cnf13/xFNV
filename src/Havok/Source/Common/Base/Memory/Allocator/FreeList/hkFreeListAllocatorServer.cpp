@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocatorServer.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkFreeListAllocatorServer::~hkFreeListAllocatorServer() {}
 

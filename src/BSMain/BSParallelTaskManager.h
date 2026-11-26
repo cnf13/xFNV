@@ -1,10 +1,29 @@
 #pragma once
 
+#include "BSCore/BSLinearTaskThread.h"
 #include "BSHavok/HavokThreadMemoryStruct.h"
-#include "Fallout/AI/AILinearTaskThreadManager.h"
 
-class BSParallelArrayTask;
 class BSParallelTaskThread;
+
+// A task that the worker threads run once per item of an array: each call gets the array and the next unclaimed index.
+// Only some of the members are declared.
+class BSParallelArrayTask {
+public:
+    // the function the worker threads run on every item
+    using TaskFunc_t = void (*)(void* apData, uint32_t auiIndex);
+
+    BSParallelArrayTask() = default;
+    BSParallelArrayTask(TaskFunc_t apTaskFunc, void* apData, uint32_t aiSize);
+
+    // 0x0
+    TaskFunc_t pTaskFunc;
+    // 0x4
+    void* pData;
+    // 0x8
+    uint32_t iSize;
+    // 0xC the next index a worker claims
+    volatile uint32_t iIndex;
+};
 
 // Runs tasks on the worker threads.
 class BSParallelTaskManager {
@@ -60,3 +79,6 @@ inline BSParallelTaskManager_ThreadProcessorArray aiThread{5};
 
 // The engine's one task manager.
 inline BSParallelTaskManager* pParallelTaskManager;
+
+inline BSParallelArrayTask::BSParallelArrayTask(TaskFunc_t apTaskFunc, void* apData, uint32_t aiSize)
+  : pTaskFunc(apTaskFunc), pData(apData), iSize(aiSize), iIndex(0) {}

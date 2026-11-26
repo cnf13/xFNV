@@ -21,8 +21,8 @@ SCRIPT_LOCAL::SCRIPT_LOCAL(const SCRIPT_LOCAL* apSource)
 
 // Swaps the variable's id and value into the machine's byte order.
 void SCRIPT_LOCAL::Endian() {
-    ENDIAN(uiID, false);
-    ENDIAN(fValue, false);
+    BSEndian(uiID, false);
+    BSEndian(fValue, false);
 }
 
 ScriptVariable::ScriptVariable() : data(), cName() {}

@@ -4,7 +4,7 @@
 #include "BSCore/MemoryManager.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderFactory.h"
@@ -387,17 +387,4 @@ void NiD3DShaderFactory::_SDMInit() {
         // NiRenderer::Error is an empty stub, so this message is never read.
         NiRenderer::Error("Failed to create shader factory!");
     }
-}
-
-// Formats into pcDest with the CRT's vsnprintf, then always terminates the last byte (vsnprintf returns -1 without
-// terminating when the text does not fit); returns 1 without writing for a zero size.
-int32_t NiSprintf(char* pcDest, size_t stDestSize, const char* pcFormat, ...) {
-    if (stDestSize == 0) {
-        return 1;
-    }
-    va_list kArgs;
-    va_start(kArgs, pcFormat);
-    int32_t iRet = vsprintf_s(pcDest, stDestSize, pcFormat, kArgs);
-    pcDest[stDestSize - 1] = '\0';
-    return iRet;
 }

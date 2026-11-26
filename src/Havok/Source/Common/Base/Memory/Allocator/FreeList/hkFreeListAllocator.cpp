@@ -1,5 +1,6 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocator.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Algorithm/Sort/hkSort.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeList.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkLargeBlockAllocator.h"
@@ -438,14 +439,7 @@ hkResult hkFreeListAllocator::walkMemory(hkFreeListAllocator::MemoryWalkCallback
         pFreeList->getBlocks(ppDest, iNumBlocks);
         ppDest += iNumBlocks;
     }
-    if (iTotalBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-            ppBlocks,
-            0,
-            iTotalBlocks - 1,
-            &hkFreeListAllocator::_comparePointers
-        );
-    }
+    hkAlgorithm::quickSort(ppBlocks, iTotalBlocks, &hkFreeListAllocator::_comparePointers);
     void** ppNextBlock = ppBlocks;
     hkLargeBlockAllocator::Iterator iter;
     m_largeAllocator.getIterator(&iter);
@@ -503,9 +497,4 @@ void hkFreeListAllocator::_deleteFreeList(hkFreeList* freeList) {
     if (&freeList[1] == m_topFreeList) {
         this->m_topFreeList = m_topFreeList - 1;
     }
-}
-
-// The two addresses are compared as unsigned integers; the pointees are never read.
-hkBool hkFreeListAllocator::_comparePointers(const void* a, const void* b) {
-    return reinterpret_cast<uintptr_t>(a) < reinterpret_cast<uintptr_t>(b);
 }

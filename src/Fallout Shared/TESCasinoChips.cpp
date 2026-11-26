@@ -2,7 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSMessageIcon.h"
@@ -25,19 +25,19 @@
 #include "xfnv/Compiler.h"
 
 void CASINO_DATA::Endian() {
-    ENDIAN(fBJ_ShufflePercent, false);
-    ENDIAN(fBJ_BlackjackPayout, false);
-    ENDIAN(iSlotStop_A, false);
-    ENDIAN(iSlotStop_B, false);
-    ENDIAN(iSlotStop_C, false);
-    ENDIAN(iSlotStop_D, false);
-    ENDIAN(iSlotStop_E, false);
-    ENDIAN(iSlotStop_F, false);
-    ENDIAN(iSlotStop_W, false);
-    ENDIAN(iBJNumDecks, false);
-    ENDIAN(iMaxWinnings, false);
-    ENDIAN(casinoChipID, false);
-    ENDIAN(questID, false);
+    BSEndian(fBJ_ShufflePercent, false);
+    BSEndian(fBJ_BlackjackPayout, false);
+    BSEndian(iSlotStop_A, false);
+    BSEndian(iSlotStop_B, false);
+    BSEndian(iSlotStop_C, false);
+    BSEndian(iSlotStop_D, false);
+    BSEndian(iSlotStop_E, false);
+    BSEndian(iSlotStop_F, false);
+    BSEndian(iSlotStop_W, false);
+    BSEndian(iBJNumDecks, false);
+    BSEndian(iMaxWinnings, false);
+    BSEndian(casinoChipID, false);
+    BSEndian(questID, false);
 }
 
 TESCasinoChips::TESCasinoChips() {

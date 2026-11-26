@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiSequence.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderLibrary.h"
@@ -13,6 +14,7 @@
 
 class IDLE_ANIM_ROOT;
 class NiShader;
+class Setting;
 
 // Map keyed by C strings: hashes and compares the characters, and with m_bCopy set owns a copy of each key.
 template <class TPARENT, class TVAL>

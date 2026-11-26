@@ -60,7 +60,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -1256,11 +1256,11 @@ void SlotMachineMenu::SwapFrontfacingTextures() {
 void SlotMachineMenu::UpdateEarningsString() {
     char acEarnings[264];
     int32_t iTotalWinnings = g_slotMachineCasinoStats->iTotalWinnings;
-    const char* pEarningsText = sCasinoEarningsText.String();
+    const char* pEarningsText = sEarningsText.String();
     BSsprintf(acEarnings, 260, "%s %s%i", SlotMachineMenu::pCasino->GetFullName(), pEarningsText, iTotalWinnings);
     int32_t iLength = BSstrlen(acEarnings);
     if (iLength < 23) {
-        pEarningsText = sCasinoEarningsText.String();
+        pEarningsText = sEarningsText.String();
         BSsprintf(acEarnings, 260, "%s %s", SlotMachineMenu::pCasino->GetFullName(), pEarningsText);
         for (int32_t i = 0; i < 23 - iLength; ++i) {
             acEarnings[iLength - 1 + i] = 32;
@@ -1288,7 +1288,7 @@ void SlotMachineMenu::DrawScene() {
     BSCullingProcess* pCuller = pWorldSceneGraph->pCuller;
     pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiCamera* pCamera = SlotMachineMenu::sp3DCamera.m_pObject;
-    NiCamera::HandleEyeFinityFOVScale(pCamera, 0.15f);
+    HandleEyeFinityFOVScale(pCamera, 0.15f);
     NiPointer<NiRefObject> spAccumulator(static_cast<NiRefObject*>(InterfaceManager::Instance()->Get3dAccumulator()));
     pCuller->SetAccumulator(static_cast<NiAccumulator*>(spAccumulator.m_pObject));
     NiCamera* pSceneCamera = pCamera ? pCamera : pWorldSceneGraph->GetCamera();
@@ -1408,7 +1408,7 @@ Tile* SlotMachineMenu::Create(
                     int32_t iPlayerChips = pPlayer->GetInventoryObjectCount(pChipType);
                     SlotMachineMenu::pMe->pTiles[1]->Set(SlotMachineMenu::iUT_X, iPlayerChips);
                     if (BSstrlen(SlotMachineMenu::pCasino->GetFullName())) {
-                        const char* pEarningsText = sCasinoEarningsText.String();
+                        const char* pEarningsText = sEarningsText.String();
                         BSsprintf(acEarningsName, 64, "%s %s", SlotMachineMenu::pCasino->GetFullName(), pEarningsText);
                     }
                     else {
@@ -1425,7 +1425,7 @@ Tile* SlotMachineMenu::Create(
                     SlotMachineMenu::pMe->pTiles[5]->Set(4036, pDecreaseBetText, true);
                     const char* pPayoutListText = sPayoutListText.String();
                     SlotMachineMenu::pMe->pTiles[6]->Set(4036, pPayoutListText, true);
-                    const char* pBetMaxText = gs_sBetMax.String();
+                    const char* pBetMaxText = sBetMaxText.String();
                     SlotMachineMenu::pMe->pTiles[7]->Set(4036, pBetMaxText, true);
                     const char* pPressAnyButtonText = sSlotPressAnyButtonText.String();
                     SlotMachineMenu::pMe->pTiles[9]->Set(4036, pPressAnyButtonText, true);

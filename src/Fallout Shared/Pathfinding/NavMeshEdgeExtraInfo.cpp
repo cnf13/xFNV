@@ -9,7 +9,7 @@ void EdgeExtraInfo::SetFromBuffer(TESFile* apFile, char* apChunkBuffer) {
     // The char buffer is read as a whole EDGE_EXTRA_INFO_TYPE, not as a single char.
     eType = *reinterpret_cast<EDGE_EXTRA_INFO_TYPE*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<EDGE_EXTRA_INFO_TYPE>(eType, false);
+        BSEndian<EDGE_EXTRA_INFO_TYPE>(eType, false);
     }
     NavMeshInfoMap* NavMeshInfoMap_ = TES::pInstance->GetNavMeshInfoMap();
     Portal.Load(NavMeshInfoMap_, apFile, apChunkBuffer + 4);

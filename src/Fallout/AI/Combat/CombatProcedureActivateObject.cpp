@@ -1,6 +1,6 @@
 #include "Fallout/AI/Combat/CombatProcedureActivateObject.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMenu/IDebugText.h"
 #include "Fallout Shared/TESForm.h"

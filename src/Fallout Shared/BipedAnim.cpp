@@ -9,6 +9,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
@@ -27,8 +28,7 @@
 #include "BSMain/BSXFlags.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderManager.h"
@@ -55,7 +55,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Fallout Shared/FaceGen/BSFaceGenUtils.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/FaceGen/FaceGenDatas.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -78,6 +77,7 @@
 #include "Fallout Shared/ScreenCustomSplatter.h"
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -184,6 +184,7 @@
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
@@ -207,10 +208,6 @@ static Player1stPersonModelArray Player1stPersonModel;
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<GameSettingCollection> sHandToHandIcon("sHandToHandIcon", "Icons\\Weapons\\HandToHand.dds");
 SettingT<INISettingCollection> bLoadHelmetsInBackground("bLoadHelmetsInBackground:BackgroundLoad", true);
-
-int32_t BSstrlwr(char* apString1, int32_t aiSize) {
-    return _strlwr_s(apString1, aiSize);
-}
 
 // Every member is a pointer, a flag or a float: the whole object starts zeroed.
 BipedAnim::BipedAnim(TESObjectREFR* apRef, NiNode* apNode) {
@@ -1747,29 +1744,6 @@ BSShaderPPLightingProperty* BipedAnim::GetLightingProperty(NiAVObject* apObj) {
     return bLighting ? static_cast<BSShaderPPLightingProperty*>(pProperty) : nullptr;
 }
 
-int32_t BSstrncpy(char* apString1, const char* apString2, int32_t aiLen) {
-    return strncpy_s(apString1, aiLen + 1, apString2, aiLen);
-}
-
-hkpWorldObject* bhkWorldObject::operator*() {
-    if (this) {
-        return Gethk();
-    }
-    return nullptr;
-}
-
-BSCloningProcess::BSCloningProcess(float afScale) : NiCloningProcess(0x101u) {
-    SetScale(afScale);
-}
-
-BSCloningProcess::~BSCloningProcess() {}
-
-void BSCloningProcess::SetScale(float afScale) {
-    Scale.z = afScale;
-    Scale.y = afScale;
-    Scale.x = afScale;
-}
-
 bool BSFaceGenManager::GetUseMultiThreading() {
     return BSFaceGenManager::bUseMultiThreadedFaceGen.Bool() && BSFaceGenManager::bUseFaceGenHeads.Bool();
 }
@@ -1797,47 +1771,4 @@ NiTexture* BSFaceGenManager::GetDefaultDetailModulationTexture() {
 
 bool TESObjectWEAP::GetHideBackpack() {
     return (data.cFlags & TESObjectWEAP::WEAPON_FLAG_HIDE_BACKPACK) != 0;
-}
-
-float NiAVObject::GetScale() {
-    return m_kLocal.m_fScale;
-}
-
-char NiObjectNET::GetDefaultAppendCharacter() {
-    return ms_cAppendCharacter;
-}
-
-uint32_t NiSkinData::GetBoneCount() const {
-    return m_uiBones;
-}
-
-NiSkinPartition* NiSkinInstance::GetSkinPartition() const {
-    return m_spSkinPartition;
-}
-
-NiSkinData* NiSkinInstance::GetSkinData() const {
-    return m_spSkinData;
-}
-
-NiAVObject** NiSkinInstance::GetBones() const {
-    return m_ppkBones;
-}
-
-void NiSkinInstance::SetBone(uint32_t i, NiAVObject* pkBone) {
-    m_ppkBones[i] = pkBone;
-}
-
-void NiSkinInstance::SetRootParent(NiAVObject* pkRootParent) {
-    m_pkRootParent = pkRootParent;
-}
-
-void NiSkinInstance::SetSkinPartition(NiSkinPartition* pkSkinPartition) {
-    m_spSkinPartition = pkSkinPartition;
-}
-
-void NiSourceTexture::SetLookNormal() {}
-
-// Always false: cLooked is read and masked with zero.
-bool NiSourceTexture::QLookNormal() {
-    return false;
 }

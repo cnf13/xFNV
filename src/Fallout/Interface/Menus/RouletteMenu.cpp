@@ -1,4 +1,6 @@
 #include "Fallout/Interface/Menus/RouletteMenu.h"
+#include "BSCore/NewOverloads.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include "BSAudio/BSAudio.h"
@@ -50,7 +52,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -814,11 +816,11 @@ int32_t RouletteMenu::GetClass() {
 void RouletteMenu::UpdateEarningsString() {
     char acEarningsText[264];
     int32_t iTotalWinnings = RouletteMenu::pCasinoData->iTotalWinnings;
-    const char* pEarnings = sCasinoEarningsText.String();
+    const char* pEarnings = sEarningsText.String();
     BSsprintf(acEarningsText, 260u, "%s %s%i", RouletteMenu::pCasino->GetFullName(), pEarnings, iTotalWinnings);
     int32_t ilen = BSstrlen(acEarningsText);
     if (ilen < 23) {
-        pEarnings = sCasinoEarningsText.String();
+        pEarnings = sEarningsText.String();
         BSsprintf(acEarningsText, 260u, "%s %s", RouletteMenu::pCasino->GetFullName(), pEarnings);
         for (int32_t i = 0; i < 23 - ilen; ++i) {
             acEarningsText[ilen - 1 + i] = ' ';
@@ -1027,7 +1029,7 @@ void RouletteMenu::Prepare3DElements() {
     float fradius = RouletteMenu::spModel->GetWorldBound().m_fRadius * 4.0;
     NiNode* pModel = RouletteMenu::spModel.m_pObject;
     BSShaderManager::GetShadowSceneNode(1)->AddAllLightsFromNode_Recurse(pModel, fradius);
-    SetupPossibleBets();
+    PrepareBetTiles();
 }
 
 NiCamera* RouletteMenu::Create3DCamera() {
@@ -1152,7 +1154,7 @@ bool RouletteMenu::IsBetChipHidden(int32_t aiIndex) {
     return pBetGeometry[aiIndex - 3]->GetTranslate().z < -3.0;
 }
 
-void RouletteMenu::SetupPossibleBets() {
+void RouletteMenu::PrepareBetTiles() {
     uint32_t auiNumberStrip[38];
     char cLetter = 'A';
     char cTens = '0';
@@ -1554,11 +1556,11 @@ void RouletteMenu::SetupPossibleBets() {
             pBet = sBetText.String();
             BSsprintf(betTileInfoArray[k + 3].cBetTiles, 64, "%s: %s \n%s: 1:1", pBet, pText, pPayout);
             pPayout = sPayoutText.String();
-            pText = gs_sBlacktext.String();
+            pText = sBlackText.String();
             pBet = sBetText.String();
             BSsprintf(betTileInfoArray[k + 4].cBetTiles, 64, "%s: %s \n%s: 1:1", pBet, pText, pPayout);
             pPayout = sPayoutText.String();
-            pText = gs_sOddtext.String();
+            pText = sOddText.String();
             pBet = sBetText.String();
             BSsprintf(betTileInfoArray[k + 6].cBetTiles, 64, "%s: %s \n%s: 1:1", pBet, pText, pPayout);
             pPayout = sPayoutText.String();
@@ -1732,7 +1734,7 @@ void RouletteMenu::DrawScene() {
     BSCullingProcess* pCuller = pSceneGraph->pCuller;
     pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiCamera* pCamera = RouletteMenu::sp3DCamera.m_pObject;
-    NiCamera::HandleEyeFinityFOVScale(pCamera, 0.15f);
+    HandleEyeFinityFOVScale(pCamera, 0.15f);
     NiPointer<NiRefObject> spAccumulator(static_cast<NiRefObject*>(InterfaceManager::Instance()->Get3dAccumulator()));
     pCuller->SetAccumulator(static_cast<NiAccumulator*>(spAccumulator.m_pObject));
     NiCamera* pRenderCamera = pCamera ? pCamera : pSceneGraph->GetCamera();
@@ -1912,11 +1914,11 @@ Tile* RouletteMenu::Create(
     // The casino's name, or its editor ID when it has none.
     char acEarnings[64];
     if (BSstrlen(static_cast<TESFullName*>(pCasino)->GetFullName())) {
-        const char* pEarningsText = sCasinoEarningsText.String();
+        const char* pEarningsText = sEarningsText.String();
         BSsprintf(acEarnings, 0x40, "%s %s", static_cast<TESFullName*>(pCasino)->GetFullName(), pEarningsText);
     }
     else {
-        const char* pEarningsText = sCasinoEarningsText.String();
+        const char* pEarningsText = sEarningsText.String();
         BSsprintf(acEarnings, 0x40, "%s %s", pCasino->GetFormEditorID(), pEarningsText);
     }
     RouletteMenu::pMe->pTiles[2]->Set(iUT_Value, acEarnings, true);

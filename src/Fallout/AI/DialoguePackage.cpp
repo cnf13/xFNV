@@ -93,7 +93,7 @@ void DialoguePackage::LoadGame() {
         LoadGameDataOLD(&sHasConversation, sizeof(sHasConversation));
         if (sHasConversation) {
             pConversation = new Conversation;
-            pConversation->LoadGameTES();
+            pConversation->LoadGame();
             int16_t sItemIndex;
             LoadGameDataOLD(&sItemIndex, sizeof(sItemIndex));
             if (sItemIndex == -1) {
@@ -266,7 +266,7 @@ void DialoguePackage::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     char cHasConversation = pConversation != nullptr;
     apSaveGameBuffer->SaveDataEndian(&cHasConversation, sizeof(cHasConversation), 0);
     if (cHasConversation) {
-        pConversation->SaveGameBGS(apSaveGameBuffer);
+        pConversation->SaveGame(apSaveGameBuffer);
         int16_t sCurrentItemIndex;
         if (pCurrentItem) {
             sCurrentItemIndex = pConversation->GetDialogueItemIndex(pCurrentItem);
@@ -315,7 +315,7 @@ void DialoguePackage::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&bHasConversation, sizeof(bHasConversation));
     if (bHasConversation) {
         pConversation = new Conversation;
-        pConversation->LoadGameBGS(apLoadGameBuffer);
+        pConversation->LoadGame(apLoadGameBuffer);
         int16_t sItemIndex = -1;
         apLoadGameBuffer->LoadData(&sItemIndex, sizeof(sItemIndex));
         if (sItemIndex != -1) {
@@ -387,7 +387,7 @@ uint16_t DialoguePackage::GetSaveSize() {
     }
     uint16_t usSize = sDataSize + 18;
     if (pConversation) {
-        usSize += pConversation->GetSaveSizeTES() + 4;
+        usSize += pConversation->GetSaveSize() + 4;
     }
     if (bDebugSaveBuffer.Bool()) {
         SaveFormHeader* pHeader = pSaveLoadGameOLD->m_pCurrentlySavingFormHeader;
@@ -455,11 +455,11 @@ void DialoguePackage::SaveGame() {
     SaveNumericID(&uiTopicID, 4);
     uint16_t usSize = 0;
     if (pConversation) {
-        usSize = pConversation->GetSaveSizeTES();
+        usSize = pConversation->GetSaveSize();
     }
     pSaveLoadGameOLD->SaveGameDataOLD(&usSize, sizeof(usSize));
     if (usSize) {
-        pConversation->SaveGameTES();
+        pConversation->SaveGame();
         int16_t sCurrentItemIndex = -1;
         if (pCurrentItem) {
             sCurrentItemIndex = pConversation->GetDialogueItemIndex(pCurrentItem);
@@ -522,7 +522,7 @@ void DialoguePackage::InitLoadGame() {
     pForm = TESForm::GetFormByNumericID(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pTargetActor)));
     pTargetActor = dynamic_cast<Actor*>(pForm);
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 32u && pConversation) {
-        pConversation->InitLoadGameTES();
+        pConversation->InitLoadGame();
     }
 
     if (pSaveLoadGameOLD->GetCurrentVersion() < 32u) {
@@ -902,7 +902,7 @@ void DialoguePackage::Speak(bool abUseSound) {
             (pConversation->GetCurrentItem() &&
              pConversation->GetCurrentItem()->GetCurrentResponse() &&
              pConversation->GetCurrentItem()->GetCurrentResponse()->cText.String()) &&
-            (gs_bGeneralSubtitles_Gameplay.Bool() ||
+            (bGeneralSubtitles.Bool() ||
              (pSpeaker->IsActor() && static_cast<uint8_t>(static_cast<Actor*>(pSpeaker)->GetShowSubtitles()))))
 
         // GetShowSubtitles: only the low byte of the result is tested.

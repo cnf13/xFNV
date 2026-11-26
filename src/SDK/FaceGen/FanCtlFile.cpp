@@ -1,6 +1,5 @@
 #include "SDK/FaceGen/FanCtlFile.h"
-#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
-#include "Fallout Shared/FaceGen/FanLinCtlGrpS.h"
+#include "SDK/FaceGen/FanControls.h"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
 #include "SDK/FaceGen/binaryFile.h"
 #include "SDK/MSVC/iosfwd.h"

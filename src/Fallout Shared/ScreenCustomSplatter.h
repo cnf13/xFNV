@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSRandom.h"
 #include "BSMain/Setting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 
@@ -9,10 +10,7 @@ class NiCamera;
 class NiNode;
 class NiTexture;
 
-float RandomFloatNeg1To1();
-// BSRandom's Bool with afPercentTrue.
-bool RandomBool(float afPercentTrue);
-// Its one caller, Cmd_SetScreenSplatterFade, passes a bool that it stores in ScreenCustomSplatter::bNoFade.
+// Its one caller, Script::SetScreenSplatterFade, passes a bool that it stores in ScreenCustomSplatter::bNoFade.
 char SetCustomSplatterFade(float afFadeStart, bool abNoFade);
 void CustomBloodSplatter();
 

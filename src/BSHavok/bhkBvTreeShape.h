@@ -1,6 +1,9 @@
 #pragma once
 
 #include "BSHavok/bhkShape.h"
+#include "BSHavok/bhkShapeCollection.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/hkpShapeCollection.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 
 struct hkBvTreeShapeCinfo;
 class hkpShapeCollection;
@@ -64,3 +67,26 @@ struct hkBvTreeShapeCinfo : public hkShapeCinfo {
 };
 
 static_assert(sizeof(hkBvTreeShapeCinfo::Serialized) == 0x8);
+
+inline bhkBvTreeShape::bhkBvTreeShape() {
+    ++iCount;
+}
+
+inline bhkShapeCollection* bhkBvTreeShape::GetShapeCollection() {
+    hkpShape* pShape = GethkShapeCollection();
+    if (pShape) {
+        return static_cast<bhkShapeCollection*>(bhkShapeCollection::Getbhk(pShape));
+    }
+
+    return nullptr;
+}
+
+inline hkpShapeCollection* bhkBvTreeShape::GethkShapeCollection() const {
+    // bhkBvTreeShape::operator* is bhkShape's null-safe getter.
+    const hkpShape* pShape = **this;
+    if (!pShape) {
+        return nullptr;
+    }
+    // The collection's container is its second base; static_cast keeps the null test.
+    return const_cast<hkpShapeCollection*>(static_cast<const hkpShapeCollection*>(pShape->getContainer()));
+}

@@ -3,7 +3,9 @@
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkSerialized.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/Types/hkResult.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 
 class bhkShapeCollection;
 class hkGeometry;
@@ -142,3 +144,11 @@ struct hkShapeCinfo : public hkSerializableCinfo {
 };
 
 static_assert(sizeof(hkShapeCinfo::Serialized) == 0x4);
+
+inline hkpShape* bhkShape::Gethk() {
+    return static_cast<hkpShape*>(phkObject);
+}
+
+inline bool bhkShape::GetMaterialVarType(MATERIAL_VARIANT_TYPE aeType) {
+    return (static_cast<int32_t>(eMaterial) & aeType) != 0;
+}

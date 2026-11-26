@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
 #include "Fallout Shared/Pathfinding/NavMeshObstacleManager.h"
@@ -126,7 +127,7 @@ bool NavMeshInfoMap::Load(TESFile* apFile) {
             case NVER_ID:
                 apFile->GetChunkData(&iFileVersion, 0);
                 if (apFile->QEndian()) {
-                    ENDIAN(iFileVersion, false);
+                    BSEndian(iFileVersion, false);
                 }
                 if (iFileVersion < 5) {
                     bUpdateAll = true;
@@ -189,7 +190,7 @@ bool NavMeshInfoMap::Load(TESFile* apFile) {
                 // The chunk is raw bytes; its first 32-bit value is the navmesh's form ID.
                 uint32_t uiNavMeshID = *reinterpret_cast<uint32_t*>(pChunk);
                 if (apFile->QEndian()) {
-                    ENDIAN(uiNavMeshID, false);
+                    BSEndian(uiNavMeshID, false);
                 }
                 TESForm::AddCompileIndex(uiNavMeshID, apFile);
                 pChunk += 4;
@@ -237,7 +238,7 @@ void NavMeshInfoMap::Save() {
         uint32_t* pchunkPointer = static_cast<uint32_t*>(pchunkdata);
         uint32_t inavmeshId = pinfo->NavMeshID;
         if (TESForm::QEndianSwapOnSave()) {
-            ENDIAN<uint32_t>(inavmeshId, false);
+            BSEndian<uint32_t>(inavmeshId, false);
         }
         *pchunkPointer++ = inavmeshId;
         pinfo->FillPortalChunk(reinterpret_cast<char*>(pchunkPointer));

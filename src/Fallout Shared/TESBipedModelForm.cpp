@@ -1,6 +1,6 @@
 #include "Fallout Shared/TESBipedModelForm.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSBipedModelList.h"
 #include "Fallout Shared/BGSListForm.h"
@@ -27,7 +27,7 @@
 #include "SDK/MSVC/string.h"
 
 void BIPED_MODEL::Endian() {
-    ENDIAN(iBipedObjectSlots, false);
+    BSEndian(iBipedObjectSlots, false);
 }
 
 TESBipedModelForm::TESBipedModelForm() {

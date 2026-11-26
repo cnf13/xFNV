@@ -1,11 +1,11 @@
 #include "Fallout Shared/Region System/TESRegionData.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 
 void REGION_DATA_BASE::Endian() {
-    ENDIAN(iDataTypeID, false);
+    BSEndian(iDataTypeID, false);
 }
 
 TESRegionData::TESRegionData() : bOverride(false), bIgnore(false), cPriority(50) {}

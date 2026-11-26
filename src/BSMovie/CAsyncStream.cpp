@@ -1,6 +1,6 @@
 #include "BSMovie/CAsyncStream.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 CAsyncStream::CAsyncStream() {}
 

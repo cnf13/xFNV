@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSHavok/bhkTransform.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSHavok/bhkCollisionListener.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSHavok/bhkShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -16,16 +17,6 @@ class TESObjectREFR;
 // The parameter is a hkpCdBody rather than a hkpCollidable because FOCollisionListener::contactPointAddedCallback
 // passes the event's hkpCdBody and the body reads only hkpCdBody members.
 HavokMaterialType GetMaterialFromCollidable(const hkpCdBody* apCollidable, NiPoint3* arLandPos);
-
-// The game's base for its Havok contact listeners: it adds a destructor to hkpContactListener and no data.
-class bhkContactListener : public hkpContactListener {
-public:
-    bhkContactListener();
-    ~bhkContactListener() override;
-
-    // The deleting destructor frees through ourFree.
-    static void operator delete(void* apMemory);
-};
 
 // The game's Havok collision listener (impact sounds, effects and damage). Only some of its members are declared. It
 // overrides the destructor and contactPointAddedCallback.

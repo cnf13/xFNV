@@ -18,7 +18,7 @@
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectDOOR.h"
 #include "Fallout Shared/TESObjectREFR.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"

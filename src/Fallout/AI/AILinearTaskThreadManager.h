@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSLinearTaskThread.h"
 #include "BSCore/BSSemaphore.h"
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/BSThread.h"
@@ -119,30 +120,6 @@ public:
     static BSSemaphore RenderSema;
     // The manager.
     static AILinearTaskThreadManager Instance;
-};
-
-// One AI worker thread: it waits on StartProcessing, runs its linear tasks and signals FinishedProcessing.
-class BSLinearTaskThread : public BSThread {
-public:
-    BSLinearTaskThread();
-    ~BSLinearTaskThread() override;
-
-    uint32_t ThreadProc() override;
-    virtual void OnStartup() {}
-    virtual void OnShutdown() {}
-    virtual void RunLinearTasks() = 0;
-
-    void WaitForCompletion();
-    void StartProcessingTasks();
-    void Shutdown();
-
-    static void operator delete(void* apMemory) {
-        ourFree(apMemory);
-    }
-
-    BSSemaphore StartProcessing;
-    BSSemaphore FinishedProcessing;
-    bool bKillThread;
 };
 
 // The game settings AILinearTaskThreadManager.cpp defines.

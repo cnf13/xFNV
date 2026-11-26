@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/MemoryManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cstddef>
 #include <cstdint>

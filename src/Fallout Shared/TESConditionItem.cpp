@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESConditionItem.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESCondition.h"
@@ -94,15 +94,15 @@ void TESConditionItem::Save() {
 }
 
 void FunctionData::Endian() {
-    ENDIAN(usFunction, false);
-    ENDIAN(uParam[0].uiNumber, false);
-    ENDIAN(uParam[1].uiNumber, false);
+    BSEndian(usFunction, false);
+    BSEndian(uParam[0].uiNumber, false);
+    BSEndian(uParam[1].uiNumber, false);
 }
 
 void ConditionItemData::Endian() {
-    ENDIAN(uComparisonValue.fValue, false);
-    ENDIAN(pReference, false);
-    ENDIAN(uiRunOn, false);
+    BSEndian(uComparisonValue.fValue, false);
+    BSEndian(pReference, false);
+    BSEndian(uiRunOn, false);
     kFunctionData.Endian();
 }
 

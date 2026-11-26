@@ -6,7 +6,7 @@
 #include "Fallout Shared/TESSaveLoadGame.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"

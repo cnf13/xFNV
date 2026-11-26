@@ -232,10 +232,3 @@ void LightEffect::AttachBestLightEffect(MagicTarget* apTarget) {
 ActiveEffect* LightEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
     return new LightEffect(apCaster, apSpell, apEffect);
 }
-
-NiColor& NiColor::operator/=(float fScalar) {
-    r = r / fScalar;
-    g = g / fScalar;
-    b = b / fScalar;
-    return *this;
-}

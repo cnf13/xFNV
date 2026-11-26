@@ -1,6 +1,6 @@
 #include "SpeedTree/LibRandom_Source/IdvRandom.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/time.h"
 #include "SpeedTree/Random.h"

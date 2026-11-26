@@ -140,3 +140,47 @@ public:
     static NiRTTI ms_RTTI;
     static inline void* pfWindData;
 };
+
+inline void ParticleShaderProperty::SetTexture(NiTexture* pTex) {
+    spBaseTexture = pTex;
+}
+
+inline void ParticleShaderProperty::SetScaleTime2(float aScaleTime) {
+    ScaleTime2 = aScaleTime;
+}
+
+inline void ParticleShaderProperty::SetVelocity(NiPoint3 aVelocity) {
+    Velocity = aVelocity;
+}
+
+inline void ParticleShaderProperty::SetAcceleration(NiPoint3 aAcceleration) {
+    Acceleration = aAcceleration;
+}
+
+inline void ParticleShaderProperty::SetColor1(NiColorA aColor) {
+    Color1 = aColor;
+}
+
+inline void ParticleShaderProperty::SetColor3(NiColorA aColor) {
+    Color3 = aColor;
+}
+
+inline ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeRay(float afRayLength) {
+    eEmitterType = EMIT_RAY;
+    fRayLength = afRayLength;
+    return this;
+}
+
+inline ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeCollision() {
+    eEmitterType = EMIT_COLLISION;
+    return this;
+}
+
+inline ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeGeometry() {
+    eEmitterType = EMIT_GEOMETRY;
+    return this;
+}
+
+inline NiTObjectArray<NiPointer<NiAVObject>>* ParticleShaderProperty::GetTargetArray() {
+    return &TargetArray;
+}

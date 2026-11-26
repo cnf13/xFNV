@@ -1,7 +1,9 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkConvexShape.h"
-#include "Fallout Shared/GlobalFunc.h"
+#include "Havok/Source/Physics/Collide/Shape/Convex/Box/hkpBoxShape.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 
 #include <stdint.h>
 
@@ -57,3 +59,17 @@ struct hkBoxShapeCinfo : public hkConvexShapeCinfo {
 // The info is its own serialized form (bhkSerialized.h): with no pointer member its layout is the file's, so
 // bhkSerializable::LoadCInfo's raw read of QCinfoSize() bytes over it is right.
 static_assert(offsetof(hkBoxShapeCinfo, m_halfExtents) == 0x10 && sizeof(hkBoxShapeCinfo) == 0x20);
+
+inline const hkVector4& bhkBoxShape::GethkHalfExtents() {
+    hkpBoxShape* pb = static_cast<hkpBoxShape*>(**this);
+    if (pb) {
+        return pb->m_halfExtents;
+    }
+
+    return hkVector4::getZero();
+}
+
+inline NiPoint3 bhkBoxShape::GetHalfExtents() {
+    NiPoint3 halfExtents;
+    return HK2NI(halfExtents, GethkHalfExtents());
+}

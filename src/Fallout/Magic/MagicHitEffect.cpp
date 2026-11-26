@@ -16,7 +16,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "SDK/MSVC/rtti.h"
 

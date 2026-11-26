@@ -32,10 +32,15 @@ class TESObjectREFR;
 // GetActiveWindow's counterpart: the main window's native handle while
 // it has SDL's input focus, else null (always null on another thread).
 HWND__* GetActiveWindow_SDL();
+// The shader system's timer (BSShaderManager::SetTimerFunc).
+float ShaderTimer(int32_t iDelta);
 // Sets up the shader system's callbacks and settings.
 void Main_ShaderInit();
 // Applies the blur and sky brightness settings (HDR or not) and the motion blur setting.
 void Main_ImagespaceInit();
+// Replaces the controls singleton with a new Controls for hinst.
+void Main_InitControls(HINSTANCE__* hinst);
+void Main_InitStartCell(char* pCellName, NiPoint3* apPosition);
 BSMsgDialogSystemUtility::USER_RESPONSE SystemUtilityDialogIdleCallback();
 void MessageMenuCallback();
 void GetInstalledPathRegistryKey(char* apPath, uint32_t auiSize);
@@ -207,7 +212,6 @@ public:
     static bool ResetDeviceCallback(bool abBeforeReset, void* apData);
     // The lost-device callback WinMain registers (Gamebryo's LOSTDEVICENOTIFYFUNC): always true.
     static bool LostDeviceCallback(void* apData);
-    static void InitStartCell(char* pCellName, NiPoint3* apPosition);
     static void InitPlayerStart(NiPoint3 position);
     static void operator delete(void* apMemory);
 
@@ -365,27 +369,27 @@ extern psXBoxGamepadText_t psXBoxGamepadText;
 using g_PS3ButtonSettingNames_t = Setting* [34];
 extern g_PS3ButtonSettingNames_t g_PS3ButtonSettingNames;
 
-extern SettingT<INISettingCollection> gs_iRetainFilenameStringTable_Archive;
+extern SettingT<INISettingCollection> iRetainFilenameStringTable;
 
-extern SettingT<INISettingCollection> gs_sDirectoryName_CameraPath;
+extern SettingT<INISettingCollection> sCameraPathDir;
 
-extern SettingT<INISettingCollection> gs_iRetainDirectoryStringTable_Archive;
+extern SettingT<INISettingCollection> iRetainDirectoryStringTable;
 
-extern SettingT<INISettingCollection> gs_sArchiveList_Archive;
+extern SettingT<INISettingCollection> sMasterArchiveList;
 
-extern SettingT<INISettingCollection> gs_bCheckRuntimeCollisions_Archive;
+extern SettingT<INISettingCollection> bCheckRuntimeCollisions;
 
-extern SettingT<INISettingCollection> gs_iRetainFilenameOffsetTable_Archive;
+extern SettingT<INISettingCollection> iRetainFilenameOffsetTable;
 
-extern SettingT<INISettingCollection> gs_bInvalidateOlderFiles_Archive;
+extern SettingT<INISettingCollection> bInvalidateOlderFiles;
 
-extern SettingT<INISettingCollection> gs_sInvalidationFile_Archive;
+extern SettingT<INISettingCollection> sArchiveInvalidationFile;
 
-extern SettingT<INISettingCollection> gs_iFPS_CameraPath;
+extern SettingT<INISettingCollection> iCameraPathFPS;
 
-extern SettingT<INISettingCollection> gs_bUseArchives_Archive;
+extern SettingT<INISettingCollection> bUseArchives;
 
-extern SettingT<INISettingCollection> gs_iTake_CameraPath;
+extern SettingT<INISettingCollection> iCameraPathTake;
 
 inline char cSkipThreadQueue;
 using psMouse_t = SettingT<GameSettingCollection>* [9];
@@ -395,30 +399,28 @@ inline bool bIsCursorVisible = true;
 // A function-local static of the message box wrapper.
 inline bool bMessageBoxOnlyOnce = true;
 
-extern SettingT<GameSettingCollection> gs_sNoText;
+extern SettingT<GameSettingCollection> pNoText;
 
-extern SettingT<GameSettingCollection> gs_sYesText;
+extern SettingT<GameSettingCollection> pYesText;
 
-extern SettingT<GameSettingCollection> gs_sYesToAllText;
+extern SettingT<GameSettingCollection> pYesToAllText;
 
-extern SettingT<INISettingCollection> gs_sIntroSequence_General;
 extern NiPointer<NiRefObject> spcameraPath;
 
-extern SettingT<INISettingCollection> gs_bAllowYesToAll_MESSAGES;
+extern SettingT<INISettingCollection> bAllowYesToAll;
 
-extern SettingT<RegSettingCollection> gs_sBasePath;
+extern SettingT<RegSettingCollection> sBasePathS;
 
-extern SettingT<INISettingCollection> gs_sUnessentialFileCacheList_General;
+extern SettingT<INISettingCollection> sUnessentialFileCacheList;
 
-extern SettingT<INISettingCollection> gs_bSkipInitializationFlows_MESSAGES;
+extern SettingT<INISettingCollection> bSkipInitializationFlows;
 
-extern SettingT<INISettingCollection> bSkipProgramFlows_MESSAGES;
+extern SettingT<INISettingCollection> bSkipProgramFlows;
 
-extern SettingT<INISettingCollection> gs_iFileLogging_MESSAGES;
+extern SettingT<INISettingCollection> iFileLogging;
 
-extern SettingT<INISettingCollection> gs_sEssentialFileCacheList_General;
+extern SettingT<INISettingCollection> sEssentialFileCacheList;
 inline bool bWindowDeactivated;
-inline int32_t iMainValue;
 
 // The program's window, which WinMain creates; appMain->hWnd holds its
 // native handle.

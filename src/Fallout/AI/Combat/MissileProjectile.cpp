@@ -11,14 +11,12 @@
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkHingeConstraint.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSProjectile.h"
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
@@ -847,89 +845,5 @@ void MissileProjectile::ProcessStick() {
                 }
             }
         }
-    }
-}
-
-hkConstraintCinfo::hkConstraintCinfo()
-  : pData(nullptr), ePriority(hkpConstraintInstance::PRIORITY_PSI), pEntityA(nullptr), pEntityB(nullptr) {}
-
-hkConstraintCinfo::~hkConstraintCinfo() {
-    SetData(nullptr);
-}
-
-uint32_t hkConstraintCinfo::CreateData() {
-    return 0;
-}
-
-void hkConstraintCinfo::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
-    char* pViewerString;
-    char cBuffer[32];
-    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
-    if (pData) {
-        uint32_t uiType = pData->getType();
-        const char* pTypeName = bhkConstraintManager::GetTypeName(uiType);
-        pViewerString = NiGetViewerString("Type", pTypeName);
-        uint32_t uiSize = apStrings->m_usSize;
-        if (uiSize >= apStrings->m_usMaxSize) {
-            apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
-        }
-        apStrings->SetAt(uiSize, pViewerString);
-    }
-    BSsprintf(cBuffer, 32, "0x%8X", pEntityA);
-    pViewerString = NiGetViewerString("hkpEntityA", static_cast<const char*>(cBuffer));
-    uint32_t uiSize = apStrings->m_usSize;
-    if (uiSize >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiSize, pViewerString);
-    BSsprintf(cBuffer, 32, "0x%8X", pEntityB);
-    pViewerString = NiGetViewerString("hkpEntityB", static_cast<const char*>(cBuffer));
-    uiSize = apStrings->m_usSize;
-    if (uiSize >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiSize, pViewerString);
-    pViewerString = NiGetViewerString("ePriority", ePriority);
-    uiSize = apStrings->m_usSize;
-    if (uiSize >= apStrings->m_usMaxSize) {
-        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
-    }
-    apStrings->SetAt(uiSize, pViewerString);
-}
-
-void hkConstraintCinfo::SetEntityB(bhkEntity* apEntity) {
-    hkpEntity* pEntity = nullptr;
-    if (apEntity) {
-        pEntity = static_cast<hkpEntity*>(**apEntity);
-    }
-    pEntityB = pEntity;
-}
-
-void hkConstraintCinfo::SetEntityA(bhkEntity* apEntity) {
-    hkpEntity* pEntity = nullptr;
-    if (apEntity) {
-        pEntity = static_cast<hkpEntity*>(**apEntity);
-    }
-    pEntityA = pEntity;
-}
-
-void hkConstraintCinfo::SetEntities(bhkEntity* apEntityA, bhkEntity* apEntityB) {
-    SetEntityA(static_cast<bhkRigidBody*>(apEntityA));
-    SetEntityB(static_cast<bhkRigidBody*>(apEntityB));
-}
-
-hkHingeConstraintCinfo::hkHingeConstraintCinfo() {}
-
-hkHingeConstraintCinfo::~hkHingeConstraintCinfo() {}
-
-void hkHingeConstraintCinfo::SetInWorldSpace(
-    const hkTransform& arBodyATrans,
-    const hkTransform& arBodyBTrans,
-    const hkVector4& arPivot,
-    const hkVector4& arAxis
-) {
-    hkpHingeConstraintData* pData = static_cast<hkpHingeConstraintData*>(this->pData);
-    if (pData) {
-        pData->setInWorldSpace(arBodyATrans, arBodyBTrans, arPivot, arAxis);
     }
 }

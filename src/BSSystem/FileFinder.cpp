@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/Archive.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
 #include "SDK/MSVC/string.h"

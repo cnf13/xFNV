@@ -1,5 +1,6 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkLargeBlockAllocator.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"

@@ -6,6 +6,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRect.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiRenderTargetGroup.h"
 
 // A scene graph object that defines a view: a frustum, a viewport and the world-to-camera matrix.
 class NiCamera : public NiAVObject {
@@ -70,11 +71,6 @@ public:
     void CopyMembers(NiCamera* pkDest, NiCloningProcess& kCloning);
     void ScreenSpaceBoundBound(const NiBound& kSBound, NiPoint3& kMinBound, NiPoint3& kMaxBound, float fZeroTolerance);
 
-    // Scales the camera's frustum for Eyefinity displays.
-    static void HandleEyeFinityFOVScale(NiCamera* apCamera, float afScale);
-    // Returns 0.75f. Typed double so callers round the result into their float local, rather than
-    // assume a float return is already rounded.
-    static double retn_0_75();
     static NiObject* CreateObject();
 
     float m_aafWorldToCam[4][4];
@@ -88,3 +84,7 @@ public:
 };
 
 NiSmartPointer(NiCamera);
+
+inline const NiRect<float>& NiCamera::GetViewPort() const {
+    return m_kPort;
+}

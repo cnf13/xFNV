@@ -6,12 +6,12 @@
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSOpenCloseForm.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/Magic/IngredientItem.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
@@ -30,8 +30,8 @@
 #include "SDK/MSVC/rtti.h"
 #include "xfnv/Compiler.h"
 
-SettingT<GameSettingCollection> gs_sFloraSuccessMessage("sFloraSuccessMessage", "You successfully harvest %s.");
-SettingT<GameSettingCollection> gs_sFloraFailureMessage("sFloraFailureMessage", "You find nothing of use.");
+SettingT<GameSettingCollection> TESFlora::sFloraSuccessMessage("sFloraSuccessMessage", "You successfully harvest %s.");
+SettingT<GameSettingCollection> TESFlora::sFloraFailureMessage("sFloraFailureMessage", "You find nothing of use.");
 
 TESFlora::TESFlora() : TESProduceForm(), TESObjectACTI() {
     SetFormType(FLOR_ID);
@@ -188,7 +188,7 @@ bool TESFlora::Activate(
             }
             if (pActor == pPlayer) {
                 BSStringT<char> kMessage;
-                kMessage.SPrintF(gs_sFloraSuccessMessage.String(), pIngr->GetFullName());
+                kMessage.SPrintF(TESFlora::sFloraSuccessMessage.String(), pIngr->GetFullName());
                 Interface::ShowMessage(kMessage.pString, 0, nullptr, nullptr, 2.0f, false);
                 BSSoundHandle soundHand;
                 soundHand = BSAudio::QInstance().GetSoundHandleByName("ITMPickupOrganic", 288u);
@@ -196,7 +196,7 @@ bool TESFlora::Activate(
             }
         }
         else if (pActor == pPlayer) {
-            Interface::ShowMessage(gs_sFloraFailureMessage.String(), 0, nullptr, nullptr, 2.0f, false);
+            Interface::ShowMessage(TESFlora::sFloraFailureMessage.String(), 0, nullptr, nullptr, 2.0f, false);
             Interface::PlayMenuSound(29);
         }
         apItemActivated->SetEmpty(true);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/HotKeysWheel.h"
 #include "Fallout/Interface/ListBox.h"
@@ -83,9 +84,6 @@ public:
 
     // Rebuilds the item list and the player's stat lines of the open menu.
     static void UpdateList();
-    // Fills the item data tile apTile (its last 13 children are the stat rows) with apItem's stats; also used by the
-    // barter and container menus.
-    static void SetupItemDataTile(ItemChange* apItem, Tile* apTile);
     // Remembers the list position of the current tab.
     static void SavePageState();
     // Whether the open inventory menu shows the keyring.

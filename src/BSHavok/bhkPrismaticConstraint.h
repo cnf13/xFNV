@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 
 // The Havok prismatic (sliding) constraint wrapper.
 class bhkPrismaticConstraint : public bhkConstraint {

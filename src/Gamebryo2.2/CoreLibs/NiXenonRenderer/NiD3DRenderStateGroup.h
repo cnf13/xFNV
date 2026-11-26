@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPool.h"
 #include "SDK/MSVC/ehvec.h"
@@ -83,10 +83,3 @@ public:
 };
 
 using NiD3DRSEntry = NiD3DRenderStateGroup::NiD3DRSEntry;
-
-// The entry pool's new[] and delete[]: NiMemObject's operator new[] and delete[], as for the group pool (whose
-// specializations are in NiTCollection.h). Defined in NiD3DRenderStateGroup.cpp.
-template <>
-NiD3DRSEntry* NiTNewInterface<NiD3DRSEntry>::Allocate(uint32_t uiNumElements);
-template <>
-void NiTNewInterface<NiD3DRSEntry>::Deallocate(NiD3DRSEntry* pArray);

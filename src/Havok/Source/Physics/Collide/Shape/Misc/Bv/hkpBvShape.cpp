@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Collide/Shape/Misc/Bv/hkpBvShape.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"

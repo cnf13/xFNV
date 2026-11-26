@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSWeightedRandom.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkUtilFunctions.h"

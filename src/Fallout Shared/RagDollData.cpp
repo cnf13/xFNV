@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkWorld.h"
@@ -109,9 +109,9 @@ bool RagDollData::Load(TESFile* apFile) {
     if (apFile->GetTESChunk() == XRGB_ID) {
         apFile->GetChunkData(&Bip01Rot, sizeof(NiPoint3));
         if (apFile->QEndian()) {
-            ENDIAN(Bip01Rot.x, false);
-            ENDIAN(Bip01Rot.y, false);
-            ENDIAN(Bip01Rot.z, false);
+            BSEndian(Bip01Rot.x, false);
+            BSEndian(Bip01Rot.y, false);
+            BSEndian(Bip01Rot.z, false);
         }
         bLoaded = true;
     }
@@ -307,10 +307,10 @@ uint8_t RagDollData::CountRagDollBones(NiNode* apNode) {
 }
 
 void RagDollBone::Endian() {
-    ENDIAN(BonePos.x, false);
-    ENDIAN(BonePos.y, false);
-    ENDIAN(BonePos.z, false);
-    ENDIAN(BoneRot.x, false);
-    ENDIAN(BoneRot.y, false);
-    ENDIAN(BoneRot.z, false);
+    BSEndian(BonePos.x, false);
+    BSEndian(BonePos.y, false);
+    BSEndian(BonePos.z, false);
+    BSEndian(BoneRot.x, false);
+    BSEndian(BoneRot.y, false);
+    BSEndian(BoneRot.z, false);
 }

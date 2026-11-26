@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSImpactDataSet.h"
 
 #include "BSCore/BSMap.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkShape.h"
 #include "BSMain/IOManager.h"
@@ -43,7 +43,7 @@ bool BGSImpactDataSet::Load(TESFile* apFile) {
                     for (BGSImpactData*& pImpactData : ppImpactData) {
                         // Until InitItem resolves it, each slot holds an untyped form ID, which is swapped as a 32-bit
                         // value.
-                        ENDIAN(reinterpret_cast<uint32_t&>(pImpactData), false);
+                        BSEndian(reinterpret_cast<uint32_t&>(pImpactData), false);
                     }
                 }
                 break;
@@ -300,9 +300,9 @@ BGSImpactDataSet::IMPACT_MATERIAL_TYPE BGSImpactDataSet::GetImpactMaterialType(H
 }
 
 void ImpactSwap::IMPACT_SWAP_DATA::Endian() {
-    ENDIAN(eType, false);
-    ENDIAN(pOldData, false);
-    ENDIAN(pNewData, false);
+    BSEndian(eType, false);
+    BSEndian(pOldData, false);
+    BSEndian(pNewData, false);
 }
 
 ImpactSwap::ImpactSwap() : pRemappedData{}, pAltFootstepMaterialNames{} {}

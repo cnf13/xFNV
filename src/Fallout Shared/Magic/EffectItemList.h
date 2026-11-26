@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/BSString.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/Magic/EffectArchetypes.h"
 #include "Fallout Shared/Magic/EffectSetting.h"
@@ -10,8 +11,6 @@
 class Actor;
 class EffectItem;
 class Script;
-
-int32_t BSvsprintf(char* apString1, const char* apFormat, va_list aList);
 
 // The effects of a magic item, with the count of hostile ones. The destructor is deliberately not virtual, as in the
 // game.
@@ -35,7 +34,7 @@ public:
     }
 
     // Writes the effects' description into the auiSize-byte buffer apBuffer.
-    void GetEffectsString(char* apBuffer, uint32_t auiSize);
+    void BuildMenuString(char* apBuffer, uint32_t auiSize);
     // Whether any effect has a flag of aeFlag.
     bool HasEffect(EffectSetting::EffectFlag aeFlag);
     // Whether any effect has the self range.

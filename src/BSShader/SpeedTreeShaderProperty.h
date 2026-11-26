@@ -85,3 +85,8 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline void STSPData::SetData(D3DXVECTOR4* apWindInfo, uint16_t asVertexCount) {
+    pWindInfo = apWindInfo;
+    sVertexCount = asVertexCount;
+}

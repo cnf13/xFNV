@@ -8,7 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCullingProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -499,3 +499,5 @@ char* NiBillboardNode::GetViewerString(const char* pcPrefix, FaceMode eMode) {
 NiObject* NiBillboardNode::CreateObject() {
     return new NiBillboardNode;
 }
+
+NiBillboardNode::~NiBillboardNode() {}

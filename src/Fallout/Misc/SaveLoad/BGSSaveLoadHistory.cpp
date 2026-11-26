@@ -2,7 +2,8 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/Magic/EffectItemList.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"

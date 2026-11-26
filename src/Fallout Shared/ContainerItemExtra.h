@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSMain/BSUtilities.h"
 #include <cstdint>
 
 class ExtraDataList;
@@ -7,8 +8,6 @@ class TESFile;
 class TESForm;
 class TESGlobal;
 class TESHealthForm;
-
-bool FloatEQ(float aX, float aY, float afPrecision);
 
 // The per-entry extra data of a base container entry: its owner and its health fraction.
 class ContainerItemExtra {

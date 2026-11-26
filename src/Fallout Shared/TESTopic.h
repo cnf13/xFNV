@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
 #include "Fallout Shared/TopicInfoArray.h"

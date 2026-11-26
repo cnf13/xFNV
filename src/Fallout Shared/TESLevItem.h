@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSMain/Setting.h"
 #include "Fallout Shared/TESLeveledList.h"
 #include "Fallout Shared/TESObject.h"
 
@@ -24,4 +25,5 @@ public:
     using TESForm::Revert;
     using TESForm::Save;
     using TESForm::SaveGame;
+    static SettingT<GameSettingCollection> iLevItemLevelDifferenceMax;
 };

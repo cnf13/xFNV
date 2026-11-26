@@ -87,3 +87,11 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+// The renderer data's pixel format; null without renderer data.
+inline const NiPixelFormat* Ni2DBuffer::GetPixelFormat() const {
+    if (!m_spRendererData) {
+        return nullptr;
+    }
+    return m_spRendererData->GetPixelFormat();
+}

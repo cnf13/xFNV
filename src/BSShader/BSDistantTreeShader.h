@@ -68,3 +68,7 @@ public:
     static NiPointer<NiTexture> spTextureAtlas;
     static inline int32_t uiMaxInstanceCount;
 };
+
+inline void BSDistantTreeShader::SetTextureAtlas(NiTexture* apTextureAtlas) {
+    BSDistantTreeShader::spTextureAtlas = apTextureAtlas;
+}

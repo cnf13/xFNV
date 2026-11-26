@@ -76,3 +76,7 @@ public:
     static inline int32_t uiShapeCount;
     static inline DebugDataArray pDD{};
 };
+
+inline void BSShaderBloodSplatterProperty::SetTexture(uint32_t auiIndex, NiTexture* apTex) {
+    spTexture[auiIndex] = apTex;
+}

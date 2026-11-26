@@ -2,6 +2,8 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
+#include "BSHavok/bhkRagdollController.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESModel.h"
 
@@ -24,46 +26,6 @@ struct RagdollSaveStruct {
     bool bLookIKEnabled;
     bool bGrabIKEnabled;
     bool bPoseMatchEnabled;
-};
-
-// The ragdoll's animation feedback settings and the bones it drives dynamically.
-struct RagdollFeedbackData {
-    // The feedback gains and limits (RAFD).
-    struct RagdollFeedbackSystemData {
-        RagdollFeedbackSystemData();
-
-        // Swaps every field read from a big-endian file.
-        void Endian();
-
-        float fKeyDynIntrp;
-        float fHeirGain;
-        float fPosGain;
-        float fVelGain;
-        float fAccGain;
-        float fSnapGain;
-        float fVelDamp;
-        float fSnapMaxLinVel;
-        float fSnapMaxAngVel;
-        float fSnapMaxLinDist;
-        float fSnapMaxAngDist;
-        float fPosMaxLinVel;
-        float fPosMaxAngVel;
-        uint32_t uiImpulseMult1;
-        uint32_t uiImpulseMult2;
-    };
-
-    // Built through Init.
-    RagdollFeedbackData();
-    ~RagdollFeedbackData();
-
-    void Init();
-    bool Compare(RagdollFeedbackData* apOther);
-    void Copy(const RagdollFeedbackData& arData);
-
-    bool bEnabled;
-    RagdollFeedbackSystemData SystemData;
-    // The game builds and destroys it as BSSimpleArray<short, 1024>.
-    BSSimpleArray<int16_t> DynamicBoneIdxA;
 };
 
 // The ragdoll's death pose matching settings.

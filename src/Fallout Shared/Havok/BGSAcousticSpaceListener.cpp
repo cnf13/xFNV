@@ -1,6 +1,6 @@
 #include "Fallout Shared/Havok/BGSAcousticSpaceListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkEntityListener.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/BSTaskManager.h"
@@ -144,13 +144,5 @@ void BGSAcousticSpaceListener::DequeueAllRemovals(bool abDoRemoval) {
 }
 
 void BGSAcousticSpaceListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-hkpEntityListener::hkpEntityListener() {}
-
-hkpEntityListener::~hkpEntityListener() {}
-
-void hkpEntityListener::operator delete(void* apMemory) {
     ourFree(apMemory);
 }

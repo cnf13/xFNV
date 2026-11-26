@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/ScrapHeap.h"
 #include "Fallout Shared/Pathfinding/AStarNode.h"
 #include "Fallout Shared/Pathfinding/NavMeshPtr.h"

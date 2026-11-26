@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Bilateral/StiffSpring/hkpStiffSpringConstraintData.h"
 
 // The creation info of a stiff spring constraint. It adds no fields to hkConstraintCinfo.

@@ -1,7 +1,7 @@
 #include "Fallout Shared/Region System/TESRegionGrassObject.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionData.h"
@@ -19,8 +19,8 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
 void TESRegionGrassObject::REGION_GRASS_OBJECT_FILE_DATA::Endian() {
-    ENDIAN(iFormID, false);
-    ENDIAN(iParentFormID, false);
+    BSEndian(iFormID, false);
+    BSEndian(iParentFormID, false);
 }
 
 TESRegionGrassObject::TESRegionGrassObject(TESGrass* apGrass, TESLandTexture* apLandTexture)

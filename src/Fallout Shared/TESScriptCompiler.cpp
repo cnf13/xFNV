@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTaskManager.h"
 #include "Fallout Shared/Animation.h"
@@ -11,6 +11,7 @@
 #include "Fallout Shared/BGSEquipType.h"
 #include "Fallout Shared/BGSListForm.h"
 #include "Fallout Shared/BGSMenuIcon.h"
+#include "Fallout Shared/BGSMessage.h"
 #include "Fallout Shared/BGSNote.h"
 #include "Fallout Shared/BGSPerk.h"
 #include "Fallout Shared/Expression.h"
@@ -45,10 +46,6 @@
 #include <cctype>
 #include <cstdint>
 #include <cstring>
-
-uint32_t BSstrtoul(const char* apString, char** apEndPtr, int32_t aiBase) {
-    return std::strtoul(apString, apEndPtr, aiBase);
-}
 
 SCRIPT_LINE::SCRIPT_LINE()
   : uiLineNumber(0), pLine(), uiSize(0), uiOffset(0), pOutput(), uiOutputSize(0), eScriptError(ERROR_SCRIPT_NOERROR) {}
@@ -1692,4 +1689,266 @@ Script::RefVariable* ScriptCompileData::GetReferencedObject(uint32_t aiIndex) {
         ++uiIndex;
     }
     return pList->m_item;
+}
+
+bool ScriptCompiler::MessageCompile(
+    const uint16_t asParamCount,
+    const SCRIPT_PARAMETER* apParameters,
+    SCRIPT_LINE* apScriptLine,
+    ScriptCompileData* apCompileData
+) {
+    return ScriptCompiler::MessageBoxCompile(asParamCount, apParameters, apScriptLine, apCompileData, false, false);
+}
+
+bool ScriptCompiler::MessageBoxCompile(
+    const uint16_t asParamCount,
+    const SCRIPT_PARAMETER* apParameters,
+    SCRIPT_LINE* apScriptLine,
+    ScriptCompileData* apCompileData
+) {
+    return ScriptCompiler::MessageBoxCompile(asParamCount, apParameters, apScriptLine, apCompileData, true, false);
+}
+
+bool ScriptCompiler::OldMessageCompile(
+    const uint16_t asParamCount,
+    const SCRIPT_PARAMETER* apParameters,
+    SCRIPT_LINE* apScriptLine,
+    ScriptCompileData* apCompileData
+) {
+    return ScriptCompiler::MessageBoxCompile(asParamCount, apParameters, apScriptLine, apCompileData, false, true);
+}
+
+// The compiled line is raw bytecode: its 16-bit and 32-bit values are written into the output byte buffer unaligned.
+bool ScriptCompiler::MessageBoxCompile(
+    const uint16_t asParamCount,
+    const SCRIPT_PARAMETER* apParameters,
+    SCRIPT_LINE* apScriptLine,
+    ScriptCompileData* apCompileData,
+    bool abButtons,
+    bool abWarning
+) {
+    apScriptLine->uiOffset = 0;
+    uint16_t usOne = 1;
+    *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = usOne;
+    apScriptLine->uiOutputSize += 2;
+    SCRIPT_WORD kTextWord;
+    BGSMessage* pMessage = nullptr;
+    int32_t iCount = 0;
+    if (abWarning) {
+        iCount = ScriptCompiler::GetNextWord(
+            apCompileData,
+            &kTextWord,
+            apScriptLine->pLine,
+            apScriptLine->uiOffset,
+            false,
+            false
+        );
+        if (!iCount) {
+            ScriptCompiler::ScriptError(apCompileData, "No message text.");
+            return false;
+        }
+        *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+            iCount
+        );
+        apScriptLine->uiOutputSize += 2;
+        ourMemcpy(&apScriptLine->pOutput[apScriptLine->uiOutputSize], kTextWord.pText, iCount);
+        apScriptLine->uiOutputSize += iCount;
+    }
+    else {
+        SCRIPT_WORD kMessageWord;
+        iCount = ScriptCompiler::GetNextWord(
+            apCompileData,
+            &kMessageWord,
+            apScriptLine->pLine,
+            apScriptLine->uiOffset,
+            false,
+            false
+        );
+        if (!iCount) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Missing parameter %s.\r\nCompiled script not saved!",
+                apParameters->pParamName
+            );
+            return false;
+        }
+        if (kMessageWord.uiRefObjectIndex || kMessageWord.cVariableType) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Parameter %s may not be a variable.\r\nCompiled script not saved!",
+                apParameters->pParamName
+            );
+            return false;
+        }
+        if (!apCompileData->GetReferencedObject(&kMessageWord, false, false) || !kMessageWord.uiRefObjectIndex) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Item '%s' not found for parameter %s.\r\nCompiled script not saved!",
+                kMessageWord.pText,
+                apParameters->pParamName
+            );
+            return false;
+        }
+        pMessage = dynamic_cast<BGSMessage*>(kMessageWord.pForm);
+        if (!kMessageWord.uiVariableID && !pMessage) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Invalid message '%s' for parameter %s.\r\nCompiled script not saved!",
+                kMessageWord.pText,
+                apParameters->pParamName
+            );
+            return false;
+        }
+        char* pOutput = apScriptLine->pOutput;
+        pOutput[apScriptLine->uiOutputSize++] = 'r';
+        *reinterpret_cast<uint16_t*>(&pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+            kMessageWord.uiRefObjectIndex
+        );
+        apScriptLine->uiOutputSize += 2;
+    }
+    // The message text, scanned for its '%' format specifiers ("%%" is a literal percent sign).
+    const char* pText = nullptr;
+    if (abWarning) {
+        pText = kTextWord.pText;
+    }
+    else if (pMessage) {
+        pText = static_cast<TESDescription*>(pMessage)->GetDescription(nullptr, DESC_ID);
+    }
+    int32_t iVariableCount = 0;
+    while (pText && *pText) {
+        if (*pText == '%') {
+            if (pText[1] == '%') {
+                ++pText;
+            }
+            else {
+                ++iVariableCount;
+            }
+        }
+        ++pText;
+    }
+    if (iVariableCount >= 10) {
+        ScriptCompiler::ScriptError(apCompileData, "Max variables of %d exceeded.", 10);
+        return false;
+    }
+    *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+        iVariableCount
+    );
+    apScriptLine->uiOutputSize += 2;
+    char* pVarOutput = apScriptLine->pOutput;
+    for (int32_t i = 0; i < iVariableCount; ++i) {
+        SCRIPT_WORD kVariableWord;
+        iCount = ScriptCompiler::GetNextWord(
+            apCompileData,
+            &kVariableWord,
+            apScriptLine->pLine,
+            apScriptLine->uiOffset,
+            true,
+            false
+        );
+        if (!iCount) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Too few variables in MessageBox parameters; expected %d, found %d.",
+                iVariableCount,
+                i
+            );
+            return false;
+        }
+        if (!kVariableWord.cVariableType) {
+            ScriptCompiler::ScriptError(
+                apCompileData,
+                "Unknown variable '%s' in MessageBox parameters.",
+                kVariableWord.pText
+            );
+            return false;
+        }
+        if (kVariableWord.uiRefObjectIndex) {
+            if (kVariableWord.cVariableType == 'G') {
+                pVarOutput[apScriptLine->uiOutputSize] = 'G';
+            }
+            else {
+                pVarOutput[apScriptLine->uiOutputSize] = 'r';
+            }
+            *reinterpret_cast<uint16_t*>(&pVarOutput[++apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+                kVariableWord.uiRefObjectIndex
+            );
+            apScriptLine->uiOutputSize += 2;
+        }
+        if (kVariableWord.cVariableType != 'G') {
+            if (!kVariableWord.uiVariableID) {
+                ScriptCompiler::ScriptError(
+                    apCompileData,
+                    "Unknown compiler error in MessageBoxCompile.  Failed to parse variable '%s'.",
+                    kVariableWord.pText
+                );
+                return false;
+            }
+            pVarOutput[apScriptLine->uiOutputSize++] = kVariableWord.cVariableType;
+            *reinterpret_cast<uint16_t*>(&pVarOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+                kVariableWord.uiVariableID
+            );
+            apScriptLine->uiOutputSize += 2;
+        }
+    }
+    if (!abWarning) {
+        if (abButtons) {
+            SCRIPT_WORD kButtonWords[10];
+            int32_t iButtonCount = 0;
+            do {
+                iCount = ScriptCompiler::GetNextWord(
+                    apCompileData,
+                    &kButtonWords[iButtonCount],
+                    apScriptLine->pLine,
+                    apScriptLine->uiOffset,
+                    false,
+                    false
+                );
+                if (iCount <= 0) {
+                    break;
+                }
+                ++iButtonCount;
+            }
+            while (iButtonCount < 10);
+            *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = static_cast<uint16_t>(
+                iButtonCount
+            );
+            apScriptLine->uiOutputSize += 2;
+            for (int32_t j = 0; j < iButtonCount; ++j) {
+                *reinterpret_cast<uint16_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = 1;
+                apScriptLine->uiOutputSize += 2;
+                iCount = BSstrlen(kButtonWords[j].pText);
+                *reinterpret_cast<uint16_t*>(
+                    &apScriptLine->pOutput[apScriptLine->uiOutputSize]
+                ) = static_cast<uint16_t>(iCount);
+                apScriptLine->uiOutputSize += 2;
+                ourMemcpy(&apScriptLine->pOutput[apScriptLine->uiOutputSize], kButtonWords[j].pText, iCount);
+                apScriptLine->uiOutputSize += iCount;
+            }
+        }
+        else {
+            int32_t iMessageTime = 0;
+            SCRIPT_WORD kTimeWord;
+            iCount = ScriptCompiler::GetNextWord(
+                apCompileData,
+                &kTimeWord,
+                apScriptLine->pLine,
+                apScriptLine->uiOffset,
+                false,
+                false
+            );
+            if (iCount > 0) {
+                if (!IsStringInteger(kTimeWord.pText)) {
+                    ScriptCompiler::ScriptError(
+                        apCompileData,
+                        "Message time must be an integer.\r\nCompiled script not saved!"
+                    );
+                    return false;
+                }
+                iMessageTime = std::atol(kTimeWord.pText);
+            }
+            *reinterpret_cast<uint32_t*>(&apScriptLine->pOutput[apScriptLine->uiOutputSize]) = iMessageTime;
+            apScriptLine->uiOutputSize += 4;
+        }
+    }
+    return true;
 }

@@ -990,14 +990,7 @@ float hkHistogram::evaluate() {
     if (iNumEntries == 0) {
         return m_freeAngle;
     }
-    if (iNumEntries > 1) {
-        hkAlgorithm::quickSortRecursive<hkEntry, hkAlgorithm::less<hkEntry>>(
-            m_entries.m_data,
-            0,
-            iNumEntries - 1,
-            hkAlgorithm::less<hkEntry>()
-        );
-    }
+    hkAlgorithm::quickSort(m_entries.m_data, iNumEntries);
     hkArray<hkEntry> ranges;
     int32_t iStart = 0;
     for (int32_t i = 1; i <= m_entries.m_size; ++i) {

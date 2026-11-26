@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESReactionForm.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -17,9 +17,9 @@
 #include "SDK/MSVC/rtti.h"
 
 void GROUP_REACTION::Endian() {
-    ENDIAN(pForm, false);
-    ENDIAN(iReaction, false);
-    ENDIAN(iFightReaction, false);
+    BSEndian(pForm, false);
+    BSEndian(iReaction, false);
+    BSEndian(iFightReaction, false);
 }
 
 TESReactionForm::TESReactionForm() {
@@ -338,7 +338,7 @@ int32_t TESReactionForm::GetFactionCombatRelation(TESForm* apForm) {
 
 // Writes the reactions to the old-format save: an optional save-game block header, a two-byte count patched in after
 // the reactions, then each reaction's form ID and iReaction.
-void TESReactionForm::SaveGameTES(uint32_t aiFlags) {
+void TESReactionForm::SaveGame(uint32_t aiFlags) {
     if ((aiFlags & CHANGE_FACTION_REACTIONS) == 0) {
         return;
     }
@@ -405,7 +405,7 @@ void TESReactionForm::SaveGameTES(uint32_t aiFlags) {
     }
 }
 
-void TESReactionForm::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
+void TESReactionForm::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     if ((aiFlags & CHANGE_FACTION_REACTIONS) != 0) {
         uint16_t usBlockSize = 0;
         uint8_t* pBlockStart = nullptr;
@@ -519,7 +519,7 @@ void TESReactionForm::LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     }
 }
 
-// Resolves each reaction's form ID (LoadGameTES keeps it in pForm) and drops the reactions whose form is gone.
+// Resolves each reaction's form ID (LoadGame keeps it in pForm) and drops the reactions whose form is gone.
 void TESReactionForm::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_FACTION_REACTIONS)) {
         BSSimpleList<GROUP_REACTION*>* pList = &m_reactionList;

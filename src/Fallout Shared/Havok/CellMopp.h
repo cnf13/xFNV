@@ -2,7 +2,6 @@
 
 #include "BSHavok/bhkBvTreeShape.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/hkBSHeightFieldShape.h"
 #include "BSMain/Setting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
@@ -43,13 +42,6 @@ public:
 NiSmartPointer(CellMopp);
 
 using bhkRigidBodyArray = NiTArray<NiPointer<bhkRigidBody>, NiTNewInterface<NiPointer<bhkRigidBody>>>;
-
-// The construction data of the terrain's triangle-sampled height field shape: hkBvTreeShapeCinfo's user data and
-// shape collection, then the 16-aligned hkBSHeightFieldShapeCinfo base at 0x10.
-class hkTriSampledHeightFieldBvTreeShapeCinfo : public hkBvTreeShapeCinfo, public hkBSHeightFieldShapeCinfo {
-public:
-    hkTriSampledHeightFieldBvTreeShapeCinfo();
-};
 
 // The game settings CellMopp.cpp defines.
 extern SettingT<INISettingCollection> fLandFriction;

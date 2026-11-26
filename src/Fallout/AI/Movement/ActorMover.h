@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSTStaticFreeList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSTMessageQueue.h"
 #include "Fallout Shared/Pathfinding/ActorPathingMessage.h"
 #include "Fallout Shared/Pathfinding/PathingLocation.h"

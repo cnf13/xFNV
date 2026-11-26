@@ -17,3 +17,12 @@ public:
     NiTPrimitiveArray<BSTextureManager::eTextureType> pBorrowTextureTypes;
     NiTPrimitiveArray<NiTexturingProperty::FilterMode> pBorrowTextureFilters;
 };
+
+inline void ImageSpaceEffectParam::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+inline ImageSpaceEffectParam::ImageSpaceEffectParam() : pBorrowTextureTypes(0, 1), pBorrowTextureFilters(0, 1) {}
+
+// The two arrays free their own buffers.
+inline ImageSpaceEffectParam::~ImageSpaceEffectParam() {}

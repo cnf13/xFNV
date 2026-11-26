@@ -2,10 +2,11 @@
 
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
 #include "Fallout Shared/Distant Terrain System/BGSDistantObjectBlock.h"
 #include "Fallout Shared/Distant Terrain System/BGSDistantTreeBlock.h"

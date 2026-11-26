@@ -3,6 +3,7 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "Fallout/Interface/ListBox.h"

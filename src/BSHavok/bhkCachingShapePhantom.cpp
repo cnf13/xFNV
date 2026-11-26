@@ -7,15 +7,16 @@
 #include "BSHavok/bhkShapePhantom.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Fallout Shared/ModelLoader.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastInput.h"
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCastOutput.h"
+#include "Havok/Source/Physics/Collide/Shape/Query/hkpShapeRayCastInput.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpCachingShapePhantom.h"
 
 NiRTTI bhkCachingShapePhantom::ms_RTTI("bhkCachingShapePhantom", &bhkShapePhantom::ms_RTTI);

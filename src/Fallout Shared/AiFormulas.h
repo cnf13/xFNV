@@ -516,6 +516,6 @@ extern SettingT<GameSettingCollection> fFollowWalkZoneMult;
 extern SettingT<GameSettingCollection> fAVDNPCFatigueEnduranceMult;
 extern SettingT<GameSettingCollection> fSneakSoundsMult;
 
-extern SettingT<GameSettingCollection> gs_fSneakSleepBonus;
+extern SettingT<GameSettingCollection> fSneakSleepMod;
 
-extern SettingT<GameSettingCollection> gs_fAIEngergyLevelMult;
+extern SettingT<GameSettingCollection> fAIEnergyLevelMult;

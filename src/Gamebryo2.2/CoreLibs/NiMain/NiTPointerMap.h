@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerAllocator.h"

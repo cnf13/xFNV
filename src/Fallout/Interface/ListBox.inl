@@ -4,6 +4,7 @@
 // The generic members, instantiated in ListBox.cpp for every list.
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"

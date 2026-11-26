@@ -184,3 +184,46 @@ public:
     static NiCriticalSection ms_kTextureListCriticalSection;
     static inline bool bLoadDirectToRenderer;
 };
+
+inline NiTexture::FormatPrefs::FormatPrefs()
+  : m_ePixelLayout(PIX_DEFAULT), m_eAlphaFmt(ALPHA_DEFAULT), m_eMipMapped(MIP_DEFAULT) {}
+
+inline const NiPixelFormat* NiTexture::RendererData::GetPixelFormat() {
+    return &m_kPixelFormat;
+}
+
+// The renderer data's pixel format, null without renderer data.
+inline const NiPixelFormat* NiTexture::GetPixelFormat() {
+    if (m_pkRendererData) {
+        return m_pkRendererData->GetPixelFormat();
+    }
+    return nullptr;
+}
+
+inline BSDegradePriority* NiTexture::RendererData::QDegradePriority() {
+    return &DegradePriorityRange;
+}
+
+// The degrade state of the texture's renderer data, 0 without one.
+inline PRIORITY_STATE NiTexture::QState() {
+    if (!GetRendererData()) {
+        return PS_NONE;
+    }
+    return GetRendererData()->QDegradePriority()->QState();
+}
+
+inline NiTexture::RendererData* NiTexture::GetRendererData() {
+    return m_pkRendererData;
+}
+
+inline void NiTexture::SetLoadMethod(uint32_t aiLoadMethod) {
+    RendererData::iLoadMethod = static_cast<int32_t>(aiLoadMethod);
+}
+
+inline uint32_t NiTexture::QLoadMethod() {
+    return static_cast<uint32_t>(RendererData::iLoadMethod);
+}
+
+inline void NiTexture::SetMipmapByDefault(bool bMipmap) {
+    NiTexture::ms_bMipmapByDefault = bMipmap;
+}

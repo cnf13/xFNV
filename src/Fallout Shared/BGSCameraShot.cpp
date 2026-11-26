@@ -2,13 +2,13 @@
 
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSSoundHandle.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/ModelLoader.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESImageSpaceModifiableForm.h"
@@ -30,7 +30,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -39,6 +38,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 #include "xfnv/Compiler.h"
@@ -55,28 +55,28 @@ SettingT<GameSettingCollection> fVATSCameraEffectVolume("fVATSCameraEffectVolume
 // The time multipliers first, then the enums and flags, then the times and the target percentage; the order is the
 // game's.
 void BGSCameraShot::CAMERA_SHOT_DATA::Endian() {
-    ENDIAN(fPlayerTimeMult, false);
-    ENDIAN(fTargetTimeMult, false);
-    ENDIAN(fGlobalTimeMult, false);
-    ENDIAN(eCameraAction, false);
-    ENDIAN(eLocation, false);
-    ENDIAN(eTarget, false);
-    ENDIAN(iFlags, false);
-    ENDIAN(fMaxTime, false);
-    ENDIAN(fMinTime, false);
-    ENDIAN(fTargetPercentBetweenActors, false);
+    BSEndian(fPlayerTimeMult, false);
+    BSEndian(fTargetTimeMult, false);
+    BSEndian(fGlobalTimeMult, false);
+    BSEndian(eCameraAction, false);
+    BSEndian(eLocation, false);
+    BSEndian(eTarget, false);
+    BSEndian(iFlags, false);
+    BSEndian(fMaxTime, false);
+    BSEndian(fMinTime, false);
+    BSEndian(fTargetPercentBetweenActors, false);
 }
 
 // The time multipliers first, then the enums and flags, then the times; the order is the game's.
 void BGSCameraShot::OLD_CAMERA_SHOT_DATA::Endian() {
-    ENDIAN(fPlayerTimeMult, false);
-    ENDIAN(fGlobalTimeMult, false);
-    ENDIAN(eCameraAction, false);
-    ENDIAN(eLocation, false);
-    ENDIAN(eTarget, false);
-    ENDIAN(iFlags, false);
-    ENDIAN(fMaxTime, false);
-    ENDIAN(fMinTime, false);
+    BSEndian(fPlayerTimeMult, false);
+    BSEndian(fGlobalTimeMult, false);
+    BSEndian(eCameraAction, false);
+    BSEndian(eLocation, false);
+    BSEndian(eTarget, false);
+    BSEndian(iFlags, false);
+    BSEndian(fMaxTime, false);
+    BSEndian(fMinTime, false);
 }
 
 BGSCameraShot::BGSCameraShot()
@@ -585,11 +585,4 @@ NiPoint3 BGSCameraShot::GetTargetPos() {
 
 bool HitData::IsFlagSet(Flag aeFlag) {
     return (uiFlags & aeFlag) != 0;
-}
-
-NiRotKey* NiTransformData::GetRotAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) {
-    uiNumKeys = m_usNumRotKeys;
-    eType = m_eRotType;
-    ucSize = m_ucRotSize;
-    return m_pkRotKeys;
 }

@@ -4,6 +4,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
+#include "BSDevices/XPrefSettings.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileImage.h"
 #include "BSMenu/TileMenu.h"

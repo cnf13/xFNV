@@ -2,9 +2,9 @@
 
 #include "BSCore/BSScrapArray.h"
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/Pathfinding/AStarNode.h"
 #include "Fallout Shared/Pathfinding/AStarSearch.h"
 #include "Fallout Shared/Pathfinding/AngleSinCosArc.h"

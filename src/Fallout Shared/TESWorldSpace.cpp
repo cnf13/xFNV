@@ -5,6 +5,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSPortalGraph.h"
 #include "BSShader/BSShaderManager.h"
@@ -46,7 +47,6 @@
 #include "Fallout Shared/TESWaterForm.h"
 #include "Fallout/AI/Movement/ActorMover.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -56,6 +56,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerAllocator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdlib.h"
@@ -71,23 +72,23 @@ BSCriticalSection TESWorldSpace::PersistentDataCritSection;
 SettingT<INISettingCollection> bCheckCellOffsetsOnInit("bCheckCellOffsetsOnInit:General", false);
 
 void WorldSpaceMapData::Endian() {
-    ENDIAN(iUsableWidth, false);
-    ENDIAN(iUsableHeight, false);
-    ENDIAN(sNorthWestCellX, false);
-    ENDIAN(sNorthWestCellY, false);
-    ENDIAN(sSouthEastCellX, false);
-    ENDIAN(sSouthEastCellY, false);
+    BSEndian(iUsableWidth, false);
+    BSEndian(iUsableHeight, false);
+    BSEndian(sNorthWestCellX, false);
+    BSEndian(sNorthWestCellY, false);
+    BSEndian(sSouthEastCellX, false);
+    BSEndian(sSouthEastCellY, false);
 }
 
 void WorldSpaceMapOffsetData::Endian() {
-    ENDIAN(fMapScale, false);
-    ENDIAN(fCellOffsetX, false);
-    ENDIAN(fCellOffsetY, false);
+    BSEndian(fMapScale, false);
+    BSEndian(fCellOffsetX, false);
+    BSEndian(fCellOffsetY, false);
 }
 
 void DEFAULT_CELL_DATA::Endian() {
-    ENDIAN(fLandHeight, false);
-    ENDIAN(fWaterHeight, false);
+    BSEndian(fLandHeight, false);
+    BSEndian(fWaterHeight, false);
 }
 
 TESWorldSpace::OFFSET_DATA::OFFSET_DATA() {}
@@ -221,7 +222,7 @@ bool TESWorldSpace::Load(TESFile* apFile) {
                     apFile->GetChunkData(poffsetData->pCellFileOffsets, 0);
                     if (apFile->QEndian()) {
                         for (uint32_t i = 0; i < ioffsetcount; ++i) {
-                            ENDIAN(poffsetData->pCellFileOffsets[i], false);
+                            BSEndian(poffsetData->pCellFileOffsets[i], false);
                         }
                     }
                 }
@@ -340,8 +341,8 @@ bool TESWorldSpace::Load(TESFile* apFile) {
                 NiPoint2 tmpCoords = {};
                 apFile->GetChunkData(&tmpCoords, 8);
                 if (apFile->QEndian()) {
-                    ENDIAN(tmpCoords.x, false);
-                    ENDIAN(tmpCoords.y, false);
+                    BSEndian(tmpCoords.x, false);
+                    BSEndian(tmpCoords.y, false);
                 }
                 MinimumCoords.X = BSMIN(MinimumCoords.X, tmpCoords.x);
                 MinimumCoords.Y = BSMIN(MinimumCoords.Y, tmpCoords.y);
@@ -356,8 +357,8 @@ bool TESWorldSpace::Load(TESFile* apFile) {
                 NiPoint2 tmpCoords = {};
                 apFile->GetChunkData(&tmpCoords, 8);
                 if (apFile->QEndian()) {
-                    ENDIAN(tmpCoords.x, false);
-                    ENDIAN(tmpCoords.y, false);
+                    BSEndian(tmpCoords.x, false);
+                    BSEndian(tmpCoords.y, false);
                 }
                 MaximumCoords.X = BSMAX(MaximumCoords.X, tmpCoords.x);
                 MaximumCoords.Y = BSMAX(MaximumCoords.Y, tmpCoords.y);
@@ -397,8 +398,8 @@ bool TESWorldSpace::LoadPartial(TESFile* apFile) {
         if (chunkid == NAM0_ID) {
             apFile->GetChunkData(&kMinCoords, 8u);
             if (apFile->QEndian()) {
-                ENDIAN<float>(kMinCoords.x, false);
-                ENDIAN<float>(kMinCoords.y, false);
+                BSEndian<float>(kMinCoords.x, false);
+                BSEndian<float>(kMinCoords.y, false);
             }
             MinimumCoords.X = BSMIN(MinimumCoords.X, kMinCoords.x);
             MinimumCoords.Y = BSMIN(MinimumCoords.Y, kMinCoords.y);
@@ -410,8 +411,8 @@ bool TESWorldSpace::LoadPartial(TESFile* apFile) {
         else if (chunkid == NAM9_ID) {
             apFile->GetChunkData(&kMaxCoords, 8u);
             if (apFile->QEndian()) {
-                ENDIAN<float>(kMaxCoords.x, false);
-                ENDIAN<float>(kMaxCoords.y, false);
+                BSEndian<float>(kMaxCoords.x, false);
+                BSEndian<float>(kMaxCoords.y, false);
             }
             MaximumCoords.X = BSMAX(MaximumCoords.X, kMaxCoords.x);
             MaximumCoords.Y = BSMAX(MaximumCoords.Y, kMaxCoords.y);

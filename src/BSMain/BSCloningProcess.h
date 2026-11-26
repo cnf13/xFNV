@@ -22,3 +22,15 @@ public:
 
     NiPoint3 Scale;
 };
+
+inline BSCloningProcess::~BSCloningProcess() {}
+
+inline BSCloningProcess::BSCloningProcess(float afScale) : NiCloningProcess(0x101u) {
+    SetScale(afScale);
+}
+
+inline void BSCloningProcess::SetScale(float afScale) {
+    Scale.z = afScale;
+    Scale.y = afScale;
+    Scale.x = afScale;
+}

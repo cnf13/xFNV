@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/BGSImpactDataSet.h"

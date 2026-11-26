@@ -1,6 +1,8 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
+#include "BSShader/BSShaderManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -20,8 +22,6 @@ class NiNode;
 class NiShadeProperty;
 class TESObjectCELL;
 class TESObjectREFR;
-
-int32_t BSSM_ShaderPropertyIsLighting(NiShadeProperty* apShaderProp);
 
 // The decal manager: the pending simple decals and the decal emitters, with the occlusion query's render target.
 class BGSDecalManager {
@@ -102,6 +102,13 @@ public:
     static inline int32_t iDecalDebugFlags;
     static NiPointer<NiAVObject> spDebugDecalBox;
     static SettingT<INISettingCollection> bDecalMultithreaded;
+    static SettingT<RendererSettingCollection> iMaxDecalsPerFrame;
+    static SettingT<RendererSettingCollection> iMaxDecals;
+    static SettingT<INISettingCollection> iMaxSkinDecals;
+    static SettingT<INISettingCollection> bProfileDecals;
+    static SettingT<INISettingCollection> bDecalOcclusionQuery;
+    static SettingT<INISettingCollection> bDecals;
+    static SettingT<INISettingCollection> bSkinnedDecals;
 };
 
 // The settings of one decal to place: where, on what, its texture and size.
@@ -145,15 +152,3 @@ public:
 extern SettingT<GameSettingCollection> fSprayDecalsDistance;
 extern SettingT<GameSettingCollection> fSprayDecalsGravity;
 extern SettingT<GameSettingCollection> iSprayDecalsDebug;
-
-extern SettingT<INISettingCollection> gs_bDecals_Decals;
-
-extern SettingT<INISettingCollection> gs_bProfileDecals_Decals;
-
-extern SettingT<RendererSettingCollection> gs_iMaxDecalsPerFrame_Display;
-
-extern SettingT<INISettingCollection> gs_bDecalOcclusionQuery_Decals;
-
-extern SettingT<INISettingCollection> gs_bSkinnedDecals_Decals;
-
-extern SettingT<INISettingCollection> gs_uMaxSkinDecals_Decals;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/MiscStats.h"
@@ -358,7 +358,7 @@ public:
     static ActorValue::Index GetTargetedBodyPart();
     static float GetRadMeterMax();
     static uint8_t GetCurrentStatsPage();
-    static void Close();
+    static void ResetHealingMode();
     static void operator delete(void* apMemory) {
         ourFree(apMemory);
     }

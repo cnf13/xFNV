@@ -10,12 +10,6 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiGeometryGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiVBChip.h"
 
-NiGeometryData::RendererData::~RendererData() {}
-
-void NiGeometryData::RendererData::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
 NiGeometryBufferData::NiGeometryBufferData()
   : m_uiFlags(0), m_pkGeometryGroup(nullptr), m_uiFVF(0), m_hDeclaration(nullptr), m_bSoftwareVP(false),
     m_uiVertCount(0), m_uiMaxVertCount(0), m_uiStreamCount(0), m_puiVertexStride(nullptr), m_ppkVBChip(nullptr),
@@ -127,78 +121,4 @@ void NiGeometryBufferData::RemoveIB() {
         m_pkIB = nullptr;
     }
     m_uiIBSize = 0;
-}
-
-// Creates the buffer on the manager's device and, when asked for, reads its description back.
-IDirect3DIndexBuffer9* NiDX9IndexBufferManager::CreateIndexBuffer(
-    uint32_t auiLength,
-    uint32_t auiUsage,
-    D3DFORMAT aeFormat,
-    D3DPOOL aePool,
-    D3DINDEXBUFFER_DESC* apkDesc
-) {
-    IDirect3DIndexBuffer9* pkIB9 = nullptr;
-    HRESULT eD3DRet = m_pkD3DDevice9->CreateIndexBuffer(auiLength, auiUsage, aeFormat, aePool, &pkIB9, nullptr);
-    if (eD3DRet < 0) {
-        NiRenderer::Error("NiDX9IndexBufferManager::CreateIndexBuffer FAILED");
-        return nullptr;
-    }
-    if (apkDesc) {
-        pkIB9->GetDesc(apkDesc);
-    }
-    return pkIB9;
-}
-
-// A buffer whose description matches the usage and pool and is large enough is reused. The device's CreateIndexBuffer
-// is called directly.
-IDirect3DIndexBuffer9* NiDX9IndexBufferManager::PackBuffer(
-    const uint16_t* apusTriList,
-    uint32_t auiLength,
-    uint32_t auiMaxLength,
-    IDirect3DIndexBuffer9* apkOldIB,
-    uint32_t* apuiIBSize,
-    D3DPOOL aePool,
-    uint32_t auiUsage
-) {
-    if (!m_pkD3DDevice9 || !apusTriList) {
-        return nullptr;
-    }
-    const uint32_t uiCreateSize = 2 * auiMaxLength;
-    const uint32_t uiCopySize = 2 * auiLength;
-    IDirect3DIndexBuffer9* pkD3DIB9 = nullptr;
-    if (apkOldIB) {
-        D3DINDEXBUFFER_DESC kIBDesc = {0, 0, 0, 0, 0};
-        if (apkOldIB->GetDesc(&kIBDesc) >= 0 &&
-            kIBDesc.Format == D3DFMT_INDEX16 &&
-            kIBDesc.Type == D3DRTYPE_INDEXBUFFER &&
-            kIBDesc.Usage == auiUsage &&
-            kIBDesc.Pool == aePool &&
-            kIBDesc.Size >= uiCreateSize) {
-            pkD3DIB9 = apkOldIB;
-        }
-    }
-    if (!pkD3DIB9) {
-        if (m_pkD3DDevice9->CreateIndexBuffer(uiCreateSize, auiUsage, D3DFMT_INDEX16, aePool, &pkD3DIB9, nullptr) < 0) {
-            NiRenderer::Error("NiDX9IndexBufferManager::PackBuffer> Failed to create index buffer\n");
-            pkD3DIB9 = nullptr;
-        }
-        if (!pkD3DIB9) {
-            NiRenderer::Error("NiDX9IndexBufferManager::PackBuffer> Failed to create index buffer\n");
-            return nullptr;
-        }
-        *apuiIBSize = uiCreateSize;
-    }
-    if (uiCopySize == 0) {
-        return pkD3DIB9;
-    }
-    void* pvData = nullptr;
-    if (pkD3DIB9->Lock(0, uiCopySize, &pvData, 0) >= 0) {
-        rt::memcpy(pvData, apusTriList, uiCopySize);
-        pkD3DIB9->Unlock();
-        return pkD3DIB9;
-    }
-    NiRenderer::Error("NiDX9IndexBufferManager::PackBuffer> Failed to lock index buffer\n");
-    pkD3DIB9->Unlock();
-    pkD3DIB9->Release();
-    return pkD3DIB9;
 }

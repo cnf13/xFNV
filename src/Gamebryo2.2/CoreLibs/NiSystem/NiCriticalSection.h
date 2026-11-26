@@ -27,3 +27,16 @@ inline void NiCriticalSection::Lock() {
 inline void NiCriticalSection::Unlock() {
     LeaveCriticalSection(&m_kCriticalSection);
 }
+
+inline NiCriticalSection::NiCriticalSection() {
+    InitializeCriticalSection(&m_kCriticalSection);
+}
+
+inline NiCriticalSection::~NiCriticalSection() {
+    DeleteCriticalSection(&m_kCriticalSection);
+}
+
+// The release build's lock count is always 0.
+inline uint32_t NiCriticalSection::GetCurrentLockCount() {
+    return 0;
+}

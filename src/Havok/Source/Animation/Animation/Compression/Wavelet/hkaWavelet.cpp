@@ -110,14 +110,7 @@ void hkZeroSmallWaveletCoefficients(
         if (index < 0) {
             index = 0;
         }
-        if (static_cast<int32_t>(nValues) > 1) {
-            hkAlgorithm::quickSortRecursive(
-                sortedCoefs.m_data,
-                0,
-                static_cast<int32_t>(nValues) - 1,
-                static_cast<uint8_t>(0)
-            );
-        }
+        hkAlgorithm::quickSort(sortedCoefs.m_data, static_cast<int32_t>(nValues));
         const float fLimit = sortedCoefs.m_data[index];
         for (uint32_t i = 0; i < nValues; i++) {
             const float fMagnitude = std::fabs(waveletData[i]);
@@ -188,42 +181,5 @@ void hkInverseWaveletTransform(float* data, uint32_t nValues) {
         hkPredictReflect(0.5f, data, &data[n8], n8);
         n8 *= 2;
         hkMergeOddEven(data, data, n8);
-    }
-}
-
-// Hoare partition around the middle element, recursing on the left part and looping on the right one.
-void hkAlgorithm::quickSortRecursive(float* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    hkAlgorithm::less<float> cmpLess;
-    for (;;) {
-        int32_t i = aiLow;
-        int32_t j = aiHigh;
-        const float fPivot = apArr[(aiLow + aiHigh) >> 1];
-        do {
-            while (cmpLess(apArr[i], fPivot)) {
-                ++i;
-            }
-            while (cmpLess(fPivot, apArr[j])) {
-                --j;
-            }
-            if (i > j) {
-                break;
-            }
-            if (i != j) {
-                float* pArr = apArr;
-                const float fTmp = pArr[j];
-                pArr[j] = pArr[i];
-                pArr[i] = fTmp;
-            }
-            ++i;
-            --j;
-        }
-        while (i <= j);
-        if (aiLow < j) {
-            hkAlgorithm::quickSortRecursive(apArr, aiLow, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return;
-        }
-        aiLow = i;
     }
 }

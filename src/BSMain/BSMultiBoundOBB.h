@@ -51,3 +51,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline void BSMultiBoundOBB::SetAxis(const NiMatrix3& arAxis) {
+    Axis = arAxis;
+}

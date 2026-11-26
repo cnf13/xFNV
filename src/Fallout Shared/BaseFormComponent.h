@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 // Root of TESForm and of the components forms are assembled from (TESFullName, TESModel, ...). It has no virtual
 // destructor: its four virtual functions are the per-component data hooks, all pure.

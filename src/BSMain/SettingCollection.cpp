@@ -1,12 +1,11 @@
-#include "BSMain/SettingCollection.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/XINISetting.h"
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollectionMap.h"
 #include "Fallout Shared/TES.h"
-#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
@@ -417,50 +416,4 @@ void INISettingCollection::SubKey(Setting& arSetting, char* apSubKey) {
             apSubKey[v2] = 0;
         }
     }
-}
-
-GameSettingCollection::GameSettingCollection() : SettingCollectionMap(GameSettingCollection::iMapSize) {}
-
-uint32_t GameSettingCollection::GetViewerStrings(NiTPrimitiveArray<char*>* apStringsA) {
-    char* element = NiGetViewerString("GameSettings");
-    apStringsA->Add(element);
-    uint32_t I = SettingCollectionMap::GetViewerStrings(apStringsA);
-    char* ViewerString_6 = NiGetViewerString("Total GameSettings", I);
-    apStringsA->Add(ViewerString_6);
-    return I;
-}
-
-bool GameSettingCollection::WriteSetting(Setting& arSetting) {
-    return false;
-}
-
-bool GameSettingCollection::Open(bool abWrite) {
-    return (pHandle != nullptr);
-}
-
-bool GameSettingCollection::Close() {
-    pHandle = nullptr;
-    return true;
-}
-
-bool GameSettingCollection::ReadSetting(TESFile* apFile, const char* apKey) {
-    bool bres = false;
-    SetFileHandle(apFile);
-    Setting* psetting = GetPtr(apKey);
-    if (psetting) {
-        bres = ReadSetting(*psetting);
-    }
-    Close();
-    return bres;
-}
-
-bool GameSettingCollection::GetSetting(const char* apKey, Setting** appSetting) {
-    return Settings.GetAt(apKey, *appSetting);
-}
-
-Setting* GameSettingCollection::GetPtr(const char* apID) {
-    Setting* appSetting;
-    appSetting = nullptr;
-    GetSetting(apID, &appSetting);
-    return appSetting;
 }

@@ -105,3 +105,11 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline const NiMatrix3 BSOcclusionPlane::QRotation() const {
+    return kRotation;
+}
+
+inline void BSOcclusionPlane::ResetCullResult() {
+    kCullResult = BSMultiBoundShape::BS_CULL_UNTESTED;
+}

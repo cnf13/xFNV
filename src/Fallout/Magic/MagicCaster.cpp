@@ -6,7 +6,6 @@
 #include "BSHavok/bhkAabbPhantom.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValue.h"
@@ -1415,16 +1414,6 @@ MagicCaster* MagicCaster::GetMagicCasterByNumericID(uint32_t aiFormID) {
     TESForm* pform = TESForm::GetFormByNumericID(aiFormID);
     if (pform && pform->IsReference()) {
         return static_cast<TESObjectREFR*>(pform)->GetMagicCaster();
-    }
-
-    return nullptr;
-}
-
-// A box phantom wraps an hkpAabbPhantom; its overlap array's getter is a trivial accessor (this + 0xD0).
-hkArray<hkpCollidable*, hkContainerHeapAllocator>* bhkAabbPhantom::GetOverlappingCollidables() {
-    hkpAabbPhantom* pphantom = static_cast<hkpAabbPhantom*>(**this);
-    if (pphantom) {
-        return &pphantom->m_overlappingCollidables;
     }
 
     return nullptr;

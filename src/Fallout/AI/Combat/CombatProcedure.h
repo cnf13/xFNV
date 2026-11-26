@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/IDebugText.h"
 #include "Fallout Shared/TESAnimGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"

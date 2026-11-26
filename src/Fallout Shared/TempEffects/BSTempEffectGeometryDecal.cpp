@@ -1,6 +1,7 @@
 #include "Fallout Shared/TempEffects/BSTempEffectGeometryDecal.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
 #include "BSShader/BSShaderManager.h"
@@ -8,24 +9,20 @@
 #include "Fallout Shared/BGSDecalManager.h"
 #include "Fallout Shared/BGSDecalNode.h"
 #include "Fallout Shared/BGSTextureSet.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESSaveLoadGame.h"
 #include "Fallout Shared/TempEffects/BSTempEffect.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiBlendIndices.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiBlendWeights.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiPoint2.h"
 #include "Fallout/AI/FixedStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/BSDismemberSkinInstance.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAdditionalGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -39,6 +36,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeomData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "platform/System.h"
@@ -1301,288 +1299,3 @@ void BSTempEffectGeometryDecal::CreateGeometry(
     spDecalGeometry = static_cast<NiTriBasedGeom*>(pnewDecal);
     pGeometry = spTargetGeom.m_pObject;
 }
-
-NiBlendWeights::NiBlendWeights() : fWeights{0.0f, 0.0f, 0.0f, 0.0f} {}
-
-BSDismemberSkinInstance::PartitionData* BSDismemberSkinInstance::GetPartitionDataArray() const {
-    return pPartitionDataArray;
-}
-
-uint16_t NiAdditionalGeometryData::GetVertexCount() const {
-    return m_usVertexCount;
-}
-
-// The additional geometry data of the model data, null without model data.
-NiAdditionalGeometryData* NiGeometry::GetAdditionalGeometryData() {
-    if (!m_spModelData) {
-        return nullptr;
-    }
-    return m_spModelData->GetAdditionalGeometryData();
-}
-
-NiSkinData::BoneData* NiSkinData::GetBoneData() const {
-    return m_pkBoneData;
-}
-
-// Skins auiVertices model vertices (and normals, binormals and tangents when given) into the destination arrays: each
-// bone's bone-to-skin transform, weighted per vertex. The binormals and tangents follow the normals in the source
-// array. The destination arrays are raw vertex buffers auiStride bytes apart, walked as bytes (hence the char casts).
-// The rounding is deliberately the game's: the scaled rotation, every transformed point and, with normals, every
-// weighted point are stored as floats; without normals the weighted vertex is added unrounded.
-void NiSkinInstance::Deform(
-    const NiPoint3* apSrcVertex,
-    const NiPoint3* apSrcNormal,
-    uint32_t auiVertices,
-    NiPoint3* apDstVertex,
-    NiPoint3* apDstNormal,
-    NiPoint3* apDstBinormal,
-    NiPoint3* apDstTangent,
-    uint32_t auiStride
-) {
-    NiTransform kWorldToRootParent;
-    m_pkRootParent->m_kWorld.Invert(kWorldToRootParent);
-    NiTransform kWorldToSkin = m_spSkinData->m_kRootParentToSkin * kWorldToRootParent;
-    NiSkinData* pkSkinData = m_spSkinData.m_pObject;
-    NiSkinData::BoneData* pkBoneData = pkSkinData->m_pkBoneData;
-    uint32_t uiBones = pkSkinData->m_uiBones;
-
-    if (apSrcNormal && apDstNormal) {
-        if (apDstBinormal && apDstTangent) {
-            const NiPoint3* pkSrcBinormal = apSrcNormal + auiVertices;
-            const NiPoint3* pkSrcTangent = pkSrcBinormal + auiVertices;
-            if (auiStride == sizeof(NiPoint3)) {
-                std::memset(apDstVertex, 0, sizeof(NiPoint3) * auiVertices);
-                std::memset(apDstNormal, 0, sizeof(NiPoint3) * auiVertices);
-                std::memset(apDstBinormal, 0, sizeof(NiPoint3) * auiVertices);
-                std::memset(apDstTangent, 0, sizeof(NiPoint3) * auiVertices);
-            }
-            else {
-                NiPoint3* pkV = apDstVertex;
-                NiPoint3* pkN = apDstNormal;
-                NiPoint3* pkB = apDstBinormal;
-                NiPoint3* pkT = apDstTangent;
-                for (uint32_t i = auiVertices; i; --i) {
-                    *pkV = NiPoint3::ZERO;
-                    *pkN = NiPoint3::ZERO;
-                    *pkB = NiPoint3::ZERO;
-                    *pkT = NiPoint3::ZERO;
-                    pkV = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkV) + auiStride);
-                    pkN = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkN) + auiStride);
-                    pkB = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkB) + auiStride);
-                    pkT = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkT) + auiStride);
-                }
-            }
-
-            for (uint32_t i = 0; i < uiBones; ++i) {
-                NiSkinData::BoneData* pkBone = &pkBoneData[i];
-                uint32_t uiVerts = pkBone->m_usVerts;
-                NiTransform kBoneToSkin = kWorldToSkin * m_ppkBones[i]->m_kWorld * pkBone->m_kSkinToBone;
-                const NiMatrix3& kRot = kBoneToSkin.m_Rotate;
-                float fScale = kBoneToSkin.m_fScale;
-                float s00 = kRot.m_pEntry[0][0] * fScale;
-                float s01 = kRot.m_pEntry[0][1] * fScale;
-                float s02 = kRot.m_pEntry[0][2] * fScale;
-                float s10 = kRot.m_pEntry[1][0] * fScale;
-                float s11 = kRot.m_pEntry[1][1] * fScale;
-                float s12 = kRot.m_pEntry[1][2] * fScale;
-                float s20 = kRot.m_pEntry[2][0] * fScale;
-                float s21 = kRot.m_pEntry[2][1] * fScale;
-                float s22 = kRot.m_pEntry[2][2] * fScale;
-                NiSkinData::BoneVertData* pkVertData = pkBone->m_pkBoneVertData;
-                for (uint32_t j = 0; j < uiVerts; ++j) {
-                    uint32_t uiVert = pkVertData[j].m_usVert;
-                    float fWeight = pkVertData[j].m_fWeight;
-                    uint32_t uiOffset = uiVert * auiStride;
-                    const NiPoint3& kSrcV = apSrcVertex[uiVert];
-                    const NiPoint3& kSrcN = apSrcNormal[uiVert];
-                    const NiPoint3& kSrcB = pkSrcBinormal[uiVert];
-                    const NiPoint3& kSrcT = pkSrcTangent[uiVert];
-                    NiPoint3 kV;
-                    kV.x = s00 * kSrcV.x + s01 * kSrcV.y + s02 * kSrcV.z + kBoneToSkin.m_Translate.x;
-                    kV.y = s10 * kSrcV.x + s11 * kSrcV.y + s12 * kSrcV.z + kBoneToSkin.m_Translate.y;
-                    kV.z = s20 * kSrcV.x + s21 * kSrcV.y + s22 * kSrcV.z + kBoneToSkin.m_Translate.z;
-                    NiPoint3 kN;
-                    kN.x = kRot.m_pEntry[0][0] * kSrcN.x + kRot.m_pEntry[0][1] * kSrcN.y +
-                        kRot.m_pEntry[0][2] * kSrcN.z;
-                    kN.y = kRot.m_pEntry[1][0] * kSrcN.x + kRot.m_pEntry[1][1] * kSrcN.y +
-                        kRot.m_pEntry[1][2] * kSrcN.z;
-                    kN.z = kRot.m_pEntry[2][0] * kSrcN.x + kRot.m_pEntry[2][1] * kSrcN.y +
-                        kRot.m_pEntry[2][2] * kSrcN.z;
-                    NiPoint3 kB;
-                    kB.x = kRot.m_pEntry[0][0] * kSrcB.x + kRot.m_pEntry[0][1] * kSrcB.y +
-                        kRot.m_pEntry[0][2] * kSrcB.z;
-                    kB.y = kRot.m_pEntry[1][0] * kSrcB.x + kRot.m_pEntry[1][1] * kSrcB.y +
-                        kRot.m_pEntry[1][2] * kSrcB.z;
-                    kB.z = kRot.m_pEntry[2][0] * kSrcB.x + kRot.m_pEntry[2][1] * kSrcB.y +
-                        kRot.m_pEntry[2][2] * kSrcB.z;
-                    NiPoint3 kT;
-                    kT.x = kRot.m_pEntry[0][0] * kSrcT.x + kRot.m_pEntry[0][1] * kSrcT.y +
-                        kRot.m_pEntry[0][2] * kSrcT.z;
-                    kT.y = kRot.m_pEntry[1][0] * kSrcT.x + kRot.m_pEntry[1][1] * kSrcT.y +
-                        kRot.m_pEntry[1][2] * kSrcT.z;
-                    kT.z = kRot.m_pEntry[2][0] * kSrcT.x + kRot.m_pEntry[2][1] * kSrcT.y +
-                        kRot.m_pEntry[2][2] * kSrcT.z;
-
-                    NiPoint3* pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstVertex) + uiOffset);
-                    NiPoint3 kW;
-                    kW.x = kV.x * fWeight;
-                    kW.y = kV.y * fWeight;
-                    kW.z = kV.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                    pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstNormal) + uiOffset);
-                    kW.x = kN.x * fWeight;
-                    kW.y = kN.y * fWeight;
-                    kW.z = kN.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                    pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstBinormal) + uiOffset);
-                    kW.x = kB.x * fWeight;
-                    kW.y = kB.y * fWeight;
-                    kW.z = kB.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                    pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstTangent) + uiOffset);
-                    kW.x = kT.x * fWeight;
-                    kW.y = kT.y * fWeight;
-                    kW.z = kT.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                }
-            }
-            NiPoint3::UnitizeVectors(apDstNormal, auiVertices, auiStride);
-            NiPoint3::UnitizeVectors(apDstBinormal, auiVertices, auiStride);
-            NiPoint3::UnitizeVectors(apDstTangent, auiVertices, auiStride);
-        }
-        else {
-            if (auiStride == sizeof(NiPoint3)) {
-                std::memset(apDstVertex, 0, sizeof(NiPoint3) * auiVertices);
-                std::memset(apDstNormal, 0, sizeof(NiPoint3) * auiVertices);
-            }
-            else {
-                NiPoint3* pkV = apDstVertex;
-                NiPoint3* pkN = apDstNormal;
-                for (uint32_t i = auiVertices; i; --i) {
-                    *pkV = NiPoint3::ZERO;
-                    *pkN = NiPoint3::ZERO;
-                    pkV = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkV) + auiStride);
-                    pkN = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkN) + auiStride);
-                }
-            }
-
-            for (uint32_t i = 0; i < uiBones; ++i) {
-                NiSkinData::BoneData* pkBone = &pkBoneData[i];
-                uint32_t uiVerts = pkBone->m_usVerts;
-                NiTransform kBoneToSkin = kWorldToSkin * m_ppkBones[i]->m_kWorld * pkBone->m_kSkinToBone;
-                const NiMatrix3& kRot = kBoneToSkin.m_Rotate;
-                float fScale = kBoneToSkin.m_fScale;
-                float s00 = kRot.m_pEntry[0][0] * fScale;
-                float s01 = kRot.m_pEntry[0][1] * fScale;
-                float s02 = kRot.m_pEntry[0][2] * fScale;
-                float s10 = kRot.m_pEntry[1][0] * fScale;
-                float s11 = kRot.m_pEntry[1][1] * fScale;
-                float s12 = kRot.m_pEntry[1][2] * fScale;
-                float s20 = kRot.m_pEntry[2][0] * fScale;
-                float s21 = kRot.m_pEntry[2][1] * fScale;
-                float s22 = kRot.m_pEntry[2][2] * fScale;
-                NiSkinData::BoneVertData* pkVertData = pkBone->m_pkBoneVertData;
-                for (uint32_t j = 0; j < uiVerts; ++j) {
-                    uint32_t uiVert = pkVertData[j].m_usVert;
-                    float fWeight = pkVertData[j].m_fWeight;
-                    uint32_t uiOffset = uiVert * auiStride;
-                    const NiPoint3& kSrcV = apSrcVertex[uiVert];
-                    const NiPoint3& kSrcN = apSrcNormal[uiVert];
-                    NiPoint3 kV;
-                    kV.x = s00 * kSrcV.x + s01 * kSrcV.y + s02 * kSrcV.z + kBoneToSkin.m_Translate.x;
-                    kV.y = s10 * kSrcV.x + s11 * kSrcV.y + s12 * kSrcV.z + kBoneToSkin.m_Translate.y;
-                    kV.z = s20 * kSrcV.x + s21 * kSrcV.y + s22 * kSrcV.z + kBoneToSkin.m_Translate.z;
-                    NiPoint3 kN;
-                    kN.x = kRot.m_pEntry[0][0] * kSrcN.x + kRot.m_pEntry[0][1] * kSrcN.y +
-                        kRot.m_pEntry[0][2] * kSrcN.z;
-                    kN.y = kRot.m_pEntry[1][0] * kSrcN.x + kRot.m_pEntry[1][1] * kSrcN.y +
-                        kRot.m_pEntry[1][2] * kSrcN.z;
-                    kN.z = kRot.m_pEntry[2][0] * kSrcN.x + kRot.m_pEntry[2][1] * kSrcN.y +
-                        kRot.m_pEntry[2][2] * kSrcN.z;
-
-                    NiPoint3* pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstVertex) + uiOffset);
-                    NiPoint3 kW;
-                    kW.x = kV.x * fWeight;
-                    kW.y = kV.y * fWeight;
-                    kW.z = kV.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                    pkDst = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(apDstNormal) + uiOffset);
-                    kW.x = kN.x * fWeight;
-                    kW.y = kN.y * fWeight;
-                    kW.z = kN.z * fWeight;
-                    pkDst->x += kW.x;
-                    pkDst->y += kW.y;
-                    pkDst->z += kW.z;
-                }
-            }
-            NiPoint3::UnitizeVectors(apDstNormal, auiVertices, auiStride);
-        }
-    }
-    else {
-        if (auiStride == sizeof(NiPoint3)) {
-            std::memset(apDstVertex, 0, sizeof(NiPoint3) * auiVertices);
-        }
-        else {
-            NiPoint3* pkV = apDstVertex;
-            for (uint32_t i = auiVertices; i; --i) {
-                *pkV = NiPoint3::ZERO;
-                pkV = reinterpret_cast<NiPoint3*>(reinterpret_cast<char*>(pkV) + auiStride);
-            }
-        }
-
-        for (uint32_t i = 0; i < uiBones; ++i) {
-            NiSkinData::BoneData* pkBone = &pkBoneData[i];
-            uint32_t uiVerts = pkBone->m_usVerts;
-            NiTransform kBoneToSkin = kWorldToSkin * m_ppkBones[i]->m_kWorld * pkBone->m_kSkinToBone;
-            const NiMatrix3& kRot = kBoneToSkin.m_Rotate;
-            float fScale = kBoneToSkin.m_fScale;
-            float s00 = kRot.m_pEntry[0][0] * fScale;
-            float s01 = kRot.m_pEntry[0][1] * fScale;
-            float s02 = kRot.m_pEntry[0][2] * fScale;
-            float s10 = kRot.m_pEntry[1][0] * fScale;
-            float s11 = kRot.m_pEntry[1][1] * fScale;
-            float s12 = kRot.m_pEntry[1][2] * fScale;
-            float s20 = kRot.m_pEntry[2][0] * fScale;
-            float s21 = kRot.m_pEntry[2][1] * fScale;
-            float s22 = kRot.m_pEntry[2][2] * fScale;
-            NiSkinData::BoneVertData* pkVertData = pkBone->m_pkBoneVertData;
-            for (uint32_t j = 0; j < uiVerts; ++j) {
-                uint32_t uiVert = pkVertData[j].m_usVert;
-                float fWeight = pkVertData[j].m_fWeight;
-                NiPoint3* pkDst = reinterpret_cast<NiPoint3*>(
-                    reinterpret_cast<char*>(apDstVertex) + uiVert * auiStride
-                );
-                const NiPoint3& kSrcV = apSrcVertex[uiVert];
-                NiPoint3 kV;
-                kV.x = s00 * kSrcV.x + s01 * kSrcV.y + s02 * kSrcV.z + kBoneToSkin.m_Translate.x;
-                kV.y = s10 * kSrcV.x + s11 * kSrcV.y + s12 * kSrcV.z + kBoneToSkin.m_Translate.y;
-                kV.z = s20 * kSrcV.x + s21 * kSrcV.y + s22 * kSrcV.z + kBoneToSkin.m_Translate.z;
-                // The weighted vertex is not rounded to float before it is added here.
-                pkDst->x = kV.x * fWeight + pkDst->x;
-                pkDst->y = kV.y * fWeight + pkDst->y;
-                pkDst->z = kV.z * fWeight + pkDst->z;
-            }
-        }
-    }
-}
-
-void NiSkinInstance::Deform(
-    [[maybe_unused]] NiGeometryDataIteratorNiPoint3* pkSrcVertex,
-    [[maybe_unused]] NiGeometryDataIteratorNiBlendWeights* pkWeights,
-    [[maybe_unused]] NiGeometryDataIteratorNiBlendIndices* pkIndices,
-    [[maybe_unused]] NiGeometryDataIteratorNiPoint3* pkSrcNormal,
-    [[maybe_unused]] uint32_t uiVertices,
-    [[maybe_unused]] NiPoint3* pkDstVertex,
-    [[maybe_unused]] NiPoint3* pkDstNormal,
-    [[maybe_unused]] uint32_t uiStride
-) {}

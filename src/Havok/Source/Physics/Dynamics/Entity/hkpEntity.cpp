@@ -713,3 +713,13 @@ hkBool* hkEntity_isActive(const hkpEntity* entity, hkBool* apResult) {
     }
     return apResult;
 }
+
+void* hkpEntity::ExtendedListeners::operator new(size_t aiNumBytes) noexcept {
+    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(aiNumBytes));
+}
+
+void hkpEntity::ExtendedListeners::operator delete(void* apMemory) {
+    if (apMemory) {
+        hkMemoryRouter::getInstance().heap().blockFree(apMemory, static_cast<int32_t>(sizeof(ExtendedListeners)));
+    }
+}

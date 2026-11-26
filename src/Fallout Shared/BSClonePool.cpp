@@ -1,5 +1,6 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/BGSDecalNode.h"
 #include "Fallout Shared/BSClonePools.h"

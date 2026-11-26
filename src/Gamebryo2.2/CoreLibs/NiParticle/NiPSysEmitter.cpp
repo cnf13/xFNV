@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiParticleInfo.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleInfo.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
@@ -217,3 +217,5 @@ void NiPSysEmitter::CopyMembers(NiPSysEmitter* pkDest, NiCloningProcess& kClonin
     pkDest->m_fLifeSpanVar = m_fLifeSpanVar;
     pkDest->m_fRadiusVar = m_fRadiusVar;
 }
+
+NiPSysEmitter::~NiPSysEmitter() {}

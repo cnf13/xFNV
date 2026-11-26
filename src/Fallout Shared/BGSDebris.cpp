@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
@@ -17,8 +17,8 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TempEffects/BSTempEffectDebris.h"
 #include "Fallout Shared/TempEffects/BSTempEffectParticle.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 #include "xfnv/Compiler.h"
 

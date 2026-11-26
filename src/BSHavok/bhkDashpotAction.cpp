@@ -8,7 +8,7 @@
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

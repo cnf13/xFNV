@@ -4,7 +4,7 @@
 #include "BSCore/BSStringT.h"
 #include "Fallout Shared/BGSTextureModel.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESAttributes.h"
 #include "Fallout Shared/TESDescription.h"
@@ -239,7 +239,5 @@ public:
     };
     // bFaceGenTexturing:General: whether faces are textured from the FaceGen texture files.
     static SettingT<INISettingCollection> bFaceGenTexturing;
-    // bFixFaceNormals:General: whether face normals are repaired.
-    static SettingT<INISettingCollection> bFixFaceNormals;
     static SettingT<GameSettingCollection> fRaceGeneticVariation;
 };

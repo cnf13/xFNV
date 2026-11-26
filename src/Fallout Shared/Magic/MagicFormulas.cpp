@@ -1,11 +1,11 @@
 #include "Fallout Shared/Magic/MagicFormulas.h"
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/SkillLevel.h"
 #include "Fallout/Magic/MagicBoltProjectile.h"
 
@@ -145,7 +145,7 @@ SettingT<GameSettingCollection> fShockBranchBoltsRadiusStrength("fShockBranchBol
 SettingT<GameSettingCollection> iShockBranchSegmentsPerBolt("iShockBranchSegmentsPerBolt", 50);
 SettingT<GameSettingCollection> fShockBranchSegmentLength("fShockBranchSegmentLength", 32.0f);
 SettingT<GameSettingCollection> fShockBranchSegmentVariance("fShockBranchSegmentVariance", 20.0f);
-SettingT<GameSettingCollection> gs_fSubSegmentVariance("fSubSegmentVariance", 0.0f);
+SettingT<GameSettingCollection> fShockBranchSubSegmentVariance("fSubSegmentVariance", 0.0f);
 SettingT<GameSettingCollection> fShockBranchLifetime("fShockBranchLifetime", 1.0f);
 SettingT<GameSettingCollection> iShockDebug("iShockDebug", 0);
 SettingT<GameSettingCollection> fAbsorbBoltsRadius("fAbsorbBoltsRadius", 5.0f);

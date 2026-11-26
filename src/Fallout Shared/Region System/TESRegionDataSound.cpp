@@ -1,7 +1,7 @@
 #include "Fallout Shared/Region System/TESRegionDataSound.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSMusicType.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -105,9 +105,9 @@ bool TESRegionDataSound::LoadRegionDataSound(TESFile* apFile) {
 TESRegionSound::TESRegionSound() : uiSound(0), uiFlags(15), uiChance(0) {}
 
 void TESRegionSound::Endian() {
-    ENDIAN(uiSound, false);
-    ENDIAN(uiFlags, false);
-    ENDIAN(uiChance, false);
+    BSEndian(uiSound, false);
+    BSEndian(uiFlags, false);
+    BSEndian(uiChance, false);
 }
 
 // pType and pMediaSetIncidentals are deliberately left unset by the constructor.
@@ -116,7 +116,7 @@ TESRegionSounds::TESRegionSounds() {}
 TESRegionSounds::~TESRegionSounds() {}
 
 void TESRegionSounds::Endian() {
-    ENDIAN(pType, false);
+    BSEndian(pType, false);
 }
 
 TESRegionDataSound::TESRegionDataSound() : TESRegionData() {

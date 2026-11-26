@@ -1,6 +1,6 @@
 #include "SpeedTree/Branch.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 #include "SpeedTree/BranchInfo.h"

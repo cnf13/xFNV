@@ -4,7 +4,7 @@
 #include "BSShader/BeamShaderProperty.h"
 #include "Fallout Shared/BGSProjectile.h"
 #include "Fallout Shared/CombatFormulas.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout Shared/TESObjectREFR.h"

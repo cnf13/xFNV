@@ -4,7 +4,7 @@
 #include "BSAudio/BSGameSound.h"
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
@@ -46,13 +46,13 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 
 #include <limits>
@@ -765,7 +765,7 @@ void MagicBoltProjectile::AddAreaTarget(MagicTarget* apTarget, ActiveEffect* apA
             pProp->SetAbsorbSegmentLength(fShockBranchSegmentLength.Float());
             pProp->iSegmentsPerBolt = iShockBranchSegmentsPerBolt.Int();
             pProp->SetSegmentVariance(fShockBranchSegmentVariance.Float());
-            pProp->SetAbsorbTortuosityVariance(gs_fSubSegmentVariance.Float());
+            pProp->SetAbsorbTortuosityVariance(fShockBranchSubSegmentVariance.Float());
             pProp->SetStartFromPoint(false);
             pProp->InitSegmentData();
         }
@@ -898,12 +898,4 @@ void MagicBoltProjectile::Init3D() {
         spBoltProperty->SetStartFromPoint(true);
         spBoltProperty->InitSegmentData();
     }
-}
-
-void BoltShader::SetSubSegmentCount(int32_t aiSubSegments) {
-    iSubSegments = aiSubSegments;
-}
-
-bool BoltShaderProperty::IsFinished() {
-    return !bWrapped && iBoltStartSegment >= iBoltEndSegment;
 }

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkListShape.h"
 #include "BSHavok/bhkShapeCollection.h"
 #include "BSHavok/hkNiTriStripsShape.h"
-#include "Fallout Shared/GlobalFunc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 

@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESLevSpell.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTaskManager.h"
 #include "Fallout Shared/ActorValue.h"

@@ -1,8 +1,7 @@
 #include "BSMain/RendererSettingCollection.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/TES.h"
 
 RendererSettingCollection::RendererSettingCollection() {}

@@ -1,6 +1,7 @@
 #include "Havok/Source/Common/Serialize/ResourceDatabase/hkResourceHandle.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaBone.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"

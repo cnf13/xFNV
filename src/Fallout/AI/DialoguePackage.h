@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSAudio/BSSoundHandle.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout/AI/MobileObject.h"
 

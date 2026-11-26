@@ -159,7 +159,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_SLEEP: {
-                            if (Interface::GetConsoleSelection() == pActor) {
+                            if (Interface::GetPickREFR() == pActor) {
                                 PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                                 const void* pPackTypeName = packageTypeToString[ePackType];
                                 std::sprintf(acBuffer, "%s is sleeping with %s", pActor->GetFullName(), pPackTypeName);
@@ -168,7 +168,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                             break;
                         }
                         case PROCEDURE_EAT: {
-                            if (Interface::GetConsoleSelection() == pActor) {
+                            if (Interface::GetPickREFR() == pActor) {
                                 PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                                 const void* pPackTypeName = packageTypeToString[ePackType];
                                 std::sprintf(acBuffer, "%s is eating with %s", pActor->GetFullName(), pPackTypeName);
@@ -371,7 +371,7 @@ void MiddleLowProcess::Update(MobileObject* apRef) {
                                     pActor->EndInterruptPackage(false);
                                 }
                             }
-                            if (Interface::GetConsoleSelection() == pActor) {
+                            if (Interface::GetPickREFR() == pActor) {
                                 PACKAGE_TYPE ePackType = GetCurrentPackage()->GetPackType();
                                 const void* pPackTypeName = packageTypeToString[ePackType];
                                 std::sprintf(acBuffer, "%s is done with %s", pActor->GetFullName(), pPackTypeName);
@@ -633,7 +633,7 @@ void MiddleLowProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobil
     }
     pSaveLoadGameOLD->LoadGameDataOLD(&iHourPackageEvaluated, sizeof(iHourPackageEvaluated));
     if (aiFlags & CHANGE_ACTOR_TEMP_MODIFIERS) {
-        pTemporaryModifiers.LoadGameTES();
+        pTemporaryModifiers.LoadGame();
     }
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         char* pNow = static_cast<char*>(pSaveLoadGameOLD->GetBufferPointer());
@@ -697,7 +697,7 @@ void MiddleLowProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, Mobil
 void MiddleLowProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     LowProcess::Revert(apLoadGameBuffer);
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_TEMP_MODIFIERS)) {
-        pTemporaryModifiers.RevertBGS(apLoadGameBuffer);
+        pTemporaryModifiers.Revert(apLoadGameBuffer);
     }
 }
 

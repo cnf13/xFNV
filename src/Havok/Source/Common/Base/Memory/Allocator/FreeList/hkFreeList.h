@@ -62,6 +62,14 @@ public:
     // of blocks freed.
     int32_t _freeBlocks(Block* cur);
 
+    // Address orders, the sorts' comparators.
+    static hkBool _compareBlocks(const Block* a, const Block* b) {
+        return a < b;
+    }
+    static hkBool _compareElements(const Element* a, const Element* b) {
+        return a < b;
+    }
+
     // The SDK's inline: the block's elements become the ones handed out from m_top on.
     void _addBlockElements(Block* block) {
         m_top = block->m_start;

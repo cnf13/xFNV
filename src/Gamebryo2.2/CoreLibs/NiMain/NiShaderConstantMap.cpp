@@ -6,7 +6,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgram.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderAttributeDesc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTextureEffect.h"

@@ -161,3 +161,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline bool NiObject::IsExactKindOf(const NiRTTI* pkRTTI) const {
+    return GetRTTI() == pkRTTI;
+}

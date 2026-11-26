@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSString.h"
 #include "BSSystem/BSMemoryFile.h"
 #include "BSSystemUtilities/BSSaveDataSystemUtility.h"
 
@@ -32,3 +33,31 @@ public:
     void (*pSaveCompleteCallback)(BSSaveDataSystemUtility::RESULT aeResult, BSSaveDataSystemUtilityFile*& arpFile);
     void (*pLoadCompleteCallback)(BSSaveDataSystemUtility::RESULT aeResult, BSSaveDataSystemUtilityFile*& arpFile);
 };
+
+inline void BSSaveDataSystemUtilityFile::SetIconImage(uint32_t auiWidth, uint32_t auiHeight, void* apvBuffer) {
+    uiIconImageWidth = auiWidth;
+    uiIconImageHeight = auiHeight;
+    pvIconImageBuffer = apvBuffer;
+}
+
+inline void BSSaveDataSystemUtilityFile::SetSubTitle(const char* apcSubTitle) {
+    BSstrcpy(cSubTitle, 0x80u, apcSubTitle);
+}
+
+inline void BSSaveDataSystemUtilityFile::SetDirectoryName(const char* apcName) {
+    BSstrcpy(cDirectoryName, 256, apcName);
+}
+
+inline void BSSaveDataSystemUtilityFile::SetDetail(const char* apcDetail) {
+    BSstrcpy(cDetail, 1024, apcDetail);
+}
+
+inline void BSSaveDataSystemUtilityFile::SetBackgroundImagePath(const char* apcPath) {
+    BSstrcpy(cBackgroundImagePath, 256, apcPath);
+}
+
+inline void BSSaveDataSystemUtilityFile::SetSaveCompleteCallback(
+    void (*apSaveCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&)
+) {
+    pSaveCompleteCallback = apSaveCompleteCallback;
+}

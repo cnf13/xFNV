@@ -4,6 +4,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSSystem/BSSystemDir.h"
 #include "Fallout Shared/BaseFormComponent.h"

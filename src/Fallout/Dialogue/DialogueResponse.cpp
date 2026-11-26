@@ -1,7 +1,7 @@
 #include "Fallout/Dialogue/DialogueResponse.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESIdleForm.h"

@@ -4,6 +4,7 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/NiObjectGarbage.h"
@@ -27,7 +28,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -44,6 +44,7 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysGravityModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysModifier.h"
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleSystem.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 NiRTTI BSTempEffectParticle::ms_RTTI("BSTempEffectParticle", &BSTempEffect::ms_RTTI);
 

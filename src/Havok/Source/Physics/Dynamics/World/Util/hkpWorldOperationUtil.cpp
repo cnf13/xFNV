@@ -608,14 +608,7 @@ void hkpWorldOperationUtil::cleanupDirtyIslands(hkpWorld* world) {
     if (numDirty == 0) {
         return;
     }
-    if (numDirty > 1) {
-        hkAlgorithm::quickSortRecursive<hkpSimulationIsland*, hkpSimulationIslandLess>(
-            dirtyIslands.m_data,
-            0,
-            numDirty - 1,
-            &worldOperationUtil_less_hkSimulationIslandPtr
-        );
-    }
+    hkAlgorithm::quickSort(dirtyIslands.m_data, numDirty, &worldOperationUtil_less_hkSimulationIslandPtr);
     for (int32_t i = 0; i < dirtyIslands.m_size; ++i) {
         hkpSimulationIsland* pIsland = dirtyIslands.m_data[i];
         if (pIsland != nullptr) {

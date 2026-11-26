@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout/AI/Combat/CombatAction.h"
@@ -193,7 +194,7 @@ public:
     void ForceFlee(Actor* apActor, float afDamage) {}
     // Called by ArrowProjectile::CollideActor and CollideTerrain. The function is empty.
     void ProjectileHitObstruction(const NiPoint3& aContactPoint, bool abActor) {}
-    // Called by Cmd_ForceTakeCover. The body is empty.
+    // Called by Script::ForceTakeCoverFunction. The body is empty.
     void ForceTakeCover(Actor* apTarget, float afDuration) {}
     void ClearCombatPlan();
     void SetTarget(Actor* apTarget);
@@ -218,6 +219,8 @@ public:
         ourFree(apMemory);
     }
     static bool CheckHasEquip(Actor* apAttacker, ItemChange* apWeapon);
+    // Flips bProcessCombat and returns the new value.
+    static bool ToggleCombatAI();
 
     CombatGroup* pCombatGroup;
     CombatProcedure* pActionProcedure;
@@ -282,3 +285,8 @@ using kCombatLocationTypeData_t = CombatLocationInfo[22];
 extern kCombatLocationTypeData_t kCombatLocationTypeData;
 
 extern BSPerformanceTimer CombatAI_Planning;
+
+inline bool CombatController::ToggleCombatAI() {
+    CombatController::bProcessCombat = !CombatController::bProcessCombat;
+    return CombatController::bProcessCombat;
+}

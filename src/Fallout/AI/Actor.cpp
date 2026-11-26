@@ -13,6 +13,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
 #include "BSHavok/WeaponObject.h"
@@ -31,7 +32,6 @@
 #include "BSHavok/bhkLimitedHingeConstraint.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkOrientHingedBodyAction.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkPoseArray.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRagdollPenetrationUtil.h"
@@ -57,7 +57,7 @@
 #include "BSMain/NiBSBoneLODController.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Tile.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderAccumulator.h"
@@ -116,6 +116,7 @@
 #include "Fallout Shared/Havok/TESHavokUtilities.h"
 #include "Fallout Shared/Havok/TESTrapListener.h"
 #include "Fallout Shared/Havok/TrapEntry.h"
+#include "Fallout Shared/Havok/XBlendSettings.h"
 #include "Fallout Shared/ImageSpaceModifierInstance.h"
 #include "Fallout Shared/InventoryChanges.h"
 #include "Fallout Shared/LipSynchAnim.h"
@@ -342,12 +343,12 @@ static float fFirstPersonSwimFloatHeight = 1.3f;
 
 // The Hit settings of the ragdoll hit blend: the nodes the hit starts at and pushes, and the bounds of the hit and
 // block forces.
-static SettingT<BlendSettingCollection> fHitForceMin("fHFMin:HIT", 0.0f);
-static SettingT<BlendSettingCollection> fHitForceMax("fHFMax:HIT", 0.0f);
-static SettingT<BlendSettingCollection> fBlockForceMin("fBFMin:HIT", 0.0f);
-static SettingT<BlendSettingCollection> fBlockForceMax("fBFMax:HIT", 0.0f);
-static SettingT<BlendSettingCollection> sHitSpot("sHitSpot:HIT", "Bip01 Spine2");
-static SettingT<BlendSettingCollection> sHitStart("sHitStart:HIT", "Bip01 Spine1");
+SettingT<BlendSettingCollection> BlendHit::fHitForceMin("fHFMin:HIT", 0.0f);
+SettingT<BlendSettingCollection> BlendHit::fHitForceMax("fHFMax:HIT", 0.0f);
+SettingT<BlendSettingCollection> BlendHit::fBlockForceMin("fBFMin:HIT", 0.0f);
+SettingT<BlendSettingCollection> BlendHit::fBlockForceMax("fBFMax:HIT", 0.0f);
+SettingT<BlendSettingCollection> BlendHit::sHitSpot("sHitSpot:HIT", "Bip01 Spine2");
+SettingT<BlendSettingCollection> BlendHit::sHitStart("sHitStart:HIT", "Bip01 Spine1");
 
 static BSPerformanceTimer AIProcessingProcess("AIProcessing", "Process", true, true);
 
@@ -896,7 +897,7 @@ void Actor::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 68u && (aiFlags & CHANGE_ACTOR_PERMANENT_MODIFIERS) != 0) {
-        pPermanentModifiers.LoadGameTES();
+        pPermanentModifiers.LoadGame();
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 69u) {
         pSaveLoadGameOLD->LoadGameDataOLD(&bMurderAlarm, sizeof(bMurderAlarm));
@@ -1496,10 +1497,10 @@ void Actor::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
         ClearDispositionModifiers();
     }
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_PERMANENT_MODIFIERS)) {
-        pPermanentModifiers.RevertBGS(apLoadGameBuffer);
+        pPermanentModifiers.Revert(apLoadGameBuffer);
     }
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_OVERRIDE_MODIFIERS)) {
-        pBaseValueOverrides.RevertBGS(apLoadGameBuffer);
+        pBaseValueOverrides.Revert(apLoadGameBuffer);
     }
     pActorMover->Revert(apLoadGameBuffer);
     if (apLoadGameBuffer->GetOldChangeFlags().CheckFlags(CHANGE_ACTOR_LIFESTATE)) {
@@ -2880,7 +2881,7 @@ bhkCharacterController* Actor::Move(float afDeltaTime, NiPoint3& arDeltaMove, ui
 bhkCharacterController* Actor::Jump() {
     bhkCharacterController* pController = MobileObject::Jump();
     if (pController) {
-        ImpactMixer::PlayJumpSound(this, 0);
+        ImpactMixer::PlayJump(this, 0);
     }
     return pController;
 }
@@ -3338,20 +3339,20 @@ void Actor::UpdateAnimation(float afDelta) {
         if (IsCreature()) {
             float frotateScale;
             if (IsInCombat()) {
-                frotateScale = gs_fCreatureCombatTurnSpeedScale_Pathfinding.Float();
+                frotateScale = fINICreatureCombatTurnSpeedScale.Float();
             }
             else {
-                frotateScale = gs_fCreatureTurnSpeedScale_Pathfinding.Float();
+                frotateScale = fINICreatureTurnSpeedScale.Float();
             }
             PickAnimations(1.0f, frotateScale);
         }
         else {
             float frotateScale;
             if (IsInCombat()) {
-                frotateScale = gs_fAICombatTurnSpeedScale_Pathfinding.Float();
+                frotateScale = fINICombatTurnSpeedScale.Float();
             }
             else {
-                frotateScale = gs_fAITurnSpeedScale_Pathfinding.Float();
+                frotateScale = fINITurnSpeedScale.Float();
             }
             PickAnimations(1.0f, frotateScale);
         }
@@ -6706,8 +6707,7 @@ BSSoundHandle Actor::VoiceSoundFunctionEx(
                     MobileObject::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID)), true);
                 }
             }
-            if ((gs_bGeneralSubtitles_Gameplay.Bool() || static_cast<uint8_t>(GetShowSubtitles())) &&
-                !abNeverSubtitle) {
+            if ((bGeneralSubtitles.Bool() || static_cast<uint8_t>(GetShowSubtitles())) && !abNeverSubtitle) {
                 // Reads the position before it builds the by-value handle argument with operator=.
                 NiPoint3 kSpeakerLoc = pRef->GetLocationOnReference();
                 BSSoundHandle kArgument;
@@ -6925,7 +6925,7 @@ void Actor::StartCombat(
                     pPlayer->ChangePerceivedActorHostileStatus(this, true);
                 }
                 if (Interface::GetActivateREFR() == this) {
-                    HUDMainMenu::HandleHealthbarForCrosshairActor_(nullptr);
+                    Interface::SetCrosshairTargetType(nullptr);
                 }
                 if (pCurrentProcess->GetCurrentPackage()) {
                     if (pCurrentProcess->GetCurrentPackage()->GetForceUnequipWeapon()) {
@@ -7286,7 +7286,7 @@ void Actor::HitMe(
     if (GetGhost()) {
         return;
     }
-    NiAVObject* pHitNode = BSUtilities::GetObjectByName(p3D, static_cast<const char*>(sHitStart));
+    NiAVObject* pHitNode = BSUtilities::GetObjectByName(p3D, static_cast<const char*>(BlendHit::sHitStart));
     NiPoint3 kStart;
     NiPoint3 kStop;
     NiNode* pAttacker3D = apAttacker->Get3D();
@@ -7309,14 +7309,14 @@ void Actor::HitMe(
         afDamage = 100.0f;
     }
     // Keeps each first setting as a double and rounds the range and the force to float.
-    double dMax = static_cast<float>(fHitForceMax);
-    float fRange = static_cast<float>(dMax - static_cast<float>(fHitForceMin));
+    double dMax = static_cast<float>(BlendHit::fHitForceMax);
+    float fRange = static_cast<float>(dMax - static_cast<float>(BlendHit::fHitForceMin));
     double dScaled = static_cast<double>(fRange) * static_cast<double>(afDamage) * 0.009999999776482582;
-    float fHitForce = static_cast<float>(static_cast<float>(fHitForceMin) + dScaled);
-    dMax = static_cast<float>(fBlockForceMax);
-    fRange = static_cast<float>(dMax - static_cast<float>(fBlockForceMin));
+    float fHitForce = static_cast<float>(static_cast<float>(BlendHit::fHitForceMin) + dScaled);
+    dMax = static_cast<float>(BlendHit::fBlockForceMax);
+    fRange = static_cast<float>(dMax - static_cast<float>(BlendHit::fBlockForceMin));
     dScaled = static_cast<double>(fRange) * static_cast<double>(afBlocked);
-    float fBlockForce = static_cast<float>(static_cast<float>(fBlockForceMin) + dScaled);
+    float fBlockForce = static_cast<float>(static_cast<float>(BlendHit::fBlockForceMin) + dScaled);
     if (afBlocked > 75.0) {
         fHitForce = 0.0f;
     }
@@ -7369,7 +7369,7 @@ void Actor::HitMe(
                 }
             }
             if (!pSpot) {
-                pSpot = BSUtilities::GetObjectByName(p3D, static_cast<const char*>(sHitSpot));
+                pSpot = BSUtilities::GetObjectByName(p3D, static_cast<const char*>(BlendHit::sHitSpot));
             }
             if (pSpot) {
                 const char* pSpotName = pSpot->GetName().GetHandleString();
@@ -10455,7 +10455,7 @@ void Actor::SetIronSights(bool abIronSights, bool abPostAnim, bool abCheckAnimBl
         BSAnimGroupSequence* pseq;
         if (this == pPlayer) {
             if (abIronSights) {
-                if (gs_bTrueIronSights_GamePlay.Bool()) {
+                if (bTrueIronSights.Bool()) {
                     NiAVObject* p3D = pPlayer->Get3D(true);
                     NiAVObject* pSightingNode = BSUtilities::GetObjectByName(p3D, "##SightingNode");
                     pPlayer->SetWeaponSightingNode(pSightingNode);
@@ -22852,14 +22852,6 @@ UpdateFightReaction(FIGHT_REACTION aeCurrentFightReaction, TESFaction* apFaction
     return aeCurrentFightReaction;
 }
 
-bool Cmd_GetIgnoreFriendlyHits(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
-    afReturnValue = 0.0;
-    if (static_cast<Actor*>(apRefObject)->IsIgnoreFriendlyHits()) {
-        afReturnValue = 1.0;
-    }
-    return true;
-}
-
 bool IsActorOfFaction(TESObjectREFR* apRef, TESForm* apOwnership, Actor* pactor) {
     if (apOwnership) {
         if (apOwnership->GetFormType() == NPC__ID) {
@@ -22923,88 +22915,6 @@ bool IsActorOfFactionList(BSSimpleList<FACTION_RANK*>* pList, Actor* pActor, con
         pList = pList->m_pkNext;
     }
     return false;
-}
-
-// The constraint instance's data, else the data of the creation info the constraint was loaded with, else null.
-hkpConstraintData* bhkConstraint::GetData() {
-    hkpConstraintInstance* pConstraint = **this;
-    if (pConstraint) {
-        return pConstraint->getDataRw();
-    }
-    if (!pInfo) {
-        return nullptr;
-    }
-    return static_cast<hkConstraintCinfo*>(pInfo)->pData;
-}
-
-bhkFilteredCdBodyCollector::bhkFilteredCdBodyCollector() {}
-
-void bhkLimitedHingeConstraint::SetMotorActive(bool abActive) {
-    hkpLimitedHingeConstraintData* pData = GetMotor();
-    if (pData) {
-        hkBool kActive(abActive);
-        pData->setMotorActive(**this, kActive);
-    }
-}
-
-void bhkOrientHingedBodyAction::SetEnabled(bool abEnable) {
-    (**this)->SetEnabled(abEnable);
-}
-
-hkOrientHingedBodyAction* bhkOrientHingedBodyAction::operator*() {
-    if (this) {
-        return static_cast<hkOrientHingedBodyAction*>(GethkObject());
-    }
-
-    return nullptr;
-}
-
-void bhkRagdollController::SetUsePhantomFootIKCasts(bool abUsePhantom) {
-    bUsePhantomFootIKCasts = abUsePhantom;
-}
-
-void bhkRagdollController::SetPoseMatchEnable(bool abEnable) {
-    bEnablePoseMatch = bInitPoseMatch && abEnable;
-}
-
-void bhkRagdollController::SetPhantom(bhkShapePhantom* apPhantom) {
-    pControllerPhantom = static_cast<hkpCachingShapePhantomRay*>(**apPhantom);
-}
-
-bool bhkRagdollController::QRagdollFeedbackEnable() {
-    return bEnableRagdollFeedback;
-}
-
-uint32_t bhkRagdollController::QFeedbackImpulseWeak() {
-    return uiFeedbackImpulseWeak;
-}
-
-uint32_t bhkRagdollController::QFeedbackImpulseStrong() {
-    return uiFeedbackImpulseStrong;
-}
-
-void bhkRagdollController::SetRagdollAnimEaseOut(bool abEaseOut) {
-    bEaseOutFootIK = abEaseOut;
-    GrabIKState[1].bEaseOutGrabIK = abEaseOut;
-    GrabIKState[0].bEaseOutGrabIK = abEaseOut;
-    bEaseOutLookIK = abEaseOut;
-    bEaseOutRagdollAnim = abEaseOut;
-}
-
-void bhkRagdollController::SetHeadOffset(const NiQuaternion& arRot) {
-    NI2HKMIGRATION_QUATERNION(CurrentHeadRotOffset, arRot);
-}
-
-void bhkRagdollController::SetGrabIKEaseOut(bhkRagdollController::GRAB_IK_ARM arArm, bool abEnable) {
-    GrabIKState[arArm].bEaseOutGrabIK = abEnable;
-}
-
-void* bhkRagdollController::operator new(size_t blocksize) {
-    return MemoryManager::Instance().Allocate(blocksize);
-}
-
-bhkRagdollTemplateData* bhkRagdollTemplate::GetRagdollTemplateData(uint32_t aiIndex) {
-    return RagdollTemplateA[aiIndex];
 }
 
 void Animation::SetGlobalTimeMultiplier(float fValue) {
@@ -23203,24 +23113,4 @@ void PlayerCharacter::RemoveTeammate(Actor* pActor) {
 void PlayerCharacter::AddTeammate(Actor* pActor) {
     ++iTeammateCount;
     pListOfTeammates.AddHead(pActor);
-}
-
-BSAnimNoteListener* NiControllerManager::QNoteListener() {
-    return pListener;
-}
-
-// m_pos's constructor stores nothing.
-hkSphere::hkSphere() {}
-
-void hkSphere::setPosition(const hkVector4& newPos) {
-    m_pos.setXYZ(newPos);
-}
-
-// Sets w through hkVector4::operator().
-void hkSphere::setRadius(float newRadius) {
-    m_pos(3) = newRadius;
-}
-
-const hkClass& hkSphere::staticClass() {
-    return hkSphereClass;
 }

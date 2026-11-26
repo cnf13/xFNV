@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/Sky/SkyObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 
@@ -61,6 +61,7 @@ public:
     static SettingT<GameSettingCollection> fSunMinimumGlareScale;
     static SettingT<GameSettingCollection> fSunReduceGlareSpeed;
     static SettingT<GameSettingCollection> fSunYExtreme;
-};
 
-extern SettingT<GameSettingCollection> gs_fSunZExtreme;
+protected:
+    static SettingT<GameSettingCollection> fSunZExtreme;
+};

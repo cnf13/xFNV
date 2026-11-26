@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/TESFile.h"
 

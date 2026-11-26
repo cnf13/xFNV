@@ -23,7 +23,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TESWaterForm.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
@@ -34,10 +34,6 @@
 
 #include <cstdint>
 #include <xmmintrin.h>
-
-NiPoint3* NiGeometry::GetVertices() {
-    return this->m_spModelData->m_pkVertex;
-}
 
 int32_t ComparePointX(const void* apA, const void* apB) {
     const NiPoint3* pA = static_cast<const NiPoint3*>(apA);
@@ -699,18 +695,6 @@ int32_t BGSAutoWater::WhichCellEdge(TESObjectCELL* apCell, NiPoint3 arVert) {
     return edgeFlags;
 }
 
-NiNode* BSPolygon2D::GetRootNode() {
-    return spRootNode;
-}
-
-NiTriShape* BSPolygon2D::Get3D() {
-    return sp3D;
-}
-
-void BSFadeNode::SetIgnoreFade(bool abIgnoreFade) {
-    NiAVObject::SetIgnoreFade(abIgnoreFade);
-}
-
 NiPoint3** TESObjectLAND::GetVertexArray() {
     if (pLoadedData) {
         return pLoadedData->ppVertices;
@@ -718,5 +702,3 @@ NiPoint3** TESObjectLAND::GetVertexArray() {
 
     return nullptr;
 }
-
-NiStencilProperty::~NiStencilProperty() {}

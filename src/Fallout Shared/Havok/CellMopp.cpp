@@ -5,7 +5,6 @@
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkTriSampledHeightFieldBvTreeShape.h"
@@ -17,7 +16,6 @@
 #include "Fallout Shared/Havok/HitCaster.h"
 #include "Fallout Shared/TES.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
@@ -25,6 +23,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -153,37 +152,4 @@ bool CellMopp::Create(NiTriStrips** appStripArray, uint32_t aiCount, float afOff
         bRes = true;
     }
     return bRes;
-}
-
-hkTriSampledHeightFieldBvTreeShapeCinfo::hkTriSampledHeightFieldBvTreeShapeCinfo() {}
-
-bhkBvTreeShape::bhkBvTreeShape() {
-    ++iCount;
-}
-
-void bhkRigidBodyCinfo::SetShape(const hkpShape* apShape) {
-    m_shape = apShape;
-    hk.m_shape = apShape;
-}
-
-hkBSHeightFieldShapeCinfo::hkBSHeightFieldShapeCinfo() : pData(nullptr), fOffset(0.0f) {}
-
-void NiQuaternion::FromAngleAxisX(float fAngle) {
-    float fHalfAngle = static_cast<float>(fAngle * 0.5);
-    NiSinCos(fHalfAngle, m_fX, m_fW);
-    m_fZ = 0.0f;
-    m_fY = 0.0f;
-}
-
-hkpSampledHeightFieldBaseCinfo::hkpSampledHeightFieldBaseCinfo()
-  : m_xRes(2), m_zRes(2), m_minHeight(0.0f), m_maxHeight(-1.0f), m_useProjectionBasedHeight(false) {
-    m_scale.set(1.0f, 1.0f, 1.0f, 0.0f);
-}
-
-void* hkpSampledHeightFieldBaseCinfo::operator new(size_t aSize) {
-    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(aSize));
-}
-
-void hkpSampledHeightFieldBaseCinfo::operator delete(void* apMemory) {
-    hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkpSampledHeightFieldBaseCinfo));
 }

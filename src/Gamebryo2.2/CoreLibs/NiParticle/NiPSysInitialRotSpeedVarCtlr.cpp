@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiParticle/NiPSysInitialRotSpeedVarCtlr.h"
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"

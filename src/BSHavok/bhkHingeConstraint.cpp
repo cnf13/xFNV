@@ -2,15 +2,14 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkConstraint.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
+#include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/TES.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkMatrix3.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
@@ -243,3 +242,7 @@ void hkHingeConstraintCinfo::ApplyScale(float afScale, hkpConstraintData* apInfo
         rPivotB.m_quad = _mm_mul_ps(kScale, rPivotB.m_quad);
     }
 }
+
+hkHingeConstraintCinfo::hkHingeConstraintCinfo() {}
+
+hkHingeConstraintCinfo::~hkHingeConstraintCinfo() {}

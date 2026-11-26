@@ -227,7 +227,7 @@ bool BGSSaveLoadGlobalData::RevertGlobalData(
             return false;
         case GLOBAL_DATA_PROCESS_LISTS: ReferenceProcessLists.Revert(apLoadGameBuffer); return true;
         case GLOBAL_DATA_COMBAT: pCombatManager->Revert(apLoadGameBuffer); return true;
-        case GLOBAL_DATA_INTERFACE: RevertGlobalData::InterfaceManagerAndMenus(apLoadGameBuffer); return true;
+        case GLOBAL_DATA_INTERFACE: Interface::Revert(apLoadGameBuffer); return true;
         case GLOBAL_DATA_EFFECTS: RevertGlobalData::ImageSpaceModifiers(); return true;
         case GLOBAL_DATA_WEATHER: return false;
         case GLOBAL_DATA_ACTOR_CAUSES: ActorCause::RevertActorCausesList(apLoadGameBuffer); return true;
@@ -285,7 +285,7 @@ bool BGSSaveLoadGlobalData::SaveGlobalData(uint32_t aiGlobalDataType, BGSSaveGam
             return true;
         }
         case GLOBAL_DATA_TES: {
-            TES::pInstance->SaveGameBGS(apSaveGameBuffer);
+            TES::pInstance->SaveGame(apSaveGameBuffer);
             return true;
         }
         case GLOBAL_DATA_GLOBALS: {
@@ -391,7 +391,7 @@ void BGSSaveLoadGlobalData::LoadLocationData(BGSLoadGameBuffer* apLoadGameBuffer
             }
             TESWorldSpace* pworldSpace = static_cast<TESWorldSpace*>(pworld);
             if (static_cast<TESWorldSpace*>(pworld)->TESWorldSpace::GetHasBorderRegion() &&
-                gs_bBorderRegionsEnabled_General.Bool() &&
+                bEnableBorderRegion.Bool() &&
                 !pworldSpace->IsPointInBorderRegion(playerLocation)) {
                 bvalidPlayerLocation = false;
             }
@@ -590,28 +590,6 @@ void BGSSaveLoadGlobalData::LoadEffects(BGSLoadGameBuffer* apLoadGameBuffer) {
             }
         }
     }
-}
-
-void RevertGlobalData::InterfaceManagerAndMenus(BGSLoadGameBuffer* apLoadGameBuffer) {
-    bIsReverting = true;
-    Interface::ClearAllSubtitlesAndMessages();
-    HUDMainMenu::Revert();
-    if (Interface::InDialog()) {
-        MobileObject* pPartner = static_cast<MobileObject*>(GetDialogMenuParterRef());
-        pPlayer->FocusOnActor(pPartner, 0.0f, true);
-        MenuTopicManager::Destroy();
-    }
-    Interface::CloseVATSMenu();
-    VATSMenu::ClearTargetList();
-    Interface::CloseAllSupportMenus(false);
-    MessageMenu::ClearMessageQueue();
-    StatsMenu::ClearPerks();
-    MapMenu::ClearSelectedNote();
-    MapMenu::ClearAudioLogSubtites();
-    Interface::PopFromEnterStack(1, true);
-    InterfaceManager::Instance()->EnterRenderedMenu(nullptr);
-    InterfaceManager::Instance()->ePipboyState = InterfaceManager::PS_CLOSED;
-    InterfaceManager::Instance()->xTutorialManager.Reset();
 }
 
 void RevertGlobalData::ImageSpaceModifiers() {

@@ -2,11 +2,11 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/ShadowSceneNode.h"
@@ -54,19 +54,19 @@
 
 #include <cmath>
 
-SettingT<INISettingCollection> gs_bUseConstant_bLightAttenuation("bUseConstant:bLightAttenuation", false);
-SettingT<INISettingCollection> gs_bUseLinear_bLightAttenuation("bUseLinear:bLightAttenuation", false);
-SettingT<INISettingCollection> gs_bUseQuadratic_bLightAttenuation("bUseQuadratic:bLightAttenuation", true);
-SettingT<INISettingCollection> gs_fFlickerMovement_bLightAttenuation("fFlickerMovement:bLightAttenuation", 8.0f);
-SettingT<INISettingCollection> gs_uLinearMethod_bLightAttenuation("uLinearMethod:bLightAttenuation", 1u);
-SettingT<INISettingCollection> gs_uQuadraticMethod_bLightAttenuation("uQuadraticMethod:bLightAttenuation", 2u);
-SettingT<INISettingCollection> gs_fLinearValue_bLightAttenuation("fLinearValue:bLightAttenuation", 3.0f);
-SettingT<INISettingCollection> gs_fQuadraticValue_bLightAttenuation("fQuadraticValue:bLightAttenuation", 16.0f);
-SettingT<INISettingCollection> gs_fConstantValue_bLightAttenuation("fConstantValue:bLightAttenuation", 0.0f);
-SettingT<INISettingCollection> gs_bOutQuadInLin_bLightAttenuation("bOutQuadInLin:bLightAttenuation", false);
-SettingT<INISettingCollection> gs_fLinearRadiusMult_bLightAttenuation("fLinearRadiusMult:bLightAttenuation", 1.0f);
+SettingT<INISettingCollection> bUseConstant("bUseConstant:bLightAttenuation", false);
+SettingT<INISettingCollection> bUseLinear("bUseLinear:bLightAttenuation", false);
+SettingT<INISettingCollection> bUseQuadratic("bUseQuadratic:bLightAttenuation", true);
+SettingT<INISettingCollection> fFlickerMovement("fFlickerMovement:bLightAttenuation", 8.0f);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::eLinearMethod("uLinearMethod:bLightAttenuation", 1u);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::eQuadraticMethod("uQuadraticMethod:bLightAttenuation", 2u);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::fLinearValue("fLinearValue:bLightAttenuation", 3.0f);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::fQuadraticValue("fQuadraticValue:bLightAttenuation", 16.0f);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::fConstantValue("fConstantValue:bLightAttenuation", 0.0f);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::bOutQuadInLin("bOutQuadInLin:bLightAttenuation", false);
+SettingT<INISettingCollection> ATTENUATION_SETTINGS::fLinearRadiusMult("fLinearRadiusMult:bLightAttenuation", 1.0f);
 SettingT<INISettingCollection>
-    gs_fQuadraticRadiusMult_bLightAttenuation("fQuadraticRadiusMult:bLightAttenuation", 1.0f);
+    ATTENUATION_SETTINGS::fQuadraticRadiusMult("fQuadraticRadiusMult:bLightAttenuation", 1.0f);
 // Whether the [LightAttenuation] settings were read.
 static bool bAttenuationInitialized = GetAttenuationSettings();
 
@@ -76,7 +76,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
     );
     if (pPointLight) {
         if ((ATTENUATION_SETTINGS::cUsageFlags & ATTENUATION_SETTINGS::USE_CONSTANT) != 0) {
-            float fConstantValue = gs_fConstantValue_bLightAttenuation.Float();
+            float fConstantValue = ATTENUATION_SETTINGS::fConstantValue.Float();
             pPointLight->SetConstantAttenuation(fConstantValue);
         }
         else {
@@ -85,9 +85,9 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
         pPointLight->SetLinearAttenuation(0.0);
         pPointLight->SetQuadraticAttenuation(0.0);
         if ((ATTENUATION_SETTINGS::cUsageFlags & ATTENUATION_SETTINGS::USE_LINEAR) != 0 ||
-            (TES::pInstance->GetInterior() && gs_bOutQuadInLin_bLightAttenuation == 1)) {
-            float fLinearRadius = gs_fLinearRadiusMult_bLightAttenuation.Float() * static_cast<double>(aiRadius);
-            uint32_t uLinearMethod = gs_uLinearMethod_bLightAttenuation.UInt();
+            (TES::pInstance->GetInterior() && ATTENUATION_SETTINGS::bOutQuadInLin == 1)) {
+            float fLinearRadius = ATTENUATION_SETTINGS::fLinearRadiusMult.Float() * static_cast<double>(aiRadius);
+            uint32_t uLinearMethod = ATTENUATION_SETTINGS::eLinearMethod.UInt();
             if (uLinearMethod) {
                 float fAttenuation;
                 double dLinear;
@@ -96,7 +96,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
                         dLinear = 0.009999999776482582;
                     }
                     else {
-                        dLinear = gs_fLinearValue_bLightAttenuation.Float() / (fLinearRadius * fLinearRadius);
+                        dLinear = ATTENUATION_SETTINGS::fLinearValue.Float() / (fLinearRadius * fLinearRadius);
                     }
                     fAttenuation = dLinear;
                     pPointLight->SetLinearAttenuation(fAttenuation);
@@ -106,20 +106,20 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
                         dLinear = 0.009999999776482582;
                     }
                     else {
-                        dLinear = gs_fLinearValue_bLightAttenuation.Float() * (1.0 / fLinearRadius);
+                        dLinear = ATTENUATION_SETTINGS::fLinearValue.Float() * (1.0 / fLinearRadius);
                     }
                     fAttenuation = dLinear;
                     pPointLight->SetLinearAttenuation(fAttenuation);
                 }
             }
             else {
-                pPointLight->SetLinearAttenuation(gs_fLinearValue_bLightAttenuation.Float());
+                pPointLight->SetLinearAttenuation(ATTENUATION_SETTINGS::fLinearValue.Float());
             }
         }
         if ((ATTENUATION_SETTINGS::cUsageFlags & ATTENUATION_SETTINGS::USE_QUADRATIC) != 0 ||
-            (!TES::pInstance->GetInterior() && gs_bOutQuadInLin_bLightAttenuation == 1)) {
-            float fQuadraticRadius = gs_fQuadraticRadiusMult_bLightAttenuation.Float() * static_cast<double>(aiRadius);
-            uint32_t uQuadraticMethod = gs_uQuadraticMethod_bLightAttenuation.UInt();
+            (!TES::pInstance->GetInterior() && ATTENUATION_SETTINGS::bOutQuadInLin == 1)) {
+            float fQuadraticRadius = ATTENUATION_SETTINGS::fQuadraticRadiusMult.Float() * static_cast<double>(aiRadius);
+            uint32_t uQuadraticMethod = ATTENUATION_SETTINGS::eQuadraticMethod.UInt();
             if (uQuadraticMethod) {
                 float fAttenuation;
                 double dQuadratic;
@@ -128,7 +128,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
                         dQuadratic = 0.009999999776482582;
                     }
                     else {
-                        dQuadratic = static_cast<float>(gs_fQuadraticValue_bLightAttenuation) *
+                        dQuadratic = static_cast<float>(ATTENUATION_SETTINGS::fQuadraticValue) *
                             (1.0 / static_cast<double>(aiRadius));
                     }
                     fAttenuation = dQuadratic;
@@ -139,7 +139,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
                         dQuadratic = 0.009999999776482582;
                     }
                     else {
-                        dQuadratic = static_cast<float>(gs_fQuadraticValue_bLightAttenuation) /
+                        dQuadratic = static_cast<float>(ATTENUATION_SETTINGS::fQuadraticValue) /
                             (fQuadraticRadius * fQuadraticRadius);
                     }
                     fAttenuation = dQuadratic;
@@ -147,7 +147,7 @@ void SetLightAttenuation(NiLight* apLight, uint32_t aiRadius) {
                 }
             }
             else {
-                pPointLight->SetQuadraticAttenuation(gs_fQuadraticValue_bLightAttenuation.Float());
+                pPointLight->SetQuadraticAttenuation(ATTENUATION_SETTINGS::fQuadraticValue.Float());
             }
         }
     }
@@ -177,46 +177,46 @@ NiLight* FindLight(NiNode* apNode) {
 
 bool GetAttenuationSettings() {
     ATTENUATION_SETTINGS::cUsageFlags = 0;
-    if (gs_bUseConstant_bLightAttenuation == 1) {
+    if (bUseConstant == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= ATTENUATION_SETTINGS::USE_CONSTANT;
     }
-    if (gs_bUseLinear_bLightAttenuation == 1) {
+    if (bUseLinear == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= ATTENUATION_SETTINGS::USE_LINEAR;
     }
-    if (gs_bUseQuadratic_bLightAttenuation == 1) {
+    if (bUseQuadratic == 1) {
         ATTENUATION_SETTINGS::cUsageFlags |= ATTENUATION_SETTINGS::USE_QUADRATIC;
     }
     if (!ATTENUATION_SETTINGS::cUsageFlags) {
         ATTENUATION_SETTINGS::cUsageFlags = ATTENUATION_SETTINGS::USE_QUADRATIC;
     }
-    if (gs_uLinearMethod_bLightAttenuation.Int() &&
-        gs_uLinearMethod_bLightAttenuation.Int() != 1 &&
-        gs_uLinearMethod_bLightAttenuation.Int() != 2) {
-        gs_uLinearMethod_bLightAttenuation = 1;
+    if (ATTENUATION_SETTINGS::eLinearMethod.Int() &&
+        ATTENUATION_SETTINGS::eLinearMethod.Int() != 1 &&
+        ATTENUATION_SETTINGS::eLinearMethod.Int() != 2) {
+        ATTENUATION_SETTINGS::eLinearMethod = 1;
     }
 
-    if (gs_uQuadraticMethod_bLightAttenuation.Int() &&
-        gs_uQuadraticMethod_bLightAttenuation.Int() != 1 &&
-        gs_uQuadraticMethod_bLightAttenuation.Int() != 2) {
-        gs_uQuadraticMethod_bLightAttenuation = 2;
+    if (ATTENUATION_SETTINGS::eQuadraticMethod.Int() &&
+        ATTENUATION_SETTINGS::eQuadraticMethod.Int() != 1 &&
+        ATTENUATION_SETTINGS::eQuadraticMethod.Int() != 2) {
+        ATTENUATION_SETTINGS::eQuadraticMethod = 2;
     }
 
-    if (gs_fLinearRadiusMult_bLightAttenuation.Float() == 0.0) {
-        gs_fLinearRadiusMult_bLightAttenuation = 1.0f;
+    if (ATTENUATION_SETTINGS::fLinearRadiusMult.Float() == 0.0) {
+        ATTENUATION_SETTINGS::fLinearRadiusMult = 1.0f;
     }
-    if (gs_fQuadraticRadiusMult_bLightAttenuation.Float() == 0.0) {
-        gs_fQuadraticRadiusMult_bLightAttenuation = 1.0f;
+    if (ATTENUATION_SETTINGS::fQuadraticRadiusMult.Float() == 0.0) {
+        ATTENUATION_SETTINGS::fQuadraticRadiusMult = 1.0f;
     }
     return true;
 }
 
 void OBJ_LIGH::Endian() {
-    ENDIAN(time, false);
-    ENDIAN(radius, false);
-    ENDIAN(color, false);
-    ENDIAN(flags, false);
-    ENDIAN(fFallOffExponent, false);
-    ENDIAN(fFOV, false);
+    BSEndian(time, false);
+    BSEndian(radius, false);
+    BSEndian(color, false);
+    BSEndian(flags, false);
+    BSEndian(fFallOffExponent, false);
+    BSEndian(fFOV, false);
 }
 
 TESObjectLIGH::TESObjectLIGH()
@@ -667,7 +667,7 @@ bool TESObjectLIGH::Update(NiPointer<NiLight> aspLight, float* apWantDimmer, Ext
         float fSinY = std::sin(fAngleY);
         float fAngleZ = (fOffsetZ + 0.30000001192092896) * 2.5999999046325684;
         float fSinZ = std::sin(fAngleZ);
-        float fFlickerMovement = gs_fFlickerMovement_bLightAttenuation.Float();
+        float fFlickerMovement = ::fFlickerMovement.Float();
         float fWobble = fFlickerMovement * fSinX * fSinY / 2.0;
         if (!(fFlickerMovement + fWobble > 0.0)) {
             fMovement = 0.0f;

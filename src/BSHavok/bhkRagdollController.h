@@ -2,10 +2,12 @@
 
 #include "BSCore/BSPrecisionTimer.h"
 #include "BSCore/BSSimpleArray.h"
+#include "BSHavok/bhkCachingShapePhantom.h"
 #include "BSHavok/bhkPoseArray.h"
 #include "BSHavok/bhkRagdollShareData.h"
+#include "BSHavok/bhkShapePhantom.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -31,11 +33,9 @@ class hkaRagdollInstance;
 class hkaRagdollRigidBodyController;
 class hkaSkeleton;
 struct hkCapsuleShapeCinfo;
-class hkpCachingShapePhantomRay;
 class hkpConstraintInstance;
 class hkpRigidBody;
 class NiQuaternion;
-struct RagdollFeedbackData;
 
 void* Reallocate(void* apMemory, uint32_t Size);
 // Appends apBody's Havok body to arBones and the Havok constraint of each bhkConstraint on its action/constraint list
@@ -46,6 +46,46 @@ void AddRagdollData(
     hkArray<hkpConstraintInstance*, hkContainerHeapAllocator>& arConstraints
 );
 NiTransform& HK2NI(NiTransform& arNiTran, const hkQsTransform& arhkTran);
+
+// The ragdoll's animation feedback settings and the bones it drives dynamically.
+struct RagdollFeedbackData {
+    // The feedback gains and limits (RAFD).
+    struct RagdollFeedbackSystemData {
+        RagdollFeedbackSystemData();
+
+        // Swaps every field read from a big-endian file.
+        void Endian();
+
+        float fKeyDynIntrp;
+        float fHeirGain;
+        float fPosGain;
+        float fVelGain;
+        float fAccGain;
+        float fSnapGain;
+        float fVelDamp;
+        float fSnapMaxLinVel;
+        float fSnapMaxAngVel;
+        float fSnapMaxLinDist;
+        float fSnapMaxAngDist;
+        float fPosMaxLinVel;
+        float fPosMaxAngVel;
+        uint32_t uiImpulseMult1;
+        uint32_t uiImpulseMult2;
+    };
+
+    // Built through Init.
+    RagdollFeedbackData();
+    ~RagdollFeedbackData();
+
+    void Init();
+    bool Compare(RagdollFeedbackData* apOther);
+    void Copy(const RagdollFeedbackData& arData);
+
+    bool bEnabled;
+    RagdollFeedbackSystemData SystemData;
+    // The game builds and destroys it as BSSimpleArray<short, 1024>.
+    BSSimpleArray<int16_t> DynamicBoneIdxA;
+};
 
 // The look IK's shared per-creature state: the head bone's skeleton and the head's forward direction in parent and in
 // local space. The 12 bytes after the pointer are hkVector4's alignment gap, which none of the functions that use the
@@ -509,30 +549,142 @@ public:
     static SettingT<INISettingCollection> bRigidBodyController;
     static PoseMap_t PoseMap;
     static SkeletonMap_t SkeletonMap;
+
+protected:
+    static SettingT<INISettingCollection> fAngleMax;
+    static SettingT<INISettingCollection> fAngleMaxEase;
+    static SettingT<INISettingCollection> fOnOffGain;
+    static SettingT<INISettingCollection> fGroundAscendingGain;
+    static SettingT<INISettingCollection> fGroundDescendingGain;
+    static SettingT<INISettingCollection> fFootRaisedGain;
+    static SettingT<INISettingCollection> fFootPlantedGain;
+    static SettingT<INISettingCollection> fOriginalGroundHeightMS;
+    static SettingT<INISettingCollection> fAnkleOffset;
+    static SettingT<INISettingCollection> fPelvisUpDownBias;
+    static SettingT<INISettingCollection> fMaxStepVertError;
 };
 
 using hkArray_bhkRagdollController_FootIkLegInfo = hkArray<bhkRagdollController::FootIkLegInfo>;
 
 inline float fMaxTrackLen = 5.0f;
 
-extern SettingT<INISettingCollection> gs_fAngleMax_LookIK;
+inline bool bhkRagdollController::QFootIKActive() {
+    return bActiveFootIK;
+}
 
-extern SettingT<INISettingCollection> gs_fAngleMaxEase_LookIK;
+inline bool bhkRagdollController::QFootIK() {
+    return bhkRagdollController::bFootIK.Bool();
+}
 
-extern SettingT<INISettingCollection> gs_fOnOffGain_FootIK;
+inline void bhkRagdollController::SetRagdollAnim(bool abEnable) {
+    bhkRagdollController::bRagdollAnim.Bool() = abEnable;
+}
 
-extern SettingT<INISettingCollection> gs_fGroundAscendingGain_FootIK;
+inline void bhkRagdollController::SetLookAtMaxAngle(bhkRagdollController::LookIKBone aeBone, float afMaxAngle) {
+    BoneParamA[aeBone].fLookAtMaxAngle = afMaxAngle;
+}
 
-extern SettingT<INISettingCollection> gs_fGroundDescendingGain_FootIK;
+inline bool bhkRagdollController::QRagdollAnim() {
+    return bhkRagdollController::bRagdollAnim.Bool();
+}
 
-extern SettingT<INISettingCollection> gs_fFootRaisedGain_FootIK;
+inline void bhkRagdollController::SetLookIKEnable(bool abEnable) {
+    bEnableLookIK = bInitLookIK && abEnable;
+}
 
-extern SettingT<INISettingCollection> gs_fFootPlantedGain_FootIK;
+inline void bhkRagdollController::SetFootIKEnable(bool abEnable) {
+    bEnableFootIK = bInitFootIK && abEnable;
+}
 
-extern SettingT<INISettingCollection> gs_fOriginalGroundHeightMS_FootIK;
+inline void bhkRagdollController::SetGrabIKEnable(bool abEnable) {
+    bEnableGrabIK = bInitGrabIK && abEnable;
+}
 
-extern SettingT<INISettingCollection> gs_fAnkleOffset_FootIK;
+inline bool bhkRagdollController::QGrabIK() {
+    return bhkRagdollController::bGrabIK.Bool();
+}
 
-extern SettingT<INISettingCollection> gs_fPelvisUpDownBias_FootIK;
+inline void bhkRagdollController::SetGrabIK(bool abEnable) {
+    bhkRagdollController::bGrabIK.Bool() = abEnable;
+}
 
-extern SettingT<INISettingCollection> gs_fMaxStepVertError_FootIK;
+inline void bhkRagdollController::SetLookIK(bool abEnable) {
+    bhkRagdollController::bLookIK.Bool() = abEnable;
+}
+
+inline void bhkRagdollController::SetFootIK(bool abEnable) {
+    bhkRagdollController::bFootIK.Bool() = abEnable;
+}
+
+inline void bhkRagdollController::SetUsePhantomFootIKCasts(bool abUsePhantom) {
+    bUsePhantomFootIKCasts = abUsePhantom;
+}
+
+inline void bhkRagdollController::SetPoseMatchEnable(bool abEnable) {
+    bEnablePoseMatch = bInitPoseMatch && abEnable;
+}
+
+inline void bhkRagdollController::SetPhantom(bhkShapePhantom* apPhantom) {
+    pControllerPhantom = static_cast<hkpCachingShapePhantomRay*>(**apPhantom);
+}
+
+inline bool bhkRagdollController::QRagdollFeedbackEnable() {
+    return bEnableRagdollFeedback;
+}
+
+inline uint32_t bhkRagdollController::QFeedbackImpulseWeak() {
+    return uiFeedbackImpulseWeak;
+}
+
+inline uint32_t bhkRagdollController::QFeedbackImpulseStrong() {
+    return uiFeedbackImpulseStrong;
+}
+
+inline void bhkRagdollController::SetRagdollAnimEaseOut(bool abEaseOut) {
+    bEaseOutFootIK = abEaseOut;
+    GrabIKState[1].bEaseOutGrabIK = abEaseOut;
+    GrabIKState[0].bEaseOutGrabIK = abEaseOut;
+    bEaseOutLookIK = abEaseOut;
+    bEaseOutRagdollAnim = abEaseOut;
+}
+
+inline void bhkRagdollController::SetHeadOffset(const NiQuaternion& arRot) {
+    NI2HKMIGRATION_QUATERNION(CurrentHeadRotOffset, arRot);
+}
+
+inline void bhkRagdollController::SetGrabIKEaseOut(bhkRagdollController::GRAB_IK_ARM arArm, bool abEnable) {
+    GrabIKState[arArm].bEaseOutGrabIK = abEnable;
+}
+
+inline void bhkRagdollController::ReinitRBControllerOnUpdate(bool abReinit) {
+    bReinitRBController = abReinit;
+}
+
+inline bool bhkRagdollController::QRagdollFeedbackActive() {
+    return bActiveRagdollFeedback;
+}
+
+inline RagdollFeedbackData::RagdollFeedbackSystemData::RagdollFeedbackSystemData()
+  : fKeyDynIntrp(0.9f), fHeirGain(0.8f), fPosGain(0.4f), fVelGain(0.2f), fAccGain(0.1f), fSnapGain(0.3f),
+    fVelDamp(0.0f), fSnapMaxLinVel(50.0f), fSnapMaxAngVel(50.0f), fSnapMaxLinDist(25.0f), fSnapMaxAngDist(25.0f),
+    fPosMaxLinVel(50.0f), fPosMaxAngVel(50.0f), uiImpulseMult1(10000), uiImpulseMult2(30000) {}
+
+inline void RagdollFeedbackData::RagdollFeedbackSystemData::Endian() {
+    BSEndian(fKeyDynIntrp, false);
+    BSEndian(fHeirGain, false);
+    BSEndian(fPosGain, false);
+    BSEndian(fVelGain, false);
+    BSEndian(fAccGain, false);
+    BSEndian(fSnapGain, false);
+    BSEndian(fVelDamp, false);
+    BSEndian(fSnapMaxLinVel, false);
+    BSEndian(fSnapMaxAngVel, false);
+    BSEndian(fSnapMaxLinDist, false);
+    BSEndian(fSnapMaxAngDist, false);
+    BSEndian(fPosMaxLinVel, false);
+    BSEndian(fPosMaxAngVel, false);
+    BSEndian(uiImpulseMult1, false);
+    BSEndian(uiImpulseMult2, false);
+}
+
+inline RagdollFeedbackData::RagdollFeedbackData() : bEnabled(false) {}

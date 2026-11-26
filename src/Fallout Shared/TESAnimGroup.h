@@ -5,6 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 
 class BSAnimGroupSequence;
+class NiControllerSequence;
 class TESObjectREFR;
 class TESSound;
 
@@ -38,15 +39,6 @@ enum ANIM_GROUP_MOVE_ENUM : uint32_t {
     ANIM_GROUP_MOVE_COUNT = 5,
 };
 
-char* GetNextLineInString(char* Str);
-// apPath is only passed to strrchr; InitAnimGroup passes its const char* on. Writes the move type through aeMove and
-// the weapon type through aeWeapon, into InitAnimGroup's move and weapon locals.
-void GetMoveHandAndPowerArmorTypeFromAnimName(
-    const char* apPath,
-    ANIM_GROUP_MOVE_ENUM* aeMove,
-    ANIM_GROUP_WEAPON_ENUM* aeWeapon,
-    bool* abIsPowerArmor
-);
 
 // The animation groups (TESAnimGroup::GetType).
 enum ANIM_GROUP_ENUM : int32_t {
@@ -472,7 +464,7 @@ public:
     uint8_t GetSectionPriority(ANIM_GROUP_SECTION aeSection);
     bool IsAimAnim();
     void SetBlend(uint8_t acBlendFrames);
-    // Stores the argument's byte as it is (InitAnimGroup passes atoi's low byte).
+    // Stores the argument's byte as it is (LoadAnimGroup passes atoi's low byte).
     void SetBlendOutFrames(uint8_t acBlendFrames);
     void SetSoundTime(uint32_t aiIndex, float afValue);
     void SetSoundObject(uint32_t aiIndex, TESSound* apSound);
@@ -483,7 +475,6 @@ public:
     void SetType_(ANIM_GROUP_ENUM aeType);
     void SetSoundCount(uint32_t aiCount);
     void SetParentRootNode(const char* apName);
-    void SetupPriorities(BSAnimGroupSequence* apSequence);
     void SetSoundEnum(uint32_t aiIndex, ANIM_ENUM aeType, uint32_t aiEnumData);
 
     // Whether the group number asGroup is an attack.
@@ -513,7 +504,22 @@ public:
     static bool IsIronSightsAction(ANIM_GROUP_ENUM aeGroup);
     // The same test for a group id: false for 0xFF, else on its GetType.
     static bool IsIronSightsAction(uint16_t asGroup);
+    // apPath is only passed to strrchr; LoadAnimGroup passes its const char* on. Writes the move type through aeMove
+    // and the weapon type through aeWeapon, into LoadAnimGroup's move and weapon locals.
+    static void ParseAnimGroupFilename(
+        const char* apPath,
+        ANIM_GROUP_MOVE_ENUM* aeMove,
+        ANIM_GROUP_WEAPON_ENUM* aeWeapon,
+        bool* abIsPowerArmor
+    );
+    // apFilename is the const char* from KFModel::InitSequence, passed on to strrchr.
+    static TESAnimGroup* LoadAnimGroup(NiControllerSequence* apSequence, const char* apFilename);
 
+private:
+    static char* GetTextKey(char* Str);
+    void FillPriorityArray(NiControllerSequence* apSequence);
+
+public:
     uint8_t cSectionPriority[8];
     uint16_t sType;
     uint32_t frameCount;

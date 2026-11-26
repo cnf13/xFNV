@@ -2,7 +2,7 @@
 
 #include "BSCore/BSRandom.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
@@ -81,20 +81,16 @@
 
 DestructibleRefsTakingDamageMap BGSDestructibleObjectForm::DestructibleObjects(37);
 
-float RandomFloat(float afMin, float afMax) {
-    return BSRandom::GetSingleton()->Float(afMin, afMax);
-}
-
 NiFixedString* get_g_ModelSwapNode() {
     return FixedStrings::ModelSwapNode;
 }
 
 // Swaps the four 4-byte fields read from a big-endian file; the four leading bytes are left alone.
 void SAVE_DESTRUCTIBLE_OBJECT_STAGE::Endian() {
-    ENDIAN(iSelfDamagePerSecond, false);
-    ENDIAN(iExplosionID, false);
-    ENDIAN(iDebrisID, false);
-    ENDIAN(iDebrisCount, false);
+    BSEndian(iSelfDamagePerSecond, false);
+    BSEndian(iExplosionID, false);
+    BSEndian(iDebrisID, false);
+    BSEndian(iDebrisCount, false);
 }
 
 // Sets the health, the stage count and the flags; the two padding bytes stay unwritten.
@@ -102,7 +98,7 @@ SAVE_DESTRUCTIBLE_OBJECT_DATA::SAVE_DESTRUCTIBLE_OBJECT_DATA() : iHealth(0), cNu
 
 // Swaps the health read from a big-endian file; the stage count and flags are bytes.
 void SAVE_DESTRUCTIBLE_OBJECT_DATA::Endian() {
-    ENDIAN(iHealth, false);
+    BSEndian(iHealth, false);
 }
 
 DestructibleObjectStage::DestructibleObjectStage()
@@ -1355,26 +1351,6 @@ DestructibleRefsTakingDamageMap* BGSDestructibleObjectForm::GetDestructibleObjec
     return &BGSDestructibleObjectForm::DestructibleObjects;
 }
 
-// The range is the double difference of the bounds, and the sum is rounded to a float local before it is returned.
-float BSRandom::Float(float afMin, float afMax) {
-    uint32_t uiValue = UnsignedInt();
-    float fResult = static_cast<float>(uiValue * (static_cast<double>(afMax) - afMin) / 4294967296.0 + afMin);
-    return fResult;
-}
-
 float BGSExplosion::GetDamage() {
     return Data.fDamage;
-}
-
-float FloatCeil(float aIn) {
-    float fFloored = fFloor(aIn);
-    if (!(fFloored - aIn >= 0.0)) {
-        return fFloored + 1.0;
-    }
-
-    return fFloored;
-}
-
-const NiPoint3& NiBound::GetCenter() const {
-    return m_kCenter;
 }

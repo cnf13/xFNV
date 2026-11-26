@@ -1,7 +1,7 @@
 #include "Fallout Shared/CreatureSounds.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESCreature.h"

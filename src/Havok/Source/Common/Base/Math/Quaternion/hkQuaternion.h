@@ -17,6 +17,9 @@ public:
     // The quaternion whose x, y, z and w are v's.
     explicit hkQuaternion(const hkVector4& v) : m_vec(v) {}
 
+    // Copies q's vector.
+    void operator=(const hkQuaternion& q);
+
     // The SDK's: its arrays treat it as plain data (hkTypeTraits.h).
     HK_DECLARE_POD_TYPE();
     // Sets the identity rotation (0, 0, 0, 1).
@@ -79,6 +82,10 @@ public:
 
     hkVector4 m_vec;
 };
+
+inline void hkQuaternion::operator=(const hkQuaternion& q) {
+    m_vec = q.m_vec;
+}
 
 // The rotation is const: it is only read, and hkQuaternion::set and setAndNormalize pass their const hkRotation&.
 void quaternionFromRotatation(const hkRotation* rotation, hkQuaternion* quatOut);

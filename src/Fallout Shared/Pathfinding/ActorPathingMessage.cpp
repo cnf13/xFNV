@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/ActorPathingMessage.h"
 
 #include "BSCore/BSTFreeList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout/AI/Movement/ActorMover.h"

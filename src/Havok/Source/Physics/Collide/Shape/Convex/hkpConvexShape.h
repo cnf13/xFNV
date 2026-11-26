@@ -70,3 +70,7 @@ const hkpConvexShape* getClosestPointAndNormal(
 );
 
 inline float hkConvexShapeDefaultRadius = 0.05f;
+
+inline void hkpConvexShape::setRadius(float radius) {
+    m_radius = radius;
+}

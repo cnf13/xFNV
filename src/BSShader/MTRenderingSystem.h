@@ -1,10 +1,10 @@
 #pragma once
 
+#include "BSCore/BSLinearTaskThread.h"
 #include "BSCore/BSSemaphore.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/Setting.h"
 #include "BSShader/BSShaderAccumulator.h"
-#include "Fallout/AI/AILinearTaskThreadManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 

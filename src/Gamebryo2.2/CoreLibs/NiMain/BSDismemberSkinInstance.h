@@ -59,3 +59,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline BSDismemberSkinInstance::PartitionData* BSDismemberSkinInstance::GetPartitionDataArray() const {
+    return pPartitionDataArray;
+}

@@ -9,7 +9,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -1364,24 +1364,4 @@ NiAVObject* BSTestObjects::CreateArrow(float afLength, const NiColorA* apColor) 
     lines->m_kLocal.m_Rotate = NiMatrix3::IDENTITY;
     lines->SetName("BSTestObjects Arrow");
     return lines;
-}
-
-NiPoint3 NiPoint3::Perpendicular() {
-    float v8 = std::fabs(static_cast<double>(x));
-    float v7 = std::fabs(static_cast<double>(y));
-    if (!(v7 > static_cast<double>(v8))) {
-        float v4 = std::fabs(static_cast<double>(z));
-        float v3 = std::fabs(static_cast<double>(y));
-        if (!(v3 > static_cast<double>(v4))) {
-            return UnitCross(NiPoint3::UNIT_Y);
-        }
-        return UnitCross(NiPoint3::UNIT_Z);
-    }
-
-    float v6 = std::fabs(static_cast<double>(z));
-    float v5 = std::fabs(static_cast<double>(x));
-    if (!(v5 > static_cast<double>(v6))) {
-        return UnitCross(NiPoint3::UNIT_X);
-    }
-    return UnitCross(NiPoint3::UNIT_Z);
 }

@@ -22,3 +22,7 @@ public:
 extern hkClass hkBaseObjectClass;
 // The class's type info (its hkBaseObjectClass.cpp, defined in hkReferencedObject.cpp).
 extern hkTypeInfo hkBaseObjectTypeInfo;
+
+inline hkBaseObject::hkBaseObject() {}
+
+inline hkBaseObject::~hkBaseObject() {}

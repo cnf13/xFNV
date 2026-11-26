@@ -2,7 +2,7 @@
 
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSAudioManager.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 
 BSSoundHandle::BSSoundHandle() {

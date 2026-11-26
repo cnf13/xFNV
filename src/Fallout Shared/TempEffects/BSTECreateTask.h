@@ -18,8 +18,3 @@ public:
     // The pool GetFreeObject takes the tasks from.
     static NiTObjectPool<BSTECreateTask> ms_kPool;
 };
-
-// The pool containers' delete[], each task destroyed through the vtable: a delete-expression would call the
-// destructor directly, and it has no definition.
-template <>
-void NiTNewInterface<BSTECreateTask>::Deallocate(BSTECreateTask* pArray);

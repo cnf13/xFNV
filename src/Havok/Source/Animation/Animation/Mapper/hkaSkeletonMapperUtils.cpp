@@ -1232,3 +1232,56 @@ hkaSkeletonMapperData::ChainMapping::ChainMapping() : m_startBoneA(0), m_endBone
 const hkClass& hkaSkeletonMapperData::ChainMapping::staticClass() {
     return hkaSkeletonMapperDataChainMappingClass;
 }
+
+hkaSkeletonMapperUtils::Params* hkaSkeletonMapperUtils::Params::Init() {
+    m_positionMatchTolerance = 0.0f;
+    m_skeletonA = nullptr;
+    m_rotationMatchTolerance = 0.5235987901687622f;
+    m_skeletonB = nullptr;
+    m_compareNames = nullptr;
+    m_userChains.m_data = nullptr;
+    m_userChains.m_size = 0;
+    m_userChains.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG;
+    m_userMappingsAtoB.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
+    m_userMappingsAtoB.m_data = nullptr;
+    m_userMappingsAtoB.m_size = 0;
+    m_userMappingsBtoA.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
+    m_userMappingsBtoA.m_data = nullptr;
+    m_userMappingsBtoA.m_size = 0;
+    m_autodetectSimple.m_bool = 1;
+    m_autodetectChains.m_bool = 1;
+    m_mappingType.m_storage = 0;
+    m_motionParams.m_extractedMotionFactorA = 1.0f;
+    m_motionParams.m_extractedMotionFactorB = 1.0f;
+    m_motionParams.m_mode.m_storage = 0;
+    m_motionParams.m_extractedMotionBoneA = 0;
+    m_motionParams.m_extractedMotionBoneB = 0;
+    return this;
+}
+
+void hkaSkeletonMapperUtils::Params::Free() {
+    hkMemoryAllocator* m_heap = hkMemoryRouter::getInstance().m_heap;
+    int32_t m_capacityAndFlags = m_userMappingsBtoA.m_capacityAndFlags;
+    m_userMappingsBtoA.m_size = 0;
+    if (m_capacityAndFlags >= 0) {
+        m_heap->bufFree(m_userMappingsBtoA.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * m_capacityAndFlags);
+    }
+    m_userMappingsBtoA.m_data = nullptr;
+    m_userMappingsBtoA.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
+    hkMemoryAllocator* v4 = hkMemoryRouter::getInstance().m_heap;
+    int32_t v5 = m_userMappingsAtoB.m_capacityAndFlags;
+    m_userMappingsAtoB.m_size = 0;
+    if ((v5 & hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG) == 0) {
+        v4->bufFree(m_userMappingsAtoB.begin(), sizeof(hkaSkeletonMapperUtils::UserMapping) * v5);
+    }
+    m_userMappingsAtoB.m_data = nullptr;
+    m_userMappingsAtoB.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserMapping>::DONT_DEALLOCATE_FLAG;
+    hkMemoryAllocator* v6 = hkMemoryRouter::getInstance().m_heap;
+    int32_t v7 = m_userChains.m_capacityAndFlags;
+    m_userChains.m_size = 0;
+    if ((v7 & hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG) == 0) {
+        v6->bufFree(m_userChains.begin(), sizeof(hkaSkeletonMapperUtils::UserChain) * v7);
+    }
+    m_userChains.m_capacityAndFlags = hkArrayBase<hkaSkeletonMapperUtils::UserChain>::DONT_DEALLOCATE_FLAG;
+    m_userChains.m_data = nullptr;
+}

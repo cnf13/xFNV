@@ -4,6 +4,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSThread.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkThreadMemoryRouter.h"
 #include "BSMain/BSParallelTask.h"
 #include "Fallout/AI/AILinearTaskThreadManager.h"

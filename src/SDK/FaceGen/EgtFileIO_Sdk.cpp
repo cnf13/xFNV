@@ -1,7 +1,6 @@
-#include "SDK/FaceGen/EgtFileIO_Sdk.h"
-#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
-#include "Fallout Shared/FaceGen/BSFaceGenModel.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
+#include "SDK/FaceGen/EgtFileIO_Sdk.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include <vector>
 #include <memory>
@@ -87,4 +86,27 @@ bool fffReadEgtFile(const std::string& fname, uint32_t& basisKey,
 		}
 	}
 	return true;
+}
+
+FffModeTexS::FffModeTexS() {}
+
+FffModeTexS::FffModeTexS(const FffModeTexS& _Right)
+  : scale(_Right.scale), width(_Right.width), height(_Right.height), rowPad(_Right.rowPad),
+    img{_Right.img[0], _Right.img[1], _Right.img[2]} {}
+
+FffModeTexS::~FffModeTexS() {}
+
+FffModeTexS& FffModeTexS::Assign(const FffModeTexS& _Right) {
+    scale = _Right.scale;
+    width = _Right.width;
+    height = _Right.height;
+    rowPad = _Right.rowPad;
+    for (uint32_t i = 0; i < 3; ++i) {
+        img[i] = _Right.img[i];
+    }
+    return *this;
+}
+
+void FffModeTexS::operator delete(void* apMemory) {
+    ourFree(apMemory);
 }

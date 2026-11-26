@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -218,6 +219,9 @@ public:
     void SetOffset(float fOffset);
     void SetName(const NiFixedString& kName);
     void SetAccumRootName(const NiFixedString& kAccumRootName);
+    const NiFixedString& GetAccumRootName() const;
+    void SetPriority(uint32_t auiIndex, uint8_t aucPriority);
+    uint8_t GetPriority(uint32_t auiIndex);
     NiInterpolator* GetInterpolatorAt(uint32_t uiIndex);
     // The target of the controller at uiIndex, or null when the entry has no controller.
     NiObjectNET* GetTargetAt(uint32_t uiIndex);
@@ -300,3 +304,66 @@ public:
     static inline const char* pMorphTag = "m:";
     static inline uint32_t iMorphTagLen = 2;
 };
+
+inline void NiControllerSequence::SetAccumRootName(const NiFixedString& kAccumRootName) {
+    m_kAccumRootName.Assign(kAccumRootName);
+}
+
+inline const NiFixedString& NiControllerSequence::GetAccumRootName() const {
+    return m_kAccumRootName;
+}
+
+inline void NiControllerSequence::SetPriority(uint32_t auiIndex, uint8_t aucPriority) {
+    if (auiIndex < m_uiArraySize) {
+        m_pkInterpArray[auiIndex].m_ucPriority = aucPriority;
+    }
+}
+
+inline uint8_t NiControllerSequence::GetPriority(uint32_t auiIndex) {
+    if (auiIndex >= m_uiArraySize) {
+        return 0xFF;
+    }
+
+    return m_pkInterpArray[auiIndex].m_ucPriority;
+}
+
+inline void NiControllerSequence::SetName(const NiFixedString& kName) {
+    m_kName.Assign(kName);
+}
+
+inline float NiControllerSequence::GetLastScaledTime() {
+    return m_fLastScaledTime;
+}
+
+inline NiInterpolator* NiControllerSequence::GetInterpolatorAt(uint32_t uiIndex) {
+    return m_pkInterpArray[uiIndex].m_spInterpolator;
+}
+
+// The index is re-read and the controller fetched again for the GetTarget call.
+inline NiObjectNET* NiControllerSequence::GetTargetAt(uint32_t uiIndex) {
+    if (m_pkInterpArray[uiIndex].m_spInterpCtlr) {
+        return m_pkInterpArray[uiIndex].m_spInterpCtlr->GetTarget();
+    }
+    return nullptr;
+}
+
+inline NiTextKeyExtraData* NiControllerSequence::GetTextKeys() {
+    return m_spTextKeys;
+}
+
+inline NiControllerSequence* NiControllerSequence::GetPartnerSequence() {
+    return m_pkPartnerSequence;
+}
+
+inline NiControllerSequence::CycleType NiControllerSequence::GetCycleType() const {
+    return m_eCycleType;
+}
+
+inline float NiControllerSequence::GetPhase() {
+    double dOffset = GetOffset();
+    return dOffset - GetBeginKeyTime();
+}
+
+inline void NiControllerSequence::SetOffset(float fOffset) {
+    m_fOffset = fOffset;
+}

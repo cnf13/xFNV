@@ -160,6 +160,20 @@ public:
     static SettingT<INISettingCollection> fDialogMinDistance;
     static SettingT<INISettingCollection> fDialogMaxDistance;
     static BSSoundHandle kVatsLoopHandle;
+    static SettingT<INISettingCollection> fDawnTime;
+    static SettingT<INISettingCollection> fDayTime;
+    static SettingT<INISettingCollection> fDuskTime;
+    static SettingT<INISettingCollection> fNightTime;
 };
 
-extern SettingT<INISettingCollection> gs_bMultiThreadAudio_Audio;
+extern SettingT<INISettingCollection> bMultiThreadAudio;
+
+inline uint32_t BSAudio::GetSynchTime() {
+    return SynchTimer.iMilliseconds;
+}
+
+inline void BSAudio::EndAllMovingSounds() {}
+
+inline int32_t BSAudio::IsSynchTimerPaused() {
+    return SynchTimer.IsPaused();
+}

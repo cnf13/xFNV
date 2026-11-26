@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "Fallout Shared/Havok/FOCollisionListener.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntityActivationListener.h"

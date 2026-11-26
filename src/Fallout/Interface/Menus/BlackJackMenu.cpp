@@ -39,6 +39,7 @@
 #include "Fallout Shared/TESWaterSystem.h"
 #include "Fallout/AI/BaseProcess.h"
 #include "Fallout/AI/PlayerCharacter.h"
+#include "Fallout/Interface/Interface.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Interface/Menus/RouletteMenu.h"
 #include "Fallout/Magic/ActiveEffect.h"
@@ -51,7 +52,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -62,6 +62,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShadeProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
@@ -1540,11 +1541,11 @@ int32_t BlackJackMenu::DealHand() {
 void BlackJackMenu::SetTileCasinoEarnings() {
     char acEarnings[264];
     int32_t iTotalWinnings = g_blackJackCasinoStats->iTotalWinnings;
-    const char* pEarningsText = sCasinoEarningsText.String();
+    const char* pEarningsText = sEarningsText.String();
     BSsprintf(acEarnings, 260u, "%s %s%i", BlackJackMenu::pCasino->GetFullName(), pEarningsText, iTotalWinnings);
     int32_t iLength = BSstrlen(acEarnings);
     if (iLength < 23) {
-        pEarningsText = sCasinoEarningsText.String();
+        pEarningsText = sEarningsText.String();
         BSsprintf(acEarnings, 260u, "%s %s", BlackJackMenu::pCasino->GetFullName(), pEarningsText);
         for (int32_t i = 0; i < 23 - iLength; ++i) {
             acEarnings[iLength - 1 + i] = 32;
@@ -1555,7 +1556,7 @@ void BlackJackMenu::SetTileCasinoEarnings() {
     pTiles[2]->Set(g_blackJackMenuTrait_Value, acEarnings, true);
 }
 
-void BlackJackMenu::LoadNifs() {
+void BlackJackMenu::Prepare3DElements() {
     pHandGeometry = pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_BlackJack\\NV_Blackjack-Hand1.NIF",
         LOD_MULT_NONE,
@@ -2223,7 +2224,7 @@ void BlackJackMenu::DrawScene() {
     BSCullingProcess* pCullingProcess = pSceneGraph->pCuller;
     pCullingProcess->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiCamera* pCamera = BlackJackMenu::spCamera.m_pObject;
-    NiCamera::HandleEyeFinityFOVScale(pCamera, 0.15f);
+    HandleEyeFinityFOVScale(pCamera, 0.15f);
     NiPointer<NiRefObject> spAccumulator(static_cast<NiRefObject*>(InterfaceManager::Instance()->Get3dAccumulator()));
     NiAccumulator* pAccumulator = static_cast<NiAccumulator*>(spAccumulator.m_pObject);
     pCullingProcess->SetAccumulator(pAccumulator);
@@ -2288,7 +2289,7 @@ void BlackJackMenu::SetDealNotSwitchHands(char abDeal) {
         BlackJackMenu::pMe->pTiles[6]->Set(4036, pText, true);
         BlackJackMenu::SetNthTileAlpha(6, 255.0f);
         BlackJackMenu::pMe->pTiles[7]->Poke(4036, 1.0);
-        pText = gs_sBetMax.String();
+        pText = sBetMaxText.String();
         BlackJackMenu::pMe->pTiles[7]->Set(4036, pText, true);
         BlackJackMenu::SetNthTileAlpha(7, 255.0f);
         BlackJackMenu::pMe->pTiles[8]->Poke(4036, 1.0);
@@ -2414,11 +2415,11 @@ Tile* BlackJackMenu::Create(
                     int32_t iChips = pPlayer->GetInventoryObjectCount(pChips);
                     BlackJackMenu::pMe->pTiles[1]->Set(BlackJackMenu::iUT_X, iChips);
                     if (BSstrlen(BlackJackMenu::pCasino->GetFullName())) {
-                        const char* pEarningsText = sCasinoEarningsText.String();
+                        const char* pEarningsText = sEarningsText.String();
                         BSsprintf(acEarnings, 64, "%s %s", BlackJackMenu::pCasino->GetFullName(), pEarningsText);
                     }
                     else {
-                        const char* pEarningsText = sCasinoEarningsText.String();
+                        const char* pEarningsText = sEarningsText.String();
                         BSsprintf(acEarnings, 64, "%s %s", BlackJackMenu::pCasino->GetFormEditorID(), pEarningsText);
                     }
                     BlackJackMenu::pMe->pTiles[2]->Set(g_blackJackMenuTrait_Value, acEarnings, true);
@@ -2431,7 +2432,7 @@ Tile* BlackJackMenu::Create(
                     BlackJackMenu::pMe->pTiles[3]->Set(4036, pText, true);
                     if (BlackJackMenu::pMe->InitCasinoData()) {
                         BlackJackMenu::SetDealNotSwitchHands(1);
-                        BlackJackMenu::pMe->LoadNifs();
+                        BlackJackMenu::pMe->Prepare3DElements();
                         BlackJackMenu::pMe->PrepForVisibility(false);
                         BlackJackMenu::pMe->pTiles[3]->Set(4003, 0);
                         BlackJackMenu::pMe->ZeroFlags();

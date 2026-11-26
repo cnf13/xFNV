@@ -54,7 +54,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadGame.h"
 #include "Fallout/Misc/TaskQueueInterface.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiControllerSequence.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"

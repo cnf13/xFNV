@@ -1,10 +1,11 @@
 #include "Fallout Shared/TESLevCharacter.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/LEVELED_OBJECT_FILE.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESGlobal.h"
@@ -18,7 +19,7 @@
 // once that is done (TESLevCharacter::Load's function-local static plastload).
 static LEVELED_OBJECT* plastload;
 
-SettingT<GameSettingCollection> gs_iLevCharLevelDifferenceMax("iLevCharLevelDifferenceMax", 0);
+SettingT<GameSettingCollection> TESLevCharacter::iLevCharLevelDifferenceMax("iLevCharLevelDifferenceMax", 0);
 
 TESLevCharacter::TESLevCharacter() : TESBoundAnimObject(), TESLeveledList(), TESModelTextureSwap() {
     cFormType = 45;
@@ -160,5 +161,5 @@ bool TESLevCharacter::Compare(TESForm* apCompare) {
 }
 
 int32_t TESLevCharacter::GetMaxLevelDifference() {
-    return gs_iLevCharLevelDifferenceMax.UInt();
+    return TESLevCharacter::iLevCharLevelDifferenceMax.UInt();
 }

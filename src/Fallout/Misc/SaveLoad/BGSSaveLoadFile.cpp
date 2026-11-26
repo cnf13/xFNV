@@ -1,7 +1,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadFile.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSFile.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"

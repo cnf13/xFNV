@@ -1,6 +1,6 @@
 #include "BSSystemUtilities/SteamAPICallbacks.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/Steam/CCallback.h"
 #include "SDK/Steam/isteamuser.h"
 #include "SDK/Steam/isteamuserstats.h"

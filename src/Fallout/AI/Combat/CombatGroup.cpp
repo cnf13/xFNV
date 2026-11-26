@@ -4,10 +4,11 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleArray.inl"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTestObjects.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BoltShader.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -28,7 +29,6 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TESScript.h"
 #include "Fallout Shared/TeleportData.h"
-#include "Fallout Shared/eBool.h"
 #include "Fallout/AI/AILinearTaskThreadManager.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/Combat/CombatDialogueManager.h"
@@ -51,12 +51,12 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Fallout/Misc/TaskQueueInterface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 #include "xfnv/Compiler.h"
 
@@ -320,7 +320,7 @@ CombatGroup::~CombatGroup() {
     for (CombatGroupCluster* pCluster : ClusterArray) {
         ourFree(pCluster);
     }
-    CreateDebugGeometry(eTrue);
+    CreateDebugGeometry(true);
 }
 
 void CombatGroup::GetTargetDetectionLevel(
@@ -2793,7 +2793,7 @@ bool CombatGroup::GetTargetLastDetectedLocation(Actor* apTarget, BGSWorldLocatio
     return true;
 }
 
-void CombatGroup::CreateDebugGeometry(eBool abClear) {
+void CombatGroup::CreateDebugGeometry(bool abClear) {
     if (spDebugGeometry.m_pObject && spDebugGeometry->m_pkParent) {
         if (AILinearTaskThreadManager::ShouldQueue3DTask()) {
             NiNode* pNode = spDebugGeometry.m_pObject;
@@ -2806,7 +2806,7 @@ void CombatGroup::CreateDebugGeometry(eBool abClear) {
     }
 
     spDebugGeometry = static_cast<NiNode*>(nullptr);
-    if (abClear != eFalse) {
+    if (abClear) {
         return;
     }
     if (!pPlayer->GetParentCell() || !pPlayer->GetParentCell()->GetMarkerNode()) {

@@ -1,5 +1,6 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/SystemMemoryBlockServer/hkSystemMemoryBlockServer.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 

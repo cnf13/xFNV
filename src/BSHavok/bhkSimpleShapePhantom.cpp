@@ -6,7 +6,7 @@
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShapePhantom.h"
 #include "BSHavok/bhkWorldObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
@@ -149,3 +149,5 @@ void bhkSimpleShapePhantom::GetFixedClosestPoints(hkpFixedBufferCdPointCollector
 NiObject* bhkSimpleShapePhantom::CreateObject() {
     return new bhkSimpleShapePhantom;
 }
+
+hkSimpleShapePhantomCinfo::~hkSimpleShapePhantomCinfo() {}

@@ -1,10 +1,13 @@
 #include "Fallout Shared/TempEffects/BSTempEffectSimpleDecal.h"
 
+#include "BSCore/BSCoreMath.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/ScrapHeap.h"
 #include "BSMain/BSOcclusionQuery.h"
 #include "BSMain/BSStream.h"
+#include "BSMain/BSTempNodeManager.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
@@ -18,7 +21,6 @@
 #include "Fallout Shared/BGSDecalManager.h"
 #include "Fallout Shared/BGSDecalNode.h"
 #include "Fallout Shared/BGSTextureSet.h"
-#include "Fallout Shared/BSTempNode.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/TESHavokUtilities.h"
@@ -35,7 +37,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPlane.h"
@@ -55,18 +56,11 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 NiPointer<QueuedFile> BSTempEffectSimpleDecal::spPreloadedDecalTextureSets;
 NiRTTI BSTempEffectSimpleDecal::ms_RTTI("BSTempEffectSimpleDecal", &BSTempEffect::ms_RTTI);
-
-double BSMAX_0(double adA, float afB) {
-    if (afB < adA) {
-        return adA;
-    }
-
-    return afB;
-}
 
 DecalVertex::DecalVertex() {}
 
@@ -87,7 +81,7 @@ BSTempEffectSimpleDecal::BSTempEffectSimpleDecal(
     bUseAlphaBlending(arDecalData.bAlphaBlending), fSpecular(arDecalData.fSpecular),
     fVertexColor(arDecalData.fVertexColor), bModelSpace(arDecalData.bModelSpace), bTwoSided(arDecalData.bTwoSided) {
     if (BSTempEffectSimpleDecal::iCurrentMaxDecalCount == -1) {
-        BSTempEffectSimpleDecal::iCurrentMaxDecalCount = gs_uMaxDecals_Decals.Int();
+        BSTempEffectSimpleDecal::iCurrentMaxDecalCount = BGSDecalManager::iMaxDecals.Int();
     }
     float fEpsilonRadians = arDecalData.fDecalEpsilon * 0.01745329238474369;
     BSTempEffectSimpleDecal::fDecalEpsilon = std::cos(fEpsilonRadians);
@@ -962,8 +956,4 @@ void BSTempEffectSimpleDecal::PreloadDecalData() {
 
 void BSTempEffectSimpleDecal::UnloadDecalData() {
     BSTempEffectSimpleDecal::spPreloadedDecalTextureSets = static_cast<QueuedFile*>(nullptr);
-}
-
-void NiAVObject::DetachAllProperties() {
-    m_kPropertyList.RemoveAll();
 }

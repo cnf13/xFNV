@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
@@ -235,7 +235,7 @@ int32_t NavMeshInfo::GetPortalChunkSize() {
 void NavMeshInfo::FillInfoChunk(char* apChunkBuffer) {
     uint32_t uiValue = uiFlags;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     ourMemcpy(apChunkBuffer, &uiValue, sizeof(uint32_t));
     apChunkBuffer += sizeof(uint32_t);
@@ -244,28 +244,28 @@ void NavMeshInfo::FillInfoChunk(char* apChunkBuffer) {
     }
     uiValue = NavMeshID;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     ourMemcpy(apChunkBuffer, &uiValue, sizeof(uint32_t));
     apChunkBuffer += sizeof(uint32_t);
     ParentSpaceID = pParentSpace->GetFormID();
     uiValue = ParentSpaceID;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     ourMemcpy(apChunkBuffer, &uiValue, sizeof(uint32_t));
     apChunkBuffer += sizeof(uint32_t);
     uiValue = static_cast<uint32_t>(iCellKey);
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     ourMemcpy(apChunkBuffer, &uiValue, sizeof(uint32_t));
     apChunkBuffer += sizeof(uint32_t);
     NiPoint3 kLocation = ApproxLocation;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(kLocation.x, false);
-        ENDIAN(kLocation.y, false);
-        ENDIAN(kLocation.z, false);
+        BSEndian(kLocation.x, false);
+        BSEndian(kLocation.y, false);
+        BSEndian(kLocation.z, false);
     }
     ourMemcpy(apChunkBuffer, &kLocation, sizeof(NiPoint3));
     apChunkBuffer += sizeof(NiPoint3);
@@ -275,7 +275,7 @@ void NavMeshInfo::FillInfoChunk(char* apChunkBuffer) {
     }
     float fPercent = fPreferredPercent;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(fPercent, false);
+        BSEndian(fPercent, false);
     }
     ourMemcpy(apChunkBuffer, &fPercent, sizeof(float));
     apChunkBuffer += sizeof(float);
@@ -284,31 +284,31 @@ void NavMeshInfo::FillInfoChunk(char* apChunkBuffer) {
 void NavMeshInfo::SetFromInfoChunk(char* apChunkBuffer, TESFile* apFile, int32_t aiFileVersionNumber) {
     ourMemcpy(&uiFlags, apChunkBuffer, sizeof(uint32_t));
     if (apFile->QEndian()) {
-        ENDIAN(uiFlags, false);
+        BSEndian(uiFlags, false);
     }
     apChunkBuffer += sizeof(uint32_t);
     ourMemcpy(&NavMeshID, apChunkBuffer, sizeof(uint32_t));
     if (apFile->QEndian()) {
-        ENDIAN(NavMeshID, false);
+        BSEndian(NavMeshID, false);
     }
     apChunkBuffer += sizeof(uint32_t);
     TESForm::AddCompileIndex(NavMeshID, apFile);
     ourMemcpy(&ParentSpaceID, apChunkBuffer, sizeof(uint32_t));
     if (apFile->QEndian()) {
-        ENDIAN(ParentSpaceID, false);
+        BSEndian(ParentSpaceID, false);
     }
     apChunkBuffer += sizeof(uint32_t);
     TESForm::AddCompileIndex(ParentSpaceID, apFile);
     ourMemcpy(&iCellKey, apChunkBuffer, sizeof(int32_t));
     if (apFile->QEndian()) {
-        ENDIAN(iCellKey, false);
+        BSEndian(iCellKey, false);
     }
     apChunkBuffer += sizeof(int32_t);
     ourMemcpy(&ApproxLocation, apChunkBuffer, sizeof(NiPoint3));
     if (apFile->QEndian()) {
-        ENDIAN(ApproxLocation.x, false);
-        ENDIAN(ApproxLocation.y, false);
-        ENDIAN(ApproxLocation.z, false);
+        BSEndian(ApproxLocation.x, false);
+        BSEndian(ApproxLocation.y, false);
+        BSEndian(ApproxLocation.z, false);
     }
     apChunkBuffer += sizeof(NiPoint3);
     if (uiFlags & NAVMESHINFO_FLAG_BOUNDS) {
@@ -321,7 +321,7 @@ void NavMeshInfo::SetFromInfoChunk(char* apChunkBuffer, TESFile* apFile, int32_t
     if (aiFileVersionNumber >= 10) {
         ourMemcpy(&fPreferredPercent, apChunkBuffer, sizeof(float));
         if (apFile->QEndian()) {
-            ENDIAN(fPreferredPercent, false);
+            BSEndian(fPreferredPercent, false);
         }
         apChunkBuffer += sizeof(float);
     }
@@ -334,7 +334,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
     alignas(NavMeshPtr) uint8_t aPreferredStorage[sizeof(NavMeshPtr)];
     uint32_t uiValue = AdjacentNavMeshes.GetSize();
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
     apChunkBuffer += sizeof(uint32_t);
@@ -346,7 +346,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
         if (pInfo->GetNavMeshEvenDisabled(spNavMesh)) {
             uiValue = spNavMesh->GetFormID();
             if (TESForm::QEndianSwapOnSave()) {
-                ENDIAN(uiValue, false);
+                BSEndian(uiValue, false);
             }
             *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
         }
@@ -355,7 +355,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
     }
     uiValue = PreferredAdjacentNavMeshes.GetSize();
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
     apChunkBuffer += sizeof(uint32_t);
@@ -367,7 +367,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
         if (pInfo->GetNavMeshEvenDisabled(spNavMesh)) {
             uiValue = spNavMesh->GetFormID();
             if (TESForm::QEndianSwapOnSave()) {
-                ENDIAN(uiValue, false);
+                BSEndian(uiValue, false);
             }
             *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
         }
@@ -376,7 +376,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
     }
     uiValue = ConnectedDoors.GetSize();
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(uiValue, false);
+        BSEndian(uiValue, false);
     }
     *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
     apChunkBuffer += sizeof(uint32_t);
@@ -386,7 +386,7 @@ void NavMeshInfo::FillPortalChunk(char* apChunkBuffer) {
         if (pDoor) {
             uiValue = pDoor->GetFormID();
             if (TESForm::QEndianSwapOnSave()) {
-                ENDIAN(uiValue, false);
+                BSEndian(uiValue, false);
             }
             *reinterpret_cast<uint32_t*>(apChunkBuffer) = uiValue;
         }
@@ -401,7 +401,7 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
     uint32_t icount = 0;
     ourMemcpy(&icount, apChunkBuffer, sizeof(icount));
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(icount, false);
+        BSEndian<uint32_t>(icount, false);
     }
     AdjacentNavMeshes.SetSize(icount, true);
     // The chunk is untyped bytes: a run of 4-byte counts and form IDs after the first count.
@@ -409,7 +409,7 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
     for (uint32_t i = 0; i < icount; ++i) {
         uint32_t uiInfoID = *puiCount;
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(uiInfoID, false);
+            BSEndian<uint32_t>(uiInfoID, false);
         }
         TESForm::AddCompileIndex(uiInfoID, apFile);
         if (uiInfoID) {
@@ -427,14 +427,14 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
         icount = 0;
         ourMemcpy(&icount, puiCount, sizeof(icount));
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(icount, false);
+            BSEndian<uint32_t>(icount, false);
         }
         PreferredAdjacentNavMeshes.SetSize(icount, true);
         ++puiCount;
         for (uint32_t i = 0; i < icount; ++i) {
             uint32_t uiInfoID = *puiCount;
             if (apFile->QEndian()) {
-                ENDIAN<uint32_t>(uiInfoID, false);
+                BSEndian<uint32_t>(uiInfoID, false);
             }
             TESForm::AddCompileIndex(uiInfoID, apFile);
             if (uiInfoID) {
@@ -451,14 +451,14 @@ void NavMeshInfo::SetFromPortalChunk(char* apChunkBuffer, TESFile* apFile, int32
     }
     ourMemcpy(&icount, puiCount, sizeof(icount));
     if (apFile->QEndian()) {
-        ENDIAN<uint32_t>(icount, false);
+        BSEndian<uint32_t>(icount, false);
     }
     ConnectedDoors.SetSize(icount, true);
     puiCount = puiCount + 1;
     for (uint32_t i = 0; i < icount; ++i) {
         uint32_t uiInfoID = *puiCount;
         if (apFile->QEndian()) {
-            ENDIAN<uint32_t>(uiInfoID, false);
+            BSEndian<uint32_t>(uiInfoID, false);
         }
         TESForm::AddCompileIndex(uiInfoID, apFile);
         TESObjectREFR** ppdoor = &ConnectedDoors.GetAt(static_cast<int32_t>(i));

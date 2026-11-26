@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/Interface/MenuManager.h"
 
 #include <concepts>

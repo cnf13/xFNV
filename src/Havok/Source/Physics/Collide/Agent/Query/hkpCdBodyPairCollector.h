@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
 
 class hkpCdBody;
 
@@ -20,3 +21,11 @@ public:
 
     hkBool m_earlyOut;
 };
+
+inline void hkpCdBodyPairCollector::operator delete(void* apMemory) {
+    hkpCdPointCollector::operator delete(apMemory);
+}
+
+inline hkpCdBodyPairCollector::hkpCdBodyPairCollector() : m_earlyOut(false) {}
+
+inline hkpCdBodyPairCollector::~hkpCdBodyPairCollector() {}

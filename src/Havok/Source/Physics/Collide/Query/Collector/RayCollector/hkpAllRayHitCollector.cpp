@@ -31,47 +31,5 @@ hkpAllRayHitCollector::~hkpAllRayHitCollector() {}
 
 // Sorts the hits by hit fraction when there are two or more.
 void hkpAllRayHitCollector::sortHits() {
-    if (m_hits.m_size > 1) {
-        // The empty comparator's byte.
-        hkAlgorithm::quickSortRecursive(m_hits.m_data, 0, m_hits.m_size - 1, static_cast<uint8_t>(0));
-    }
-}
-
-// Hoare partition by hit fraction around a copy of the middle hit, recursing on the left part and looping on the right
-// one.
-void hkAlgorithm::quickSortRecursive(hkpWorldRayCastOutput* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    for (;;) {
-        int32_t i = aiLow;
-        int32_t j = aiHigh;
-        const hkpWorldRayCastOutput kPivot(apArr[(aiLow + aiHigh) >> 1]);
-        hkAlgorithm::less<hkpWorldRayCastOutput> cmpLess;
-        do {
-            while (cmpLess(apArr[i], kPivot)) {
-                ++i;
-            }
-            while (cmpLess(kPivot, apArr[j])) {
-                --j;
-            }
-            if (i > j) {
-                break;
-            }
-            if (i != j) {
-                hkpWorldRayCastOutput& rLeft = apArr[i];
-                hkpWorldRayCastOutput& rRight = apArr[j];
-                const hkpWorldRayCastOutput kRight(rRight);
-                rRight = rLeft;
-                rLeft = kRight;
-            }
-            ++i;
-            --j;
-        }
-        while (i <= j);
-        if (aiLow < j) {
-            quickSortRecursive(apArr, aiLow, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return;
-        }
-        aiLow = i;
-    }
+    hkAlgorithm::quickSort(m_hits.m_data, m_hits.m_size);
 }

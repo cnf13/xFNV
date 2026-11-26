@@ -8,7 +8,7 @@
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/BGSExplosion.h"
@@ -71,7 +71,7 @@ float CombatThreat::ComputeThreatScore(
     if (afCompareTime < 0.0 || IsActive(afCompareTime)) {
         float fmodifiedRadius = fRadius + afAdditionalRadius;
         float fsquaredDistanceFromThreat = 0.0f;
-        float fextrudeRadius = fmodifiedRadius * gs_fCombatThreatExtrudeVelocityThreshold.Float();
+        float fextrudeRadius = fmodifiedRadius * fCombatThreatExtrudeRadiusMult.Float();
         NiPoint3 linearVelocity = GetThreatLinearVelocity();
         float fvelocityMagnitude = linearVelocity.UnitizeGetLength();
         NiPoint3 halfVelocity = linearVelocity * fvelocityMagnitude * 0.5f;
@@ -218,7 +218,7 @@ NiPoint3 CombatThreat::GetThreatLinearVelocity() {
 
 PathingAvoidNode* CombatThreat::GetAvoidNode(PathingAvoidNode* apResult, Actor* apActor) {
     NiPoint3 linearVelocity = GetThreatLinearVelocity();
-    float fextrudeRadius = fRadius * gs_fCombatThreatExtrudeVelocityThreshold.Float();
+    float fextrudeRadius = fRadius * fCombatThreatExtrudeRadiusMult.Float();
     float fthreatScore = GetBaseThreatScore(apActor, 0.0f);
     float fvelocityMagnitude = linearVelocity.UnitizeGetLength();
     NiPoint3 halfVelocity = linearVelocity * fvelocityMagnitude * 0.5f;

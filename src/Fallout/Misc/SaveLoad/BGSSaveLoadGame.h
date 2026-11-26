@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadFormHeader.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"

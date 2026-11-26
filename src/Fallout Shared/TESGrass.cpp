@@ -1,9 +1,10 @@
 #include "Fallout Shared/TESGrass.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESModel.h"
@@ -15,12 +16,12 @@ SettingT<INISettingCollection> TESGrass::fWaveOffsetRange("fWaveOffsetRange:Gras
 
 // The three slope and density bytes and the flags byte need no swap.
 void TESGrass::GRASS_DATA::Endian() {
-    ENDIAN(sDistanceFromWaterLevel, false);
-    ENDIAN(eUnderwater, false);
-    ENDIAN(fPositionRange, false);
-    ENDIAN(fHeightRange, false);
-    ENDIAN(fColorRange, false);
-    ENDIAN(fWavePeriod, false);
+    BSEndian(sDistanceFromWaterLevel, false);
+    BSEndian(eUnderwater, false);
+    BSEndian(fPositionRange, false);
+    BSEndian(fHeightRange, false);
+    BSEndian(fColorRange, false);
+    BSEndian(fWavePeriod, false);
 }
 
 TESGrass::TESGrass() : TESBoundObject(), TESModel() {

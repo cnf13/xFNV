@@ -1,6 +1,4 @@
 #pragma once
 
+#include "BSCore/BSCoreMath.h"
 #include <cstdint>
-
-uint32_t BSMAX(uint32_t iA, uint16_t iB);
-char BSMIN(char iA, char iB);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiScreenElementsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 
 class NiScreenElementsData;
@@ -34,3 +35,19 @@ public:
 };
 
 NiSmartPointer(NiScreenElements);
+
+inline bool NiScreenElements::SetTextures(
+    int32_t iPolygon,
+    uint16_t usSet,
+    float fLeft,
+    float fTop,
+    float fRight,
+    float fBottom
+) {
+    NiScreenElementsData* pModelData = static_cast<NiScreenElementsData*>(GetModelData());
+    return pModelData->SetTextures(iPolygon, usSet, fLeft, fTop, fRight, fBottom);
+}
+
+inline NiScreenElementsData* NiScreenElements::Data() {
+    return NiSmartPointerCast<NiScreenElementsData>(m_spModelData);
+}

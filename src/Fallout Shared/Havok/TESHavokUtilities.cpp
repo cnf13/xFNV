@@ -489,38 +489,3 @@ NiPoint3 TESHavokUtilities::GetLocalPointWithinCollision(NiAVObject* apObject) {
     }
     return kPoint;
 }
-
-hkpShapeCollection* bhkShapeCollection::operator*() const {
-    if (this) {
-        return static_cast<hkpShapeCollection*>(const_cast<bhkShapeCollection*>(this)->Gethk());
-    }
-
-    return nullptr;
-}
-
-// The container base is taken without a null test, so it goes through a reference.
-uint32_t bhkShapeCollection::GetFirstKey() {
-    const hkpShapeContainer& kContainer = ***this;
-    return kContainer.getFirstKey();
-}
-
-uint32_t bhkShapeCollection::GetNextKey(uint32_t aiOldKey) {
-    const hkpShapeContainer& kContainer = ***this;
-    return kContainer.getNextKey(aiOldKey);
-}
-
-void NiAVObject::SetCollisionObject(NiCollisionObject* pkCollisionObject) {
-    m_spCollisionObject = static_cast<bhkNiCollisionObject*>(pkCollisionObject);
-    if (m_spCollisionObject) {
-        NiCollisionObject* pkCollision = m_spCollisionObject;
-        if (pkCollision->GetSceneGraphObject() != this) {
-            pkCollision = m_spCollisionObject;
-            pkCollision->SetSceneGraphObject(this);
-        }
-    }
-}
-
-// The SDK's inline body; the child container's getChild is a trivial accessor.
-const hkpShapeCollection* hkpMoppBvTreeShape::getShapeCollection() const {
-    return static_cast<const hkpShapeCollection*>(m_child.m_childShape);
-}

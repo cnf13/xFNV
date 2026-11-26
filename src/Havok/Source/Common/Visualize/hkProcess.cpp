@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Visualize/hkProcess.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkProcess::hkProcess(hkBool selectable) : m_selectable(selectable) {}
 

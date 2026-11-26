@@ -47,3 +47,16 @@ public:
     static inline int32_t iCount;
 };
 NiSmartPointer(bhkSimpleShapePhantom);
+
+inline hkSimpleShapePhantomCinfo::hkSimpleShapePhantomCinfo() {}
+
+inline bhkSimpleShapePhantom::bhkSimpleShapePhantom(const hkSimpleShapePhantomCinfo& arInfo) {
+    bhkSimpleShapePhantom::Init(arInfo);
+    ++iCount;
+    ResetPhantomFlags();
+}
+
+inline hkArray<hkpSimpleShapePhantom::CollisionDetail, hkContainerHeapAllocator>&
+bhkSimpleShapePhantom::GetCollisionDetails() {
+    return static_cast<hkpSimpleShapePhantom*>(**this)->getCollisionDetails();
+}

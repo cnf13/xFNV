@@ -1,6 +1,6 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiVBBlock.h"
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiVBChip.h"

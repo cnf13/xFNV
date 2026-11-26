@@ -2,13 +2,14 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSEntryPointFunctionDataActivateChoice.h"
 #include "Fallout Shared/BGSListForm.h"
 #include "Fallout Shared/BGSMessageIcon.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/MiscStats.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESChallengeManager.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESDescription.h"
@@ -34,13 +35,13 @@ TESChallengeManager::ChallengeListTable TESChallengeManager::pInactiveChallengeL
 TESChallengeManager::ChallengeListTable TESChallengeManager::pChallengeList;
 
 void CHALLENGE_DATA::Endian() {
-    ENDIAN(nChallengeType, false);
-    ENDIAN(iThreshold, false);
-    ENDIAN(nFlags, false);
-    ENDIAN(iInterval, false);
-    ENDIAN(nSpecialDataOne, false);
-    ENDIAN(nSpecialDataTwo, false);
-    ENDIAN(nSpecialDataThree, false);
+    BSEndian(nChallengeType, false);
+    BSEndian(iThreshold, false);
+    BSEndian(nFlags, false);
+    BSEndian(iInterval, false);
+    BSEndian(nSpecialDataOne, false);
+    BSEndian(nSpecialDataTwo, false);
+    BSEndian(nSpecialDataThree, false);
 }
 
 TESChallenge::TESChallenge() {

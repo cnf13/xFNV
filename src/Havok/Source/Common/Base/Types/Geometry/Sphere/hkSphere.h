@@ -30,3 +30,15 @@ public:
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkSphereTypeInfo;
+
+// m_pos's constructor stores nothing.
+inline hkSphere::hkSphere() {}
+
+inline void hkSphere::setPosition(const hkVector4& newPos) {
+    m_pos.setXYZ(newPos);
+}
+
+// Sets w through hkVector4::operator().
+inline void hkSphere::setRadius(float newRadius) {
+    m_pos(3) = newRadius;
+}

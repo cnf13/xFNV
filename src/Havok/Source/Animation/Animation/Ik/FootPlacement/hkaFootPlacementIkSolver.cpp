@@ -1,5 +1,6 @@
 #include "Havok/Source/Animation/Animation/Ik/FootPlacement/hkaFootPlacementIkSolver.h"
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Animation/Animation/Ik/TwoJoints/hkaTwoJointsIkSolver.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaPose.h"
 #include "Havok/Source/Common/Base/Container/String/hkString.h"
@@ -864,4 +865,21 @@ void hkaFootPlacementIkSolver::doFootPlacement(
     v147.m_quad = groundNormalWSOut.m_quad;
     this->m_previousGroundHeightWS = m_previousGroundHeightWS_1;
     m_previousGroundNormalWS.m_quad = v147.m_quad;
+}
+
+// The filtered cast hits nothing here: it returns false without reading its arguments.
+hkBool hkaRaycastInterface::castRay(
+    const hkVector4& fromWS,
+    const hkVector4& toWS,
+    uint32_t collisionFilterInfo,
+    float& hitFractionOut,
+    hkVector4& normalWS
+) {
+    hkBool kResult;
+    kResult.m_bool = 0;
+    return kResult;
+}
+
+void hkaRaycastInterface::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
 }

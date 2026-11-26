@@ -7,6 +7,7 @@
 #include "BSHavok/bhkUtilFunctions.h"
 #include "BSMain/BSPortal.h"
 #include "BSMain/BSXFlags.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderUtil.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -21,7 +22,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCullingProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -39,7 +40,7 @@
 NiRTTI BSFadeNode::ms_RTTI("BSFadeNode", &NiNode::ms_RTTI);
 BSFadeNode::MinNearDistanceSetting BSFadeNode::iMinNearDistance("iFadeNodeMinNearDistance:LOD", 400);
 NiPointer<NiAlphaProperty> BSFadeNode::spFadeAlpha;
-SettingT<INISettingCollection> gs_fLODMultTrees_LOD("fLODMultTrees:LOD", 1.2f);
+SettingT<INISettingCollection> BSFadeNode::fLODMultTrees("fLODMultTrees:LOD", 1.2f);
 
 // Fade distances at the float maximum, no fade yet, and the faded-in, ignore-fade and moving-sound flags cleared.
 BSFadeNode::BSFadeNode()

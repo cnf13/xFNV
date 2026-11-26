@@ -175,10 +175,7 @@ void hkpCachingShapePhantom::removeOverlappingCollidable(hkpCollidable* collidab
 // Sorts the cached collision details once a query has changed them, then clears the dirty flag.
 void hkpCachingShapePhantom::ensureDeterministicOrder() {
     if (m_orderDirty.m_bool) {
-        int32_t size = m_collisionDetails.m_size;
-        if (size > 1) {
-            quickSortRecursive(m_collisionDetails.m_data, 0, size - 1, 0);
-        }
+        hkAlgorithm::quickSort(m_collisionDetails.m_data, m_collisionDetails.m_size, OrderByUid());
         m_orderDirty.m_bool = 0;
     }
 }
@@ -309,62 +306,6 @@ void hkpCachingShapePhantom::getPenetrations(hkpCdBodyPairCollector& collector, 
         m_collisionDetails.m_data[i]
             .m_agent->getPenetrations(m_collidable, *m_collisionDetails.m_data[i].m_collidable, *input, collector);
         if (collector.m_earlyOut.m_bool) {
-            break;
-        }
-    }
-}
-
-// hkAlgorithm::quickSortRecursive instantiation for hkpCollisionDetail and OrderByUid.
-void quickSortRecursive(
-    hkpCachingShapePhantom::hkpCollisionDetail* apDetails,
-    int32_t aFirst,
-    int32_t aLast,
-    uint8_t aFlag
-) {
-    int32_t v4 = aLast;
-    for (int32_t i = aFirst;; aFirst = i) {
-        hkpCachingShapePhantom::hkpCollisionDetail v13 = apDetails[(i + v4) >> 1];
-        do {
-            uint32_t m_id = v13.m_collidable->m_broadPhaseHandle.m_id;
-            hkpCollidable** p_m_collidable = &apDetails[i].m_collidable;
-            if ((*p_m_collidable)->m_broadPhaseHandle.m_id < m_id) {
-                hkpCollidable* v8;
-                do {
-                    v8 = p_m_collidable[2];
-                    p_m_collidable += 2;
-                    ++i;
-                }
-                while (v8->m_broadPhaseHandle.m_id < m_id);
-            }
-            hkpCollidable** v9 = &apDetails[v4].m_collidable;
-            if (m_id < (*v9)->m_broadPhaseHandle.m_id) {
-                hkpCollidable* v10;
-                do {
-                    v10 = *(v9 - 2);
-                    v9 -= 2;
-                    --v4;
-                }
-                while (m_id < v10->m_broadPhaseHandle.m_id);
-            }
-            if (v4 < i) {
-                break;
-            }
-            if (v4 != i) {
-                hkpCollisionAgent* m_agent = apDetails[v4].m_agent;
-                hkpCollidable* m_collidable = apDetails[v4].m_collidable;
-                apDetails[v4] = apDetails[i];
-                apDetails[i].m_agent = m_agent;
-                apDetails[i].m_collidable = m_collidable;
-            }
-            --v4;
-            ++i;
-        }
-        while (i <= v4);
-        if (aFirst < v4) {
-            quickSortRecursive(apDetails, aFirst, v4, aFlag);
-        }
-        v4 = aLast;
-        if (i >= aLast) {
             break;
         }
     }

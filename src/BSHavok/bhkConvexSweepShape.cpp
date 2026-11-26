@@ -4,7 +4,7 @@
 #include "BSHavok/bhkConvexShape.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 

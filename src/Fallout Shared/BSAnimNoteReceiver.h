@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiAnimation/BSAnimNoteListener.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/BSAnimNote.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
@@ -7,19 +8,6 @@
 #include <stdint.h>
 
 class TESObjectREFR;
-
-// What a BSAnimNoteListener hands the animation notes it hears to.
-class IBSAnimNoteReceiver {
-public:
-    IBSAnimNoteReceiver();
-    virtual ~IBSAnimNoteReceiver();
-
-    // Handles one note.
-    virtual void Update(BSAnimNote* apNote) = 0;
-
-    // The deleting destructors free through ourFree.
-    static void operator delete(void* apMemory);
-};
 
 // A reference's receiver: calls the function registered for each note type with the reference and the note.
 class BSAnimNoteReceiver : public IBSAnimNoteReceiver {

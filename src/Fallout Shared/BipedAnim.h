@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSString.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESBipedModelForm.h"
@@ -10,8 +11,6 @@ class QueuedHelmet;
 class TESNPC;
 class TESObjectWEAP;
 class TESRace;
-
-int32_t BSstrlwr(char* apString1, int32_t aiSize);
 
 enum BIPED_BONE : int32_t {
     BIPED_BONE_NONE = -1,

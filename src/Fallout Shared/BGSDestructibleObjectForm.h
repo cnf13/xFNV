@@ -1,6 +1,8 @@
 #pragma once
 
+#include "BSCore/BSRandom.h"
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
@@ -16,7 +18,6 @@ class TESObjectREFR;
 
 enum IO_TASK_PRIORITY : int32_t;
 
-float RandomFloat(float afMin, float afMax);
 NiFixedString* get_g_ModelSwapNode();
 
 // The references taking destruction damage.

@@ -4,11 +4,12 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSCore/TimeGlobal.h"
 #include "BSHavok/bhkCharacterListener.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEncounterZone.h"
@@ -2877,7 +2878,7 @@ bool CombatState::FindBetterWeapon() {
     float fweaponDPS = (fPickupWeaponMinDPSImprovementPercent.Float() + 1.0) * fbaseWeaponDPS;
     float fdistanceMult = 1.0f;
     if (fMaxCombatWeaponDPS < static_cast<double>(fDisarmedDPS)) {
-        fdistanceMult = gs_fDisarmedPickupWeaponDistanceMult.Float();
+        fdistanceMult = fPickupWeaponDisarmedDistanceMult.Float();
         fweaponDPS = BSMIN(fweaponDPS, fDisarmedDPS);
     }
     if (btargetUnreachable) {
@@ -3419,10 +3420,10 @@ void CombatState::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         pLocationTarget->LoadGame(apLoadGameBuffer);
     }
     if ((csavedData & 2) != 0) {
-        CoverSearchInfo.LoadGameBGS(apLoadGameBuffer);
+        CoverSearchInfo.LoadGame(apLoadGameBuffer);
     }
     if ((csavedData & 8) != 0) {
-        SecondaryCoverSearchInfo.LoadGameBGS(apLoadGameBuffer);
+        SecondaryCoverSearchInfo.LoadGame(apLoadGameBuffer);
     }
     isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     UnreachableCoverLocations.SetSize(isaveGameCount, true);
@@ -3884,7 +3885,7 @@ void CombatCoverSearchInfo::Copy(const CombatCoverSearchInfo* apCopy) {
     bSearching = apCopy->bSearching;
 }
 
-void CombatCoverSearchInfo::LoadGameBGS(BGSLoadGameBuffer* apLoadGameBuffer) {
+void CombatCoverSearchInfo::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&kSearchLocation, sizeof(kSearchLocation));
     apLoadGameBuffer->LoadData(&kCenter, sizeof(kCenter));
     apLoadGameBuffer->LoadData(&fRadius, sizeof(fRadius));
@@ -4005,8 +4006,4 @@ void UnreachableCoverLocation::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 void UnreachableCoverLocation::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     apLoadGameBuffer->LoadData(&iCoverKey, sizeof(iCoverKey));
     fTimeStamp.LoadGame(apLoadGameBuffer);
-}
-
-float NiSqrt(float fValue) {
-    return std::sqrt(fValue);
 }

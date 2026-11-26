@@ -2,8 +2,8 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -12,6 +12,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShapeData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cmath>
 
@@ -426,21 +427,4 @@ float BSPolygon2D::AreaofTriangle(const int32_t aiIndex1, const int32_t aiIndex2
 
 void BSPolygon2D::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-void BSWrap(float& aVal, float aMin, float aMax) {
-    if (!(aMax < static_cast<double>(aMin))) {
-        if (!(aMax < static_cast<double>(aVal))) {
-            if (aMin > static_cast<double>(aVal)) {
-                float v4 = aMax - aMin;
-                float v3 = aVal - aMin;
-                aVal = std::fmodf(v3, v4) + aMax;
-            }
-        }
-        else {
-            float v6 = aMax - aMin;
-            float v5 = aVal - aMin;
-            aVal = std::fmodf(v5, v6) + aMin;
-        }
-    }
 }

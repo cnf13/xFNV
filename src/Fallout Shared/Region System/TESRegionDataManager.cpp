@@ -1,7 +1,7 @@
 #include "Fallout Shared/Region System/TESRegionDataManager.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionData.h"
 #include "Fallout Shared/Region System/TESRegionDataGrass.h"

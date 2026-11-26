@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSMain/BSTaskManager.h"
-#include "Fallout Shared/BSTaskThread.h"
 
 // A BSTaskManager's worker thread (a BSTaskThread). It serves BSTaskManager<int64_t>, the only instantiation.
 class BSTaskManagerThread : public BSTaskThread {

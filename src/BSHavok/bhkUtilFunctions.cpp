@@ -15,7 +15,6 @@
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
 #include "BSHavok/bhkRigidBodyT.h"
 #include "BSHavok/bhkShapeCollection.h"
 #include "BSHavok/bhkStiffSpringConstraint.h"
@@ -25,21 +24,18 @@
 #include "BSMain/BSXFlags.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderManager.h"
-#include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESObject.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/AI/BaseProcess.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "Fallout/Interface/Interface.h"
 #include "Fallout/Misc/Main.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -49,6 +45,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/Array/hkSmallArray.h"
@@ -1058,4 +1055,9 @@ bhkStiffSpringConstraint::bhkStiffSpringConstraint(const hkStiffSpringConstraint
 
 const NiRTTI* bhkStiffSpringConstraint::GetRTTI() const {
     return &bhkStiffSpringConstraint::ms_RTTI;
+}
+
+template <>
+void BSSimpleArray<bhkUtilFunctions::AVLevel, 1024>::SetAt(uint32_t aiIndex, const bhkUtilFunctions::AVLevel& aValue) {
+    Insert(aiIndex, aValue);
 }

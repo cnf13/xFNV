@@ -11,7 +11,7 @@ bool NavMeshTriangleEdgePortal::IsValid() const {
 void NavMeshTriangleEdgePortal::Load(TESForm* apOwner, TESFile* apFile, char* pBuffer) {
     uint32_t uiFormID = *reinterpret_cast<uint32_t*>(pBuffer);
     if (apFile->QEndian()) {
-        ENDIAN(uiFormID, false);
+        BSEndian(uiFormID, false);
     }
     TESForm::AddCompileIndex(uiFormID, apFile);
     if (uiFormID) {
@@ -23,6 +23,6 @@ void NavMeshTriangleEdgePortal::Load(TESForm* apOwner, TESFile* apFile, char* pB
     pBuffer += 4;
     sTriangle = *reinterpret_cast<uint16_t*>(pBuffer);
     if (apFile->QEndian()) {
-        ENDIAN(sTriangle, false);
+        BSEndian(sTriangle, false);
     }
 }

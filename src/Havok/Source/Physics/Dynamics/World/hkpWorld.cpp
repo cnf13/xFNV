@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"

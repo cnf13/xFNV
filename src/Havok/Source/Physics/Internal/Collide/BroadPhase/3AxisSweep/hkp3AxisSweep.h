@@ -388,9 +388,6 @@ public:
 // Returns the index of v's smallest x/y/z component and writes that component to *minOut.
 int32_t getMinComponent(float* v, float* minOut);
 int32_t max2Uint16(uint16_t a, uint16_t b);
-// Sorts an axis's end points in place, by their coordinate only; the fourth argument is the comparator, passed by
-// value, which the body only forwards.
-int32_t quickSortRecursive(hkp3AxisSweep::hkpBpEndPoint* pArr, int32_t d, int32_t h, uint32_t cmpLess);
 // Flips bit bitIndex of the bit array bitArray and returns the word at index bitIndex >> 5.
 int32_t toggleBit(int32_t bitIndex, uint32_t* bitArray);
 // Clears bit bitIndex of the bit array bitArray and returns the 32-bit word at index bitIndex >> 5.

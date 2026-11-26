@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout/Interface/EditableTextField.h"
 

@@ -21,7 +21,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPlane.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
@@ -3774,29 +3774,6 @@ bool NiD3DShaderConstantMap::GetDynamicEffectData(
     // The matrix mappings without an effect.
     FillDataArray(apfData, kIdentMatrix);
     return false;
-}
-
-NiShaderConstantMapEntry::~NiShaderConstantMapEntry() {
-    if (m_bOwnData) {
-        _NiFree(m_pvDataSource);
-    }
-}
-
-void NiShaderConstantMapEntry::SetVariableName(const NiFixedString& kVariableName) {
-    const char* m_kHandle = kVariableName.GetHandle();
-    if (m_kVariableName.GetHandle() != kVariableName.GetHandle()) {
-        NiGlobalStringTable::AcquireHandle(m_kHandle);
-        const char* v4 = m_kVariableName.GetHandle();
-        NiGlobalStringTable::ReleaseHandle(v4);
-        m_kVariableName.m_kHandle = m_kHandle;
-    }
-}
-
-const NiMatrix3* NiTextureTransform::GetMatrix() const {
-    if (m_bMatrixDirty) {
-        UpdateMatrix();
-    }
-    return &m_kMatrix;
 }
 
 // The product goes into a local and is then copied to the result, so D3DXMatrixMultiply never writes the caller's

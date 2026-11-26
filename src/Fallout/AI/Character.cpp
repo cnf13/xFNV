@@ -906,7 +906,3 @@ bool TESRace::GetChildRace() const {
 uint32_t TrespassPackage::GetNumberActors() {
     return iNumberActors;
 }
-
-NiMorphData::MorphTarget* NiGeomMorpherController::GetTarget(uint32_t uiIndex) {
-    return m_spMorphData->GetTarget(uiIndex);
-}

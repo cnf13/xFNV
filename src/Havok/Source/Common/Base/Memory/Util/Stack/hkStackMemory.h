@@ -26,3 +26,28 @@ struct hkStackMemory {
     hkPadSpu<void*> m_start;
     hkPadSpu<void*> m_end;
 };
+
+// Checks the free size (the assert's call, the result unused), then moves m_next past the block.
+inline void* hkStackMemory::allocateStack(int32_t numBytes, const char* what) {
+    getFreeStackSize();
+    char* pCurrent = m_next;
+    m_next = hkAddByteOffset(pCurrent, numBytes);
+    return pCurrent;
+}
+
+inline void hkStackMemory::deallocateStack(void* p) {
+    m_next = static_cast<char*>(p);
+}
+
+inline void hkStackMemory::initMemory(void* p, int32_t size) {
+    m_start.m_storage = p;
+    m_next = static_cast<char*>(p);
+    m_end.m_storage = hkAddByteOffset<char>(static_cast<char*>(p), size);
+}
+
+// Returns the bytes from m_next to m_end, reading m_end first.
+inline int32_t hkStackMemory::getFreeStackSize() {
+    void* pEnd = m_end;
+    char* pNext = m_next;
+    return hkGetByteOffset(pNext, pEnd);
+}

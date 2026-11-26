@@ -5,6 +5,7 @@
 #include "BSMain/Setting.h"
 #include "BSShader/SkyShaderProperty.h"
 #include "Fallout Shared/ModelLoader.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyObject.h"
 #include "Fallout/Misc/Calendar.h"

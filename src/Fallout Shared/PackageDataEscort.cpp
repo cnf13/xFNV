@@ -1,4 +1,4 @@
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/PackageData.h"
 #include "Fallout Shared/PackageLocation.h"
@@ -11,7 +11,7 @@
 
 // Swaps the radius read from a big-endian file. PACK_FOLLOW_DATA::Endian shares the code.
 void PACK_ESCORT_DATA::Endian() {
-    ENDIAN(iFollowPackRadius, false);
+    BSEndian(iFollowPackRadius, false);
 }
 
 // From the package's file data: an empty search location and the radius the file data holds.

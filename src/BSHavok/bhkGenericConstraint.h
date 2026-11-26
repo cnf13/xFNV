@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 
 // A constraint built from generic constraint data. Only its virtual table is modelled.
 class bhkGenericConstraint : public bhkConstraint {

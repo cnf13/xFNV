@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/IDLE_ANIM_ROOT.h"
@@ -385,7 +385,7 @@ void IDLE_ANIM_ROOT::AddRootFilenameList(BSSimpleList<const char*>* apList) {
     if (apList) {
         while (!apList->IsEmpty()) {
             const char* pfilename = apList->m_item;
-            GetMoveHandAndPowerArmorTypeFromAnimName(pfilename, &eanimMove, &eanimWeapon, &bpowerArmor);
+            TESAnimGroup::ParseAnimGroupFilename(pfilename, &eanimMove, &eanimWeapon, &bpowerArmor);
             if (eanimWeapon == AGW_ONE_HAND_PISTOL) {
                 const char* plastSlash = std::strrchr(pfilename, 92);
                 if (plastSlash) {

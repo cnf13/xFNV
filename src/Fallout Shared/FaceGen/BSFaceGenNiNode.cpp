@@ -2,7 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/Setting.h"
 #include "BSShader/BSFadeNode.h"
@@ -27,7 +27,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -42,6 +41,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cstring>
 
@@ -559,10 +559,6 @@ void BSFaceGenNiNode::UpdateMorphing(NiUpdateData& UpdateData) {
     if (bCycleFaceGenCoord && pActor) {
         BSFaceGenManager::CycleFaceGenCoordValue(pActor);
     }
-}
-
-bool BSTimer::GetSecondsIsZero() const {
-    return bZeroDelta;
 }
 
 float BSFaceGenManager::GetLodDistance() {

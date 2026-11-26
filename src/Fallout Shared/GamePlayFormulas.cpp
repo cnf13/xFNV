@@ -2,12 +2,12 @@
 
 #include "BSCore/BSRandom.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Magic/MagicFormulas.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESObjectARMO.h"
 #include "Fallout Shared/TESObjectWEAP.h"
 #include "Fallout/AI/ProcessLists.h"
@@ -70,9 +70,9 @@ SettingT<GameSettingCollection> fPathPointTurningSpeed("fPathPointTurningSpeed",
 SettingT<GameSettingCollection> fLockpickBonusHealth("fLockpickBonusHealth", 0.01f);
 SettingT<GameSettingCollection> iVatsTargetAngle("iVatsTargetAngle", 15);
 SettingT<GameSettingCollection> fHavokTauRatio("fHavokTauRatio", 0.5f);
-SettingT<GameSettingCollection> gs_sYesText("sYesText", "&Yes");
-SettingT<GameSettingCollection> gs_sNoText("sNoText", "&No");
-SettingT<GameSettingCollection> gs_sYesToAllText("sYesToAllText", "Yes to &All");
+SettingT<GameSettingCollection> pYesText("sYesText", "&Yes");
+SettingT<GameSettingCollection> pNoText("sNoText", "&No");
+SettingT<GameSettingCollection> pYesToAllText("sYesToAllText", "Yes to &All");
 static SettingT<GameSettingCollection> pAbortText("sAbortText", "&Abort");
 static SettingT<GameSettingCollection> pRetryText("sRetryText", "&Retry");
 static SettingT<GameSettingCollection> pIgnoreText("sIgnoreText", "&Ignore");
@@ -409,7 +409,7 @@ SettingT<GameSettingCollection> fObjectHitTwoHandReach("fObjectHitTwoHandReach",
 SettingT<GameSettingCollection> fRemoveExcessDeadTime("fRemoveExcessDeadTime", 10.0f);
 SettingT<GameSettingCollection> iRemoveExcessDeadCount("iRemoveExcessDeadCount", 15);
 SettingT<GameSettingCollection> iRemoveExcessDeadTotalActorCount("iRemoveExcessDeadTotalActorCount", 20);
-SettingT<GameSettingCollection> gs_fRemoveExcessComplexDeadTime("fRemoveExcessComplexDeadTime", 2.5f);
+SettingT<GameSettingCollection> fRemoveExcessDeadComplexTime("fRemoveExcessComplexDeadTime", 2.5f);
 SettingT<GameSettingCollection> iRemoveExcessDeadComplexCount("iRemoveExcessDeadComplexCount", 3);
 SettingT<GameSettingCollection> iRemoveExcessDeadComplexTotalActorCount("iRemoveExcessDeadComplexTotalActorCount", 20);
 SettingT<GameSettingCollection> fActorAnimZAdjust("fActorAnimZAdjust", 1.8f);

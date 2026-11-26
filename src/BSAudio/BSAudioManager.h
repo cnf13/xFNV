@@ -129,7 +129,7 @@ public:
     // A handle for the sound of form auiFormID.
     BSSoundHandle GetSoundHandleByNumericID(uint32_t auiFormID, uint32_t aiTypeFlags);
     // A handle for the sound of the file apFilename.
-    BSSoundHandle GetSoundHandleByFilePath(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound);
+    BSSoundHandle GetSoundHandleByFilename(const char* apFilename, uint32_t aeTypeFlags, TESSound* apSound);
     // An empty handle.
     BSSoundHandle SpawnSoundReference(
         int32_t aiFormID,
@@ -390,33 +390,37 @@ public:
 
 inline int32_t Singleton_guard;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultMasterVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fMasterVolumeDefault;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultFootVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fFootVolumeDefault;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultVoiceVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fVoiceVolumeDefault;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultEffectsVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fEffectsVolumeDefault;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultMusicVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fMusicVolumeDefault;
 
-extern SettingT<INIPrefSettingCollection> gs_fDefaultRadioVolume_Audio;
+extern SettingT<INIPrefSettingCollection> fRadioVolumeDefault;
 
-extern SettingT<INISettingCollection> g_bUseAudioDebugInformation_Audio;
+extern SettingT<INISettingCollection> bUseAudioDebugInformation;
 
-extern SettingT<INISettingCollection> gs_fAudioDebugDelay_Audio;
+extern SettingT<INISettingCollection> fAudioDebugDelay;
 
-extern SettingT<INISettingCollection> gs_fMasterVolumeMult;
+extern SettingT<INISettingCollection> fMasterVolumeMult;
 
 // File-local settings of BSAudioManager.cpp, in the Audio section of the INI.
 extern SettingT<INISettingCollection> fDialogueFadeDecibels;
 extern SettingT<INISettingCollection> fDialogueFadeSecondsIn;
 extern SettingT<INISettingCollection> fDialogueFadeSecondsOut;
 
-extern SettingT<INISettingCollection> gs_bEnableAudioCache_Audio;
+extern SettingT<INISettingCollection> bEnableAudioCache;
 
-extern SettingT<INISettingCollection> gs_iAudioCacheSize_Audio;
+extern SettingT<INISettingCollection> iAudioCacheSize;
 
-extern SettingT<INISettingCollection> gs_iMaxSizeForCachedSound;
+extern SettingT<INISettingCollection> iMaxSizeForCachedSound;
 
-extern SettingT<INISettingCollection> gs_iAudioHWThread_Audio;
+extern SettingT<INISettingCollection> iAudioHWThread;
+
+inline void BSAudioManager::SetIgnoreGlobalTimeMultiplier(bool bIgnore) {
+    bIgnoreGlobalTimeMultiplier = bIgnore;
+}

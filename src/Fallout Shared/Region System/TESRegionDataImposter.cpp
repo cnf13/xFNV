@@ -1,7 +1,7 @@
 #include "Fallout Shared/Region System/TESRegionDataImposter.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/BGSWorldLocation.h"
@@ -112,7 +112,7 @@ bool TESRegionDataImposter::LoadRegionDataImposter(TESFile* apFile) {
     for (uint32_t i = 0; i < uiCount; ++i) {
         uint32_t uiID = pIDs[i];
         if (apFile->QEndian()) {
-            ENDIAN(uiID, false);
+            BSEndian(uiID, false);
         }
         AddToImposterList(reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(uiID)));
     }

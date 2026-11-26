@@ -72,20 +72,17 @@ public:
     static CurrentRegionSounds_t CurrentRegionSounds;
     static BSSoundHandle UnderwaterLoop;
     static SettingT<INISettingCollection> iMusicTransitionInMS;
+
+private:
+    static SettingT<INISettingCollection> fASFadeInTime;
+    static SettingT<INISettingCollection> fASFadeOutTime;
+    static SettingT<INISettingCollection> fASFadeStartTime;
+    static SettingT<INISettingCollection> fRegionLoopFadeInTime;
+    static SettingT<INISettingCollection> fRegionLoopFadeOutTime;
+
+public:
+    static SettingT<INISettingCollection> fWeaponInteriorNearVolumeMod;
+    static SettingT<INISettingCollection> fWeaponInteriorNearAttenuationMod;
+    static SettingT<INISettingCollection> fWeaponInteriorFarVolumeMod;
+    static SettingT<INISettingCollection> fWeaponInteriorFarAttenuationMod;
 };
-
-extern SettingT<INISettingCollection> gs_fRegionLoopFadeOutTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fASFadeStartTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fRegionLoopFadeInTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fASFadeInTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fDawnTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fDayTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fDuskTime_Audio;
-
-extern SettingT<INISettingCollection> gs_fNightTime_Audio;

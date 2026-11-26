@@ -65,3 +65,26 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+// Indexes the width table by mipmap level and ignores the face argument.
+inline uint32_t NiPixelData::GetWidth(uint32_t uiMipmapLevel, uint32_t) const {
+    return m_puiWidth[uiMipmapLevel];
+}
+
+// The face stride uses the offset table's terminal entry at m_uiMipmapLevels.
+inline uint8_t* NiPixelData::GetPixels(uint32_t uiMipmapLevel, uint32_t uiFace) {
+    return m_pucPixels + m_puiOffsetInBytes[m_uiMipmapLevels] * uiFace + m_puiOffsetInBytes[uiMipmapLevel];
+}
+
+// MarkAsChanged advances the revision ID once.
+inline void NiPixelData::MarkAsChanged() {
+    ++m_uiRevID;
+}
+
+inline uint32_t NiPixelData::GetSizeInBytes(uint32_t uiMipmapLevel, uint32_t uiFace) const {
+    return m_puiOffsetInBytes[uiMipmapLevel + 1] - m_puiOffsetInBytes[uiMipmapLevel];
+}
+
+inline void NiPixelData::SetNoConvert(bool abTF) {
+    bNoConvert = abTF;
+}

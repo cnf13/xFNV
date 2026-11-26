@@ -37,15 +37,6 @@
 #include <emmintrin.h>
 #include <xmmintrin.h>
 
-// The key of a quantised hit list entry is kept in the four bytes after the lowest corner, where an hkAabbUint32 holds
-// its expansion bytes.
-void hkpCollectionCollectionAgent3::setHitListKey(hkAabbUint32& arAabb, uint32_t auiKey) {
-    arAabb.m_expansionMin[0] = static_cast<uint8_t>(auiKey);
-    arAabb.m_expansionMin[1] = static_cast<uint8_t>(auiKey >> 8);
-    arAabb.m_expansionMin[2] = static_cast<uint8_t>(auiKey >> 16);
-    arAabb.m_expansionShift = static_cast<uint8_t>(auiKey >> 24);
-}
-
 // Packs a float box into the input's quantised AABB space: add the low bit offset to the lowest corner and the high one
 // to the highest, scale, clamp to the largest quantised value and to zero, then round each lane to an integer. Each
 // lane is rounded to nearest, even on a tie.
@@ -203,7 +194,7 @@ void hkpCollectionCollectionAgent3::calcAabbsOfKeys(
     const hkpCdBody& arBodyA,
     const uint32_t* apuiKeys,
     int32_t aiNumKeys,
-    hkAabbUint32* apAabbsOut
+    hk1AxisSweep::AabbInt* apAabbsOut
 ) {
     hkAabbUtil::OffsetAabbInput kRootMotion;
     const int32_t bContinuous = arInput.m_input->m_collisionQualityInfo->m_useContinuousPhysics.m_storage;
@@ -224,7 +215,7 @@ void hkpCollectionCollectionAgent3::calcAabbsOfKeys(
             growAabbByRootMotion(kRootMotion, kAabb);
         }
         quantiseAabb(*arInput.m_input, kAabb, apAabbsOut[i]);
-        setHitListKey(apAabbsOut[i], uiKey);
+        apAabbsOut[i].getKey() = uiKey;
     }
 }
 
@@ -237,7 +228,7 @@ int32_t hkpCollectionCollectionAgent3::calcAabbsOfCollidable(
     const hkpCdBody* apOverrideBody,
     const hkpShapeContainer* apShapeContainer,
     const hkpProcessCollisionInput* apInput,
-    hkAabbUint32* apAabbsOut
+    hk1AxisSweep::AabbInt* apAabbsOut
 ) {
     const bool bContinuous = apInput->m_collisionQualityInfo->m_useContinuousPhysics.m_storage != 0;
     const hkpCollidable::BoundingVolumeData& arVolumeData = apCollidable->m_boundingVolumeData;
@@ -263,7 +254,7 @@ int32_t hkpCollectionCollectionAgent3::calcAabbsOfCollidable(
                     hkString::memCpy16<32>(&apAabbsOut[i], &arChild);
                 }
                 ++iNumAabbs;
-                setHitListKey(apAabbsOut[i], arVolumeData.m_childShapeKeys[i]);
+                apAabbsOut[i].getKey() = arVolumeData.m_childShapeKeys[i];
             }
             if (!bContinuous) {
                 return iNumAabbs;
@@ -284,7 +275,7 @@ int32_t hkpCollectionCollectionAgent3::calcAabbsOfCollidable(
                 // The bounding volume data starts with the box, laid out as an hkAabbUint32.
                 hkString::memCpy16<32>(&apAabbsOut[0], &arVolumeData);
             }
-            setHitListKey(apAabbsOut[0], 0);
+            apAabbsOut[0].getKey() = 0;
             return 1;
         }
     }
@@ -307,13 +298,11 @@ int32_t hkpCollectionCollectionAgent3::calcAabbsOfCollidable(
                 growAabbByRootMotion(kRootMotion, kAabb);
             }
             quantiseAabb(*apInput, kAabb, apAabbsOut[iNumAabbs]);
-            setHitListKey(apAabbsOut[iNumAabbs], uiKey);
+            apAabbsOut[iNumAabbs].getKey() = uiKey;
             ++iNumAabbs;
         }
     }
-    if (iNumAabbs > 1) {
-        hkAlgorithm::quickSortRecursive(apAabbsOut, 0, iNumAabbs - 1, AabbUint32Less{0});
-    }
+    hkAlgorithm::quickSort(apAabbsOut, iNumAabbs);
     return iNumAabbs;
 }
 
@@ -485,13 +474,11 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
                 growAabbByRootMotion(kRootMotion, kAabb);
             }
             quantiseAabb(*input.m_input, kAabb, pAabbs1[i]);
-            setHitListKey(pAabbs1[i], uiKey);
+            pAabbs1[i].getKey() = uiKey;
         }
 
         HK_TIMER_SPLIT_LIST("SortHitList");
-        if (iNum1 > 1) {
-            hkAlgorithm::quickSortRecursive<hkAabbUint32, AabbUint32Less>(pAabbs1, 0, iNum1 - 1, AabbUint32Less{0});
-        }
+        hkAlgorithm::quickSort(pAabbs1, iNum1);
     }
 
     hk1AxisSweep::AabbInt* pAabbs2;
@@ -569,15 +556,7 @@ hkpAgentData* hkpCollectionCollectionAgent3::process(
 
     HK_TIMER_SPLIT_LIST("SortHits");
     HK_MONITOR_ADD_VALUE("NumHits", static_cast<float>(iNumHits), HK_MONITOR_TYPE_INT);
-    if (iNumHits > 1) {
-        // The comparator argument is the stream's address with its low byte cleared (only its low 32 bits).
-        hkAlgorithm::quickSortRecursive(
-            pHitList,
-            0,
-            iNumHits - 1,
-            static_cast<int32_t>(reinterpret_cast<uintptr_t>(&rAxisStream) & 0xFFFFFF00u)
-        );
-    }
+    hkAlgorithm::quickSort(pHitList, iNumHits);
     pHitList[iNumHits].m_shapeKeyA = HK_INVALID_SHAPE_KEY;
     pHitList[iNumHits].m_shapeKeyB = HK_INVALID_SHAPE_KEY;
     if (iNumHits + 1 < HK_MAX_NUM_HITS_PER_AABB_QUERY) {
@@ -666,42 +645,4 @@ void hkpCollectionCollectionAgent3::registerAgent3(hkpCollisionDispatcher* dispa
     dispatcher->registerAgent3(f, HK_SHAPE_COLLECTION, HK_SHAPE_COLLECTION);
     dispatcher->m_midphaseAgent3Registered.m_bool = 1;
     g_agentRegistered = 1;
-}
-
-// The left index climbs past the pairs below the middle one and the right index drops past those above it; the
-// recursion takes the left part, the loop the right one.
-int32_t hkAlgorithm::quickSortRecursive(hkShapeKeyPair* apArr, int32_t aiLow, int32_t aiHigh, int32_t aiLess) {
-    hkAlgorithm::less<hkShapeKeyPair> cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = d;
-        int32_t j = aiHigh;
-        const hkShapeKeyPair str = apArr[(d + j) >> 1];
-        do {
-            while (cmpLess(apArr[i], str)) {
-                i++;
-            }
-            while (cmpLess(str, apArr[j])) {
-                j--;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                hkShapeKeyPair tmp = apArr[j];
-                apArr[j] = apArr[i];
-                apArr[i] = tmp;
-            }
-            --j;
-            ++i;
-        }
-        while (i <= j);
-        if (d < j) {
-            j = hkAlgorithm::quickSortRecursive(apArr, d, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return j;
-        }
-        d = i;
-    }
 }

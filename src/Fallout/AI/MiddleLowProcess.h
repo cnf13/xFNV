@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout/AI/LowProcess.h"
 #include "Fallout/AI/ModifierList.h"
 

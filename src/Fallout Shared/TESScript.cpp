@@ -6,9 +6,10 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -706,17 +707,6 @@ void ScriptLocals::ClearOptimizations() {
     pLastScriptEventList = nullptr;
     uiLastScriptVarID = 0xFFFFFFFF;
     pLastScriptVariable = nullptr;
-}
-
-void* ourCalloc(uint32_t aNum, uint32_t aSize) {
-    uint32_t uiSize = aNum * aSize;
-    void* pMemory = MemoryManager::Instance().Allocate(uiSize);
-    ourMemset(pMemory, 0, uiSize);
-    return pMemory;
-}
-
-bool BSFadeNode::IsVisible() {
-    return static_cast<uint8_t>(GetIgnoreFade()) || (!BSFadeNode::bFadeEnabled || fCurrentFade > 0.0);
 }
 
 Script::RefVariable::RefVariable() : form(nullptr), varIdx(0) {}

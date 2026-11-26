@@ -141,6 +141,14 @@ public:
     static inline Actor* pStranger;
     // The Miss Fortune actor while her VATS effect runs.
     static inline Actor* pMissFortune;
+    static SettingT<INISettingCollection> fVATSLightLevelMin;
+    static SettingT<INISettingCollection> fVATSLightLevelMax;
+    static SettingT<INISettingCollection> fVATSLightAngle;
+    static SettingT<INISettingCollection> fVATSLightDistance;
+    static SettingT<INISettingCollection> fVATSLightElevation;
+    static SettingT<INISettingCollection> fVatsLightColorR;
+    static SettingT<INISettingCollection> fVatsLightColorG;
+    static SettingT<INISettingCollection> fVatsLightColorB;
 };
 
 // One queued VATS action: what the action is, the target and limb, and its outcome and damage.
@@ -200,19 +208,3 @@ inline int32_t icameraIndex;
 // The command the camera list was last chosen for: Update stores the head command there and compares its eAction
 // (+0) with ACTION_TARGET_KILL_SHOT.
 inline VATS_COMMAND* pcameraCommand;
-
-extern SettingT<INISettingCollection> gs_fVatsLightColorR_VATS;
-
-extern SettingT<INISettingCollection> gs_fVATSLightLevelMax_VATS;
-
-extern SettingT<INISettingCollection> gs_fVATSLightElevation_VATS;
-
-extern SettingT<INISettingCollection> gs_fVATSLightDistance_VATS;
-
-extern SettingT<INISettingCollection> gs_fVATSLightLevelMin_VATS;
-
-extern SettingT<INISettingCollection> gs_fVatsLightColorG_VATS;
-
-extern SettingT<INISettingCollection> gs_fVatsLightColorB_VATS;
-
-extern SettingT<INISettingCollection> gs_fVATSLightAngle_VATS;

@@ -13,3 +13,5 @@ struct hkpWorldRayCastInput {
     hkBool m_enableShapeCollectionFilter;
     uint32_t m_filterInfo;
 };
+
+inline hkpWorldRayCastInput::hkpWorldRayCastInput() : m_enableShapeCollectionFilter(false), m_filterInfo(0) {}

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -18,9 +18,9 @@
 #include "xfnv/Compiler.h"
 
 void LOAD_FORM_DATA::Endian() {
-    ENDIAN(iFormID, false);
-    ENDIAN(iWorldID, false);
-    ENDIAN(iCellKey, false);
+    BSEndian(iFormID, false);
+    BSEndian(iWorldID, false);
+    BSEndian(iCellKey, false);
 }
 
 TESLoadScreen::TESLoadScreen()

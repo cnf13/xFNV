@@ -18,7 +18,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -706,26 +706,4 @@ BSShader* ParticleShader::CreateShader() {
     pshader->CreateConstantMaps();
     pshader->SetShaderDecl(spShaderDecl);
     return pshader;
-}
-
-// The table is built on the stack, indexed by the D3DBLEND value less one.
-NiAlphaProperty::AlphaFunction NiAlphaProperty::GetNiAlphaFunctionFromD3D(uint32_t auiD3D) {
-    // Values outside 1 to 11 give ALPHA_ONE (a departure): the exe reads the stack beside its table, which on x64
-    // puts 0 about 16 GiB past it.
-    if (auiD3D - 1 >= NiAlphaProperty::ALPHA_MAX_MODES) {
-        return NiAlphaProperty::ALPHA_ONE;
-    }
-    NiAlphaProperty::AlphaFunction aeResult[11];
-    aeResult[0] = NiAlphaProperty::ALPHA_ZERO;
-    aeResult[1] = NiAlphaProperty::ALPHA_ONE;
-    aeResult[2] = NiAlphaProperty::ALPHA_SRCCOLOR;
-    aeResult[3] = NiAlphaProperty::ALPHA_INVSRCCOLOR;
-    aeResult[4] = NiAlphaProperty::ALPHA_SRCALPHA;
-    aeResult[5] = NiAlphaProperty::ALPHA_INVSRCALPHA;
-    aeResult[6] = NiAlphaProperty::ALPHA_DESTALPHA;
-    aeResult[7] = NiAlphaProperty::ALPHA_INVDESTALPHA;
-    aeResult[8] = NiAlphaProperty::ALPHA_DESTCOLOR;
-    aeResult[9] = NiAlphaProperty::ALPHA_INVDESTCOLOR;
-    aeResult[10] = NiAlphaProperty::ALPHA_SRCALPHASAT;
-    return aeResult[auiD3D - 1];
 }

@@ -2,6 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSCriticalSection.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldNS.h"
 #include "BSMain/Setting.h"
@@ -284,7 +285,7 @@ public:
     // Loads the reference's animation state.
     void LoadAnimation(BGSLoadGameBuffer* apLoadGameBuffer);
     // Loads the reference's havok state from apLoadGameBuffer, or warns when it has no 3D or its body count changed.
-    void LoadHavokDataBGS(BGSLoadGameBuffer* apLoadGameBuffer);
+    void LoadHavokData(BGSLoadGameBuffer* apLoadGameBuffer);
     // Saves the reference's havok flags, body count and each body's state into apSaveGameBuffer.
     void SaveHavokData(BGSSaveFormBuffer* apSaveGameBuffer);
     // Writes each rigid body's state, gathered into apHavokSaveData by GetHavokDataSaveSize,
@@ -781,7 +782,7 @@ public:
     static void SetTerminalUnlocked(TESObjectREFR* apTerminal, char acUnlocked);
     static bool IsHacked(TESObjectREFR* apTerminal);
     static bool IsLockedOut(TESObjectREFR* apTerminal);
-    static void LoadControllerManagerBGS(NiControllerManager* apManager, BGSLoadGameBuffer* apBuffer, float afTime);
+    static void LoadControllerManager(NiControllerManager* apManager, BGSLoadGameBuffer* apBuffer, float afTime);
     // The DoObjectRec callback of LoadHavokData for one collision object.
     static void
     LoadHavokDataForCollisionObjectOld(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData);
@@ -789,7 +790,7 @@ public:
     // (not for the collision root), its flags byte when the save data's flags have bit 4, and its velocities when it
     // is active.
     static void SaveHavokDataForCollisionObject(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData);
-    // The DoObjectRec callback of LoadHavokDataBGS for one collision object.
+    // The DoObjectRec callback of LoadHavokData for one collision object.
     static void LoadHavokDataForCollisionObject(bhkNiCollisionObject* apObject, bhkWorld::ObjectRecData& arData);
     // Removes apRef from TESObjectCELL::MultiboundTestMap, whose key
     // it is; Release3DRelatedData passes `this`.
@@ -816,9 +817,6 @@ public:
 };
 
 void UpdateLODMultInvisibility(TESObjectREFR* apRef, NiNode* apNode);
-// hkQuaternion::operator=(q), defined in TESObjectREFR.cpp. It is a free function because a user-provided operator=
-// would make hkQuaternion non-trivially copyable for every user.
-void hkQuaternion_operator_assign(hkQuaternion* apThis, const hkQuaternion& q);
 
 enum HAVOK_SAVE_FLAGS : uint8_t {
     // Every body has saved velocities.

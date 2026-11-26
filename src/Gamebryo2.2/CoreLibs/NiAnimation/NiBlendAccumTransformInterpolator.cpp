@@ -5,7 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBlendInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiQuatTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -582,11 +582,4 @@ void NiBlendAccumTransformInterpolator::CalculateSingleValue(float fTime, NiObje
 
 NiObject* NiBlendAccumTransformInterpolator::CreateObject() {
     return new NiBlendAccumTransformInterpolator;
-}
-
-// Each component times fScalar, rounded to float, set through SetValues.
-NiQuaternion NiQuaternion::operator*(float fScalar) const {
-    NiQuaternion kResult;
-    kResult.SetValues(m_fW * fScalar, m_fX * fScalar, m_fY * fScalar, m_fZ * fScalar);
-    return kResult;
 }

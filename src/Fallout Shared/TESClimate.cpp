@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESClimate.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/MessageHandler.h"
 #include "Fallout Shared/BGSTextureSet.h"

@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESObjectWEAP.h"
 
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -83,11 +83,11 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "xfnv/Compiler.h"
 
 // Fire's guarded static: the scope offset, a function-local static built on first use.
@@ -693,61 +693,61 @@ bool TESObjectWEAP::Load(TESFile* apFile) {
 // Swaps the fields read from a big-endian file. The condition level, the projectile and the power attack animation are
 // left alone, and the skill requirement is swapped right after the strength requirement.
 void OBJ_WEAP::Endian() {
-    ENDIAN(fSpeed, false);
-    ENDIAN(fReach, false);
-    ENDIAN(fMinSpread, false);
-    ENDIAN(fSpread, false);
-    ENDIAN(fDrift, false);
-    ENDIAN(fIronFOV, false);
-    ENDIAN(fMinRange, false);
-    ENDIAN(fMaxRange, false);
-    ENDIAN(eHitBehavior, false);
-    ENDIAN(iFlagsEx, false);
-    ENDIAN(fAttackMult, false);
-    ENDIAN(fShotsPerSec, false);
-    ENDIAN(fActionPoints, false);
-    ENDIAN(fFiringRumbleLeftMotorStrength, false);
-    ENDIAN(fFiringRumbleRightMotorStrength, false);
-    ENDIAN(fFiringRumbleDuration, false);
-    ENDIAN(fDamageToWeaponMult, false);
-    ENDIAN(fAnimShotsPerSecond, false);
-    ENDIAN(fAnimReloadTime, false);
-    ENDIAN(fAnimJamTime, false);
-    ENDIAN(fAimArc, false);
-    ENDIAN(eSkill, false);
-    ENDIAN(eRumblePattern, false);
-    ENDIAN(fRumbleWavelength, false);
-    ENDIAN(fLimbDamageMult, false);
-    ENDIAN(eResistance, false);
-    ENDIAN(fIronSightUseMult, false);
-    ENDIAN(fSemiAutomaticFireDelayMin, false);
-    ENDIAN(fSemiAutomaticFireDelayMax, false);
-    ENDIAN(fCookTimer, false);
-    ENDIAN(eModActionOne, false);
-    ENDIAN(eModActionTwo, false);
-    ENDIAN(eModActionThree, false);
-    ENDIAN(fModActionOneValue, false);
-    ENDIAN(fModActionTwoValue, false);
-    ENDIAN(fModActionThreeValue, false);
-    ENDIAN(iStrengthRequirement, false);
-    ENDIAN(iSkillRequirement, false);
-    ENDIAN(fAmmoRegenRate, false);
-    ENDIAN(fKillImpulse, false);
-    ENDIAN(fModActionOneValueTwo, false);
-    ENDIAN(fModActionTwoValueTwo, false);
-    ENDIAN(fModActionThreeValueTwo, false);
-    ENDIAN(fKillImpulseDistance, false);
+    BSEndian(fSpeed, false);
+    BSEndian(fReach, false);
+    BSEndian(fMinSpread, false);
+    BSEndian(fSpread, false);
+    BSEndian(fDrift, false);
+    BSEndian(fIronFOV, false);
+    BSEndian(fMinRange, false);
+    BSEndian(fMaxRange, false);
+    BSEndian(eHitBehavior, false);
+    BSEndian(iFlagsEx, false);
+    BSEndian(fAttackMult, false);
+    BSEndian(fShotsPerSec, false);
+    BSEndian(fActionPoints, false);
+    BSEndian(fFiringRumbleLeftMotorStrength, false);
+    BSEndian(fFiringRumbleRightMotorStrength, false);
+    BSEndian(fFiringRumbleDuration, false);
+    BSEndian(fDamageToWeaponMult, false);
+    BSEndian(fAnimShotsPerSecond, false);
+    BSEndian(fAnimReloadTime, false);
+    BSEndian(fAnimJamTime, false);
+    BSEndian(fAimArc, false);
+    BSEndian(eSkill, false);
+    BSEndian(eRumblePattern, false);
+    BSEndian(fRumbleWavelength, false);
+    BSEndian(fLimbDamageMult, false);
+    BSEndian(eResistance, false);
+    BSEndian(fIronSightUseMult, false);
+    BSEndian(fSemiAutomaticFireDelayMin, false);
+    BSEndian(fSemiAutomaticFireDelayMax, false);
+    BSEndian(fCookTimer, false);
+    BSEndian(eModActionOne, false);
+    BSEndian(eModActionTwo, false);
+    BSEndian(eModActionThree, false);
+    BSEndian(fModActionOneValue, false);
+    BSEndian(fModActionTwoValue, false);
+    BSEndian(fModActionThreeValue, false);
+    BSEndian(iStrengthRequirement, false);
+    BSEndian(iSkillRequirement, false);
+    BSEndian(fAmmoRegenRate, false);
+    BSEndian(fKillImpulse, false);
+    BSEndian(fModActionOneValueTwo, false);
+    BSEndian(fModActionTwoValueTwo, false);
+    BSEndian(fModActionThreeValueTwo, false);
+    BSEndian(fKillImpulseDistance, false);
 }
 
 void OBJ_WEAP_CRITICAL::Endian() {
-    ENDIAN(sCriticalDamage, false);
-    ENDIAN(fCriticalChanceMult, false);
+    BSEndian(sCriticalDamage, false);
+    BSEndian(fCriticalChanceMult, false);
 }
 
 void OBJ_WEAP_VATS_SPECIAL::Endian() {
-    ENDIAN(fVATSSpecialAP, false);
-    ENDIAN(fVATSSpecialMultiplier, false);
-    ENDIAN(fVATSSkillRequired, false);
+    BSEndian(fVATSSpecialAP, false);
+    BSEndian(fVATSSpecialMultiplier, false);
+    BSEndian(fVATSSkillRequired, false);
 }
 
 TESObjectWEAP::TESObjectWEAP() {
@@ -2162,7 +2162,7 @@ void TESObjectWEAP::Fire(TESObjectREFR* apSource) {
                 bool bHighArc = false;
                 BGSProjectile* pprojectile = GetProjectile(nullptr);
                 if (pprojectile) {
-                    float fspeedMult = bHighArc ? gs_fGrenadeHighArcSpeedPercentage.Float() : 1.0f;
+                    float fspeedMult = bHighArc ? fGrenadeHighArcSpeedMult.Float() : 1.0f;
                     float fprojectileSpeed = pprojectile->GetSpeed() * fspeedMult;
                     targetedPoint = CombatUtilities::GetProjectedPointForTarget(
                         pactor,

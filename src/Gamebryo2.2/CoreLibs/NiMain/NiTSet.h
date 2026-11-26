@@ -2,7 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiControllerSequence.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialResource.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"

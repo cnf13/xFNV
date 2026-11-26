@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSHunger.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSPlaceableWater.h"
 #include "Fallout Shared/Magic/SpellItem.h"
@@ -62,8 +62,8 @@ bool BGSHungerStage::Load(TESFile* apFile) {
 
 // The hunger level and the sickness spell swapped for a big-endian file.
 void BGSHungerStageData::Endian() {
-    ENDIAN(iFOOD, false);
-    ENDIAN(pSickness, false);
+    BSEndian(iFOOD, false);
+    BSEndian(pSickness, false);
 }
 
 void BGSHungerStageData::Clear() {

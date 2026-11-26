@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 
 #include <stdint.h>
 
@@ -12,8 +12,7 @@ public:
     ~BlendSettingCollection() override;
 };
 
-// The hit reaction's blend settings (blend weight pairs per bone, and its timings). fHitForceMax, fHitForceMin,
-// fBlockForceMax, fBlockForceMin, sHitSpot and sHitStart are declared where they are used (Fallout/AI/Actor.cpp).
+// The hit reaction's blend settings (blend weight pairs per bone, and its timings).
 class BlendHit {
 public:
     static SettingT<BlendSettingCollection> Head;
@@ -30,6 +29,12 @@ public:
     static SettingT<BlendSettingCollection> fMinHeirGain;
     static SettingT<BlendSettingCollection> fGetUpTime;
     static SettingT<BlendSettingCollection> fKnockDownTime;
+    static SettingT<BlendSettingCollection> fHitForceMin;
+    static SettingT<BlendSettingCollection> fHitForceMax;
+    static SettingT<BlendSettingCollection> fBlockForceMin;
+    static SettingT<BlendSettingCollection> fBlockForceMax;
+    static SettingT<BlendSettingCollection> sHitSpot;
+    static SettingT<BlendSettingCollection> sHitStart;
 };
 
 // The quadruped hit reaction's blend settings.

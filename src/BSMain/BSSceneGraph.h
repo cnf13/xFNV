@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCullingProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
@@ -59,10 +59,10 @@ public:
     static SettingT<INISettingCollection> fPipboy1stPersonFOV;
 };
 
-extern SettingT<INISettingCollection> gs_bAutoViewDistance_Display;
+extern SettingT<INISettingCollection> bAutoViewDistance;
 
-extern SettingT<INISettingCollection> gs_iAutoViewLowFrameRate_Display;
+extern SettingT<INISettingCollection> iAutoViewLowFrameRate;
 
-extern SettingT<INISettingCollection> gs_iAutoViewHiFrameRate_Display;
+extern SettingT<INISettingCollection> iAutoViewHiFrameRate;
 
-extern SettingT<INISettingCollection> gs_iAutoViewMinDistance_Display;
+extern SettingT<INISettingCollection> iAutoViewMinDistance;

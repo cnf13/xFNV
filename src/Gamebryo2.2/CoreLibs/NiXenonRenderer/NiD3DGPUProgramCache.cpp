@@ -6,7 +6,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgramCache.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialResource.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
@@ -370,8 +370,4 @@ bool NiD3DGPUProgramCache::SaveDebugHLSLFile(const char* pcFilename, const char*
     pkFile->Write(pcProgramText, static_cast<uint32_t>(std::strlen(pcProgramText)));
     delete pkFile;
     return true;
-}
-
-const NiRTTI* NiGPUProgramCache::GetRTTI() const {
-    return &ms_RTTI;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 
 class BGSLoadFormBuffer;
 class BGSSaveFormBuffer;

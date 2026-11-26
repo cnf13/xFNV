@@ -230,3 +230,7 @@ public:
     // Guards the object queues.
     static BSSpinLock SSNObjectQueueCrit;
 };
+
+inline void ShadowSceneNode::ToggleWireframe() {
+    bWireframe = !bWireframe;
+}

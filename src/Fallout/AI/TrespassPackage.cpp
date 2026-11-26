@@ -1,6 +1,6 @@
 #include "Fallout/AI/TrespassPackage.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/AiFormulas.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/Package.h"

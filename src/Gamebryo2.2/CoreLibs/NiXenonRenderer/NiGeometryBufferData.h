@@ -2,22 +2,11 @@
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderDeclaration.h"
 
 class NiGeometryGroup;
 class NiVBChip;
-
-// Renderer-side data of a geometry; the renderer derives its buffer data from it.
-class NiGeometryData::RendererData : public NiMemObject {
-public:
-    virtual ~RendererData();
-
-    virtual bool ContainsVertexData(NiShaderDeclaration::ShaderParameter aeParameter) = 0;
-
-    // Renderer data is freed through MemoryManager, not NiMemObject's operator.
-    static void operator delete(void* apMemory);
-};
 
 // The device buffers of one geometry: vertex chips per stream, index buffer and draw counts.
 class NiGeometryBufferData : public NiGeometryData::RendererData {
@@ -56,3 +45,10 @@ public:
     const uint16_t* m_pusArrayLengths;
     const uint16_t* m_pusIndexArray;
 };
+
+inline NiVBChip* NiGeometryBufferData::GetVBChip(uint32_t uiIndex) {
+    if (uiIndex >= m_uiStreamCount) {
+        return nullptr;
+    }
+    return m_ppkVBChip[uiIndex];
+}

@@ -49,3 +49,10 @@ void BSFadeNodeCuller::Process(NiAVObject* apObject) {
 void BSFadeNodeCuller::Process(const NiCamera* apCamera, NiAVObject* apScene, NiVisibleArray* apVisibleSet) {
     m_pkCamera = const_cast<NiCamera*>(apCamera);
 }
+
+BSFadeNodeCuller::~BSFadeNodeCuller() {}
+
+// Frees through the engine's CRT.
+void BSFadeNodeCuller::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}

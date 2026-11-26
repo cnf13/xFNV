@@ -1,7 +1,7 @@
 #include "Fallout/AI/GunWobble.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkBlendCollisionObjectAddRotation.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/BSUtilities.h"

@@ -8,7 +8,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "SDK/MSVC/rtti.h"
 
-bool AvoidAreaStruct::LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer) {
+bool AvoidAreaStruct::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     pAvoidNode.LoadGame(apLoadGameBuffer);
     apLoadGameBuffer->LoadData(&fTimeExpire, sizeof(fTimeExpire));
     apLoadGameBuffer->LoadData(&afRadiationLevel, sizeof(afRadiationLevel));

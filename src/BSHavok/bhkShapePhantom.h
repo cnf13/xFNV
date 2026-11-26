@@ -1,8 +1,11 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkPhantom.h"
-#include "BSHavok/bhkTransform.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpShapePhantom.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpSimpleShapePhantom.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 #include <stdint.h>
 
@@ -89,3 +92,30 @@ public:
     static NiRTTI ms_RTTI;
     static inline int32_t iCount;
 };
+
+inline void bhkShapePhantom::SetPosition(const hkVector4& arPos) {
+    hkpShapePhantom* pPhantom = static_cast<hkpShapePhantom*>(**this);
+    if (pPhantom) {
+        MarkWrite();
+        pPhantom->setPosition(arPos, 0.0f);
+        UnMarkWrite();
+    }
+}
+
+inline bhkShapePhantom::bhkShapePhantom() {
+    ++iCount;
+    ResetPhantomFlags();
+}
+
+inline void bhkShapePhantom::SetTransform(const NiTransform& arTrans) {
+    hkTransform hkt;
+    hkTransform* pTransform = &NI2HK(hkt, arTrans);
+    bhkShapePhantom::setTransform(pTransform);
+}
+
+inline void bhkShapePhantom::GetPenetrations(hkpCdBodyPairCollector* arCollector) {
+    hkpSimpleShapePhantom* pphantom = static_cast<hkpSimpleShapePhantom*>(**this);
+    if (pphantom && pphantom->m_world) {
+        pphantom->getPenetrations(*arCollector, nullptr);
+    }
+}

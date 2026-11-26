@@ -9,28 +9,28 @@
 #include "Fallout Shared/TESTopic.h"
 
 void PACK_DIALOGUE_DATA::Endian() {
-    ENDIAN(fFov, false);
-    ENDIAN(iTopicID, false);
-    ENDIAN(eTriggerType, false);
-    ENDIAN(fDistanceStartTalking, false);
+    BSEndian(fFov, false);
+    BSEndian(iTopicID, false);
+    BSEndian(eTriggerType, false);
+    BSEndian(fDistanceStartTalking, false);
 }
 
 void PACK_PATROL_DATA::Endian() {}
 
 void PACK_USE_WEAPON_DATA_PKW2::Endian() {
-    ENDIAN(sBurstCount, false);
-    ENDIAN(sVolleyShotsMin, false);
-    ENDIAN(sVolleyShotsMax, false);
-    ENDIAN(fVolleyWaitMin, false);
-    ENDIAN(fVolleyWaitMax, false);
+    BSEndian(sBurstCount, false);
+    BSEndian(sVolleyShotsMin, false);
+    BSEndian(sVolleyShotsMax, false);
+    BSEndian(fVolleyWaitMin, false);
+    BSEndian(fVolleyWaitMax, false);
 }
 
 void PACK_USE_WEAPON_DATA_PKW3::Endian() {
-    ENDIAN(sBurstCount, false);
-    ENDIAN(sVolleyShotsMin, false);
-    ENDIAN(sVolleyShotsMax, false);
-    ENDIAN(fVolleyWaitMin, false);
-    ENDIAN(fVolleyWaitMax, false);
+    BSEndian(sBurstCount, false);
+    BSEndian(sVolleyShotsMin, false);
+    BSEndian(sVolleyShotsMax, false);
+    BSEndian(fVolleyWaitMin, false);
+    BSEndian(fVolleyWaitMax, false);
 }
 
 TESAmbushPackageData::TESAmbushPackageData() : pAmbushLocation(nullptr) {}

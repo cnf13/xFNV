@@ -24,7 +24,6 @@
 #include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkListShape.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
@@ -42,7 +41,6 @@
 #include "BSShader/SpeedTreeLeafShader.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
-#include "Fallout Shared/Havok/SpecificItemCollector.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -57,13 +55,13 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
@@ -147,7 +145,8 @@ static hkQuadReal endAdj{};
 static hkQuadReal startAdj{};
 static int32_t startAdj_guard;
 
-SettingT<INISettingCollection> gs_fCharControllerWarpDistSqr_HAVOK("fCharControllerWarpDistSqr:HAVOK", 6000000.0f);
+SettingT<INISettingCollection>
+    bhkCharacterController::fCharControllerWarpDistSqr("fCharControllerWarpDistSqr:HAVOK", 6000000.0f);
 NiPointer<bhkShape> bhkCharacterController::spDefaultConvexShape;
 
 // The triangle collection apShape is, or the one a MOPP shape wraps (the SDK's getShapeCollection(), the child read
@@ -2187,7 +2186,7 @@ void bhkCharacterController::FindSupportPoint(uint32_t aiFrontBack, hkVector4& a
     XFNV_M128_F32(arPos.m_quad, 2) = v5;
     pickRes.hkLength.m_quad = hkVector4Zero.m_quad;
     v6.m_quad = arPos.m_quad;
-    pickRes.pCloseCollector = static_cast<SpecificItemCollector*>(&v13);
+    pickRes.pCloseCollector = &v13;
     pickRes.pAllCollector = nullptr;
     pickRes.m_to.m_quad = v6.m_quad;
     GetCollisionFilter(&iflt);
@@ -3502,19 +3501,3 @@ void bhkCharacterProxy::Integrate(hkStepInfo& arInfo) {
 
 // The members are destroyed in reverse order: the filter infos are freed first, then the child shapes.
 hkListShapeCinfo::~hkListShapeCinfo() {}
-
-hkpSurfaceConstraintInfo*
-hkpSurfaceConstraintInfo::Assign(hkpSurfaceConstraintInfo* apThis, const hkpSurfaceConstraintInfo& arOther) {
-    *apThis = arOther;
-    return apThis;
-}
-
-void* hkpCharacterProxyCinfo::operator new(size_t auiSize) {
-    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(auiSize));
-}
-
-void hkpCharacterProxyCinfo::operator delete(void* apMemory) {
-    if (apMemory) {
-        hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkpCharacterProxyCinfo));
-    }
-}

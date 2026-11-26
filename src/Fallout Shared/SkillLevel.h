@@ -1,9 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include "BSCore/BSCoreDefines.h"
 
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
+#include <cstdint>
 
 // The skill mastery levels and their thresholds (static members only). MagicFormulas::GetMagicSpellLevel returns a
 // Value.

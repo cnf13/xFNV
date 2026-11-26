@@ -2,6 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiSkinPartition.h"
 
 class BSNiBound;
 class NiAVObject;
@@ -103,3 +104,27 @@ public:
 };
 
 NiSmartPointer(NiSkinInstance);
+
+inline NiSkinPartition* NiSkinInstance::GetSkinPartition() const {
+    return m_spSkinPartition;
+}
+
+inline NiSkinData* NiSkinInstance::GetSkinData() const {
+    return m_spSkinData;
+}
+
+inline NiAVObject** NiSkinInstance::GetBones() const {
+    return m_ppkBones;
+}
+
+inline void NiSkinInstance::SetBone(uint32_t i, NiAVObject* pkBone) {
+    m_ppkBones[i] = pkBone;
+}
+
+inline void NiSkinInstance::SetRootParent(NiAVObject* pkRootParent) {
+    m_pkRootParent = pkRootParent;
+}
+
+inline void NiSkinInstance::SetSkinPartition(NiSkinPartition* pkSkinPartition) {
+    m_spSkinPartition = pkSkinPartition;
+}

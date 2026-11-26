@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Collide/Filter/hkpShapeCollectionFilter.h"
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 
 // The class record of hkpShapeCollectionFilter, as the SDK's generated file has it (the SDK has no .cpp of the class:
@@ -20,3 +21,7 @@ hkClass hkpShapeCollectionFilterClass(
     0,
     0
 );
+
+void hkpShapeCollectionFilter::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}

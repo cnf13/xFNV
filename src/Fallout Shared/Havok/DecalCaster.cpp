@@ -1,11 +1,11 @@
 #include "Fallout Shared/Havok/DecalCaster.h"
 
 #include "BSHavok/bhkCollisionFilter.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkShapePhantom.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
-#include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
@@ -13,9 +13,9 @@
 #include "Fallout/AI/Actor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCollisionObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/Color/hkColor.h"
@@ -217,20 +217,4 @@ void DecalCaster::ClearInstance() {
         delete DecalCaster::pSmallInstance;
     }
     DecalCaster::pSmallInstance = nullptr;
-}
-
-void bhkShapePhantom::GetPenetrations(hkpCdBodyPairCollector* arCollector) {
-    hkpSimpleShapePhantom* pphantom = static_cast<hkpSimpleShapePhantom*>(**this);
-    if (pphantom && pphantom->m_world) {
-        pphantom->getPenetrations(*arCollector, nullptr);
-    }
-}
-
-void bhkWorldObject::SetName(const char* apName) {
-    hkpWorldObject* pObject = **this;
-    if (pObject) {
-        MarkWrite();
-        pObject->setName(apName);
-        UnMarkWrite();
-    }
 }

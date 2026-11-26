@@ -5,7 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9TextureData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDynamicTexture.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 

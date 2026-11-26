@@ -1,7 +1,7 @@
 #include "Fallout/AI/ArrowProjectile.h"
 
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -56,11 +56,11 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
@@ -1802,15 +1802,4 @@ NiAVObject* ArrowProjectile::PickSceneGraph(
         return apObject;
     }
     return nullptr;
-}
-
-bool bhkWorldObject::IsAddedToWorld() {
-    hkpWorldObject* pObject = Gethk();
-    bool bAdded = false;
-    if (pObject) {
-        MarkRead();
-        bAdded = pObject->isAddedToWorld();
-        UnMarkRead();
-    }
-    return bAdded;
 }

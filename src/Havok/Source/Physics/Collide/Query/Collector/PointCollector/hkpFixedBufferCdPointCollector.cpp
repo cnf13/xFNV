@@ -107,3 +107,11 @@ void hkpFixedBufferCdPointCollector::addCdPointImplementation(
     float fDistance = XFNV_M128_F32(pFurthest->m_contact.m_separatingNormal.m_quad, 3);
     collector->m_earlyOutDistance = fDistance;
 }
+
+hkpFixedBufferCdPointCollector::~hkpFixedBufferCdPointCollector() {}
+
+void hkpFixedBufferCdPointCollector::operator delete(void* p) {
+    if (p) {
+        hkMemoryRouter::getInstance().m_heap->blockFree(p, sizeof(hkpFixedBufferCdPointCollector));
+    }
+}

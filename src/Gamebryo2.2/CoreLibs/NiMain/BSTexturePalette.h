@@ -60,6 +60,8 @@ public:
 
 protected:
     static uint32_t DeterminePriority(NiTexture* apTex);
+    // The palette's purged-list flag.
+    static inline bool bCheckPurgedListS;
 
 public:
     static bool ArePathsEqual(const char* apRequestedPath, const char* apPath);
@@ -101,6 +103,3 @@ struct BSTexturePalette::PathMap {
     uint32_t uiSize;
     BSTexMap kGroups[7];
 };
-
-// The palette's purged-list flag; a free global, not a member.
-inline bool bCheckPurgedTextureList;

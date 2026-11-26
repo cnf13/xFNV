@@ -257,3 +257,15 @@ inline hkpRigidBody* hkGetRigidBody(const hkpCollidable* collidable) {
 
 extern hkClass hkpRigidBodyClass;
 extern hkTypeInfo hkpRigidBodyTypeInfo;
+
+inline hkpMotion::MotionType hkpRigidBody::getMotionType() {
+    return getMotion()->getType();
+}
+
+inline hkpRigidBody* hkpGetRigidBody(const hkpCollidable* collidable) {
+    if (collidable->getType() == 1) {
+        return static_cast<hkpRigidBody*>(hkGetWorldObject(collidable));
+    }
+
+    return nullptr;
+}

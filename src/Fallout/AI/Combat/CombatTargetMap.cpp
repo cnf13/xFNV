@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout/AI/AILinearTaskThreadManager.h"
 #include "Fallout/AI/Actor.h"
 #include "Fallout/Misc/TaskQueueInterface.h"

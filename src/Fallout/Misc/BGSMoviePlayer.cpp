@@ -3,7 +3,9 @@
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSWin32Audio.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
+#include "BSMain/XINISetting.h"
 #include "BSMovie/MoviePlayer.h"
 #include "Fallout Shared/Renderer.h"
 #include "Fallout Shared/TESSaveLoadGame.h"
@@ -14,7 +16,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRenderer.h"
 
-SettingT<INISettingCollection> gs_sIntroSequence_General("sIntroSequence:General", "");
+SettingT<INISettingCollection> BGSMoviePlayer::sIntroSequence("sIntroSequence:General", "");
 SettingT<INISettingCollection> BGSMoviePlayer::sMainMenuMovieIntro("sMainMenuMovieIntro:General", "");
 SettingT<INISettingCollection> BGSMoviePlayer::sIntroMovie("sIntroMovie:General", "");
 

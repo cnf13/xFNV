@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -121,7 +121,7 @@ public:
     // Builds the book's model, light and the nine pages' buttons and text items, then refreshes every page. Called by
     // Create.
     void InitBook();
-    void LoadBBTextures();
+    void LoadButtonAndTextImages();
     NiCamera* InitCamera();
 
     // Opens the SPECIAL book menu with aiTotalPoints to spend.

@@ -5,24 +5,12 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include "SDK/FaceGen/Vect2.h"
+#include "SDK/FaceGen/Vect3.h"
 #include "SDK/MSVC/iosfwd.h"
 
-template <class T>
-class FR2Vect2TC;
-template <class T>
-class FR2Vect3TC;
 class FffTriFileDataS;
 class FutBinaryFileC;
-
-// The 12-byte FR2Vect3TC<int>: a .tri triangle's three vertex indices (FffTriFileDataS::triList and txtTriList). The
-// PDB places it in BSFaceGenManager.cpp beside the float instance, whose vector bodies (resize 0xABA7B0) it shares.
-template <>
-class FR2Vect3TC<int> {
-public:
-    int32_t x1;
-    int32_t x2;
-    int32_t x3;
-};
 
 // A .tri file's header: the element counts of the lists that follow it (0x38 bytes, the size fffReadTriFile reads it
 // with). The PDB's members; extraInfo's bit 0 says the file carries texture coordinates, and the counts are compared
@@ -119,3 +107,54 @@ using UIntVector = std::vector<uint32_t, std::allocator<uint32_t>>;
 using CharVector = std::vector<char, std::allocator<char>>;
 
 char fffIsTriFile(std::basic_string<char, std::char_traits<char>, std::allocator<char>>* a1);
+
+// The FR2Vect3TC<float> vector's const operator[], used on vectors other than FffTriFileDataS::vtxList too
+// (BSFaceGenMorphDataHair's constructor on a diff morph's vtxDelta): checked against size().
+const FR2Vect3TC<float>&
+VectorSubscript(const std::vector<FR2Vect3TC<float>, std::allocator<FR2Vect3TC<float>>>* apThis, uint32_t _Pos);
+
+// The data of a FaceGen .tri file: the vertex, triangle, quad, texture and label lists and the difference and static
+// morphs.
+class FffTriFileDataS {
+public:
+    FffTriFileDataS();
+    ~FffTriFileDataS();
+
+    // The vertex count of the model itself: vtxList's size, lowered to the first vertex of
+    // any static morph.
+    uint32_t numModelVtx() const;
+    // Returns vtxList.size().
+    uint32_t vtxListSize() const;
+    const FR2Vect3TC<float>& vtxListAt(uint32_t i) const;
+    // Copies d's lists into this one: each list resized to d's count, the plain lists copied whole and the labels' and
+    // morphs' elements one by one. Defined in TriFileIO.cpp.
+    void copyFrom(const FffTriFileDataS& d);
+    void extractSurfLblPts(std::vector<FR2Vect3TC<float>, std::allocator<FR2Vect3TC<float>>>& ptList);
+    void extractVtxLblPts(std::vector<FR2Vect3TC<float>, std::allocator<FR2Vect3TC<float>>>& ptList);
+
+    static void operator delete(void* apMemory);
+
+    std::vector<FR2Vect3TC<float>, std::allocator<FR2Vect3TC<float>>> vtxList;
+    std::vector<FR2Vect3TC<int32_t>, std::allocator<FR2Vect3TC<int32_t>>> triList;
+    std::vector<FutVect4TC<int32_t>, std::allocator<FutVect4TC<int32_t>>> quadList;
+    std::vector<FR2Vect2TC<float>, std::allocator<FR2Vect2TC<float>>> txtData;
+    std::vector<FR2Vect3TC<int32_t>, std::allocator<FR2Vect3TC<int32_t>>> txtTriList;
+    std::vector<FutVect4TC<int32_t>, std::allocator<FutVect4TC<int32_t>>> txtQuadList;
+    std::vector<FffTriVtxLabelS, std::allocator<FffTriVtxLabelS>> vtxLabelList;
+    std::vector<FffTriSurfLabelS, std::allocator<FffTriSurfLabelS>> surfLabelList;
+    // The difference morphs; BSFaceGenMorphDataHair's constructor reads element 0's label and vertex deltas
+    // (FffTriDiffMorphS::vtxDelta).
+    std::vector<FffTriDiffMorphS, std::allocator<FffTriDiffMorphS>> diffMorphList;
+    // The static morphs.
+    std::vector<FffTriStatMorphS, std::allocator<FffTriStatMorphS>> statMorphList;
+};
+
+inline uint32_t FffTriFileDataS::numModelVtx() const {
+    uint32_t numVtx = vtxListSize();
+    for (uint32_t xx = 0; xx < statMorphList.size(); ++xx) {
+        if (statMorphList[xx].firstVtxOffset < numVtx) {
+            numVtx = statMorphList[xx].firstVtxOffset;
+        }
+    }
+    return numVtx;
+}

@@ -82,3 +82,7 @@ public:
     static inline char ms_cAppendCharacter = 36;
     static NiCriticalSection ExtraDataCrit;
 };
+
+inline char NiObjectNET::GetDefaultAppendCharacter() {
+    return ms_cAppendCharacter;
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/TESCaravan.h"
 #include "SDK/MSVC/ehvec.h"
@@ -154,7 +155,7 @@ public:
     void UpdateBettingUI(int32_t maxraise, int32_t raise);
     void UpdateTrackValue(int32_t aiTrack);
     bool IsWellFormedMenu();
-    void LoadNifs();
+    void PrepareDeckMenu();
     void SwapDeckBuildingTextures(int32_t aiTarget, bool abFastScrolling);
     void UpdateDealCardTexture(bool abPlayer);
     void SelectDeckCard(bool abUnselectOnly);
@@ -171,7 +172,7 @@ protected:
     int32_t CalculateWinningState(int32_t aivalue);
 
 public:
-    uint32_t LoadNifs2();
+    uint32_t PrepareShared3DElements();
     // The menu's 3D camera, built fresh; it never reads this.
     NiCamera* Create3DCamera();
     char PrepareCaravanData();

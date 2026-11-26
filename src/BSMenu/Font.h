@@ -363,3 +363,7 @@ inline int32_t fontBufferSize;
 // The rise of each of the eight fonts, which TextLine::AddChar reads by iFontIndex.
 using aFontRise_t = int32_t[8];
 inline aFontRise_t aFontRise{35, 35, 30, 60, 60, 0, 0, 0};
+
+inline Font* FontManager::GetFont(int32_t aiIndex) {
+    return pFont[aiIndex];
+}

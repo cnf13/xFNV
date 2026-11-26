@@ -1,18 +1,17 @@
 #include "BSHavok/bhkSpringAction.h"
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkAction.h"
 #include "BSHavok/bhkBinaryAction.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkStream.h"
 #include "BSMain/BSCloningProcess.h"
-#include "Fallout Shared/GlobalFunc.h"
-#include "Fallout Shared/TESFile.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -46,7 +45,7 @@ NiObject* bhkSpringAction::CreateClone(NiCloningProcess& arCloneData) {
 }
 
 // The base's fields, then, for a big-endian source, the creation info's pivots (bhkStream::Endian) and its rest length,
-// strength and damping (ENDIAN) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so
+// strength and damping (BSEndian) byte-swapped in place. The stream's byte is compared with 1: any other byte swaps, so
 // it is read as a byte rather than a bool tested. A cinfo built here is not killed.
 void bhkSpringAction::LoadBinary(NiStream& arStream) {
     bhkBinaryAction::LoadBinary(arStream);
@@ -55,9 +54,9 @@ void bhkSpringAction::LoadBinary(NiStream& arStream) {
         hkSpringActionCinfo& rInfo = static_cast<hkSpringActionCinfo&>(CreateCinfo(bCreated));
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        ENDIAN(rInfo.m_restLength, false);
-        ENDIAN(rInfo.m_strength, false);
-        ENDIAN(rInfo.m_damping, false);
+        BSEndian(rInfo.m_restLength, false);
+        BSEndian(rInfo.m_strength, false);
+        BSEndian(rInfo.m_damping, false);
     }
 }
 
@@ -71,17 +70,17 @@ void bhkSpringAction::SaveBinary(NiStream& arStream) {
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        ENDIAN(rInfo.m_restLength, false);
-        ENDIAN(rInfo.m_strength, false);
-        ENDIAN(rInfo.m_damping, false);
+        BSEndian(rInfo.m_restLength, false);
+        BSEndian(rInfo.m_strength, false);
+        BSEndian(rInfo.m_damping, false);
     }
     bhkBinaryAction::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(rInfo.m_pivotA);
         bhkStream::Endian(rInfo.m_pivotB);
-        ENDIAN(rInfo.m_restLength, false);
-        ENDIAN(rInfo.m_strength, false);
-        ENDIAN(rInfo.m_damping, false);
+        BSEndian(rInfo.m_restLength, false);
+        BSEndian(rInfo.m_strength, false);
+        BSEndian(rInfo.m_damping, false);
     }
 }
 

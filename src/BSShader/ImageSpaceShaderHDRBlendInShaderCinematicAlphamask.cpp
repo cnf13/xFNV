@@ -1,0 +1,62 @@
+#include "BSShader/ImageSpaceShaderHDRBlendInShaderCinematicAlphamask.h"
+
+#include "BSShader/BSShader.h"
+#include "BSShader/BSShaderManager.h"
+#include "BSShader/ImageSpaceEffect.h"
+#include "BSShader/ImageSpaceManager.h"
+#include "BSShader/ImageSpaceShader.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "SDK/MSVC/string.h"
+
+ImageSpaceShaderHDRBlendInShaderCinematicAlphamask::ImageSpaceShaderHDRBlendInShaderCinematicAlphamask() {
+    pTextures.SetSize(4u);
+}
+
+ImageSpaceShaderHDRBlendInShaderCinematicAlphamask::~ImageSpaceShaderHDRBlendInShaderCinematicAlphamask() {}
+
+void ImageSpaceShaderHDRBlendInShaderCinematicAlphamask::ReloadShaders() {
+    const char* pName;
+    alignas(8) BSShaderMacro kPixelSource;
+    alignas(8) BSShaderMacro kVertex;
+    alignas(8) BSShaderMacro kPixel;
+    kVertex.strPath = "imagespace\\2x\\v\\HDRbase.v.hlsl";
+    kVertex.kMacros[0].Name = "TEX2";
+    kVertex.kMacros[0].Definition = nullptr;
+    kVertex.kMacros[1].Name = nullptr;
+    std::memset(&kVertex.kMacros[1].Definition, 0, sizeof(kVertex) - offsetof(BSShaderMacro, kMacros[1].Definition));
+    kPixelSource.kMacros[0].Definition = nullptr;
+    kPixelSource.kMacros[1].Definition = nullptr;
+    kPixelSource.kMacros[2].Definition = nullptr;
+    if (bDoTestHDR.uValue.b) {
+        kPixelSource.strPath = "imagespace\\2x\\p\\HDRBlur_TEST.p.hlsl";
+        kPixelSource.kMacros[0].Name = "CINEMATIC";
+        kPixelSource.kMacros[1].Name = "SHBLEND";
+        kPixelSource.kMacros[2].Name = "TONEMAP";
+        kPixelSource.kMacros[3].Name = nullptr;
+        std::memset(
+            &kPixelSource.kMacros[3].Definition,
+            0,
+            sizeof(kPixelSource) - offsetof(BSShaderMacro, kMacros[3].Definition)
+        );
+        pName = "HDRBLENDINSHADERCINT";
+    }
+    else {
+        kPixelSource.kMacros[4].Definition = nullptr;
+        for (uint32_t i = 5; i < 9; ++i) {
+            kPixelSource.kMacros[i].Name = nullptr;
+            kPixelSource.kMacros[i].Definition = nullptr;
+        }
+        kPixelSource.strPath = "imagespace\\2x\\p\\HDRBlur.p.hlsl";
+        kPixelSource.kMacros[0].Name = "ALPHAMASK";
+        kPixelSource.kMacros[1].Name = "CINEMATIC";
+        kPixelSource.kMacros[2].Name = "SHBLEND";
+        kPixelSource.kMacros[3].Name = "TONEMAP";
+        kPixelSource.kMacros[3].Definition = nullptr;
+        kPixelSource.kMacros[4].Name = nullptr;
+        pName = "HDRBLENDINSHADERCINAM";
+    }
+    kPixel = kPixelSource;
+    LoadShaders(kVertex, kPixel, pName, ShaderTarget_vs_1_1, "ps_2_a");
+    LoadStagesAndPasses();
+}

@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/NavMesh_Util.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XInputManager.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/ModelLoader.h"

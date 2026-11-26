@@ -117,3 +117,16 @@ public:
 };
 
 inline int32_t uiTESStandardBufferSize = 65536;
+
+// Uses the auxiliary file position unless it is unset, then the true file position.
+inline uint32_t BSFile::Tell() {
+    if (iAuxTrueFilePos == -1) {
+        return iTrueFilePos;
+    }
+    return iAuxTrueFilePos;
+}
+
+// Returns the file's open state from BSFile::m_bGood.
+inline bool BSFile::FileIsGood() const {
+    return m_bGood;
+}

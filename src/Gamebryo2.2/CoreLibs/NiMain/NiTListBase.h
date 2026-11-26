@@ -1,8 +1,9 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <stdint.h>
 

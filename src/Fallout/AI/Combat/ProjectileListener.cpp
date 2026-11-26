@@ -4,7 +4,7 @@
 #include "BSHavok/bhkCollisionBox.h"
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkPhantom.h"
-#include "BSHavok/bhkPickData.h"
+#include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/Havok/TESHavokUtilities.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/TES.h"

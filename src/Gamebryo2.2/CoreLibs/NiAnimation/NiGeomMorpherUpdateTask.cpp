@@ -17,13 +17,6 @@ NiRTTI NiGeomMorpherUpdateTask::ms_RTTI("NiGeomMorpherUpdateTask", &NiTask::ms_R
 NiCriticalSection NiGeomMorpherUpdateTask::ms_kPoolCriticalSection;
 NiTObjectPool<NiGeomMorpherUpdateTask> NiGeomMorpherUpdateTask::ms_kPool;
 
-// A real new[]: clang gives the class a vector deleting destructor only where its new[] is seen, and _SDMShutdown's
-// delete[] goes through it.
-template <>
-NiGeomMorpherUpdateTask* NiTNewInterface<NiGeomMorpherUpdateTask>::Allocate(uint32_t uiNumElements) {
-    return new NiGeomMorpherUpdateTask[uiNumElements];
-}
-
 using NiTPool_lNiGeomMorpherUpdateTask_cNiTNewInterface_lNiGeomMorpherUpdateTask = NiTPool<
     NiGeomMorpherUpdateTask,
     NiTNewInterface<NiGeomMorpherUpdateTask>>;

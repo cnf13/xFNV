@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"

@@ -9,7 +9,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9SourceCubeMapData.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9TextureData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiImageConverter.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPersistentSrcTextureRendererData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"

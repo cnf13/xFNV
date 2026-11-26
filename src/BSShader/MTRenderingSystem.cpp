@@ -7,6 +7,7 @@
 #include "BSMain/BSCompoundFrustum.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderUtil.h"

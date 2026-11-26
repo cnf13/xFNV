@@ -4,9 +4,11 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "BSSystem/FileFinder.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESConditionFunctions.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
@@ -25,25 +27,25 @@ static SettingT<GameSettingCollection> fCombatSoundFleshPct("fCombatSoundFleshPc
 
 // The volume bytes and the pitch need no swap; the rest is swapped in field order.
 void TESSound::SOUND_DATA::Endian() {
-    ENDIAN(iFlags, false);
-    ENDIAN(iAttenuation, false);
-    ENDIAN(iTimeConstraints, false);
-    ENDIAN(pAttenuationCurve[0], false);
-    ENDIAN(pAttenuationCurve[1], false);
-    ENDIAN(pAttenuationCurve[2], false);
-    ENDIAN(pAttenuationCurve[3], false);
-    ENDIAN(pAttenuationCurve[4], false);
-    ENDIAN(iReverbAttenuation, false);
-    ENDIAN(iPriority, false);
-    ENDIAN(iLoopBegin, false);
-    ENDIAN(iLoopEnd, false);
+    BSEndian(iFlags, false);
+    BSEndian(iAttenuation, false);
+    BSEndian(iTimeConstraints, false);
+    BSEndian(pAttenuationCurve[0], false);
+    BSEndian(pAttenuationCurve[1], false);
+    BSEndian(pAttenuationCurve[2], false);
+    BSEndian(pAttenuationCurve[3], false);
+    BSEndian(pAttenuationCurve[4], false);
+    BSEndian(iReverbAttenuation, false);
+    BSEndian(iPriority, false);
+    BSEndian(iLoopBegin, false);
+    BSEndian(iLoopEnd, false);
 }
 
 // The three attenuation bytes and the pitch need no swap.
 void TESSound::SOUND_DATA2::Endian() {
-    ENDIAN(iFlags, false);
-    ENDIAN(iAttenuation, false);
-    ENDIAN(iTimeConstraints, false);
+    BSEndian(iFlags, false);
+    BSEndian(iAttenuation, false);
+    BSEndian(iTimeConstraints, false);
 }
 
 TESSound::TESSound() : TESBoundAnimObject(), TESSoundFile(), strEditorID(), cRandomPercentChance(0) {
@@ -133,11 +135,11 @@ bool TESSound::Load(TESFile* apFile) {
             case ANAM_ID:
                 LoadData(apFile, static_cast<char*>(static_cast<void*>(data.pAttenuationCurve)), 0xA);
                 if (apFile->QEndian()) {
-                    ENDIAN(data.pAttenuationCurve[0], false);
-                    ENDIAN(data.pAttenuationCurve[1], false);
-                    ENDIAN(data.pAttenuationCurve[2], false);
-                    ENDIAN(data.pAttenuationCurve[3], false);
-                    ENDIAN(data.pAttenuationCurve[4], false);
+                    BSEndian(data.pAttenuationCurve[0], false);
+                    BSEndian(data.pAttenuationCurve[1], false);
+                    BSEndian(data.pAttenuationCurve[2], false);
+                    BSEndian(data.pAttenuationCurve[3], false);
+                    BSEndian(data.pAttenuationCurve[4], false);
                 }
                 if (data.pAttenuationCurve[0] == 100 &&
                     data.pAttenuationCurve[1] == 75 &&
@@ -366,14 +368,14 @@ bool TESSound::PickRandomFilename(char* pPath) {
 }
 
 // Both bounds are tested signed.
-const char* GetBushSoundName(int32_t aiIndex) {
+const char* TESSound::GetPassThroughSoundName(int32_t aiIndex) {
     if (aiIndex < 0 || aiIndex >= 10) {
         return nullptr;
     }
-    return g_bushSoundNameArray[aiIndex];
+    return pPassthroughSoundNames[aiIndex];
 }
 
-TESSound* GetNthBrushPassthroughSound(int32_t aiIndex) {
+TESSound* TESSound::GetPassThroughSound(int32_t aiIndex) {
     if (pPlayer) {
         const char* pMove;
         if (pPlayer->IsSneaking()) {
@@ -383,10 +385,10 @@ TESSound* GetNthBrushPassthroughSound(int32_t aiIndex) {
             pMove = pPlayer->IsRunning() ? "Run" : "Walk";
         }
         char acName[40];
-        BSsprintf(acName, 0x28, "BRUSH%s%s", GetBushSoundName(aiIndex), pMove);
+        BSsprintf(acName, 0x28, "BRUSH%s%s", GetPassThroughSoundName(aiIndex), pMove);
         return pDataHandler->GetSound(acName);
     }
     char acWalkName[40];
-    BSsprintf(acWalkName, 0x28, "BRUSH%sWalk", GetBushSoundName(aiIndex));
+    BSsprintf(acWalkName, 0x28, "BRUSH%sWalk", GetPassThroughSoundName(aiIndex));
     return pDataHandler->GetSound(acWalkName);
 }

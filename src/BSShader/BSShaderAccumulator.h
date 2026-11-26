@@ -331,3 +331,23 @@ public:
 };
 
 NiSmartPointer(BSShaderAccumulator);
+
+inline void BSShaderAccumulator::SetAccumulate(bool abTF) {
+    bAccumulate = abTF;
+}
+
+inline bool BSShaderAccumulator::GetRenderDecals() {
+    return bRenderDecals;
+}
+
+inline void BSShaderAccumulator::SetRenderDecals(bool abRenderDecals) {
+    bRenderDecals = abRenderDecals;
+}
+
+inline void BSShaderAccumulator::ToggleRefractionDebugTexture() {
+    BSShaderAccumulator::bShowRefractionDebugTexture = !BSShaderAccumulator::bShowRefractionDebugTexture;
+}
+
+inline void BSShaderAccumulator::SetHasWater(bool abHasWater) {
+    bCellHasWater = abHasWater;
+}

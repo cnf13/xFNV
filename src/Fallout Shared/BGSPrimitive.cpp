@@ -1,6 +1,6 @@
 #include "Fallout Shared/BGSPrimitive.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSMultiBoundAABB.h"
 #include "BSMain/BSMultiBoundOBB.h"
 #include "BSMain/BSMultiBoundShape.h"
@@ -21,7 +21,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -30,6 +29,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cmath>
 
@@ -463,10 +463,6 @@ BSMultiBoundShape* BGSPrimitiveBox::MakeMultiBoundShape(NiPoint3& akAngle) {
     return new BSMultiBoundAABB(&NiPoint3::ZERO, &Radii);
 }
 
-BSMultiBoundSphere::~BSMultiBoundSphere() {}
-
-BSOcclusionPlane::~BSOcclusionPlane() {}
-
 BGSPrimitiveSphere::BGSPrimitiveSphere() {
     eType = BGSPrimitive::PRIMITIVE_SPHERE;
 }
@@ -574,16 +570,4 @@ void BGSPrimitiveSphere::SetRadius(float afRadius) {
         spGeometry->UpdateProperties();
         spNode->UpdateWorldBound();
     }
-}
-
-void NiGeometry::SetModelBound(const NiBound& kBound) {
-    m_spModelData->SetBound(kBound);
-}
-
-void NiGeometryData::SetBound(const NiBound& kBound) {
-    m_kBound.Copy(&kBound);
-}
-
-NiColorA* NiGeometryData::GetColors() const {
-    return m_pkColor;
 }

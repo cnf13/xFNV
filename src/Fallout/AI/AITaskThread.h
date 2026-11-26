@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSemaphore.h"
 #include "BSCore/BSThread.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 
 // A worker thread of the AI task manager: it waits on StartProcessing, runs its share of the AI tasks with its own

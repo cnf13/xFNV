@@ -110,7 +110,7 @@ public:
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     void SetItemOwnership(TESForm* apowner);
     // SaveGame of the old save format.
-    void SaveGameTES();
+    void SaveGame();
     void Copy(ItemChange* apCopy);
     int32_t GetAmountNonDefaultExtra();
     void RemoveOriginalChanges();
@@ -210,13 +210,13 @@ public:
     // count.
     TESBoundObject* GetObjectbyType(ENUM_FORM_ID aeFormID, int32_t& ainumb);
     // Resolves the inventory's form IDs after a TES-format load.
-    void InitLoadGameTES();
+    void InitLoadGame();
     // Writes the inventory's changes into the old save.
     void SaveGame();
     // Reads the inventory's changes from the old save.
     void LoadGame();
     // Saves the inventory's changes into apSaveGameBuffer with no current form and flags 0x400, then restores both.
-    void SaveGameBGS(BGSSaveFormBuffer* apSaveGameBuffer);
+    void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
 
     bool IsEmpty();
     // The bytes the changes take in a save.

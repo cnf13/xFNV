@@ -1,6 +1,6 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadDefines.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectCELL.h"
@@ -229,34 +229,4 @@ bool GetLocationCellOrWorld(TESForm* apLocation, TESObjectCELL*& arpCell, TESWor
     }
 
     return false;
-}
-
-void NiEndian::Swap32(char* pcValue, uint32_t uiCount) {
-    for (uint32_t i = uiCount; i; --i) {
-        char c0 = pcValue[0];
-        pcValue[0] = pcValue[3];
-        pcValue[3] = c0;
-        char c1 = pcValue[1];
-        pcValue[1] = pcValue[2];
-        pcValue[2] = c1;
-        pcValue += 4;
-    }
-}
-
-void NiEndian::Swap64(void* pvValue, int32_t iCount) {
-    for (int32_t i = iCount; i; --i) {
-        char c0 = *static_cast<uint8_t*>(pvValue);
-        *static_cast<uint8_t*>(pvValue) = *(static_cast<uint8_t*>(pvValue) + 7);
-        *(static_cast<uint8_t*>(pvValue) + 7) = c0;
-        char c1 = *(static_cast<uint8_t*>(pvValue) + 1);
-        *(static_cast<uint8_t*>(pvValue) + 1) = *(static_cast<uint8_t*>(pvValue) + 6);
-        *(static_cast<uint8_t*>(pvValue) + 6) = c1;
-        char c2 = *(static_cast<uint8_t*>(pvValue) + 2);
-        *(static_cast<uint8_t*>(pvValue) + 2) = *(static_cast<uint8_t*>(pvValue) + 5);
-        *(static_cast<uint8_t*>(pvValue) + 5) = c2;
-        char c3 = *(static_cast<uint8_t*>(pvValue) + 3);
-        *(static_cast<uint8_t*>(pvValue) + 3) = *(static_cast<uint8_t*>(pvValue) + 4);
-        *(static_cast<uint8_t*>(pvValue) + 4) = c3;
-        pvValue = static_cast<char*>(pvValue) + 8;
-    }
 }

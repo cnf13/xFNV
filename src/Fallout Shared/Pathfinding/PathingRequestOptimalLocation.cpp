@@ -6,7 +6,7 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 PathingRequestOptimalLocation::PathingRequestOptimalLocation()
   : PathingRequest(), fMinDistance(0x1p+7f), fMaxDistance(0x1p+11f), fAbsoluteMinDistance(0x1p+7f),

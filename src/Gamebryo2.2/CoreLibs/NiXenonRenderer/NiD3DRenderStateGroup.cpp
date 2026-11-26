@@ -4,7 +4,6 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DRenderState.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9RenderState.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPool.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTSet.h"
@@ -13,35 +12,6 @@
 
 #include <cstdint>
 #include <xmmintrin.h>
-
-template <>
-NiD3DRenderStateGroup* NiTNewInterface<NiD3DRenderStateGroup>::Allocate(uint32_t auiCount) {
-    return new NiD3DRenderStateGroup[auiCount];
-}
-
-template <>
-void NiTNewInterface<NiD3DRenderStateGroup>::Deallocate(NiD3DRenderStateGroup* apArray) {
-    delete[] apArray;
-}
-
-// new NiD3DRSEntry[auiCount]: the entry is a NiMemObject with no destructor, so NiMemObject's operator new[] with no
-// count cookie; a size past the address width saturates so that the allocation fails.
-template <>
-NiD3DRenderStateGroup::NiD3DRSEntry* NiTNewInterface<NiD3DRenderStateGroup::NiD3DRSEntry>::Allocate(uint32_t auiCount) {
-    size_t stSize = auiCount <= SIZE_MAX / sizeof(NiD3DRSEntry) ? sizeof(NiD3DRSEntry) * auiCount : SIZE_MAX;
-    NiD3DRSEntry* pkArray = static_cast<NiD3DRSEntry*>(NiMemObject::operator new[](stSize));
-    if (pkArray) {
-        // The element count is taken as an int.
-        ::new (static_cast<void*>(pkArray)) NiD3DRSEntry[static_cast<int32_t>(auiCount)];
-    }
-    return pkArray;
-}
-
-// delete[] of an entry array: no destructor to run, the block straight to NiMemObject's operator delete[].
-template <>
-void NiTNewInterface<NiD3DRenderStateGroup::NiD3DRSEntry>::Deallocate(NiD3DRenderStateGroup::NiD3DRSEntry* apArray) {
-    NiMemObject::operator delete[](apArray, sizeof(NiD3DRSEntry));
-}
 
 NiD3DRenderStateGroup::NiD3DRSEntry::NiD3DRSEntry()
   : m_uiRenderState(0), m_uiValue(0), m_pkNext(nullptr), m_pkPrev(nullptr) {}
@@ -366,7 +336,7 @@ void NiD3DRenderStateGroup::ShutdownPools() {
             pkContainers = pkEntryPool->m_pkContainers;
         pkEntryPool->m_kFreeObjects.m_uiUsed = 0;
         if (pkContainers) {
-            NiMemObject::operator delete[](pkContainers->m_pkObjectArray, sizeof(NiD3DRenderStateGroup::NiD3DRSEntry));
+            delete[] pkContainers->m_pkObjectArray;
             NiTPoolContainer<NiD3DRenderStateGroup::NiD3DRSEntry, NiTNewInterface<NiD3DRenderStateGroup::NiD3DRSEntry>>*
                 pkNext = pkContainers->m_pkNext;
             delete pkNext;

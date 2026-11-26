@@ -265,3 +265,12 @@ inline uint32_t hkNextPowerOf2(uint32_t in) {
 
     return in + 1;
 }
+
+inline hkUFloat8::hkUFloat8(const float f) {
+    *this = f;
+}
+
+// The bytes from base to pntr.
+inline int32_t hkGetByteOffset(const void* base, const void* pntr) {
+    return static_cast<int32_t>(static_cast<const char*>(pntr) - static_cast<const char*>(base));
+}

@@ -52,3 +52,10 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiRotKey* NiTransformData::GetRotAnim(uint32_t& uiNumKeys, NiAnimationKey::KeyType& eType, uint8_t& ucSize) {
+    uiNumKeys = m_usNumRotKeys;
+    eType = m_eRotType;
+    ucSize = m_ucRotSize;
+    return m_pkRotKeys;
+}

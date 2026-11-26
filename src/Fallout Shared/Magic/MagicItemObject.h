@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Magic/MagicItem.h"
 #include "Fallout Shared/TESObject.h"
 

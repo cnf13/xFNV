@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Havok/Source/Common/Base/Algorithm/Collide/1AxisSweep/hk1AxisSweep.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkSimdReal.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabbUtil.h"
@@ -25,18 +26,6 @@ using hkpAgentData = void;
 // AABB helpers the process uses.
 class hkpCollectionCollectionAgent3 {
 public:
-    // Orders two quantised child AABBs by their lowest corner, the axis the sweep walks.
-    struct AabbUint32Less {
-        bool operator()(const hkAabbUint32& arA, const hkAabbUint32& arB) const {
-            return arA.m_min[0] < arB.m_min[0];
-        }
-
-        uint8_t m_byte;
-    };
-
-    // The key of a quantised hit list entry: the four bytes after the lowest corner, where an hkAabbUint32 holds its
-    // expansion bytes.
-    static void setHitListKey(hkAabbUint32& arAabb, uint32_t auiKey);
     // Packs a float box into the input's quantised AABB space.
     static void quantiseAabb(const hkpCollisionInput& arInput, const hkAabb& arAabb, hkAabbUint32& arOut);
     // Grows a child shape's box by the root body's motion over the step.
@@ -48,7 +37,7 @@ public:
         const hkpCdBody& arBodyA,
         const uint32_t* apuiKeys,
         int32_t aiNumKeys,
-        hkAabbUint32* apAabbsOut
+        hk1AxisSweep::AabbInt* apAabbsOut
     );
     // The quantised child AABBs the collidable caches in its bounding volume data, or one box per child shape of the
     // container its shape exposes.
@@ -57,7 +46,7 @@ public:
         const hkpCdBody* apOverrideBody,
         const hkpShapeContainer* apShapeContainer,
         const hkpProcessCollisionInput* apInput,
-        hkAabbUint32* apAabbsOut
+        hk1AxisSweep::AabbInt* apAabbsOut
     );
 
     // The agent's process: queries one body's children against the other's tree and narrows

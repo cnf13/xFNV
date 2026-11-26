@@ -1,13 +1,78 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkEntity.h"
+#include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkSerializable.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 
-class hkConstraintCinfo;
 class hkpConstraintData;
 class NiCloningProcess;
+
+// The creation info of a constraint: the constraint data, its priority and the two entities.
+class hkConstraintCinfo : public hkSerializableCinfo {
+public:
+    hkConstraintCinfo();
+    virtual ~hkConstraintCinfo();
+
+    virtual void CloneData(hkpConstraintData* apData, NiCloningProcess&);
+    virtual void LoadBinary(NiStream& arStream);
+    virtual void SaveBinary(NiStream& arStream);
+    virtual uint32_t CreateData();
+    virtual void GetViewerStrings(NiTPrimitiveArray<char*>* apStrings);
+
+    // Stores the entity wrapped by apEntity (null for none) as entity B.
+    void SetEntityB(bhkEntity* apEntity);
+    // Stores the entity wrapped by apEntity (null for none) as entity A.
+    void SetEntityA(bhkEntity* apEntity);
+    void SetEntities(bhkEntity* apEntityA, bhkEntity* apEntityB);
+    void SetData(hkpConstraintData* apData);
+    // Reads a motor from the stream, null when it holds none; the caller owns the reference.
+    class hkpConstraintMotor* LoadMotor(NiStream& arStream);
+    void SaveMotor(hkpConstraintMotor* apMotor, NiStream& arStream);
+
+    static void operator delete(void* apMemory) {
+        ourFree(apMemory);
+    }
+
+    hkpConstraintData* pData;
+    hkpConstraintInstance::ConstraintPriority ePriority;
+    hkpEntity* pEntityA;
+    hkpEntity* pEntityB;
+};
+
+inline hkConstraintCinfo::hkConstraintCinfo()
+  : pData(nullptr), ePriority(hkpConstraintInstance::PRIORITY_PSI), pEntityA(nullptr), pEntityB(nullptr) {}
+
+inline hkConstraintCinfo::~hkConstraintCinfo() {
+    SetData(nullptr);
+}
+
+inline void hkConstraintCinfo::SetEntityB(bhkEntity* apEntity) {
+    hkpEntity* pEntity = nullptr;
+    if (apEntity) {
+        pEntity = static_cast<hkpEntity*>(**apEntity);
+    }
+    pEntityB = pEntity;
+}
+
+inline void hkConstraintCinfo::SetEntityA(bhkEntity* apEntity) {
+    hkpEntity* pEntity = nullptr;
+    if (apEntity) {
+        pEntity = static_cast<hkpEntity*>(**apEntity);
+    }
+    pEntityA = pEntity;
+}
+
+inline void hkConstraintCinfo::SetEntities(bhkEntity* apEntityA, bhkEntity* apEntityB) {
+    SetEntityA(static_cast<bhkRigidBody*>(apEntityA));
+    SetEntityB(static_cast<bhkRigidBody*>(apEntityB));
+}
+
+inline uint32_t hkConstraintCinfo::CreateData() {
+    return 0;
+}
 
 // The Gamebryo side of a Havok constraint between two entities. It has no fields of its own: the constraint is the
 // wrapped Havok object, reached through phkObject, and the creation info through pInfo.
@@ -75,3 +140,15 @@ public:
     // Replaces the second entity the instance constrains, releasing the old one.
     void setEntityB(hkpEntity* apEntity);
 };
+
+// The constraint instance's data, else the data of the creation info the constraint was loaded with, else null.
+inline hkpConstraintData* bhkConstraint::GetData() {
+    hkpConstraintInstance* pConstraint = **this;
+    if (pConstraint) {
+        return pConstraint->getDataRw();
+    }
+    if (!pInfo) {
+        return nullptr;
+    }
+    return static_cast<hkConstraintCinfo*>(pInfo)->pData;
+}

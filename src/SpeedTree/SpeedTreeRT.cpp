@@ -2,6 +2,7 @@
 
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/Archive.h"
 #include "BSSystem/BSFile.h"
 #include "BSSystem/FileFinder.h"

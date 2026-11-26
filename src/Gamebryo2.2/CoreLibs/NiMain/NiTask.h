@@ -26,3 +26,14 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiTask::~NiTask() {}
+
+// A task can always run.
+inline bool NiTask::CanExecute() {
+    return true;
+}
+
+inline bool NiTask::Clear() {
+    return m_eStatus == ABORTED || m_eStatus == COMPLETED;
+}

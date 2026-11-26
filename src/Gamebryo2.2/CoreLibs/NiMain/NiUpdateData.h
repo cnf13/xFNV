@@ -25,3 +25,7 @@ struct NiUpdateData {
     bool bFoundMorphController;
     bool bSceneGraphChange;
 };
+
+inline NiUpdateData::NiUpdateData(float afTime, bool abUpdateControllers, bool abParallelUpdate)
+  : fTime(afTime), bUpdateControllers(abUpdateControllers), bParallelUpdate(abParallelUpdate), bFoundParticles(false),
+    bFoundMorphController(false), bSceneGraphChange(false) {}

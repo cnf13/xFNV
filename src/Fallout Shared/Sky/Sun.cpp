@@ -6,6 +6,7 @@
 #include "BSShader/BSShaderData.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/SkyShaderProperty.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyObject.h"
 #include "Fallout Shared/TES.h"
@@ -23,7 +24,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDirectionalLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -41,7 +42,7 @@ SettingT<GameSettingCollection> Sun::fSunReduceGlareSpeed("fSunReduceGlareSpeed"
 SettingT<GameSettingCollection> Sun::fSunAlphaTransTime("fSunAlphaTransTime", 2.0f);
 SettingT<GameSettingCollection> Sun::fSunXExtreme("fSunXExtreme", -400.0f);
 SettingT<GameSettingCollection> Sun::fSunYExtreme("fSunYExtreme", 25.0f);
-SettingT<GameSettingCollection> gs_fSunZExtreme("fSunZExtreme", -100.0f);
+SettingT<GameSettingCollection> Sun::fSunZExtreme("fSunZExtreme", -100.0f);
 SettingT<INISettingCollection> Sun::fSunBaseSize("fSunBaseSize:Weather", 250.0f);
 SettingT<INISettingCollection> Sun::fSunGlareSize("fSunGlareSize:Weather", 350.0f);
 
@@ -362,7 +363,7 @@ void Sun::Update(Sky* apSky, float afSecondsPassed) {
             newLoc.z = dAbsXExtreme - std::fabsf(fxNewAim);
             spRoot->SetTranslate(newLoc);
             spSunGlareNode->SetTranslate(newLoc);
-            float fZExtreme = gs_fSunZExtreme;
+            float fZExtreme = Sun::fSunZExtreme;
             float fMaxb = Sun::fSunYExtreme;
             NiPoint3 kSunDirection(-fxNewAim, fMaxb, fZExtreme);
             kSunDirection.Unitize();

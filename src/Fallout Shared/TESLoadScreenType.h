@@ -1,14 +1,12 @@
 #pragma once
 
+#include "BSCore/BSCoreDefines.h"
 #include "Fallout Shared/TESForm.h"
 
 // The data of a load screen type (its data type, then the display data of its two text windows).
 struct LoadScreenType_Data;
 
 enum FONTS : int32_t;
-
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
 
 // What a load screen type shows besides its texture.
 enum LOAD_SCREEN_DATA_TYPE : int32_t {

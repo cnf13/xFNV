@@ -1,5 +1,5 @@
 #include "SDK/DirectShow/CAsyncReader.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMovie/CAsyncStream.h"
 #include "BSMovie/CBaseObject.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"

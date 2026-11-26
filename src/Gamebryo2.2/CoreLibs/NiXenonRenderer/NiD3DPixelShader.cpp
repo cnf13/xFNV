@@ -3,7 +3,7 @@
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DRenderState.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgram.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderConstantMapEntry.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgram.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiD3DShaderProgramFactory.h"

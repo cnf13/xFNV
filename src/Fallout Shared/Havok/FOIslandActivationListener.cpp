@@ -1,6 +1,6 @@
 #include "Fallout Shared/Havok/FOIslandActivationListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -189,13 +189,5 @@ void FOIslandActivationListener::RemoveFromWorld(hkpWorld* apWorld) {
 }
 
 void FOIslandActivationListener::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-hkpIslandActivationListener::hkpIslandActivationListener() {}
-
-hkpIslandActivationListener::~hkpIslandActivationListener() {}
-
-void hkpIslandActivationListener::operator delete(void* apMemory) {
     ourFree(apMemory);
 }

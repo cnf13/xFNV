@@ -100,3 +100,19 @@ public:
 };
 
 NiSmartPointer(NiShaderConstantMapEntry);
+
+inline NiShaderConstantMapEntry::~NiShaderConstantMapEntry() {
+    if (m_bOwnData) {
+        _NiFree(m_pvDataSource);
+    }
+}
+
+inline void NiShaderConstantMapEntry::SetVariableName(const NiFixedString& kVariableName) {
+    const char* m_kHandle = kVariableName.GetHandle();
+    if (m_kVariableName.GetHandle() != kVariableName.GetHandle()) {
+        NiGlobalStringTable::AcquireHandle(m_kHandle);
+        const char* v4 = m_kVariableName.GetHandle();
+        NiGlobalStringTable::ReleaseHandle(v4);
+        m_kVariableName.m_kHandle = m_kHandle;
+    }
+}

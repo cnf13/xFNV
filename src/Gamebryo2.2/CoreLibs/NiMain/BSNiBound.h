@@ -12,3 +12,6 @@ public:
     // The constructor: builds the NiBound base and ignores both arguments.
     BSNiBound(uint16_t asFlags, uint16_t asLevel);
 };
+
+// The constructor deliberately leaves the sphere unset and ignores both arguments.
+inline BSNiBound::BSNiBound(uint16_t asFlags, uint16_t asLevel) {}

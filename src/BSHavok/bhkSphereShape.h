@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkConvexShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Sphere/hkpSphereShape.h"
 
@@ -43,3 +44,13 @@ struct hkSphereShapeCinfo : public hkConvexShapeCinfo {
 // The info is its own serialized form (bhkSerialized.h): with no pointer member its layout is the file's, so
 // bhkSerializable::LoadCInfo's raw read of QCinfoSize() bytes over it is right.
 static_assert(sizeof(hkSphereShapeCinfo) == 0x8);
+
+inline bhkSphereShape::bhkSphereShape(float afRadius, bool abBS) {
+    ++iCount;
+    if (abBS) {
+        Init(NI2HK(afRadius));
+    }
+    else {
+        Init(afRadius);
+    }
+}

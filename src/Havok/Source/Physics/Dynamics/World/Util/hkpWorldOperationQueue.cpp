@@ -42,46 +42,6 @@ static hkBool islandLess(const hkWorldOperation::BiggestOperation& a, const hkWo
     return 0;
 }
 
-int32_t hkAlgorithm::quickSortRecursive(
-    hkWorldOperation::BiggestOperation* apArr,
-    int32_t aiLow,
-    int32_t aiHigh,
-    hkBool (*cmpLess)(const hkWorldOperation::BiggestOperation&, const hkWorldOperation::BiggestOperation&)
-) {
-    for (;;) {
-        int32_t i = aiLow;
-        int32_t j = aiHigh;
-        alignas(16) const hkWorldOperation::BiggestOperation str = apArr[(aiLow + aiHigh) >> 1];
-        do {
-            while (cmpLess(apArr[i], str).m_bool) {
-                i++;
-            }
-            while (cmpLess(str, apArr[j]).m_bool) {
-                j--;
-            }
-            if (i > j) {
-                break;
-            }
-            if (i != j) {
-                hkWorldOperation::BiggestOperation tmp = apArr[j];
-                apArr[j] = apArr[i];
-                apArr[i] = tmp;
-            }
-            i++;
-            j--;
-        }
-        while (i <= j);
-        int32_t iResult = aiLow;
-        if (aiLow < j) {
-            iResult = quickSortRecursive(apArr, aiLow, j, cmpLess);
-        }
-        if (i >= aiHigh) {
-            return iResult;
-        }
-        aiLow = i;
-    }
-}
-
 // Orders body operations by their entity's uid, and the operations on one entity by descending priority; both compares
 // are unsigned.
 bool hkpWorldBodyOperationQueueSortCmp(const hkpBodyOperationEntry& a, const hkpBodyOperationEntry& b) {
@@ -122,14 +82,7 @@ void hkpWorldOperationQueue::executeAllPendingBodyOperations() {
         m_world->m_pendingBodyOperationsCount = 0;
         m_pendingBodyOperations.reserve(16);
         const int32_t iCount = kOperations.m_size;
-        if (iCount > 1) {
-            hkAlgorithm::quickSortRecursive<hkpBodyOperationEntry, hkpBodyOperationEntryLess>(
-                kOperations.m_data,
-                0,
-                iCount - 1,
-                &hkpWorldBodyOperationQueueSortCmp
-            );
-        }
+        hkAlgorithm::quickSort(kOperations.m_data, iCount, &hkpWorldBodyOperationQueueSortCmp);
         for (int32_t i = 0; i < iCount; ++i) {
             hkpBodyOperationEntry& rEntry = kOperations.m_data[i];
             hkpBodyOperation::UpdateInfo kInfo;
@@ -156,9 +109,7 @@ void hkpWorldOperationQueue::executeAllPending() {
     tmpOldPending.swap(m_pending);
     ++m_world->m_pendingOperationQueueCount;
 
-    if (m_islandMerges.m_size > 1) {
-        hkAlgorithm::quickSortRecursive(m_islandMerges.m_data, 0, m_islandMerges.m_size - 1, &islandLess);
-    }
+    hkAlgorithm::quickSort(m_islandMerges.m_data, m_islandMerges.m_size, &islandLess);
     while (m_islandMerges.m_size != 0) {
         hkWorldOperation::BiggestOperation kOperation = m_islandMerges.m_data[m_islandMerges.m_size - 1];
         m_islandMerges.popBack();

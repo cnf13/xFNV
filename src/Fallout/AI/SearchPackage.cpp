@@ -1,7 +1,7 @@
 #include "Fallout/AI/SearchPackage.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout Shared/Pathfinding/Pathfind.h"
 #include "Fallout Shared/Pathfinding/PathingCoverLocation.h"

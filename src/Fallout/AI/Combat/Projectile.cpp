@@ -7,6 +7,7 @@
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionBox.h"
@@ -14,7 +15,6 @@
 #include "BSHavok/bhkCollisionObject.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkRigidBodyT.h"
@@ -27,7 +27,7 @@
 #include "BSMain/BSBlastNode.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderUtil.h"
 #include "BSShader/ShadowSceneNode.h"
@@ -3290,20 +3290,6 @@ float Projectile::ComputeSpeed(float afSpeed, float afPower, float afSpeedMult) 
     return static_cast<float>((fArrowWeakSpeed.Float() * (1.0 - afPower) + afSpeed * afPower) * afSpeedMult);
 }
 
-void bhkCharacterControllerCinfo::SetCollisionBox(bool abTF) {
-    bCollisionBox = abTF;
-}
-
-void bhkPickData::GetLength(NiPoint3& arLength) {
-    HK2NI(arLength, GethkLength());
-}
-
-// The ray's filter, built from its filter info through CFilter's one-field constructor.
-CFilter* bhkPickData::GetFilter(CFilter* apResult) {
-    ::new (apResult) CFilter(m_filterInfo);
-    return apResult;
-}
-
 ProjectileTarget::ProjectileTarget() : pReference(nullptr), spPart(nullptr), kOffset(NiPoint3::ZERO) {}
 
 ProjectileTarget::~ProjectileTarget() {}
@@ -3328,30 +3314,4 @@ NiPoint3 ProjectileTarget::GetWorldLocation() {
 
 void ProjectileTarget::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-hkpWorldRayCastOutput& hkpWorldRayCastOutput::operator=(const hkpWorldRayCastOutput& __that) {
-    hkpShapeRayCastOutput::operator=(__that);
-    m_rootCollidable = __that.m_rootCollidable;
-    return *this;
-}
-
-hkpShapeRayCastCollectorOutput&
-hkpShapeRayCastCollectorOutput::operator=(const hkpShapeRayCastCollectorOutput& arOther) {
-    m_normal = arOther.m_normal;
-    m_hitFraction = arOther.m_hitFraction;
-    m_extraInfo = arOther.m_extraInfo;
-    for (uint32_t i = 0; i < 2; ++i) {
-        m_pad[i] = arOther.m_pad[i];
-    }
-    return *this;
-}
-
-hkpShapeRayCastOutput& hkpShapeRayCastOutput::operator=(const hkpShapeRayCastOutput& __that) {
-    hkpShapeRayCastCollectorOutput::operator=(__that);
-    for (uint32_t i = 0; i < MAX_HIERARCHY_DEPTH; ++i) {
-        m_shapeKeys[i] = __that.m_shapeKeys[i];
-    }
-    m_shapeKeyIndex = __that.m_shapeKeyIndex;
-    return *this;
 }

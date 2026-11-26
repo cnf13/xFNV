@@ -9,8 +9,10 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/RadialTile.h"
 #include "BSMenu/Tile3D.h"
@@ -34,7 +36,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -59,6 +60,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/stdlib.h"
@@ -1404,7 +1406,7 @@ bool Tile::UpdateTile(bool abClearUpdateFlags) {
             }
             float fScaleX = (fScreenWidth / Interface::GetScreenWidth());
             const float fScaleY = (fScreenHeight / Interface::GetScreenHeight());
-            if (Menu::ShouldScaleByResolutionRatio(this->GetMenu())) {
+            if (Interface::IsRenderedMenu(this->GetMenu())) {
                 fScaleX = Interface::GetAspectRatioRatio() * fScaleX;
             }
             float fLeft = this->GetRealX();
@@ -1435,7 +1437,7 @@ bool Tile::UpdateTile(bool abClearUpdateFlags) {
                 }
                 float fScaleX = (fScreenWidth / Interface::GetScreenWidth());
                 const float fScaleY = (fScreenHeight / Interface::GetScreenHeight());
-                if (Menu::ShouldScaleByResolutionRatio(this->GetMenu())) {
+                if (Interface::IsRenderedMenu(this->GetMenu())) {
                     fScaleX = Interface::GetAspectRatioRatio() * fScaleX;
                 }
                 // Rounded through float slots as above.

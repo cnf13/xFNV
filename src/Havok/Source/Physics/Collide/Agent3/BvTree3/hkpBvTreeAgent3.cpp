@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Collide/Agent3/BvTree3/hkpBvTreeAgent3.h"
 
+#include "Havok/Source/Common/Base/Algorithm/Sort/hkSort.h"
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -7,23 +8,22 @@
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
 #include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
-#include "Havok/Source/Physics/Collide/Agent/CompoundAgent/BvTreeStream/hkpBvTreeStreamAgent.h"
 #include "Havok/Source/Physics/Collide/Agent/ContactMgr/hkpContactMgr.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionInput.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionQualityInfo.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionInput.h"
 #include "Havok/Source/Physics/Collide/Agent3/CollectionCollection3/hkpCollectionCollectionAgent3.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3ProcessInput.h"
+#include "Havok/Source/Physics/Collide/Agent3/hkpAgentEntry.h"
 #include "Havok/Source/Physics/Collide/Agent3/List3/hkpListAgent3.h"
 #include "Havok/Source/Physics/Collide/Agent3/Machine/1n/hkpAgent1nMachine.h"
 #include "Havok/Source/Physics/Collide/Agent3/Machine/1n/hkpAgent1nTrack.h"
 #include "Havok/Source/Physics/Collide/Agent3/Machine/hkpAgentMachineUtil.h"
-#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3.h"
-#include "Havok/Source/Physics/Collide/Agent3/hkpAgent3ProcessInput.h"
-#include "Havok/Source/Physics/Collide/Agent3/hkpAgentEntry.h"
 #include "Havok/Source/Physics/Collide/Filter/hkpCollisionFilter.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Collection/hkpShapeCollection.h"
-#include "Havok/Source/Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppBvTreeShape.h"
 #include "Havok/Source/Physics/Collide/Shape/Compound/Tree/hkpBvTreeShape.h"
+#include "Havok/Source/Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppBvTreeShape.h"
 #include "Havok/Source/Physics/Collide/Shape/HeightField/TriSampledHeightField/hkpTriSampledHeightFieldBvTreeShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShape.h"
 #include "Havok/Source/Physics/Collide/Shape/hkpShapeBuffer.h"
@@ -33,7 +33,6 @@
 #include "SDK/MSVC/string.h"
 #include "xfnv/Compiler.h"
 
-#include <bit>
 #include <xmmintrin.h>
 
 // A's AABB in B's space is queried against B's tree into a hit list on the Havok stack, and the 1n machine runs the
@@ -165,7 +164,6 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
     timInB._setRotatedInverseDir(rotB, linearTimInfo);
     const __m128 kTimInB = timInB.m_quad;
 
-    float fSpill;
     // The hkAabb default constructor is deliberately not called for aabb.
     hkAabb aabb;
     __m128 kMin;
@@ -191,7 +189,6 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
         kMin = _mm_max_ps(_mm_load_ps(&reinterpret_cast<float*>(&aabb.m_min.m_quad)[0]), _mm_sub_ps(kCenter, kRadius));
         kMax = _mm_min_ps(_mm_load_ps(&reinterpret_cast<float*>(&aabb.m_max.m_quad)[0]), _mm_add_ps(kCenter, kRadius));
         kExtent = _mm_sub_ps(kMax, kMin);
-        fSpill = fRadius;
 
         if (0.0f < XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3)) {
             const float fScale = XFNV_M128_F32(msB->m_sweptTransform.m_centerOfMass1.m_quad, 3) *
@@ -204,7 +201,6 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
             hkVector4 cross;
             cross.setCross(arm, msB->m_deltaAngle);
             kMotion = _mm_add_ps(_mm_mul_ps(cross.m_quad, _mm_set1_ps(fScale)), kTimInB);
-            fSpill = fScale;
         }
         const __m128 kZero = _mm_setzero_ps();
         kMin = _mm_add_ps(_mm_min_ps(kZero, kMotion), kMin);
@@ -218,7 +214,6 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
         kMax = _mm_load_ps(&reinterpret_cast<float*>(&aabb.m_max.m_quad)[0]);
         kMin = _mm_load_ps(&reinterpret_cast<float*>(&aabb.m_min.m_quad)[0]);
         kExtent = _mm_sub_ps(kMax, kMin);
-        fSpill = fTolerance;
     }
 
     if (cachedAabb) {
@@ -245,7 +240,6 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
         _mm_store_ps(&reinterpret_cast<float*>(&aabb.m_max.m_quad)[0], kMax);
         _mm_store_ps(&reinterpret_cast<float*>(&cachedAabb->m_min.m_quad)[0], kMin);
         _mm_store_ps(&reinterpret_cast<float*>(&cachedAabb->m_max.m_quad)[0], kMax);
-        fSpill = -2.0f;
     }
 
     int32_t numHits = static_cast<const hkpBvTreeShape*>(bodyB.m_shape)
@@ -265,12 +259,7 @@ int32_t hkBvTreeAgent3::calcAabbAndQueryTree(
             numHits = hitListCapacity - 1;
         }
     }
-    if (numHits > 1) {
-        // The comparator is an empty functor passed by value as a 32-bit value: its low byte is zeroed and its upper
-        // three bytes deliberately still hold the bits of the float fSpill.
-        const uint32_t uiComparator = std::bit_cast<uint32_t>(fSpill) & 0xFFFFFF00;
-        quickSortRecursive(hitListOut, 0, numHits - 1, static_cast<int32_t>(uiComparator));
-    }
+    hkAlgorithm::quickSort(hitListOut, numHits);
     // The invalid shape key ends the list.
     hitListOut[numHits] = 0xFFFFFFFF;
     return numHits;

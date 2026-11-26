@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkBinaryAction.h"
 #include "BSHavok/bhkConstraint.h"
 #include "BSHavok/bhkListShape.h"

@@ -46,7 +46,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -849,26 +849,6 @@ void MagicShaderHitEffect::ResetAlphaTimer() {
     for (ParticleShaderProperty* pProperty : ParticlePropertyArray) {
         pProperty->RewindTimer(fAlphaTimer);
     }
-}
-
-ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeRay(float afRayLength) {
-    eEmitterType = EMIT_RAY;
-    fRayLength = afRayLength;
-    return this;
-}
-
-ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeCollision() {
-    eEmitterType = EMIT_COLLISION;
-    return this;
-}
-
-ParticleShaderProperty* ParticleShaderProperty::SetEmitterTypeGeometry() {
-    eEmitterType = EMIT_GEOMETRY;
-    return this;
-}
-
-NiTObjectArray<NiPointer<NiAVObject>>* ParticleShaderProperty::GetTargetArray() {
-    return &TargetArray;
 }
 
 float TESEffectShader::GetAddOnScaleOutTime() {

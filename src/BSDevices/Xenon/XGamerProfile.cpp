@@ -4,12 +4,12 @@
 #include "BSCore/MemoryManager.h"
 #include "BSDevices/XPrefSettings.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
 
-SettingT<INISettingCollection> gs_uXenonPresenceUpdateInterval_Online("uXenonPresenceUpdateInterval:Online", 600000u);
+SettingT<INISettingCollection> uXenonPresenceUpdateInterval("uXenonPresenceUpdateInterval:Online", 600000u);
 static SettingT<INISettingCollection> gs_iLanguage_Controls("iLanguage:Controls", 0);
 static SettingT<INISettingCollection> gs_bXenonLoadDownloadedContent_Online("bXenonLoadDownloadedContent:Online", true);
 
@@ -181,7 +181,7 @@ void XGamerProfile::AddSignedInEntry(void* apEntry) {
 void XGamerProfile::UpdatePresence() {
     if (m_bSignedIn[m_PlayerIndex] && unk4 && return_1_3() && (!bForcePresenceUpdate)) {
         Setting::Info* p_uValue;
-        p_uValue = &gs_uXenonPresenceUpdateInterval_Online.uValue;
+        p_uValue = &uXenonPresenceUpdateInterval.uValue;
         static_cast<void>(p_uValue->uint);
     }
 }

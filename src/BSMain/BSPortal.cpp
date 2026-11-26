@@ -7,12 +7,10 @@
 #include "BSMain/BSMultiBoundRoom.h"
 #include "BSMain/BSMultiBoundShape.h"
 #include "BSMain/BSOcclusionPlane.h"
-#include "BSMain/BSPortalSharedNode.h"
 #include "BSShader/ShadowSceneLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -20,6 +18,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 NiRTTI BSPortal::ms_RTTI("BSPortal", &BSOcclusionPlane::ms_RTTI);
 NiRTTI BSPortalSharedNode::ms_RTTI("BSPortalSharedNode", &NiNode::ms_RTTI);

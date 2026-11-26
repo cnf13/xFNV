@@ -12,3 +12,5 @@ public:
     void addCdBodyPair(const hkpCdBody& arBodyA, const hkpCdBody& arBodyB) override;
     ~bhkFilteredCdBodyCollector() override;
 };
+
+inline bhkFilteredCdBodyCollector::bhkFilteredCdBodyCollector() {}

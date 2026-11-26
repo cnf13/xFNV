@@ -33,3 +33,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline void NiAlphaAccumulator::SetInterfaceSort(bool abInterface) {
+    m_bInterfaceSort = abInterface;
+}

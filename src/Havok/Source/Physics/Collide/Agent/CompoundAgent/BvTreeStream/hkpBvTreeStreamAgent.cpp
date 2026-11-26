@@ -1,5 +1,6 @@
 #include "Havok/Source/Physics/Collide/Agent/CompoundAgent/BvTreeStream/hkpBvTreeStreamAgent.h"
 
+#include "Havok/Source/Common/Base/Algorithm/Sort/hkSort.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
@@ -43,41 +44,7 @@
 #include "Havok/Source/Physics/Internal/Collide/Gjk/hkpGskCache.h"
 #include "xfnv/Compiler.h"
 
-#include <bit>
 #include <xmmintrin.h>
-
-// A Hoare partition around the middle key, then the two halves. The fourth argument is handed to the recursive calls
-// and never read; the compares against the keys are unsigned, those between the indices signed.
-void quickSortRecursive(uint32_t* keys, int32_t low, int32_t high, int32_t unused) {
-    int32_t i = low;
-    int32_t j = high;
-    const uint32_t pivot = keys[(low + high) >> 1];
-    do {
-        while (keys[i] < pivot) {
-            ++i;
-        }
-        while (pivot < keys[j]) {
-            --j;
-        }
-        if (j < i) {
-            break;
-        }
-        if (i != j) {
-            const uint32_t key = keys[j];
-            keys[j] = keys[i];
-            keys[i] = key;
-        }
-        --j;
-        ++i;
-    }
-    while (i <= j);
-    if (low < j) {
-        quickSortRecursive(keys, low, j, unused);
-    }
-    if (i < high) {
-        quickSortRecursive(keys, i, high, unused);
-    }
-}
 
 // The input's dispatcher, an empty cached box and a new agent track.
 hkpBvTreeStreamAgent::hkpBvTreeStreamAgent(
@@ -184,7 +151,6 @@ void hkpBvTreeStreamAgent::processCollision(
     timInB._setRotatedInverseDir(rotB, in3.m_linearTimInfo);
     const __m128 kTimInB = timInB.m_quad;
 
-    float fSpill;
     hkAabb aabb;
     __m128 kMin;
     __m128 kMax;
@@ -209,7 +175,6 @@ void hkpBvTreeStreamAgent::processCollision(
         kMin = _mm_max_ps(aabb.m_min.m_quad, _mm_sub_ps(kCenter, kRadius));
         kMax = _mm_min_ps(aabb.m_max.m_quad, _mm_add_ps(kCenter, kRadius));
         kExtent = _mm_sub_ps(kMax, kMin);
-        fSpill = fRadius;
 
         if (0.0f < XFNV_M128_F32(msB->m_deltaAngle.m_quad, 3)) {
             const float fScale = XFNV_M128_F32(msB->m_sweptTransform.m_centerOfMass1.m_quad, 3) *
@@ -219,7 +184,6 @@ void hkpBvTreeStreamAgent::processCollision(
             hkVector4 cross;
             cross.setCross(arm, msB->m_deltaAngle);
             kMotion = _mm_add_ps(_mm_mul_ps(cross.m_quad, _mm_set1_ps(fScale)), kTimInB);
-            fSpill = fScale;
         }
         const __m128 kZero = _mm_setzero_ps();
         kMin = _mm_add_ps(_mm_min_ps(kZero, kMotion), kMin);
@@ -233,7 +197,6 @@ void hkpBvTreeStreamAgent::processCollision(
         kMax = aabb.m_max.m_quad;
         kMin = aabb.m_min.m_quad;
         kExtent = _mm_sub_ps(kMax, kMin);
-        fSpill = fTolerance;
     }
 
     bool bCacheHit = false;
@@ -262,7 +225,6 @@ void hkpBvTreeStreamAgent::processCollision(
             aabb.m_max.m_quad = kMax;
             cachedAabb->m_min.m_quad = kMin;
             cachedAabb->m_max.m_quad = kMax;
-            fSpill = -2.0f;
         }
     }
     if (!bCacheHit) {
@@ -283,12 +245,7 @@ void hkpBvTreeStreamAgent::processCollision(
         HK_TIMER_END_LIST();
     }
     else {
-        if (hitList.m_size > 1) {
-            // The comparator is an empty functor passed by value: its low byte is zeroed while its upper three bytes
-            // still hold the float fSpill.
-            const uint32_t uiComparator = std::bit_cast<uint32_t>(fSpill) & 0xFFFFFF00;
-            quickSortRecursive(hitList.m_data, 0, hitList.m_size - 1, static_cast<int32_t>(uiComparator));
-        }
+        hkAlgorithm::quickSort(hitList.m_data, hitList.m_size);
         hkAgent1nMachine_Process(m_agentTrack, in3, bodyB.m_shape->getContainer(), hitList.m_data, result);
         HK_TIMER_END_LIST();
     }

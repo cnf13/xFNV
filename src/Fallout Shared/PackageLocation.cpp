@@ -1,6 +1,6 @@
 #include "Fallout Shared/PackageLocation.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/TESTrapListener.h"
@@ -34,8 +34,8 @@ void PackageLocation::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 void PACK_LOC_FILE::Endian() {
-    ENDIAN(iFormID, false);
-    ENDIAN(iRadius, false);
+    BSEndian(iFormID, false);
+    BSEndian(iRadius, false);
 }
 
 PackageLocation::PackageLocation() {

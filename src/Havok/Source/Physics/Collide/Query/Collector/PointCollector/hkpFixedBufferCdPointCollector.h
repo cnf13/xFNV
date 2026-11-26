@@ -43,3 +43,22 @@ public:
 
 // The addCdPoint callback the collector calls, registered by registerDefaultAddCdPointFunction.
 inline hkFixedBufferCdPointCollectorAddCdPointCallbackFunc g_FixedBufferCdPointCollectorAddCdPointCallbackFunc{};
+
+inline hkpFixedBufferCdPointCollector::hkpFixedBufferCdPointCollector(hkpRootCdPoint* buffer, int32_t capacity)
+  : m_pointsArrayBase{buffer}, m_nextFreePoint{buffer}, m_capacity{capacity}, m_numPoints{0} {}
+
+inline void hkpFixedBufferCdPointCollector::addCdPoint(const hkpCdPoint& event) {
+    g_FixedBufferCdPointCollectorAddCdPointCallbackFunc(event, this);
+}
+
+inline const hkpRootCdPoint* hkpFixedBufferCdPointCollector::getHits() const {
+    return m_pointsArrayBase;
+}
+
+inline int32_t hkpFixedBufferCdPointCollector::getNumHits() const {
+    return m_numPoints;
+}
+
+inline hkBool hkpFixedBufferCdPointCollector::hasHit() {
+    return m_numPoints > 0;
+}

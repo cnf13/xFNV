@@ -8,7 +8,7 @@
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkSphereRepShape.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"

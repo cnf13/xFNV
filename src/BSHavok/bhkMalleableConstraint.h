@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/Malleable/hkpMalleableConstraintData.h"
 
 // Bethesda's hkpMalleableConstraintData: the same layout and vtable, with the engine's own constructor and setup
@@ -75,3 +74,9 @@ public:
     // Number of live instances; the constructors count them.
     static inline uint32_t iCount;
 };
+
+inline hkMalleableConstraintCinfo& bhkMalleableConstraint::GetCinfo() {
+    bool bc;
+    hkSerializableCinfo* pCinfo = &CreateCinfo(bc);
+    return *static_cast<hkMalleableConstraintCinfo*>(pCinfo);
+}

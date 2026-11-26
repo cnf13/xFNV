@@ -1,7 +1,11 @@
 #pragma once
 
 #include "BSHavok/bhkNiCollisionObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 class bhkRigidBody;
 class hkpRigidBody;
@@ -46,3 +50,24 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline bhkRigidBody* bhkCollisionObject::GetRigidBody() {
+    return spWorldObject;
+}
+
+inline bhkCollisionObject* bhkCollisionObject::GetbhkCollisionObject(NiAVObject* apObject) {
+    return static_cast<bhkCollisionObject*>(
+        NiObject::DynamicCastStatic(&bhkCollisionObject::ms_RTTI, apObject->NiAVObject::GetCollisionObject())
+    );
+}
+
+inline bhkCollisionObject::bhkCollisionObject() {}
+
+inline bhkCollisionObject* bhkCollisionObject::Getbhk(const hkpRigidBody* apBody) {
+    bhkNiCollisionObject* pCollisionObject = bhkNiCollisionObject::Getbhk(apBody);
+    return static_cast<bhkCollisionObject*>(
+        NiObject::DynamicCastStatic(&bhkCollisionObject::ms_RTTI, pCollisionObject)
+    );
+}
+
+inline bhkCollisionObject::bhkCollisionObject(NiAVObject* apObject) : bhkNiCollisionObject(static_cast<NiNode*>(apObject)) {}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 class NiVBBlock;
 class NiVBDynamicSet;
@@ -56,3 +56,23 @@ public:
     NiVBChip* m_pkNextChip;
     NiVBChip* m_pkPrevChip;
 };
+
+inline NiVBChip* NiVBChip::Create(
+    NiVBBlock* pkBlock,
+    IDirect3DVertexBuffer9* pkVB,
+    uint32_t uiOffset,
+    uint32_t uiSize,
+    uint32_t uiIndex
+) {
+    NiVBChip* pkChip;
+    pkChip = new NiVBChip;
+    if (pkChip) {
+        pkChip->m_uiIndex = uiIndex;
+        pkChip->m_pkBlock = pkBlock;
+        pkChip->m_pkVB = pkVB;
+        pkChip->m_uiOffset = uiOffset;
+        pkChip->m_uiSize = uiSize;
+        pkChip->m_uiLockFlags = 0;
+    }
+    return pkChip;
+}

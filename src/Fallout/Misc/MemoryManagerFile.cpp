@@ -2,6 +2,7 @@
 
 #include "BSCore/IMemoryManagerFile.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSSystem/BSSystemFile.h"
 
 MemoryManagerFile::MemoryManagerFile(const char* apFileName) : File(apFileName, 1u, 2u, false) {}
@@ -35,13 +36,4 @@ void MemoryManagerFile::Seek(int32_t aiPos) {
 
 void MemoryManagerFile::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-IMemoryManagerFile::IMemoryManagerFile() {}
-
-IMemoryManagerFile::~IMemoryManagerFile() {}
-
-BSSystemFile::ErrorCode BSSystemFile::Seek(uint64_t auiOffset, SeekMode aeWhence, uint64_t& auiPos) {
-    eLastError = DoSeek(auiOffset, aeWhence, auiPos);
-    return eLastError;
 }

@@ -7,3 +7,10 @@ NiRTTI NiFragmentShaderInstanceDescriptor::ms_RTTI(
     "NiFragmentShaderInstanceDescriptor",
     &NiShader::NiShaderInstanceDescriptor::ms_RTTI
 );
+
+// m_kMatDesc's identifier releases its own handle.
+NiFragmentShaderInstanceDescriptor::~NiFragmentShaderInstanceDescriptor() {}
+
+void NiFragmentShaderInstanceDescriptor::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}

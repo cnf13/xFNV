@@ -12,6 +12,7 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSCore/MemoryPool.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSCore/ScrapHeap.h"
 #include "BSCore/Xenon/BSThread_Xenon.h"
@@ -40,7 +41,7 @@
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMain/XRegSetting.h"
 #include "BSMenu/DebugText.h"
 #include "BSMenu/Menu.h"
@@ -64,7 +65,6 @@
 #include "BSShader/ImageSpaceEffect.h"
 #include "BSShader/ImageSpaceEffectBlur.h"
 #include "BSShader/ImageSpaceEffectDepthOfField.h"
-#include "BSShader/ImageSpaceEffectFullScreenBlur.h"
 #include "BSShader/ImageSpaceEffectHDR.h"
 #include "BSShader/ImageSpaceEffectMotionBlur.h"
 #include "BSShader/ImageSpaceManager.h"
@@ -134,6 +134,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/Sky/Sun.h"
@@ -249,7 +250,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParallelUpdateTaskManager.h"
@@ -271,6 +271,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVisibleArray.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiStaticDataManager.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/rtti.h"
@@ -310,10 +311,10 @@ NiPointer<BSRenderedTexture> Main::spMenuBGTexture;
 NiPointer<BSRenderedTexture> Main::spInterfaceFXTex;
 NiPointer<BSRenderedTexture> Main::spVATSTex;
 NiPointer<NiScreenElements> Main::spMenuBGGeometry;
-SettingT<INISettingCollection> gs_bUseArchives_Archive("bUseArchives:Archive", true);
+SettingT<INISettingCollection> bUseArchives("bUseArchives:Archive", true);
 SettingT<INISettingCollection> bAlwaysActive("bAlwaysActive:General", false);
 SettingT<INISettingCollection> bCRTMemoryChecks("bCRTMemoryChecks:General", false);
-SettingT<INISettingCollection> gs_sEssentialFileCacheList_General(
+SettingT<INISettingCollection> sEssentialFileCacheList(
     "sEssentialFileCacheList:General",
     "Data\\FalloutNV.esm, Data\\Fallout - Misc.bsa, Data\\Fallout - Sound.bsa, Data\\final_master_xml.dat, "
     "Data\\Shaders\\shaderpackage.sdp, Data\\Music\\Battle\\*, Data\\Music\\Battle\\Finale\\*, Data\\Music\\Base\\*, "
@@ -321,11 +322,9 @@ SettingT<INISettingCollection> gs_sEssentialFileCacheList_General(
     "Data\\Music\\Special\\*, Data\\Music\\Tension\\*, Data\\Music\\TranquilityLane\\*"
 );
 SettingT<INISettingCollection>
-    gs_sUnessentialFileCacheList_General("sUnessentialFileCacheList:General", "Data\\Fallout - Meshes.bsa");
-SettingT<INISettingCollection> gs_sArchiveList_Archive(
-    "sArchiveList:Archive",
-    "Fallout - Textures.bsa, Fallout - Meshes.bsa, Oblivion - Voices1.bsa"
-);
+    sUnessentialFileCacheList("sUnessentialFileCacheList:General", "Data\\Fallout - Meshes.bsa");
+SettingT<INISettingCollection>
+    sMasterArchiveList("sArchiveList:Archive", "Fallout - Textures.bsa, Fallout - Meshes.bsa, Oblivion - Voices1.bsa");
 SettingT<INISettingCollection> sTestFile1("sTestFile1:General", "FalloutNV.esm");
 SettingT<INISettingCollection> sTestFile2("sTestFile2:General", "");
 SettingT<INISettingCollection> sTestFile3("sTestFile3:General", "");
@@ -351,9 +350,9 @@ SettingT<INISettingCollection> bUseThreadedTempEffects("bUseThreadedTempEffects:
 SettingT<INISettingCollection> bDisplayBoundingVolumes("bDisplayBoundingVolumes:General", false);
 SettingT<INISettingCollection> bEnableBoundingVolumeOcclusion("bEnableBoundingVolumeOcclusion:General", false);
 static SettingT<INISettingCollection> sCameraPathNif("sNif:CameraPath", "Test\\CameraPath.nif");
-SettingT<INISettingCollection> gs_iFPS_CameraPath("iFPS:CameraPath", 60);
-SettingT<INISettingCollection> gs_sDirectoryName_CameraPath("sDirectoryName:CameraPath", "TestCameraPath");
-SettingT<INISettingCollection> gs_iTake_CameraPath("iTake:CameraPath", 0);
+SettingT<INISettingCollection> iCameraPathFPS("iFPS:CameraPath", 60);
+SettingT<INISettingCollection> sCameraPathDir("sDirectoryName:CameraPath", "TestCameraPath");
+SettingT<INISettingCollection> iCameraPathTake("iTake:CameraPath", 0);
 SettingT<INISettingCollection> bPreCullActors("bPreCullActors:General", true);
 SettingT<INISettingCollection> fLODLandVerticalBias("fLODLandVerticalBias:LOD", 0.0f);
 SettingT<INISettingCollection> fLODLandDropAmount("fLODLandDropAmount:LOD", 230.0f);
@@ -381,28 +380,28 @@ static SettingT<INISettingCollection>
     sCopyProtectionMessage2("sCopyProtectionMessage2:CopyProtectionStrings", "Insert the Fallout Disc.");
 SettingT<INISettingCollection> bUseBackgroundFileLoader("bUseBackgroundFileLoader:BackgroundLoad", false);
 NiPointer<NiRefObject> spcameraPath;
-SettingT<INISettingCollection> gs_bCheckRuntimeCollisions_Archive("bCheckRuntimeCollisions:Archive", false);
-SettingT<INISettingCollection> gs_iRetainDirectoryStringTable_Archive("iRetainDirectoryStringTable:Archive", 1);
-SettingT<INISettingCollection> gs_iRetainFilenameStringTable_Archive("iRetainFilenameStringTable:Archive", 1);
-SettingT<INISettingCollection> gs_iRetainFilenameOffsetTable_Archive("iRetainFilenameOffsetTable:Archive", 1);
-SettingT<INISettingCollection> gs_sInvalidationFile_Archive("sInvalidationFile:Archive", "ArchiveInvalidation.txt");
-SettingT<INISettingCollection> gs_bInvalidateOlderFiles_Archive("bInvalidateOlderFiles:Archive", true);
-SettingT<INISettingCollection> gs_iFileLogging_MESSAGES("iFileLogging:MESSAGES", 0);
+SettingT<INISettingCollection> bCheckRuntimeCollisions("bCheckRuntimeCollisions:Archive", false);
+SettingT<INISettingCollection> iRetainDirectoryStringTable("iRetainDirectoryStringTable:Archive", 1);
+SettingT<INISettingCollection> iRetainFilenameStringTable("iRetainFilenameStringTable:Archive", 1);
+SettingT<INISettingCollection> iRetainFilenameOffsetTable("iRetainFilenameOffsetTable:Archive", 1);
+SettingT<INISettingCollection> sArchiveInvalidationFile("sInvalidationFile:Archive", "ArchiveInvalidation.txt");
+SettingT<INISettingCollection> bInvalidateOlderFiles("bInvalidateOlderFiles:Archive", true);
+SettingT<INISettingCollection> iFileLogging("iFileLogging:MESSAGES", 0);
 SettingT<INISettingCollection> sDebugText("sDebugText:Display", "VATS");
 SettingT<INISettingCollection> bShowMenuTextureUse("bShowMenuTextureUse:Display", true);
 SettingT<INISettingCollection> iDebugTextTopBottomOffset("iDebugTextTopBottomOffset:Display", 10);
 SettingT<INISettingCollection> iDebugTextLeftRightOffset("iDebugTextLeftRightOffset:Display", 10);
 SettingT<INISettingCollection> bUseSunbeams("bUseSunbeams:Display", false);
 SettingT<INISettingCollection> fScopeScissorAmount("fScopeScissorAmount:Display", 0.3f);
-SettingT<RegSettingCollection> gs_sBasePath("sBasePath", ".\\");
+SettingT<RegSettingCollection> sBasePathS("sBasePath", ".\\");
 SettingT<INISettingCollection> bBlockMessageBoxes("bBlockMessageBoxes:MESSAGES", false);
 SettingT<INISettingCollection> bUseWindowsMessageBox("bUseWindowsMessageBox:MESSAGES", false);
 static BSPrecisionTimer UpdateTexturesTraverseTimer;
 static SettingT<INISettingCollection> fINIUpgradeTexturesDistance("fUpgradeTexturesDistance:General", 1500.0f);
 static SettingT<INISettingCollection> fINIDegradeTexturesDistance("fDegradeTexturesDistance:General", 2500.0f);
-SettingT<INISettingCollection> gs_bAllowYesToAll_MESSAGES("bAllowYesToAll:MESSAGES", true);
-SettingT<INISettingCollection> bSkipProgramFlows_MESSAGES("bSkipProgramFlows:MESSAGES", true);
-SettingT<INISettingCollection> gs_bSkipInitializationFlows_MESSAGES("bSkipInitializationFlows:MESSAGES", true);
+SettingT<INISettingCollection> bAllowYesToAll("bAllowYesToAll:MESSAGES", true);
+SettingT<INISettingCollection> bSkipProgramFlows("bSkipProgramFlows:MESSAGES", true);
+SettingT<INISettingCollection> bSkipInitializationFlows("bSkipInitializationFlows:MESSAGES", true);
 
 // The program's window, which WinMain creates; appMain->hWnd holds its
 // native handle.
@@ -525,15 +524,9 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
 
     char acPath[264];
     bool bDisableWarningMessageBox = true;
-    bool bSkipInitializationFlows = gs_bSkipInitializationFlows_MESSAGES.Bool();
-    bool bSkipProgramFlows = bSkipProgramFlows_MESSAGES.Bool();
-    MessageHandler::Init(
-        true,
-        gs_bAllowYesToAll_MESSAGES.Bool(),
-        bSkipProgramFlows,
-        bSkipInitializationFlows,
-        &MessageBoxCallback
-    );
+    bool bSkipInitializationFlows = ::bSkipInitializationFlows.Bool();
+    bool bSkipProgramFlows = ::bSkipProgramFlows.Bool();
+    MessageHandler::Init(true, bAllowYesToAll.Bool(), bSkipProgramFlows, bSkipInitializationFlows, &MessageBoxCallback);
     MessageHandler::SetWarningFileName("Warnings.txt");
     MessageHandler::SetProgramFlowFileName("ProgramFlow.txt");
     MessageHandler::SetProgrammerOutputFileName("ProgrammerOutput.txt");
@@ -599,7 +592,7 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
             iNumHWThreads.Int() = 2;
         }
         if (CreateDisplayDriver()) {
-            BSShaderManager::Shutdown(eTrue);
+            Renderer::Kill(true);
             BSWin32TaskletManager* pTaskletManager = static_cast<BSWin32TaskletManager*>(
                 &BSTaskletManager::QInstance()
             );
@@ -611,16 +604,16 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
             return 0;
         }
 
-        const char* pUnessentialFileCacheList = gs_sUnessentialFileCacheList_General.String();
-        const char* pEssentialFileCacheList = gs_sEssentialFileCacheList_General.String();
+        const char* pUnessentialFileCacheList = sUnessentialFileCacheList.String();
+        const char* pEssentialFileCacheList = sEssentialFileCacheList.String();
         BSFileCache::QInstance().SetFileCacheList(pEssentialFileCacheList, pUnessentialFileCacheList);
-        new FileFinder(gs_sBasePath.String(), gs_iFileLogging_MESSAGES.Int(), false);
+        new FileFinder(sBasePathS.String(), iFileLogging.Int(), false);
         FileFinder::AddPath_0("DATA");
-        bSkipInitializationFlows = gs_bSkipInitializationFlows_MESSAGES.Bool();
-        bSkipProgramFlows = bSkipProgramFlows_MESSAGES.Bool();
+        bSkipInitializationFlows = ::bSkipInitializationFlows.Bool();
+        bSkipProgramFlows = ::bSkipProgramFlows.Bool();
         MessageHandler::Init(
             bDisableWarningMessageBox,
-            gs_bAllowYesToAll_MESSAGES.Bool(),
+            bAllowYesToAll.Bool(),
             bSkipProgramFlows,
             bSkipInitializationFlows,
             &MessageBoxCallback
@@ -688,7 +681,7 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
         pRenderer = static_cast<NiDX9Renderer*>(NiRenderer::GetRenderer());
         pRenderer->UnlockRenderer();
         BGSMoviePlayer::Create();
-        const char* pIntroSequence = gs_sIntroSequence_General.String();
+        const char* pIntroSequence = BGSMoviePlayer::sIntroSequence.String();
         pMoviePlayer->StartSequence(pIntroSequence, false, -1, true, true, 0.0f);
         kMemContext.Leave();
         appMain->InitTES(Main::GetWorldSceneGraph());
@@ -715,7 +708,7 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
         pDataHandler->UpdateAutoCalcNPCs();
         pSaveLoadGame->SetGlobalAllowChanges(true);
         InitializationFlow("Loading initial area...");
-        Main::InitStartCell(pStartCellName, &kInitialPos);
+        Main_InitStartCell(pStartCellName, &kInitialPos);
         InitializationFlow("Placing player...");
         Main::InitPlayerStart(kInitialPos);
         Interface::InitSecond();
@@ -876,7 +869,7 @@ int32_t WINAPI WinMain(HINSTANCE__* hInstance, HINSTANCE__* hPrevInstance, char*
         NavMeshRender::Destroy();
         BSTexturePalette::Kill();
         BSShaderSDM::KillSDM();
-        BSShaderManager::Shutdown(eTrue);
+        Renderer::Kill(true);
         FileFinder::Close();
         TES::KillSDM();
         BSMain::KillSDM();
@@ -899,12 +892,38 @@ HWND__* GetActiveWindow_SDL() {
     return GetNativeWindow_SDL(pSDLMainWindow);
 }
 
+float ShaderTimer(int32_t iDelta) {
+    switch (iDelta) {
+        case 3: {
+            return appTimer.GetSeconds();
+        }
+        case 2: {
+            if (Interface::IsInMenuMode()) {
+                return 0.0;
+            }
+
+            return static_cast<float>(appTimer.BSTimer::GetTime() / 1000.0);
+        }
+        case 1: {
+            if (!Interface::IsInMenuMode()) {
+                return appTimer.GetSeconds();
+            }
+            return 0.0;
+        }
+        default: {
+            if (iDelta) {
+                return 0.0;
+            }
+
+            return static_cast<float>((appCalendar.GetHour() * 60.0) * 60.0);
+        }
+    }
+}
+
 void Main_ShaderInit() {
     InitializationFlow("Initializing Shader System...");
     BSShaderManager::SetShaderErrorCallback(nullptr);
-    BSShaderManager::SetTimerFunc([](int32_t iDelta) {
-        return static_cast<float>(BSShaderManager::CalculateTime(iDelta));
-    });
+    BSShaderManager::SetTimerFunc(ShaderTimer);
     BSShaderManager::SetUseHardDriveCache(bUseHardDriveCache.Bool());
     BSShaderManager::bDisplayLODLand = bDisplayLODLandINI.Bool();
     BSShaderManager::fLocalTreeMipMapLODBias = static_cast<float>(fLocalTreeMipMapLODBiasINI);
@@ -1017,18 +1036,18 @@ int32_t Main_LoadIniFile(char* lpFileName) {
 }
 
 void SetupArchiveSettings_AndLoadBSAs() {
-    const char* pArchiveList = gs_sArchiveList_Archive.String();
+    const char* pArchiveList = sMasterArchiveList.String();
     const char* pMasterPath = sLocalMasterPath.String();
-    ArchiveManager::Init(gs_bUseArchives_Archive.Bool(), pMasterPath, pArchiveList, 0x200000u);
+    ArchiveManager::Init(bUseArchives.Bool(), pMasterPath, pArchiveList, 0x200000u);
 
-    ArchiveManager::SetCheckRuntimeCollisions(gs_bCheckRuntimeCollisions_Archive.Bool());
+    ArchiveManager::SetCheckRuntimeCollisions(bCheckRuntimeCollisions.Bool());
     ArchiveManager::SetRetainTables(
-        gs_iRetainDirectoryStringTable_Archive.Int(),
-        gs_iRetainFilenameStringTable_Archive.Int(),
-        gs_iRetainFilenameOffsetTable_Archive.Int()
+        iRetainDirectoryStringTable.Int(),
+        iRetainFilenameStringTable.Int(),
+        iRetainFilenameOffsetTable.Int()
     );
-    const char* pInvalidationFile = gs_sInvalidationFile_Archive.String();
-    ArchiveManager::SetInvalidation(gs_bInvalidateOlderFiles_Archive.Bool(), pInvalidationFile);
+    const char* pInvalidationFile = sArchiveInvalidationFile.String();
+    ArchiveManager::SetInvalidation(bInvalidateOlderFiles.Bool(), pInvalidationFile);
     ArchiveManager::OpenMasterArchives();
 }
 
@@ -1083,12 +1102,12 @@ int32_t MessageBoxCallback(const char* apText, const char* apCaption, uint32_t a
             pYesToAllText = nullptr;
             switch (cType) {
                 case 3: {
-                    pYesToAllText = gs_sYesToAllText.String();
+                    pYesToAllText = ::pYesToAllText.String();
                     [[fallthrough]];
                 }
                 case 4: {
-                    pYesText = gs_sYesText.String();
-                    pNoText = gs_sNoText.String();
+                    pYesText = ::pYesText.String();
+                    pNoText = ::pNoText.String();
                     break;
                 }
                 default: {
@@ -1172,7 +1191,7 @@ Main::Main(HWND__* ahWnd, HINSTANCE__* ahInstance)
     SetThreadName(uiThreadID, "Main");
     {
         AutoMemContext kMemContext(MEM_CONTEXT_INTERFACE);
-        Controls::InitializeInstance(ahInstance);
+        Main_InitControls(ahInstance);
         Controls::GetInstance()->InitControlsFromIni();
     }
     {
@@ -1709,8 +1728,7 @@ void Main::OnIdle() {
     if (NiParallelUpdateTaskManager::IsActive()) {
         NiParallelUpdateTaskManager::EndUpdate();
     }
-    // UpdateSleeping never reads this, so the menu is passed only because a this pointer is required.
-    if (Interface::GetTopMenuID() == Interface::eSleepWaitMenu && SleepWaitMenu::pMe->UpdateSleeping()) {
+    if (Interface::GetTopMenuID() == Interface::eSleepWaitMenu && Interface::UpdateSleeping()) {
         RenderMenuBackground();
     }
     CheckWithinMultiBoundTask::DoAttachments();
@@ -2170,11 +2188,11 @@ void Main::Swap() {
             bMultiScreenshotQueued = !bMultiScreenshotQueued;
             if (bMultiScreenshotQueued) {
                 iIdleSectionCount = 0;
-                gs_iTake_CameraPath = gs_iTake_CameraPath.Int() + 1;
-                BSsprintf(acPathName, 260, "%s%03d", gs_sDirectoryName_CameraPath.String(), gs_iTake_CameraPath.Int());
+                iCameraPathTake = iCameraPathTake.Int() + 1;
+                BSsprintf(acPathName, 260, "%s%03d", sCameraPathDir.String(), iCameraPathTake.Int());
                 std::error_code kError;
                 std::filesystem::create_directory(platform::NativePath(acPathName), kError);
-                appTimer.ClampAt(static_cast<uint32_t>(gs_iFPS_CameraPath.Int()));
+                appTimer.ClampAt(static_cast<uint32_t>(iCameraPathFPS.Int()));
             }
             else {
                 appTimer.ClampAt(0);
@@ -4108,7 +4126,7 @@ int32_t Main::DrawWorld_RenderedMenu(void* apPipboyGeom, NiDX9Renderer* apRender
             &fMouseY,
             &uiMenuToSet
         );
-        Interface::SetQueuedPipboyTab(ucOverPipBoyScreen, fMouseX, fMouseY, uiMenuToSet);
+        Interface::SetPipboyPickResults(ucOverPipBoyScreen, fMouseX, fMouseY, uiMenuToSet);
     }
     if (!pCam) {
         pCam = pSceneGraph->GetCamera();
@@ -4391,7 +4409,7 @@ bool Main::LostDeviceCallback([[maybe_unused]] void* apData) {
     return true;
 }
 
-void Main::InitStartCell(char* pCellName, NiPoint3* apPosition) {
+void Main_InitStartCell(char* pCellName, NiPoint3* apPosition) {
     int32_t iY;
     int32_t iX;
     TESObjectCELL* pCell = nullptr;
@@ -4540,128 +4558,6 @@ void Main::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-void Controls::DeleteInstance() {
-    if (pInstance) {
-        Controls* pControls = pInstance;
-        if (pControls) {
-            delete pControls;
-        }
-    }
-    pInstance = nullptr;
-}
-
-void MessageHandler::Close() {
-    if (MessageHandler::pHandler && !MessageHandler::pHandler->bStatic && MessageHandler::pHandler) {
-        delete MessageHandler::pHandler;
-    }
-}
-
-int32_t MessageHandler::QWarningContext() {
-    return iMainValue;
-}
-
-RegSettingCollection::RegSettingCollection() {}
-
-BSFadeNodeCuller::BSFadeNodeCuller(NiVisibleArray* apVisSet) : NiCullingProcess(apVisSet) {}
-
-BSFadeNodeCuller::~BSFadeNodeCuller() {}
-
-// Frees through the engine's CRT.
-void BSFadeNodeCuller::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-// The width of rendered texture aiIndex through its virtual GetWidth, 0 when it is missing.
-uint32_t BSRenderedTexture::GetWidth(int32_t aiIndex) {
-    if (!spTexture[aiIndex]) {
-        return 0;
-    }
-    NiRenderedTexture* pTexture = spTexture[aiIndex];
-    return pTexture->GetWidth();
-}
-
-// The height of rendered texture auiIndex through its virtual GetHeight, 0 when it is missing.
-uint32_t BSRenderedTexture::GetHeight(int32_t aiIndex) {
-    if (!spTexture[aiIndex]) {
-        return 0;
-    }
-    NiRenderedTexture* pTexture = spTexture[aiIndex];
-    return pTexture->GetHeight();
-}
-
-// Copies the pre-restore group into the first target group when one exists.
-void BSRenderedTexture::UsePreRestoreGroup() {
-    if (spPreRestoreGroup) {
-        spGroup[0] = spPreRestoreGroup;
-    }
-}
-
-void ImageSpaceEffectFullScreenBlur::CheckCamera(NiCamera* apCam) {
-    if (apCam) {
-        NiPoint3 kDirDelta;
-        NiPoint3 kDirection;
-        NiPoint3 kLocDelta;
-        NiPoint3 kLocation = apCam->GetWorldTranslate();
-        kDirection = apCam->GetWorldDirection();
-        kLocDelta = kLocation - ImageSpaceEffectFullScreenBlur::kCamLoc;
-        kDirDelta = kDirection - ImageSpaceEffectFullScreenBlur::kCamDir;
-        float fLocZ = kLocDelta.z / ImageSpaceEffectFullScreenBlur::kCamLoc.z;
-        float fLocY = kLocDelta.y / ImageSpaceEffectFullScreenBlur::kCamLoc.y;
-        float fLocX = kLocDelta.x / ImageSpaceEffectFullScreenBlur::kCamLoc.x;
-        NiPoint3 kLocChange(fLocX, fLocY, fLocZ);
-        float fDirZ = kDirDelta.z / ImageSpaceEffectFullScreenBlur::kCamDir.z;
-        float fDirY = kDirDelta.y / ImageSpaceEffectFullScreenBlur::kCamDir.y;
-        float fDirX = kDirDelta.x / ImageSpaceEffectFullScreenBlur::kCamDir.x;
-        NiPoint3 kDirChange(fDirX, fDirY, fDirZ);
-        ImageSpaceEffectFullScreenBlur::bMoving = kLocChange.x > 0.01 ||
-            kLocChange.y > 0.01 ||
-            kLocChange.z > 0.01 ||
-            kDirChange.x > 0.01 ||
-            kDirChange.y > 0.01 ||
-            kDirChange.z > 0.01;
-        ImageSpaceEffectFullScreenBlur::kCamLoc = kLocation;
-        ImageSpaceEffectFullScreenBlur::kCamDir = kDirection;
-    }
-    else {
-        ImageSpaceEffectFullScreenBlur::kCamDir = NiPoint3::UNIT_ALL;
-        ImageSpaceEffectFullScreenBlur::bMoving = false;
-    }
-}
-
-void BSFileCache::ForcePauseFileCaching() {
-    if (eFileCacheState == FILE_CACHING_IN_PROGRESS || eFileCacheState == FILE_CACHING_PAUSED) {
-        eFileCacheState = FILE_CACHING_FORCE_PAUSED;
-    }
-}
-
-// The queue's semaphore (0, 100) is built by BSTCommonScrapHeapMessageQueue's own constructor.
-BSPackedTaskQueue::BSPackedTaskQueue(ScrapHeap* apScrapHeap, UnpackFunc apUnpackFunc)
-  : Queue(apScrapHeap), pUnpackFunc(apUnpackFunc), bProcessing(false) {}
-
-void BSPackedTaskQueue::ThreadBeginInput() {
-    Queue.semaphore.Signal();
-}
-
-void BSPackedTaskQueue::ThreadEndInput() {
-    Queue.semaphore.Wait();
-}
-
-bool BSPackedTaskQueue::AddTask(BSPackedTask* apMessage) {
-    return static_cast<BSTMessageQueue*>(&Queue)->Push(apMessage);
-}
-
-void FileFinder::AddPath_0(const char* apPath) {
-    if (FileFinder::pFinder) {
-        FileFinder::pFinder->AddPath(apPath);
-    }
-}
-
-void FileFinder::Close() {
-    if (FileFinder::pFinder) {
-        delete FileFinder::pFinder;
-    }
-}
-
 void BGSDestructibleObjectForm::SetLastUpdateTime(float afTime) {
     fLastTime = afTime;
 }
@@ -4704,36 +4600,11 @@ bool FOPipboyManager::GetPipBoyManagerReset() {
     return this->bResetPipboyManager;
 }
 
-void NiRenderer::SetSorter(NiAccumulator* pkAccum) {
-    m_spAccum = pkAccum;
-}
-
-bool NiScreenElements::SetTextures(
-    int32_t iPolygon,
-    uint16_t usSet,
-    float fLeft,
-    float fTop,
-    float fRight,
-    float fBottom
-) {
-    NiScreenElementsData* pModelData = static_cast<NiScreenElementsData*>(GetModelData());
-    return pModelData->SetTextures(iPolygon, usSet, fLeft, fTop, fRight, fBottom);
-}
-
-NiScreenElementsData* NiScreenElements::Data() {
-    return NiSmartPointerCast<NiScreenElementsData>(m_spModelData);
-}
-
-void NiSourceTexture::SetDestroyAppDataFlag(bool bDestroy) {
-    NiSourceTexture::ms_bDestroyAppData = bDestroy;
-}
-
-void ShadowSceneLight::SetClipSpacePlanes(float* apfClipPlanes) {
-    if (apfClipPlanes) {
-        rt::memcpy(pfClipSpacePlanes, apfClipPlanes, sizeof(pfClipSpacePlanes));
-        bClipSpacePlanesReady = true;
+void Main_InitControls(HINSTANCE__* hinst) {
+    Controls* oSInputGlobals;
+    if (Controls::pInstance) {
+        delete Controls::pInstance;
     }
-    else {
-        bClipSpacePlanesReady = false;
-    }
+    oSInputGlobals = new Controls(hinst);
+    Controls::pInstance = oSInputGlobals;
 }

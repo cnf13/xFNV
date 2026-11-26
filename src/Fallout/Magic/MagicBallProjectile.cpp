@@ -2,7 +2,7 @@
 
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSSoundHandle.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
@@ -41,7 +41,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -49,6 +48,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <limits>
 
@@ -590,14 +590,6 @@ void MagicBallProjectile::Init3D() {
             }
         }
     }
-}
-
-void bhkCharacterControllerCinfo::SetPosition(const NiPoint3& arPos) {
-    NI2HK(m_position, arPos);
-}
-
-void bhkCharacterControllerCinfo::SetShape(bhkShape* apShape) {
-    spShape = apShape;
 }
 
 EffectItem* MagicProjectile::GetDominantEffect() {

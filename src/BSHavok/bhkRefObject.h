@@ -42,3 +42,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline hkReferencedObject* bhkRefObject::GethkObject() const {
+    return phkObject;
+}

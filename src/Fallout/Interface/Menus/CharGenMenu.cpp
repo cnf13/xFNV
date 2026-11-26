@@ -377,14 +377,6 @@ Tile* CharGenMenu::Create(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAd
     return nullptr;
 }
 
-// Instance is called twice.
-Tile* CharGenMenu::Create_(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAddValues, bool abShowTaggedSkills) {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
-        return CharGenMenu::Create(aiItemType, aiMaxPoints, abOnlyAddValues, abShowTaggedSkills);
-    }
-    return nullptr;
-}
-
 int32_t CharGenMenu::GetClassStatic() {
     return Interface::eCharGenMenu;
 }

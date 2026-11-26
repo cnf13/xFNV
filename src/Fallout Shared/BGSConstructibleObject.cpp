@@ -2,7 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
-#include "BSMain/BSPortalSharedNode.h"
+#include "BSMain/BSPortal.h"
 #include "BSMain/BSValueNode.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSListForm.h"

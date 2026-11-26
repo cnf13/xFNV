@@ -1,12 +1,10 @@
 #pragma once
 
+#include "BSCore/BSCoreDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Havok/Source/Physics/Collide/Filter/hkpCollisionFilter.h"
 
 class NiColor;
-
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
 
 // The collision layers: the low seven bits of a collision filter info.
 enum COL_LAYER {
@@ -199,3 +197,34 @@ public:
 	// The last system group handed out.
 	static inline uint32_t uiNextGroup = 10;
 };
+
+inline BIPED_PART CFilter::GetBipedPart() {
+    return static_cast<BIPED_PART>(GetPart());
+}
+
+inline void bhkCollisionFilter::SetCollisionFlags(COL_LAYER aeLayer, uint64_t aiFlags) {
+    if (aeLayer >= L_CAMERA) {
+        bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
+            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFF00000000ull) |
+            (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags)))
+        );
+        bhkCollisionFilter::ulLayerFlagA[aeLayer] = static_cast<uint64_t>(
+            (bhkCollisionFilter::ulLayerFlagA[aeLayer] & 0xFFFFFFFFull) |
+            (static_cast<uint64_t>(static_cast<uint32_t>(aiFlags >> 32)) << 32)
+        );
+    }
+}
+
+inline void CFilter::SetGroup(uint32_t aiGroup) {
+    iFilter = static_cast<uint16_t>(iFilter);
+    iFilter |= aiGroup << 16;
+}
+
+// The next system group, wrapping within 16 bits and skipping the reserved groups 0..9 (restarts at 10).
+inline uint32_t bhkCollisionFilter::GetNewSystemGroup() {
+    uiNextGroup = static_cast<uint16_t>(uiNextGroup + 1);
+    if (!uiNextGroup) {
+        uiNextGroup = 10;
+    }
+    return uiNextGroup;
+}

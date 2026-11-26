@@ -60,6 +60,16 @@ namespace ATTENUATION_SETTINGS {
     };
 
     inline uint8_t cUsageFlags;
+    // The [LightAttenuation] ini settings: each is constructed by SettingT<INISettingCollection>'s constructors and
+    // destroyed by its destructor at exit.
+    extern SettingT<INISettingCollection> eLinearMethod;
+    extern SettingT<INISettingCollection> eQuadraticMethod;
+    extern SettingT<INISettingCollection> fLinearValue;
+    extern SettingT<INISettingCollection> fQuadraticValue;
+    extern SettingT<INISettingCollection> fConstantValue;
+    extern SettingT<INISettingCollection> bOutQuadInLin;
+    extern SettingT<INISettingCollection> fLinearRadiusMult;
+    extern SettingT<INISettingCollection> fQuadraticRadiusMult;
 } // namespace ATTENUATION_SETTINGS
 
 // A light base form (LIGH).
@@ -141,4 +151,4 @@ public:
     NiColor EmittanceColor;
 };
 
-extern SettingT<INISettingCollection> gs_fFlickerMovement_bLightAttenuation;
+extern SettingT<INISettingCollection> fFlickerMovement;

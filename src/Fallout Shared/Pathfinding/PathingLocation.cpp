@@ -5,7 +5,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSWorldLocation.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"

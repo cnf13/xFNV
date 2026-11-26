@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 // The interface of the large-block allocator a free-list allocator takes its big blocks from: alloc/free, validity

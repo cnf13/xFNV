@@ -91,3 +91,29 @@ spErrorCallback_t SetFileCallback(spErrorCallback_t apCallback);
 char InvokeFileCallback(uint32_t a1, uint32_t a2, uint32_t a3);
 
 inline spErrorCallback_t spErrorCallback{};
+
+inline BSSystemFile::ErrorCode BSSystemFile::GetSizeOfFile(const char* apcPath, uint64_t& auiSize) {
+    BSSystemFile kFile(apcPath, 0, 0, false);
+    BSSystemFile::ErrorCode eError = kFile.QLastError();
+    if (eError) {
+        auiSize = 0;
+    }
+    else {
+        eError = kFile.GetSize(auiSize);
+    }
+    return eError;
+}
+
+inline BSSystemFile::ErrorCode BSSystemFile::QLastError() const {
+    return eLastError;
+}
+
+inline BSSystemFile::ErrorCode BSSystemFile::Seek(uint64_t auiOffset, SeekMode aeWhence, uint64_t& auiPos) {
+    eLastError = DoSeek(auiOffset, aeWhence, auiPos);
+    return eLastError;
+}
+
+inline BSSystemFile::ErrorCode BSSystemFile::Read(void* apvBuffer, uint64_t auiBytes, uint64_t& auiRead) {
+    eLastError = DoRead(apvBuffer, auiBytes, auiRead);
+    return eLastError;
+}

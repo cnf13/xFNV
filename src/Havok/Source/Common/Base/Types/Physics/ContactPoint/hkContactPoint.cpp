@@ -55,3 +55,7 @@ hkClass hkContactPointClass(
 static void cleanupLoadedObjecthkContactPoint(void* p) {
     ;
 }
+
+const hkClass& hkContactPoint::staticClass() {
+    return hkContactPointClass;
+}

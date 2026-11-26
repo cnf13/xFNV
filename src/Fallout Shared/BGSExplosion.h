@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BGSPreloadable.h"
 #include "Fallout Shared/TESEnchantableForm.h"
 #include "Fallout Shared/TESFullName.h"

@@ -134,6 +134,7 @@ public:
     std::vector<BSFaceGenRGBA, std::allocator<BSFaceGenRGBA>> UncompressedImage;
     uint32_t iWidth;
     uint32_t iHeight;
-};
 
-extern SettingT<INISettingCollection> gs_bFaceMipMaps_General;
+protected:
+    static SettingT<INISettingCollection> bFaceMipMaps;
+};

@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
@@ -470,7 +471,6 @@ bool GetIsControllerDisabled();
 // wrapping to 0, and returns apDevice.
 uint32_t* IncrementControlsDevice(uint32_t* apDevice);
 void SetXboxController(StartMenu::UserOption* apUOpt);
-float Get_fGamma();
 void SetTextureSize(StartMenu::UserOption* apUOpt);
 void SetActorFade(StartMenu::UserOption* apUOpt);
 

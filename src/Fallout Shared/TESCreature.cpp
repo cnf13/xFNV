@@ -3,7 +3,7 @@
 #include "BSAudio/BSAudio.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/BSUtilities.h"
@@ -26,6 +26,7 @@
 #include "Fallout Shared/Package.h"
 #include "Fallout Shared/PackageLocation.h"
 #include "Fallout Shared/PackageSchedule.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESAIForm.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESActorBaseData.h"
@@ -75,7 +76,7 @@
 #include <bit>
 
 static SettingT<GameSettingCollection> fCreatureCalcDamage("fCreatureCalcDamage", 1.0f);
-SettingT<GameSettingCollection> gs_fCreatureCalcCombat("fCreatureCalcCombat", 2.0f);
+SettingT<GameSettingCollection> fCreatureCalcCombat("fCreatureCalcCombat", 2.0f);
 
 static SettingT<GameSettingCollection> fCreatureCalcMagic("fCreatureCalcMagic", 2.0f);
 static SettingT<GameSettingCollection> fCreatureCalcStealth("fCreatureCalcStealth", 2.0f);
@@ -893,7 +894,7 @@ bool TESCreature::Activate(
         if (!pactor->IsKnockedOut()) {
             BaseProcess* pspeaker = pactor->pCurrentProcess;
             if (pspeaker->GetPickpocketed()) {
-                const char* pText = gs_sNoPickPocketAgain.String();
+                const char* pText = sNoPickpocketAgain.String();
                 std::sprintf(msg, "%s %s", pactor->GetFullName(), pText);
                 Interface::ShowMessage(
                     msg,
@@ -1486,7 +1487,7 @@ uint8_t TESCreature::GetCombatSkill() const {
         if (sLevel < 1) {
             sLevel = 1;
         }
-        iCombat += static_cast<int32_t>(gs_fCreatureCalcCombat.Float() * static_cast<double>(sLevel));
+        iCombat += static_cast<int32_t>(fCreatureCalcCombat.Float() * static_cast<double>(sLevel));
     }
     return iCombat;
 }

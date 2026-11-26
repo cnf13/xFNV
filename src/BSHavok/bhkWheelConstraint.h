@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 
 // The Gamebryo side of a wheel constraint. It adds no fields to bhkConstraint (its CreateObject allocates 0x10
 // bytes).

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 
 #include <cstdarg>

@@ -14,3 +14,11 @@ void hkpAllCdBodyPairCollector::addCdBodyPair(const hkpCdBody& bodyA, const hkpC
     pair->m_rootCollidableB = bodyB.getRootCollidable();
     pair->m_shapeKeyB = bodyB.m_shapeKey;
 }
+
+void hkpAllCdBodyPairCollector::operator delete(void* p) {
+    if (!p) {
+        return;
+    }
+    hkMemoryAllocator& kAllocator = hkMemoryRouter::getInstance().heap();
+    kAllocator.blockFree(p, sizeof(hkpAllCdBodyPairCollector));
+}

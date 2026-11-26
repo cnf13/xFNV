@@ -16,3 +16,6 @@ public:
     hkArray<int32_t, hkContainerHeapAllocator> m_hardwareThreadIds;
     const char* m_threadName;
 };
+
+// The hardware thread id array is freed by its own destructor.
+inline hkCpuJobThreadPoolCinfo::~hkCpuJobThreadPoolCinfo() {}

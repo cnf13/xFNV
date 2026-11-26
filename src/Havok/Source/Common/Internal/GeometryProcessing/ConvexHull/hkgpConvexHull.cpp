@@ -2177,9 +2177,7 @@ void hkgpConvexHull::createVoronoiCells(
     float fFarthest = -1.0f;
     for (const hkVector4& site : sites) {
         hkgpConvexHull* pCell = domain->clone();
-        if (sorted.m_size > 1) {
-            sortByDistance(sorted.m_data, 0, sorted.m_size - 1, &site);
-        }
+        hkAlgorithm::quickSort(sorted.m_data, sorted.m_size, hkgpConvexHullImpl::RadialSort(site));
         pCell->m_data->m_config.m_buildIndices.m_bool = false;
         pCell->m_data->m_config.m_buildMassProperties.m_bool = false;
         for (int32_t j = 0; j < sorted.m_size; ++j) {
@@ -2565,8 +2563,8 @@ int32_t hkgpConvexHullImpl::build(
                 m_pendings[i].m_source.setInt24W(i);
             }
         }
-        if ((!static_cast<uint8_t>(forcePlanar) && m_config.m_sortInputs.m_bool) && (m_pendings.m_size > 1)) {
-            hkAlgorithm::quickSortRecursive(m_pendings.m_data, 0, m_pendings.m_size - 1, static_cast<uint8_t>(0));
+        if (!static_cast<uint8_t>(forcePlanar) && m_config.m_sortInputs.m_bool) {
+            hkAlgorithm::quickSort(m_pendings.m_data, m_pendings.m_size);
         }
 
         for (;;) {
@@ -2640,15 +2638,7 @@ int32_t hkgpConvexHullImpl::build(
                             v.m_x[2] = iSwap;
                         }
                     }
-                    // quickSort, with the hkAlgorithm::less comparator passed as byte 0 as above.
-                    if (m_pendings.m_size > 1) {
-                        hkAlgorithm::quickSortRecursive(
-                            m_pendings.m_data,
-                            0,
-                            m_pendings.m_size - 1,
-                            static_cast<uint8_t>(0)
-                        );
-                    }
+                    hkAlgorithm::quickSort(m_pendings.m_data, m_pendings.m_size);
                     hull.setSize(2 * numPoints);
                     int32_t numHull = 0;
                     // The upper chain, then the lower one.
@@ -3330,10 +3320,7 @@ int32_t hkgpConvexHullImpl::generateIndexedFaces(
         for (Triangle* t = m_mesh.m_triangles.m_used; t; t = t->m_next) {
             triangles.pushBackUnchecked(t);
         }
-        if (triangles.m_size > 1) {
-            // The last argument is the comparator, an empty Triangle::SortByPlaneId.
-            sortTrianglesByPlaneIndex(triangles.m_data, 0, triangles.m_size - 1, 0);
-        }
+        hkAlgorithm::quickSort(triangles.m_data, triangles.m_size, Triangle::SortByPlaneId());
         const int32_t numTriangles = triangles.m_size;
         for (int32_t i = 0; i < numTriangles; ++i) {
             Triangle* t = triangles.m_data[i];
@@ -3880,8 +3867,6 @@ void hkgpConvexHullImpl::buildIndices() {
     trianglePlanes_t trianglePlanes;
     if (numTriangles != 0) {
         sorted.reserve(numTriangles);
-        // The bits of the last triangle's key, which the comparator argument below carries.
-        uint32_t uiLessSlot = 0;
         for (Triangle* t = m_mesh.m_triangles.m_used; t; t = t->m_next) {
             SortedTriangle& st = sorted.expandOneUnchecked();
             st.m_data = t;
@@ -3938,18 +3923,8 @@ void hkgpConvexHullImpl::buildIndices() {
                 _mm_sqrt_ss(_mm_add_ss(_mm_shuffle_ps(sq, sq, 0xAA), _mm_add_ss(_mm_shuffle_ps(sq, sq, 0x55), sq)))
             );
             st.m_value = fLength;
-            uiLessSlot = std::bit_cast<uint32_t>(fLength);
         }
-        if (sorted.m_size > 1) {
-            // The empty less<SortedTriangle> is passed as a 32-bit value with its low byte cleared, so its upper three
-            // bytes are those of the last triangle's key float.
-            hkAlgorithm::quickSortRecursive(
-                sorted.m_data,
-                0,
-                sorted.m_size - 1,
-                static_cast<int32_t>(uiLessSlot & 0xFFFFFF00u)
-            );
-        }
+        hkAlgorithm::quickSort(sorted.m_data, sorted.m_size);
         map.reserve(hkMemoryRouter::getInstance().heap(), m_mesh.m_triangles.m_numUsed);
         trianglePlanes.setSize(m_mesh.m_triangles.m_numUsed);
         int32_t index = 0;
@@ -5407,9 +5382,7 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
         for (Vertex* pVertex = m_mesh.m_vertices.m_used; pVertex; pVertex = pVertex->m_next) {
             pVertex->m_scratch = 0.0f;
         }
-        if (edges.m_size > 1) {
-            hkAlgorithm::quickSortRecursive(edges.m_data, 0, edges.m_size - 1, 0);
-        }
+        hkAlgorithm::quickSort(edges.m_data, edges.m_size);
         const int32_t iNumToRemove = m_mesh.m_vertices.m_numUsed - numVerticesToKeep;
         int32_t iNumRemoved = 0;
         if (iNumToRemove > 0) {
@@ -5484,237 +5457,6 @@ bool hkgpConvexHullImpl::decimateVertices(int32_t numVerticesToKeep, bool contai
         buildMassProperties();
     }
     return true;
-}
-
-// Quicksort over triangle pointers keyed by their plane's index (Triangle::SortByPlaneId, signed compares): sorts
-// apArr[aiLow..aiHigh] in place (inclusive bounds), recursing on the lower part and looping on the upper. The pivot's
-// key is read through the pivot pointer on each pass. aiLess is the comparator (an empty class), passed on to the
-// recursive call.
-int32_t sortTrianglesByPlaneIndex(hkgpConvexHullImpl::Triangle** apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    for (;;) {
-        int32_t i = aiLow;
-        int32_t j = aiHigh;
-        const hkgpConvexHullImpl::Triangle* pPivot = apArr[(aiLow + aiHigh) >> 1];
-        do {
-            const int32_t iPivotKey = pPivot->m_plane.m_index;
-            while (apArr[i]->m_plane.m_index < iPivotKey) {
-                ++i;
-            }
-            while (iPivotKey < apArr[j]->m_plane.m_index) {
-                --j;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                hkgpConvexHullImpl::Triangle* pTriangle = apArr[i];
-                apArr[i] = apArr[j];
-                apArr[j] = pTriangle;
-            }
-            --j;
-            ++i;
-        }
-        while (i <= j);
-        if (aiLow < j) {
-            sortTrianglesByPlaneIndex(apArr, aiLow, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return aiHigh;
-        }
-        aiLow = i;
-    }
-}
-
-// The SDK's quickSortRecursive specialised to compare points by squared distance to origin: the middle element the
-// pivot, recursing on the lower part and looping on the upper one.
-void sortByDistance(hkVector4* points, int32_t lo, int32_t hi, const hkVector4* origin) {
-    while (true) {
-        int32_t i = lo;
-        int32_t j = hi;
-        const hkVector4 pivot = points[(lo + hi) >> 1];
-        do {
-            const hkVector4 o = *origin;
-            const float fPivot = pivot.distanceToSquared3(o);
-            // Each scan stops at an equal or unordered distance.
-            while (fPivot > points[i].distanceToSquared3(o)) {
-                ++i;
-            }
-            while (points[j].distanceToSquared3(o) > fPivot) {
-                --j;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                const __m128 swap = points[j].m_quad;
-                points[j].m_quad = points[i].m_quad;
-                points[i].m_quad = swap;
-            }
-            --j;
-            ++i;
-        }
-        while (i <= j);
-        if (lo < j) {
-            sortByDistance(points, lo, j, origin);
-        }
-        if (i >= hi) {
-            return;
-        }
-        lo = i;
-    }
-}
-
-// hkgpAbstractMeshDefinitions::List<...>::Item::operator= copies nothing (hkgpAbstractMesh.h), so element copies copy
-// only the vertex's own members. Item here declares no such operator, so the copies are written member by member.
-int32_t
-hkAlgorithm::quickSortRecursive(hkgpConvexHullImpl::Vertex* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    less<hkgpConvexHullImpl::Vertex> cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = aiHigh;
-        int32_t j = d;
-        hkgpConvexHullImpl::Vertex str;
-        const hkgpConvexHullImpl::Vertex& rMid = apArr[(d + aiHigh) >> 1];
-        str.m_source = rMid.m_source;
-        str.m_x[0] = rMid.m_x[0];
-        str.m_x[1] = rMid.m_x[1];
-        str.m_x[2] = rMid.m_x[2];
-        str.m_scratch = rMid.m_scratch;
-        str.m_refs = rMid.m_refs;
-        str.m_index = rMid.m_index;
-        do {
-            while (cmpLess(apArr[j], str)) {
-                j++;
-            }
-            while (cmpLess(str, apArr[i])) {
-                i--;
-            }
-            if (i < j) {
-                break;
-            }
-            if (i != j) {
-                hkgpConvexHullImpl::Vertex zal;
-                hkgpConvexHullImpl::Vertex& pi = apArr[i];
-                hkgpConvexHullImpl::Vertex& pj = apArr[j];
-                zal.m_source = pi.m_source;
-                zal.m_x[0] = pi.m_x[0];
-                zal.m_x[1] = pi.m_x[1];
-                zal.m_x[2] = pi.m_x[2];
-                zal.m_scratch = pi.m_scratch;
-                zal.m_refs = pi.m_refs;
-                zal.m_index = pi.m_index;
-                pi.m_source = pj.m_source;
-                pi.m_x[0] = pj.m_x[0];
-                pi.m_x[1] = pj.m_x[1];
-                pi.m_x[2] = pj.m_x[2];
-                pi.m_scratch = pj.m_scratch;
-                pi.m_refs = pj.m_refs;
-                pi.m_index = pj.m_index;
-                pj.m_source = zal.m_source;
-                pj.m_x[0] = zal.m_x[0];
-                pj.m_x[1] = zal.m_x[1];
-                pj.m_x[2] = zal.m_x[2];
-                pj.m_scratch = zal.m_scratch;
-                pj.m_refs = zal.m_refs;
-                pj.m_index = zal.m_index;
-            }
-            i--;
-            j++;
-        }
-        while (j <= i);
-        int32_t iResult = d;
-        if (d < i) {
-            iResult = quickSortRecursive(apArr, d, i, aiLess);
-        }
-        if (j >= aiHigh) {
-            return iResult;
-        }
-        d = j;
-    }
-}
-
-// Sorts decimateVertices's edges apArr[aiLow..aiHigh] in place (inclusive bounds), largest key first (ORDER -1). The
-// pivot is copied whole.
-void hkAlgorithm::quickSortRecursive(
-    hkgpConvexHullImpl::SortedEdge* apArr,
-    int32_t aiLow,
-    int32_t aiHigh,
-    int32_t aiLess
-) {
-    less<hkgpConvexHullImpl::SortedEdge> cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = aiHigh;
-        int32_t j = d;
-        const hkgpConvexHullImpl::SortedEdge pivot = apArr[(d + aiHigh) >> 1];
-        do {
-            while (cmpLess(apArr[j], pivot)) {
-                j++;
-            }
-            while (cmpLess(pivot, apArr[i])) {
-                i--;
-            }
-            if (i < j) {
-                break;
-            }
-            if (i != j) {
-                hkgpConvexHullImpl::SortedEdge zal = apArr[i];
-                apArr[i] = apArr[j];
-                apArr[j] = zal;
-            }
-            i--;
-            j++;
-        }
-        while (j <= i);
-        if (d < i) {
-            quickSortRecursive(apArr, d, i, aiLess);
-        }
-        if (j >= aiHigh) {
-            return;
-        }
-        d = j;
-    }
-}
-
-void hkAlgorithm::quickSortRecursive(
-    hkgpConvexHullImpl::SortedTriangle* apArr,
-    int32_t aiLow,
-    int32_t aiHigh,
-    int32_t aiLess
-) {
-    less<hkgpConvexHullImpl::SortedTriangle> cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = aiHigh;
-        int32_t j = d;
-        const hkgpConvexHullImpl::SortedTriangle str = apArr[(d + aiHigh) >> 1];
-        do {
-            while (cmpLess(apArr[j], str)) {
-                j++;
-            }
-            while (cmpLess(str, apArr[i])) {
-                i--;
-            }
-            if (i < j) {
-                break;
-            }
-            if (i != j) {
-                hkgpConvexHullImpl::SortedTriangle zal = apArr[i];
-                apArr[i] = apArr[j];
-                apArr[j] = zal;
-            }
-            i--;
-            j++;
-        }
-        while (j <= i);
-        if (d < i) {
-            quickSortRecursive(apArr, d, i, aiLess);
-        }
-        if (j >= aiHigh) {
-            return;
-        }
-        d = j;
-    }
 }
 
 void hkPseudoRandomGenerator::getRandomVector11(hkVector4& vecOut) {

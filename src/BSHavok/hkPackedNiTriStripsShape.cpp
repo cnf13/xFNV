@@ -3,7 +3,7 @@
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkPackedNiTriStripsShape.h"
 #include "BSHavok/hkNormalTriangleShape.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -387,5 +387,3 @@ void hkPackedNiTriStripsShape::CalcWorldAabb(const hkTransform& localToWorld) {
 // hkpTriangleShape's constructor with the SDK's default welding (none) and no extrusion.
 hkNormalTriangleShape::hkNormalTriangleShape(float afRadius)
   : hkpTriangleShape(afRadius, 0, hkpWeldingUtility::WELDING_TYPE_NONE) {}
-
-hkpShapeCollection::~hkpShapeCollection() {}

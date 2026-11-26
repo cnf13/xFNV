@@ -1,6 +1,7 @@
 #include "Fallout/Interface/BGSMenuPacker.h"
 
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Tile.h"
 #include "Fallout/Interface/Interface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

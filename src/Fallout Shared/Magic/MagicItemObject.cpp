@@ -1,6 +1,6 @@
 #include "Fallout Shared/Magic/MagicItemObject.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Magic/AlchemyItem.h"

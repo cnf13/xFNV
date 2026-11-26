@@ -2,6 +2,7 @@
 
 // hkWorldObjectCinfo's native operator delete frees through MemoryManager::Instance().
 #include "BSCore/MemoryManager.h"
+#include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkSerialized.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -134,6 +135,13 @@ public:
     static inline uint32_t iCount;
 };
 
+inline hkpWorldObject* bhkWorldObject::operator*() {
+    if (this) {
+        return Gethk();
+    }
+    return nullptr;
+}
+
 // The creation info a world object's wrapper builds the Havok object from.
 class hkWorldObjectCinfo : public hkSerializableCinfo {
 public:
@@ -176,3 +184,60 @@ static_assert(offsetof(hkWorldObjectCinfo::Serialized, m_shape) == 0x4);
 static_assert(offsetof(hkWorldObjectCinfo::Serialized, m_broadPhaseType) == 0x8);
 static_assert(offsetof(hkWorldObjectCinfo::Serialized, m_properties) == 0xC);
 static_assert(sizeof(hkWorldObjectCinfo::Serialized) == 0x18);
+
+inline bhkWorldObject* bhkWorldObject::Getbhk(const hkpWorldObject* apObj) {
+    if (apObj) {
+        return apObj->getUserData();
+    }
+
+    return nullptr;
+}
+
+inline void bhkWorldObject::SetCollisionFilter(CFilter aiFilter) {
+    hkpCollidable* pc = GetCollidableRw();
+    if (pc) {
+        static_cast<hkpLinkedCollidable*>(pc)->hkpLinkedCollidable::setCollisionInfoFlags(aiFilter.iFilter);
+    }
+    UpdateCFilter();
+}
+
+inline void bhkWorldObject::SetFlags(uint32_t aiFlags, bool abTF) {
+    if (abTF) {
+        iFlags |= aiFlags;
+    }
+    else {
+        ClearFlags(aiFlags);
+    }
+}
+
+inline hkpWorldObject* bhkWorldObject::Gethk() {
+    return static_cast<hkpWorldObject*>(phkObject);
+}
+
+inline bool bhkWorldObject::ForceAdd(bhkWorld* apWorld) {
+    return Add(apWorld);
+}
+
+inline hkWorldObjectCinfo::hkWorldObjectCinfo() : m_collisionFilterInfo(0), m_shape(nullptr) {
+    m_broadPhaseType = hkpWorldObject::BROAD_PHASE_ENTITY;
+}
+
+inline bool bhkWorldObject::IsAddedToWorld() {
+    hkpWorldObject* pObject = Gethk();
+    bool bAdded = false;
+    if (pObject) {
+        MarkRead();
+        bAdded = pObject->isAddedToWorld();
+        UnMarkRead();
+    }
+    return bAdded;
+}
+
+inline void bhkWorldObject::SetName(const char* apName) {
+    hkpWorldObject* pObject = **this;
+    if (pObject) {
+        MarkWrite();
+        pObject->setName(apName);
+        UnMarkWrite();
+    }
+}

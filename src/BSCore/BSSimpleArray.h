@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/AiFormulas.h"
 #include "Fallout Shared/Magic/EffectItem.h"
 #include "Fallout Shared/Pathfinding/AStarNode.h"

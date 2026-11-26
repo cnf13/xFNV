@@ -6,11 +6,12 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFogProperty.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowLightShader.h"
@@ -25,6 +26,7 @@
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionList.h"
 #include "Fallout Shared/Renderer.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Atmosphere.h"
 #include "Fallout Shared/Sky/Clouds.h"
 #include "Fallout Shared/Sky/Moon.h"
@@ -61,7 +63,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -70,6 +71,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 
@@ -1885,16 +1887,6 @@ void Sky::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-void BSShaderManager::SetWindDirection(NiPoint2 aDirection) {
-    WindDirection = aDirection;
-}
-
-// Stores the point's two floats straight into the shadow projection transform.
-void ShadowLightShader::SetProjectedShadowTranslate(NiPoint2 aTranslate) {
-    kShadowProjTransform.x = aTranslate.x;
-    kShadowProjTransform.y = aTranslate.y;
-}
-
 void ImageSpaceModifierInstanceForm::SetImageSpaceModifier(TESImageSpaceModifier* apMod) {
     pImageSpaceMod = apMod;
 }
@@ -1920,8 +1912,4 @@ float TESWeather::GetFogData(FogData aType) const {
 
 uint8_t TESWeather::GetWeatherDataRaw(WeatherData aeType) const {
     return ucWeatherData[aeType];
-}
-
-float NiSinQ(float afRadians) {
-    return s_fSinTableA[static_cast<int32_t>(512.0 / NI_TWO_PI * afRadians) & 511];
 }

@@ -3,8 +3,9 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/DebugText.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/TileImage.h"
@@ -231,7 +232,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                     RefreshLines();
                 }
                 else if (!_tcsicmp(cLine, "tag")) {
-                    TESObjectREFR* ppickRef = pim->GetConsoleSelection();
+                    TESObjectREFR* ppickRef = pim->GetPickedREFR();
                     if (ppickRef) {
                         BSStringT<char> xMessage;
                         int32_t iFormID = ppickRef->iFormID;
@@ -415,7 +416,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                                     xScript.CompileAndRun(
                                         pConsoleCompiler,
                                         SYSTEM_WINDOW_COMPILER,
-                                        pmanager->GetConsoleSelection()
+                                        pmanager->GetPickedREFR()
                                     );
                                 }
                             }
@@ -502,7 +503,7 @@ bool MenuConsole::Idle(int32_t aiKey) {
                     xScript.SetTemporary();
                     xScript.SetText(cLine);
                     InterfaceManager* pmanager = InterfaceManager::Instance();
-                    xScript.CompileAndRun(pConsoleCompiler, SYSTEM_WINDOW_COMPILER, pmanager->GetConsoleSelection());
+                    xScript.CompileAndRun(pConsoleCompiler, SYSTEM_WINDOW_COMPILER, pmanager->GetPickedREFR());
                 }
             }
         }

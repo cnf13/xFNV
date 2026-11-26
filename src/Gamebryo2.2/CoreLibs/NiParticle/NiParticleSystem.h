@@ -73,3 +73,19 @@ public:
     static inline bool ms_bParallelUpdateEnabled;
     static inline uint32_t iThreadID;
 };
+
+inline NiPSysModifier* NiParticleSystem::GetModifierAt(uint32_t uiIndex) {
+    NiTListItem<NiPointer<NiPSysModifier>>* kIter;
+    if (uiIndex >= m_kModifierList.m_uiCount) {
+        return nullptr;
+    }
+    uint32_t uiCount = 0;
+    kIter = m_kModifierList.m_pkHead;
+    while (kIter) {
+        NiPSysModifier* pkModifier = m_kModifierList.GetNext(kIter).m_pObject;
+        if (uiCount++ == uiIndex) {
+            return pkModifier;
+        }
+    }
+    return nullptr;
+}

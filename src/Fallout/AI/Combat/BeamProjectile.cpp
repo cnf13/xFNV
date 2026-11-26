@@ -4,7 +4,7 @@
 #include "BSShader/BeamShaderProperty.h"
 #include "Fallout Shared/ActorCause.h"
 #include "Fallout Shared/BGSProjectile.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout Shared/TESObjectWEAP.h"
 #include "Fallout/AI/Combat/Projectile.h"
@@ -297,14 +297,6 @@ void BeamProjectile::ScaleBeam3D(NiAVObject* ap3D, float afDesiredLength, float 
             }
         }
     }
-}
-
-void BeamShaderProperty::SetLength(float afValue) {
-    fLength = afValue;
-}
-
-void BeamShaderProperty::SetAlpha(float afValue) {
-    fAlpha = afValue;
 }
 
 void Projectile::SetActorCause(ActorCause* apActorCause) {

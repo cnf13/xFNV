@@ -335,7 +335,7 @@ void BaseProcess::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, MobileObje
         istartBufferPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
         pSaveLoadGameOLD->LoadGameDataOLD(&iblockSize, sizeof(iblockSize));
     }
-    CurrentPackage.LoadGameTES(aiFlags, aiCurrentFlags);
+    CurrentPackage.LoadGame(aiFlags, aiCurrentFlags);
     pSaveLoadGameOLD->LoadGameDataOLD(&fSystemTimeClock, sizeof(fSystemTimeClock));
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         uint8_t* icurrentBufferPosition = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -414,11 +414,11 @@ void BaseProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 void BaseProcess::InitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, MobileObject* pmob) {
-    CurrentPackage.InitLoadGameTES(aiFlags, aiOldFlags);
+    CurrentPackage.InitLoadGame(aiFlags, aiOldFlags);
 }
 
 void BaseProcess::InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
-    CurrentPackage.InitLoadGameBGS(apLoadGameBuffer);
+    CurrentPackage.InitLoadGame(apLoadGameBuffer);
     if (pCachedValues) {
         pCachedValues->Reset();
     }
@@ -434,14 +434,14 @@ void BaseProcess::FinishInitLoadGame(uint32_t aiFlags, uint32_t aiOldFlags, Mobi
 
 // ActorPackage::Revert ignores both the flags and the process.
 void BaseProcess::Revert(uint32_t aiFlags, MobileObject* pmob) {
-    CurrentPackage.RevertTES(static_cast<int32_t>(aiFlags));
+    CurrentPackage.Revert(static_cast<int32_t>(aiFlags));
 }
 
 // Forgets when the actor was last processed, then reverts the package and marks the cached values stale.
 void BaseProcess::Revert(BGSLoadFormBuffer* apLoadGameBuffer) {
     fHourLastProcessed = -1.0f;
     iDateLastProcessed = 0;
-    CurrentPackage.RevertBGS(apLoadGameBuffer);
+    CurrentPackage.Revert(apLoadGameBuffer);
     if (pCachedValues) {
         pCachedValues->Reset();
     }

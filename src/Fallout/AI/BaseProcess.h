@@ -3,6 +3,7 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSBodyPart.h"

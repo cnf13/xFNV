@@ -146,3 +146,13 @@ inline fLightWeights_t fLightWeights{};
 // The same weights again; only written.
 using fLightDistances_t = float[40];
 inline fLightDistances_t fLightDistances{};
+
+inline void ShadowSceneLight::SetClipSpacePlanes(float* apfClipPlanes) {
+    if (apfClipPlanes) {
+        rt::memcpy(pfClipSpacePlanes, apfClipPlanes, sizeof(pfClipSpacePlanes));
+        bClipSpacePlanesReady = true;
+    }
+    else {
+        bClipSpacePlanesReady = false;
+    }
+}

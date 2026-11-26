@@ -32,13 +32,10 @@ public:
     // Returns the animation group the sequence's keys belong to.
     TESAnimGroup* GetAnimGroup();
     uint16_t GetSaveSize();
-    NiFixedString* GetRootNodeNamePtr();
     bool ResolveTransformInterpolators(NiAVObject* apNode, uint32_t aiTransformControllerCount);
     double GetKeyLengthOverFrequency();
     // Looks up the priority of the group tag apTag; true when it is known.
     uint8_t GetPriority(const char* apBoneName, uint32_t* apReturnIndex);
-    void SetInterpolatorPriority(uint32_t auiIndex, uint8_t aucPriority);
-    uint8_t GetInterpolatorPriority(uint32_t auiIndex);
     void SetAnimGroup(TESAnimGroup* apAnimGroup);
     void ClearBlendInterp();
     float GetScaledTime(float afTime);
@@ -53,8 +50,6 @@ public:
     // The save size of a sequence; the version check adds 4 bytes for saves before version 0x71. GetSaveSize calls it.
     static uint16_t GetSequenceSaveSize();
     static bool PlaySounds(NiControllerSequence* apSeq, TESObjectREFR* apRef);
-    // apFilename is the const char* from KFModel::InitSequence, passed on to strrchr.
-    static void* InitAnimGroup(BSAnimGroupSequence* apSequence, const char* apFilename);
     // Reads sequence uiIndex of kStream through NiControllerSequence's
     // CreateSequenceFromFile, wraps it in a new BSAnimGroupSequence (no anim group) and stores that in
     // aspControllerSequence.

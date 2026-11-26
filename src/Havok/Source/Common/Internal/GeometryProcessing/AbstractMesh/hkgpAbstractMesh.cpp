@@ -98,7 +98,3 @@ using hkgpTriangulatorType_lhkgpTriangulatorBase_nVertexBase_chkgpTriangulatorBa
 // The edge array pointers' _append: the SDK's inline body (hkArray.h).
 using hkArrayBase_lhkArray_lhkgpMeshBase_nEdge_chkContainerHeapAllocator_g_p = hkArrayBase<
     hkArray<hkgpMeshBase::Edge, hkContainerHeapAllocator>*>;
-// The list links (m_next, m_prev) are not copied: the list sets them.
-hkgpMeshBase::Vertex::Vertex(const hkgpMeshBase::Vertex& other)
-  : m_position(other.m_position), m_normal(other.m_normal), m_data(other.m_data), m_refs(other.m_refs),
-    m_tag(other.m_tag) {}

@@ -54,22 +54,6 @@
 
 #include <cstdint>
 
-TESObjectREFR* GetDialogMenuParterRef() {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
-        DialogMenu* pDialogMenu = nullptr;
-        Tile* pMenuTile = Menu::GetMenuByClass(1009);
-        if (pMenuTile) {
-            Menu* pMenu = pMenuTile->GetMenu();
-            pDialogMenu = dynamic_cast<DialogMenu*>(pMenu);
-        }
-        if (pDialogMenu) {
-            return pDialogMenu->pSpeaker;
-        }
-    }
-
-    return nullptr;
-}
-
 DialogMenu::DialogMenu()
   : Menu(), eDialogState(eCameraZoomIn), eGoodbyeState(eInDialogue), pSpeaker(nullptr), bResponseShown(false),
     fElapsedSecs(0.0f), uiIgnoreInputStartTime(0), pDepthOfFieldInstance(nullptr), bIsIn3rdPerson(false),
@@ -694,7 +678,7 @@ Tile* DialogMenu::Create(MobileObject* apSpeaker, TESTopic* apGreetTopic, Mobile
                 DialogMenu::iUT_DialogVisible = Tile::TextToTrait("_DialogVisible");
                 DialogMenu::iUT_ShowingText = Tile::TextToTrait("_ShowingText");
                 g_dialogMenu_TraitCurrentValue = Tile::TextToTrait("_current_value");
-                bool bShowSubtitles = gs_bDialogueSubtitles_GamePlay.Bool() ||
+                bool bShowSubtitles = bDialogueSubtitles.Bool() ||
                     (apSpeaker->IsActor() &&
                      static_cast<uint8_t>(static_cast<Actor*>(apSpeaker)->Actor::GetShowSubtitles()));
                 int32_t iShowSubtitlesTrait = Tile::TextToTrait("_ShowSubtitles");

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
 #include <stdint.h>

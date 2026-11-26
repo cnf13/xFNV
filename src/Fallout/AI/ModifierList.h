@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 class BGSLoadFormBuffer;
 class BGSSaveFormBuffer;
@@ -68,11 +68,11 @@ public:
     void AdjustModifier(char acKey, float afValue, ClampStyle aeClampStyle);
     void Revert();
     bool WriteModifier(Modifier* apModifier);
-    void RevertBGS(BGSLoadFormBuffer* apBuffer);
+    void Revert(BGSLoadFormBuffer* apBuffer);
     // Saves the modifier count, then the key byte and the value of each list and fast modifier.
     void SaveGame(BGSSaveFormBuffer* apSaveGameBuffer);
     // Loads the old-format modifiers from the save.
-    void LoadGameTES();
+    void LoadGame();
     // Reads what SaveGame(BGSSaveFormBuffer*) writes and adds each modifier.
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Saves the modifiers into the old-format save.

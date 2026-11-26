@@ -3,9 +3,9 @@
 #include <stdint.h>
 
 #include "BSMovie/CAsyncStream.h"
-#include "BSMovie/CRequestList.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/DirectShow/CAMEvent.h"
+#include "SDK/DirectShow/CRequestList.h"
 #include "SDK/DirectShow/CUnknown.h"
 
 class BSSystemThread;

@@ -3,8 +3,10 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"
 #include "Fallout Shared/Pathfinding/NavMeshInfo.h"
@@ -97,7 +99,7 @@ bool NavMesh::Load(TESFile* apFile) {
                 case NVER_ID:
                     apFile->GetChunkData(&ifileVersionNumber, 4);
                     if (apFile->QEndian()) {
-                        ENDIAN(ifileVersionNumber, false);
+                        BSEndian(ifileVersionNumber, false);
                     }
                     break;
                 case DATA_ID: {
@@ -172,7 +174,7 @@ bool NavMesh::Load(TESFile* apFile) {
                     if (apFile->QEndian()) {
                         uint32_t isize = CoverArray.GetSize();
                         for (uint32_t i = 0; i < isize; ++i) {
-                            ENDIAN(CoverArray.GetAt(i), false);
+                            BSEndian(CoverArray.GetAt(i), false);
                         }
                     }
                     break;
@@ -425,12 +427,12 @@ uint32_t EdgeExtraInfoOLD::GetSaveSize() {
 }
 
 void NavMeshSaveStruct::Endian() {
-    ENDIAN(ParentCellID, false);
-    ENDIAN(VertexCount, false);
-    ENDIAN(TriangleCount, false);
-    ENDIAN(ExtraInfoCount, false);
-    ENDIAN(CoverArrayCount, false);
-    ENDIAN(DoorPortalCount, false);
+    BSEndian(ParentCellID, false);
+    BSEndian(VertexCount, false);
+    BSEndian(TriangleCount, false);
+    BSEndian(ExtraInfoCount, false);
+    BSEndian(CoverArrayCount, false);
+    BSEndian(DoorPortalCount, false);
 }
 
 void BSClampUInt16(uint16_t* aVal, uint16_t aMin, uint16_t aMax) {
@@ -453,8 +455,8 @@ int32_t EdgeExtraInfo::GetSaveSizeOld() {
 }
 
 void NavMeshTriangleDoorPortal::Endian() {
-    ENDIAN(pDoorForm, false);
-    ENDIAN(iOwningTriangleIndex, false);
+    BSEndian(pDoorForm, false);
+    BSEndian(iOwningTriangleIndex, false);
 }
 
 void NavMesh::FinishLoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
@@ -613,20 +615,20 @@ void NavMeshTriangle::SetObjectCount(uint32_t aiCount) {
 
 // Swaps the flags, then the three vertex and the three triangle indices, read from a big-endian file.
 void NavMeshTriangle::Endian() {
-    ENDIAN(TriangleFlags, false);
-    ENDIAN(Vertices[0], false);
-    ENDIAN(Vertices[1], false);
-    ENDIAN(Vertices[2], false);
-    ENDIAN(Triangles[0], false);
-    ENDIAN(Triangles[1], false);
-    ENDIAN(Triangles[2], false);
+    BSEndian(TriangleFlags, false);
+    BSEndian(Vertices[0], false);
+    BSEndian(Vertices[1], false);
+    BSEndian(Vertices[2], false);
+    BSEndian(Triangles[0], false);
+    BSEndian(Triangles[1], false);
+    BSEndian(Triangles[2], false);
 }
 
 NavMeshVertex::NavMeshVertex() {}
 
 // Swaps the three coordinates read from a big-endian file.
 void NavMeshVertex::Endian() {
-    ENDIAN(Location.x, false);
-    ENDIAN(Location.y, false);
-    ENDIAN(Location.z, false);
+    BSEndian(Location.x, false);
+    BSEndian(Location.y, false);
+    BSEndian(Location.z, false);
 }

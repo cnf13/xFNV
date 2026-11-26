@@ -129,4 +129,4 @@ extern SettingT<INISettingCollection> fTabKnobMaxPosition;
 extern SettingT<INISettingCollection> fScrollKnobRate;
 inline int32_t iClickedOrangeButton = -1;
 
-extern SettingT<INISettingCollection> gs_fScanlineFrequencyPipboy_Pipboy;
+extern SettingT<INISettingCollection> fScanlineScalePipboy;

@@ -12,7 +12,6 @@
 #include "BSMain/BSOcclusionPlane.h"
 #include "BSMain/BSPortal.h"
 #include "BSMain/BSPortalGraph.h"
-#include "BSMain/BSPortalSharedNode.h"
 #include "BSShader/BSCubeMapCamera.h"
 #include "BSShader/BSFogProperty.h"
 #include "BSShader/BSRenderedTexture.h"
@@ -30,7 +29,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDirectionalLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustumPlanes.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -48,6 +46,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 
 // GetAverageLightPos's function-local statics: each gathered light's blend scale and attenuation (the same value),
@@ -2673,39 +2672,5 @@ void ShadowSceneNode::RemoveLightsFromGeom(NiTriBasedGeom* apGeom) {
     while (pLight) {
         pLight->RemoveTriGeom(pGeom, nullptr);
         pLight = pShaderProperty->GetNextLight(reinterpret_cast<void*&>(apGeom));
-    }
-}
-
-void BSPortalGraph::AddRoomToAccumList(BSMultiBoundRoom* apRoom) {
-    if (apRoom) {
-        apRoom->IncRefCount();
-    }
-
-    auto* pItem = lMultiBoundRoomAccumList.m_pkHead;
-    bool bAdd = true;
-    while (pItem) {
-        auto* pElement = &pItem->m_element;
-        pItem = pItem->m_pkNext;
-        if (apRoom == pElement->m_pObject) {
-            bAdd = false;
-            break;
-        }
-    }
-    NiRefObject* pRoom = apRoom;
-    if (pRoom) {
-        pRoom->DecRefCount();
-    }
-
-    if (bAdd) {
-        NiPointer<BSMultiBoundRoom> spRoom;
-        spRoom.m_pObject = apRoom;
-        if (apRoom) {
-            apRoom->IncRefCount();
-        }
-        lMultiBoundRoomAccumList.AddTail(spRoom);
-        spRoom.m_pObject = nullptr;
-        if (pRoom) {
-            pRoom->DecRefCount();
-        }
     }
 }

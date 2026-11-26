@@ -24,6 +24,9 @@ public:
     // The size of the Eyefinity display group (SLS).
     static float GetEyefinitySLSWidth();
     static float GetEyefinitySLSHeight();
+    // Frees the shader system and releases the renderer. On the final kill, first reports any other smart pointers
+    // still holding the renderer.
+    static void Kill(bool abFinalKill);
     // Creates the renderer for the window; null on failure.
     static NiDX9Renderer* Init(HWND__* ahWnd, HINSTANCE__* ahInstance);
     // The text of the last renderer creation error, pErrorStringA.
@@ -80,6 +83,7 @@ public:
     static float GetBlurEmmisiveMultHDR();
     static bool GetWidescreen();
     static void SetGamma(float afGamma);
+    static float GetGamma();
     // Applies the pending resize.
     static void DoResize();
     // Whether the screen settings are usable. abCheckDims is never read.
@@ -134,8 +138,6 @@ public:
     static SettingT<INISettingCollection> fBrightScale;
     static SettingT<INISettingCollection> fEyeAdaptSpeed;
     static SettingT<INISettingCollection> fEmissiveHDRMult;
-    static SettingT<INISettingCollection> fUpperLUMClamp;
-    static SettingT<INISettingCollection> fTargetLUM;
     static SettingT<INISettingCollection> bAllowPartialPrecision;
     static SettingT<INISettingCollection> bDecalsOnSkinnedGeometry;
     static SettingT<INISettingCollection> bTintMipMaps;
@@ -272,6 +274,29 @@ public:
     // The size of the Eyefinity display group; SetupEyefinity sets it.
     static inline float fEyefinitySLSWidth = 1280.0f;
     static inline float fEyefinitySLSHeight = 720.0f;
+
+protected:
+    // Settings built with SettingT<INISettingCollection>'s float and bool constructors in Renderer.cpp's dynamic
+    // initialisers.
+    static SettingT<INISettingCollection> fDecalLODStart;
+    static SettingT<INISettingCollection> bDoAmbientPass;
+    static SettingT<INISettingCollection> bDoDiffusePass;
+    static SettingT<INISettingCollection> bDoSpecularPass;
+    static SettingT<INISettingCollection> bDoTexturePass;
+    static SettingT<INISettingCollection> fUpperLUMClamp;
+    static SettingT<INISettingCollection> fTargetLUM;
+    static SettingT<INISettingCollection> iIniBlurPassesHDRInterior;
+    static SettingT<INISettingCollection> fIniBlurRadiusHDRInterior;
+    static SettingT<INISettingCollection> fBrightClampInterior;
+    static SettingT<INISettingCollection> fBrightScaleInterior;
+    static SettingT<INISettingCollection> fEyeAdaptSpeedInterior;
+    static SettingT<INISettingCollection> fEmissiveHDRMultInterior;
+    static SettingT<INISettingCollection> fUpperLUMClampInterior;
+    static SettingT<INISettingCollection> fTargetLUMInterior;
+    static SettingT<INIPrefSettingCollection> fGamma;
+
+public:
+    static SettingT<RendererSettingCollection> sD3DDevice;
 };
 
 // One display of an Eyefinity group (AMD's sample's DisplayInfoStruct): atiEyefinityGetConfigInfo allocates them 0x2C
@@ -330,4 +355,6 @@ inline float fEyefinityWidth;
 // The window class name (ModelLoader.cpp overlays it as pWindowTitle).
 inline const char* pAppClassName = "Fallout: New Vegas";
 
-extern SettingT<RendererSettingCollection> gs_sD3DDevice_Display;
+inline float Renderer::GetGamma() {
+    return Renderer::fGamma;
+}

@@ -1,8 +1,13 @@
 #pragma once
 
+#include "BSCore/BSCoreMath.h"
 #include "BSCore/BSStringT.h"
 #include "Fallout Shared/FaceGen/BSFaceGenAnimationData.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/EgmFileIO.h"
+#include "SDK/FaceGen/EgtFileIO_Sdk.h"
+#include "SDK/FaceGen/MatrixVT.h"
+#include "SDK/FaceGen/Vect2.h"
+#include "SDK/FaceGen/Vect3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
@@ -29,8 +34,6 @@ class BSMultiBoundNode;
 class BSResizableTriShape;
 class BSSegmentedTriShape;
 struct EGMData;
-struct FffModeGS;
-struct FffModeTexS;
 class FffTriFileDataS;
 class NiGeometry;
 class NiLines;
@@ -42,12 +45,6 @@ class NiTriShape;
 class NiTriStrips;
 
 enum HAIR_PART : int32_t;
-
-// FaceGen's element classes that the vector instantiations below hold; they are not modelled yet.
-template <class T>
-class FR2Vect2TC;
-template <class T>
-class FR2Vect3TC;
 
 // The .tri morph data of a FaceGen mesh (head or hair). Not an NiObject, but it repeats NiObject's run-time type
 // virtuals, as NiShader does.
@@ -285,74 +282,6 @@ inline void NiDecRefCount(BSFaceGenModelMeshData* apData) {
     apData->DecRefCount();
 }
 
-// The 6-byte FR2Vect3TC<short>: the diff morphs' vertex deltas and FffModeGS's vertex offsets.
-template <>
-class FR2Vect3TC<int16_t> {
-public:
-    int16_t x1;
-    int16_t x2;
-    int16_t x3;
-};
-
-// The 12-byte FR2Vect3TC<float>: the .tri reader's vertices. The int instance has the same shape.
-template <>
-class FR2Vect3TC<float> {
-public:
-    // The element-wise sum with v1, built in apResult.
-    FR2Vect3TC* Add(FR2Vect3TC* apResult, const FR2Vect3TC& v1) const;
-    // Multiplies each element by val and builds the result in apResult.
-    FR2Vect3TC* MulScalar(FR2Vect3TC* apResult, float val) const;
-
-    float x1;
-    float x2;
-    float x3;
-};
-
-// FR2Vect2TC<float>: a .tri texture coordinate. This file's vector rows copy one element as two floats.
-template <>
-class FR2Vect2TC<float> {
-public:
-    float x1;
-    float x2;
-};
-
-// The 0x1C-byte mode of a FaceGen mesh: its scale and its vertex offsets.
-struct FffModeGS {
-    FffModeGS() = default;
-    FffModeGS(const FffModeGS& _Right);
-    ~FffModeGS();
-
-    // Copy assignment: the scale, then the vertex offsets' vector assignment; returns this. Not declared as operator=:
-    // a user-declared copy assignment would make FffModeGS non-trivially copyable (vector's Assign has the same
-    // reason).
-    FffModeGS& Assign(const FffModeGS& _Right);
-
-    float scale;
-    std::vector<FR2Vect3TC<int16_t>, std::allocator<FR2Vect3TC<int16_t>>> vertPos;
-};
-
-// The texture mode of a FaceGen mesh: its scale, width, height and row padding, then its three byte vectors of image
-// data. fffReadEgtFile stores the .egt header's column and row counts in width and height.
-struct FffModeTexS {
-    FffModeTexS();
-    FffModeTexS(const FffModeTexS& _Right);
-    ~FffModeTexS();
-
-    // Copy assignment: copies the scale and the three dimensions, then assigns each image vector. Not declared as
-    // operator=, as FffModeGS::Assign.
-    FffModeTexS& Assign(const FffModeTexS& _Right);
-
-    static void operator delete(void* apMemory);
-
-    float scale;
-    uint32_t width;
-    uint32_t height;
-    uint32_t rowPad;
-    std::vector<uint8_t, std::allocator<uint8_t>> img[3];
-};
-
-// FffModeGS::vertPos: the mode's vertex offsets.
-using FR2Vect3SVector = std::vector<FR2Vect3TC<int16_t>, std::allocator<FR2Vect3TC<int16_t>>>;
 // EGTData::EGTBasis: the texture modes of each of the two bases.
 using FffModeTexSVector = std::vector<FffModeTexS, std::allocator<FffModeTexS>>;
 // BSFaceGenModel's morph vectors.
@@ -360,12 +289,8 @@ using FR2Vect3FloatVector = std::vector<FR2Vect3TC<float>, std::allocator<FR2Vec
 using FutVect4Vector = std::vector<FutVect4TC<int32_t>, std::allocator<FutVect4TC<int32_t>>>;
 using FffTriStatMorphVector = std::vector<FffTriStatMorphS, std::allocator<FffTriStatMorphS>>;
 
-// FffModeTexS::img: the three byte vectors of a texture mode's image data.
-using FffModeTexImgVector = std::vector<uint8_t, std::allocator<uint8_t>>;
-
 // Returns its first argument. Callers push one to three arguments.
 int32_t return_value(int32_t aiValue, ...);
-uint32_t BSMIN(uint16_t a, uint32_t b);
 // The modes' backward move dispatcher:
 // passes _First, _Last, _Dest and the iterator-category tag _Cat (the fourth argument's byte) on to the
 // backward copy CopyBackwardOpt (FffModeGS steps of 0x1C) with two more tag bytes, and returns its result.

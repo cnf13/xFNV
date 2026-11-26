@@ -11,3 +11,5 @@ public:
     float m_maxExtraPenetration;
     float m_startPointTolerance;
 };
+
+inline hkpLinearCastInput::hkpLinearCastInput() : m_maxExtraPenetration(0x1p-23f), m_startPointTolerance(0x1p-23f) {}

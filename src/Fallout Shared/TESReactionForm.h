@@ -55,9 +55,9 @@ public:
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     int32_t GetFactionCombatRelation(TESForm* apForm);
     // Writes the reactions to the old-format save. Tests the caller's whole aiFlags value.
-    void SaveGameTES(uint32_t aiFlags);
+    void SaveGame(uint32_t aiFlags);
     // Reads the reactions from the old-format save.
-    void LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags);
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags);
     // Resolves the loaded reactions' form IDs.
     void InitLoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Resolves the reaction form IDs after an old-format load when aiFlags has bit 2.

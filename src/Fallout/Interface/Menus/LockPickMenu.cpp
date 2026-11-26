@@ -63,7 +63,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -1029,7 +1029,7 @@ void LockPickMenu::Draw3DElements() {
         BSCullingProcess* pCuller = pSceneGraph->pCuller;
         pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         NiCamera* pMenuCamera = LockPickMenu::spCamera.m_pObject;
-        NiCamera::HandleEyeFinityFOVScale(pMenuCamera, 0.15f);
+        HandleEyeFinityFOVScale(pMenuCamera, 0.15f);
         NiPointer<NiRefObject> spAccumulator(
             static_cast<NiRefObject*>(InterfaceManager::Instance()->Get3dAccumulator())
         );

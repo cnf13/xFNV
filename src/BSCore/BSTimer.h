@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/BSCoreUtils.h"
+
 #include <cstdint>
 
 // Frame timer: tracks the time between updates, scaled by the global time multiplier.
@@ -59,3 +61,11 @@ public:
 extern BSTimer appTimer;
 
 inline float fTimerGlobalMultChangeSpeed = 0.1f;
+
+inline BSTimer::BSTimer() {
+    Init(BSGetTickCount());
+}
+
+inline bool BSTimer::GetSecondsIsZero() const {
+    return bZeroDelta;
+}

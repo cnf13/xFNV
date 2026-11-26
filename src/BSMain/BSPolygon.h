@@ -60,3 +60,11 @@ public:
     NiPointer<NiTriShape> sp3D;
     NiPoint3 vWorldTranslate;
 };
+
+inline NiNode* BSPolygon2D::GetRootNode() {
+    return spRootNode;
+}
+
+inline NiTriShape* BSPolygon2D::Get3D() {
+    return sp3D;
+}

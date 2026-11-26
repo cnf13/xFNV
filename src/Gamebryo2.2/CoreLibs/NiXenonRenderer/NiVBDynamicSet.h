@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 // A dynamic vertex buffer that chips are carved from at a moving offset.
 class NiVBDynamicSet : public NiMemObject {

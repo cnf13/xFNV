@@ -5,7 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatInterpController.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiFloatInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"

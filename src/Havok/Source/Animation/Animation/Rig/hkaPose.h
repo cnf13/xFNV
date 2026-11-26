@@ -108,6 +108,12 @@ public:
     hkArray<float> m_floatSlotValues;
 };
 
+inline void hkaPose::operator delete(void* apMemory) {
+    if (apMemory) {
+        hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkaPose));
+    }
+}
+
 inline hkaPose::hkaPose(const hkaSkeleton* skeleton)
   : m_skeleton(skeleton), m_modelInSync(false), m_localInSync(false) {
     const int32_t numBones = m_skeleton->m_bones.m_size;

@@ -7,7 +7,7 @@
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout/AI/Movement/ActorMover.h"
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 

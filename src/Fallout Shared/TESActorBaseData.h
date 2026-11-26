@@ -241,9 +241,9 @@ public:
     // Loads the base data when the save changed it (CHANGE_ACTOR_BASE_DATA), keeping the current sex flag.
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Saves the base data to the old-format save.
-    void SaveGameTES(uint32_t aiFlags);
+    void SaveGame(uint32_t aiFlags);
     // Loads the base data from the old-format save.
-    void LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags);
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags);
     void SetMatchesPCLevel(bool abVal);
     void SetRunsInLow(bool abValue, bool abAddChange);
     void SetLevel(uint16_t asValue);

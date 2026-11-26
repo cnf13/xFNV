@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/Magic/MagicSystem.h"
@@ -8,11 +9,6 @@
 class Actor;
 class EffectSetting;
 class Script;
-
-double fFloor(float afValue);
-// The game's floor of a float: the truncation fFloor gives, less 1 when aIn lies below it, with the result rounded to
-// float. Not the CRT's floor.
-float FloatFloor(float aIn);
 
 // The numbers of one magic effect entry.
 struct EffectItemData {

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/TESScriptCompiler.h"
 #include "Fallout Shared/TESScriptVariable.h"

@@ -12,7 +12,7 @@
 #include "BSMain/BSCloningProcess.h"
 #include "Fallout Shared/TES.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -323,17 +323,4 @@ hkScaledMoppBvTreeShape::hkScaledMoppBvTreeShape(
     if (apOriginal) {
         apOriginal->addReference();
     }
-}
-
-hkpMoppCode::hkpMoppCode(
-    const CodeInfo& arInfo,
-    const uint8_t* apMoppData,
-    int32_t aiMoppBytes,
-    BuildType aeBuildType
-) {
-    m_info.m_offset = arInfo.m_offset;
-    m_data.m_size = aiMoppBytes;
-    m_data.m_data = const_cast<uint8_t*>(apMoppData);
-    m_data.m_capacityAndFlags = aiMoppBytes | hkArray<uint8_t>::DONT_DEALLOCATE_FLAG;
-    m_buildType.m_storage = aeBuildType;
 }

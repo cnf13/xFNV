@@ -1,7 +1,7 @@
 #include "Fallout Shared/Region System/TESRegionPointList.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/Region System/TESRegionPoint.h"
 #include "Fallout Shared/TESFile.h"
@@ -52,8 +52,8 @@ bool TESRegionPointList::Load(TESFile* apFile) {
         for (uint32_t i = 0; i < uiPoints; ++i) {
             TESRegionPoint* pPoint;
             if (apFile->QEndian()) {
-                ENDIAN<float>(pPoints[i].x, false);
-                ENDIAN<float>(pPoints[i].y, false);
+                BSEndian<float>(pPoints[i].x, false);
+                BSEndian<float>(pPoints[i].y, false);
             }
             pPoint = new TESRegionPoint(pPoints[i]);
             if (static_cast<double>(Minimums.x) > pPoint->Point.x) {

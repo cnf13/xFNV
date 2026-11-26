@@ -59,3 +59,9 @@ public:
     static NiRTTI ms_RTTI;
     static NiPointer<NiZBufferProperty> ms_spDefault;
 };
+
+inline NiZBufferProperty* NiZBufferProperty::GetDefault() {
+    return ms_spDefault;
+}
+
+inline NiZBufferProperty::NiZBufferProperty() : m_uFlags(15) {}

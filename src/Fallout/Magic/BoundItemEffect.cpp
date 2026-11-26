@@ -283,13 +283,13 @@ void BoundItemEffect::SaveGame(Actor* apActor) {
     bool bDisplaced = pDisplacedWeapon != nullptr;
     pSaveLoadGameOLD->SaveGameDataOLD(&bDisplaced, sizeof(bDisplaced));
     if (bDisplaced) {
-        pDisplacedWeapon->SaveGameTES();
+        pDisplacedWeapon->SaveGame();
     }
     for (int32_t i = 0; i < 20; ++i) {
         bDisplaced = pDisplacedItems[i] != nullptr;
         pSaveLoadGameOLD->SaveGameDataOLD(&bDisplaced, sizeof(bDisplaced));
         if (bDisplaced) {
-            pDisplacedItems[i]->SaveGameTES();
+            pDisplacedItems[i]->SaveGame();
         }
     }
     if (pSaveLoadGameOLD->GetCurrentVersion() >= 65u) {

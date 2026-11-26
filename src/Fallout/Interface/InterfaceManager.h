@@ -6,6 +6,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
+#include "BSShader/BSRenderedTexture.h"
 #include "Fallout/Interface/FOHUDEffectManager.h"
 #include "Fallout/Interface/FOVATSEffectManager.h"
 #include "Fallout/Interface/Interface.h"
@@ -40,28 +41,13 @@ void QueueRenderedMenuDelete(FORenderedMenu* pRenderedMenu);
 int32_t ConvertSpecialInputKeyToControllerKey(int32_t aiKey);
 // The menu height over the interface height, rounded to float.
 float GetMenuHeightRatio();
-// Flips the full-help flag on the interface singleton when the menus are shown.
-void ToggleFullHelp();
-// Whether the full help is on and the menus are shown.
-bool GetIsFullHelp();
-// Whether the map menu shows the fog of war; true without a map menu.
-bool GetMapMenuFogOfWar();
-// Sets the fog of war on the open map menu.
-void SetMapMenuFogOfWar(bool abFogOfWar);
 // The size of the Eyefinity screen the game draws on.
 float GetEyefinityScreenWidth();
 float GetEyefinityScreenHeight();
 // True while the display spans several monitors.
 bool IsEyefinity();
-// Opens the barter menu for apRef when the menus are shown.
-TileMenu* ShowBarterMenu_(TESObjectREFR* apRef, int32_t aiMode);
-// The mode of the open container menu, 0 without one.
-uint32_t GetContainerMenuMode();
-// Opens the lock pick menu when the menus are shown. The script commands pass null as the first argument.
-TileMenu* _ShowLockPickMenu(TESObjectREFR* apRef, int32_t aiLockLevel, bool abFlag);
 // Deletes the rendered menus queued for deletion, under the rendered-menu critical section.
 void ClearRenderedMenuDeleteList();
-uint32_t MakeRGBA(uint32_t aiRed, uint32_t aiGreen, uint32_t aiBlue, uint32_t aiAlpha);
 int32_t SplitColorComponents(int32_t aiColor, uint32_t* apRed, uint32_t* apGreen, uint32_t* apBlue, uint32_t* apAlpha);
 void RecursivelySetVisibilityDirty(Tile* apTile);
 
@@ -187,7 +173,7 @@ public:
     // Whether the mouse cursor is shown or no controller is connected.
     bool GetMouseVisible();
     InterfaceManager*
-    SetQueuedPipboyTab(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, uint32_t auiMenuToSet);
+    SetPipboyPickResults(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, uint32_t auiMenuToSet);
     void HandleControllerStateChange(int32_t aiState);
     char GetMapPageNumber();
     void DumpMenuPackingInfo();
@@ -218,7 +204,7 @@ public:
     NiNode* GetCursorRoot();
     NiNode* GetDebugTextRoot();
     // The console's picked reference, and the pipboy manager.
-    TESObjectREFR* GetConsoleSelection();
+    TESObjectREFR* GetPickedREFR();
     FOPipboyManager* GetPipboy();
     // True when the renderer asked for the emergency texture release.
     bool GetFirstChanceTextureRelease();
@@ -318,7 +304,7 @@ public:
     // The menu tile under the cursor (only a target tile when abExactTargetOnly), or null.
     Tile* PickMenus(bool abExactTargetOnly);
     // Sets up an interface scene graph (a new one named apName when apSceneGraph is null) with its camera and roots.
-    SceneGraph* InitSceneGraph(SceneGraph* apSceneGraph, const char* apName, bool abIs3D);
+    SceneGraph* CreateSceneGraph(SceneGraph* apSceneGraph, const char* apName, bool abIs3D);
     // Replaces the pip-boy manager with a new, initialised one.
     void ReinitialisePipboyManager();
     // Accumulates and renders the interface scene graph (abPipboyVisible is unused).
@@ -376,7 +362,7 @@ public:
     void ClearTargetREFR();
     int32_t GetCursorX();
     // The pip-boy tab last shown: the root tile's value 0x1771, converted to an integer.
-    int32_t GetLastPipboyTab();
+    int32_t GetCurrentMainMenu();
     // aiCrosshairRef is the reference's address (pCrossHairRef), pointer-sized.
     void SetCrosshairRef(intptr_t aiCrosshairRef);
     void SetLockpickControlsDisable(bool abDisable);
@@ -389,7 +375,6 @@ protected:
 
 public:
     static void Free();
-    static TESObjectREFR* GetTelekinesisTarget();
     // The interface singleton, created by InterfaceManager::Initialize.
     static InterfaceManager* Instance();
     // The string tile root that globals render through.
@@ -445,7 +430,6 @@ public:
     static void ClearMenuButton(Interface::enumGamepadButtons eAction);
     static void operator delete(void* apMemory);
     static void SetContainerMenuQueued(bool abQueued);
-    static bool IsPipboyClosed();
     static float GetScreenAspect();
     static void UpdatePipBoyInventoryEffects(
         Tile* pTileFade1,

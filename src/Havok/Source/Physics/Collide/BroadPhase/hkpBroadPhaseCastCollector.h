@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/MemoryManager.h"
+
 #include <cstdint>
 
 class hkpBroadPhaseHandle;
@@ -16,3 +18,7 @@ public:
     // DeletingDestruct's free (MemoryManager::Deallocate).
     static void operator delete(void* apMemory);
 };
+
+inline void hkpBroadPhaseCastCollector::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}

@@ -91,3 +91,22 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline void NiNode::SetChildArraySize(uint32_t aiSize) {
+    m_kChildren.SetSize(aiSize);
+}
+
+inline void NiNode::RemoveAllChildren() {
+    m_kChildren.RemoveAll();
+}
+
+inline void NiNode::DetachAllChildren() {
+    uint32_t icount = m_kChildren.m_usSize;
+    for (uint32_t i = 0; i < icount; ++i) {
+        NiAVObject* pchild = m_kChildren[i].m_pObject;
+        if (pchild) {
+            pchild->DetachParent();
+        }
+    }
+    m_kChildren.RemoveAll();
+}

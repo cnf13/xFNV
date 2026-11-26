@@ -1,16 +1,12 @@
 #include "Fallout Shared/BSAnimNoteReceiver.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 
 using BSAnimNoteReceiverTypeArray = NiTArray<
     BSAnimNoteReceiver::BSAnimNoteReceiverType*,
     NiTMallocInterface<BSAnimNoteReceiver::BSAnimNoteReceiverType*>>;
-
-void IBSAnimNoteReceiver::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
 
 BSAnimNoteReceiver::BSAnimNoteReceiver() : CallTypeA(0, 1u) {}
 

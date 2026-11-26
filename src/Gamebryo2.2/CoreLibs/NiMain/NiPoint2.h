@@ -47,5 +47,44 @@ public:
     static NiPoint2 ZERO;
     static NiPoint2 UNIT_Y;
 };
+
+inline NiPoint2& NiPoint2::operator*=(float fScalar) {
+    x = x * fScalar;
+    y = y * fScalar;
+    return *this;
+}
+
+inline NiPoint2& NiPoint2::operator/=(float fScalar) {
+    x = x / fScalar;
+    y = y / fScalar;
+    return *this;
+}
+
+inline NiPoint2& NiPoint2::operator+=(const NiPoint2& pt) {
+    x = x + pt.x;
+    y = y + pt.y;
+    return *this;
+}
+
+inline NiPoint2& NiPoint2::operator-=(const NiPoint2& pt) {
+    x = x - pt.x;
+    y = y - pt.y;
+    return *this;
+}
 inline NiPoint2 NiPoint2::UNIT_Y{0.0f, 1.0f};
 inline NiPoint2 NiPoint2::ZERO{};
+
+inline float NiPoint2::Unitize() {
+    float fLength = Length();
+    if (fLength > 9.999999974752427e-07) {
+        float fRecip = 1.0 / fLength;
+        x = x * fRecip;
+        y = y * fRecip;
+    }
+    else {
+        x = 0.0;
+        y = 0.0;
+        return 0.0;
+    }
+    return fLength;
+}

@@ -1,4 +1,5 @@
 #include "Fallout/Interface/Menus/CaravanMenu.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include "BSAudio/BSAudio.h"
@@ -56,7 +57,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -1963,7 +1964,7 @@ bool CaravanMenu::DoGamepad(int32_t aiButton, float afValue) {
             }
             else {
                 if (iPlayerAnte > 0 || !iNPCAnte) {
-                    LoadNifs();
+                    PrepareDeckMenu();
                     BSAudio::QInstance().GetSoundHandleByName("UIMenuOK", 289u).Play(false);
                 }
                 bHandled = true;
@@ -2808,7 +2809,7 @@ bool CaravanMenu::IsWellFormedMenu() {
     return true;
 }
 
-void CaravanMenu::LoadNifs() {
+void CaravanMenu::PrepareDeckMenu() {
     char acButtonText[268];
     pActiveDeckGeometry = pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Deck.NIF",
@@ -3769,7 +3770,7 @@ int32_t CaravanMenu::CalculateWinningState(int32_t aivalue) {
     return -1;
 }
 
-uint32_t CaravanMenu::LoadNifs2() {
+uint32_t CaravanMenu::PrepareShared3DElements() {
     pTableGeometry = pModelLoader->LoadFile(
         "Meshes\\Terminals\\NV_Caravan\\NV_Caravan-Table.NIF",
         LOD_MULT_NONE,
@@ -5454,7 +5455,7 @@ void CaravanMenu::Draw3DElements() {
     BSCullingProcess* pCuller = pWorldSceneGraph->pCuller;
     pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiCamera* p3DCamera = CaravanMenu::sp3DCamera.m_pObject;
-    NiCamera::HandleEyeFinityFOVScale(p3DCamera, 0.15f);
+    HandleEyeFinityFOVScale(p3DCamera, 0.15f);
     NiPointer<NiRefObject> spAccumulator(static_cast<NiRefObject*>(InterfaceManager::Instance()->Get3dAccumulator()));
     pCuller->SetAccumulator(static_cast<NiAccumulator*>(spAccumulator.m_pObject));
     NiCamera* pCamera = p3DCamera ? p3DCamera : pWorldSceneGraph->GetCamera();
@@ -5502,7 +5503,7 @@ Tile* CaravanMenu::Create(
                     int32_t iSetInCode = Tile::TextToTrait("_SetInCode");
                     CaravanMenu::pMe->pTiles[15]->Poke(iSetInCode, 1.0f);
                     CaravanMenu::bDebugAI = false;
-                    CaravanMenu::pMe->LoadNifs2();
+                    CaravanMenu::pMe->PrepareShared3DElements();
                     CaravanMenu::pMe->SetupCurrency();
                     CaravanMenu::pMe->SetFlag(CaravanMenu::CAF_DISABLE_ALLCONTROLS, false);
                     CaravanMenu::pMe->PrepForVisibility(false);

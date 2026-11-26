@@ -9,12 +9,14 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
+#include "BSDevices/XPrefSettings.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/DebugText.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
@@ -109,7 +111,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParallelUpdateTaskManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -124,6 +125,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSemaphore.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "xfnv/Compiler.h"
@@ -266,36 +268,6 @@ float GetMenuHeightRatio() {
     return fResult;
 }
 
-// These five are declared in InterfaceManager.h, so they keep external linkage: defined inside the anonymous
-// namespace above they are different, internal entities, and the header's declarations stay undefined.
-void ToggleFullHelp() {
-    if (InterfaceManager::Instance()) {
-        if (InterfaceManager::Instance()->IsDoneFirstInit()) {
-            // Tests the flag as a raw byte: any byte but 0 reads as set, and it stores 0 or 1.
-            bool bNewFullHelp = static_cast<uint8_t>(InterfaceManager::Instance()->bFullHelp) == 0;
-            InterfaceManager::Instance()->bFullHelp = bNewFullHelp;
-        }
-    }
-}
-
-bool GetIsFullHelp() {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return InterfaceManager::Instance()->bFullHelp;
-    }
-
-    return false;
-}
-
-bool GetMapMenuFogOfWar() {
-    return !MapMenu::pMe || MapMenu::pMe->bFogOfWarEnabled;
-}
-
-void SetMapMenuFogOfWar(bool abFogOfWar) {
-    if (MapMenu::pMe) {
-        MapMenu::pMe->bFogOfWarEnabled = abFogOfWar;
-    }
-}
-
 float GetEyefinityScreenWidth() {
     return fEyefinityScreenWidth;
 }
@@ -309,30 +281,6 @@ bool IsEyefinity() {
     return bIsEyefinity && bIsEyefinityActive;
 }
 
-// Returns null on both failed tests: the null singleton, then IsDoneFirstInit.
-TileMenu* ShowBarterMenu_(TESObjectREFR* apRef, int32_t aiMode) {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return static_cast<TileMenu*>(BarterMenu::Create(apRef, aiMode));
-    }
-    return nullptr;
-}
-
-uint32_t GetContainerMenuMode() {
-    if (ContainerMenu::pMe) {
-        return ContainerMenu::pMe->eContainerMode;
-    }
-
-    return 0;
-}
-
-// Returns null on both failed tests: the null singleton, then IsDoneFirstInit.
-TileMenu* _ShowLockPickMenu(TESObjectREFR* apRef, int32_t aiLockLevel, bool abFlag) {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return static_cast<TileMenu*>(LockPickMenu::Create(apRef, aiLockLevel, abFlag));
-    }
-    return nullptr;
-}
-
 void ClearRenderedMenuDeleteList() {
     kRenderedMenuCriticalSection.Enter(nullptr);
     while (!s_RenderedMenuDeleteList.IsEmpty()) {
@@ -342,11 +290,6 @@ void ClearRenderedMenuDeleteList() {
         }
     }
     kRenderedMenuCriticalSection.Leave();
-}
-
-uint32_t MakeRGBA(uint32_t aiRed, uint32_t aiGreen, uint32_t aiBlue, uint32_t aiAlpha) {
-    return (aiRed << 24) | (static_cast<uint8_t>(aiGreen) << 16) | (static_cast<uint8_t>(aiBlue) << 8) |
-        static_cast<uint8_t>(aiAlpha);
 }
 
 int32_t SplitColorComponents(int32_t aiColor, uint32_t* apRed, uint32_t* apGreen, uint32_t* apBlue, uint32_t* apAlpha) {
@@ -544,8 +487,8 @@ InterfaceManager::InterfaceManager()
         spAlphaProp->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
         spAlphaProp->SetDestBlendMode(NiAlphaProperty::ALPHA_INVSRCALPHA);
     }
-    sp3DSceneGraph = InitSceneGraph(Main::MenuRootNode3D(), "Menu3DRoot", true);
-    spSceneGraph = InitSceneGraph(Main::MenuRootNode(), "MenuRoot", false);
+    sp3DSceneGraph = CreateSceneGraph(Main::MenuRootNode3D(), "Menu3DRoot", true);
+    spSceneGraph = CreateSceneGraph(Main::MenuRootNode(), "MenuRoot", false);
     MenuManager::Instance(true);
     pViewCaster = new ViewCaster();
     pTimers = new InterfaceManager::Timer();
@@ -601,7 +544,7 @@ bool InterfaceManager::GetMouseVisible() {
     return !InterfaceManager::Has360Controller() || bShowMouse;
 }
 
-InterfaceManager* InterfaceManager::SetQueuedPipboyTab(
+InterfaceManager* InterfaceManager::SetPipboyPickResults(
     uint8_t aucOverPipBoyScreen,
     float afMouseX,
     float afMouseY,
@@ -834,7 +777,7 @@ NiNode* InterfaceManager::GetDebugTextRoot() {
     return this->pDebugTextRoot;
 }
 
-TESObjectREFR* InterfaceManager::GetConsoleSelection() {
+TESObjectREFR* InterfaceManager::GetPickedREFR() {
     return this->pPickRef;
 }
 
@@ -2081,7 +2024,7 @@ void InterfaceManager::Idle() {
             Interface::bIsDroppingInInventory = false;
         }
         if (Interface::bNeedLevelUpMenu) {
-            LevelUpMenu::CreateMenu();
+            LevelUpMenu::Create();
             Interface::bNeedLevelUpMenu = false;
         }
         pPlayer->CastEatDrinkItems();
@@ -3840,7 +3783,7 @@ Tile* InterfaceManager::PickMenus(bool abExactTargetOnly) {
 }
 
 // AutoMemContext as in UpdateCursor.
-SceneGraph* InterfaceManager::InitSceneGraph(SceneGraph* apSceneGraph, const char* apName, bool abIs3D) {
+SceneGraph* InterfaceManager::CreateSceneGraph(SceneGraph* apSceneGraph, const char* apName, bool abIs3D) {
     alignas(AutoMemContext) uint8_t aucContext[sizeof(AutoMemContext)];
     AutoMemContext* pContext = reinterpret_cast<AutoMemContext*>(aucContext);
     ::new (aucContext) AutoMemContext(
@@ -4491,7 +4434,7 @@ int32_t InterfaceManager::GetCursorX() {
     return static_cast<int32_t>(InterfaceManager::GetScreenWidth() / 2.0 + sCursorPos.x);
 }
 
-int32_t InterfaceManager::GetLastPipboyTab() {
+int32_t InterfaceManager::GetCurrentMainMenu() {
     return static_cast<int32_t>(pMenusRoot->GetFloat(0x1771));
 }
 
@@ -4527,16 +4470,6 @@ void InterfaceManager::Free() {
         delete InterfaceManager::pInstance;
         InterfaceManager::pInstance = nullptr;
     }
-}
-
-TESObjectREFR* InterfaceManager::GetTelekinesisTarget() {
-    if (!InterfaceManager::Instance()) {
-        return nullptr;
-    }
-    if (!InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return nullptr;
-    }
-    return InterfaceManager::Instance()->pTelekinesisRef;
 }
 
 InterfaceManager* InterfaceManager::Instance() {
@@ -4918,10 +4851,6 @@ void InterfaceManager::SetContainerMenuQueued(bool abQueued) {
     }
 }
 
-bool InterfaceManager::IsPipboyClosed() {
-    return InterfaceManager::Instance()->ePipboyState == 0;
-}
-
 float InterfaceManager::GetScreenAspect() {
     double realScreenHeight = InterfaceManager::GetRealScreenHeight();
     return static_cast<float>(realScreenHeight / InterfaceManager::GetScreenHeight());
@@ -5201,55 +5130,6 @@ void SystemColorManager::DeleteInstance() {
     g_sysColorManager = nullptr;
 }
 
-int32_t Controls::GetButtonState(int32_t aiDevice, uint8_t aucKey, CONTROL_TOGGLE_FLAGS aeFlags) {
-    if (aiDevice <= 3) {
-        if (aiDevice == 3) {
-            return this->GetControllerButton(static_cast<GAMEPAD_BUTTON>(aucKey), aeFlags);
-        }
-        if (aiDevice == 0) {
-            return this->GetKeyboardButton(aucKey, aeFlags);
-        }
-        if (aiDevice == 1) {
-            return this->GetMouseButton(aucKey, aeFlags);
-        }
-    }
-    else if (aiDevice == 255) {
-        return 0;
-    }
-    if (aiDevice - 2 >= static_cast<int32_t>(this->uiJoyStickCount)) {
-        return 0;
-    }
-    // Keys from 32 up are hat directions; the key's high word (always 0) is passed as the hat.
-    if (aucKey < 32) {
-        return this->GetJoyStickButton(aiDevice - 2, aucKey, aeFlags);
-    }
-    uint32_t uiKey = aucKey;
-    return this->GetJoystickHat(aiDevice - 2, static_cast<uint16_t>(uiKey >> 16)) == static_cast<uint16_t>(uiKey);
-}
-
-float Tile::Value::QFloat() {
-    return fValue;
-}
-
-bool Tile::GetNeedsNiUpdate() {
-    return bNeedsNiUpdate;
-}
-
-const char* TileImage::GetTypeName() {
-    return "IMGE";
-}
-
-// NEEDS: ImageSpaceEffectMenuBG and its ImageSpaceEffect base need typed class declarations for GetEffect's
-// base-to-derived conversion before calling SetBlendEnabled.
-void ImageSpaceManager::SetMenuBGBlendEnabled(bool abEnabled) {
-    ImageSpaceEffectMenuBG* pEffect = static_cast<ImageSpaceEffectMenuBG*>(GetEffect(EFFECT_MENU_BG));
-    pEffect->SetBlendEnabled(abEnabled);
-}
-
-void ImageSpaceManager::SetMenuBGBlendValue(float afStrength) {
-    static_cast<ImageSpaceEffectMenuBG*>(GetEffect(EFFECT_MENU_BG))->SetBlendValue(afStrength);
-}
-
 EditableTextField::EditableTextField()
   : sText(), sDisplayText(), iCurPos(0), iMaxPixelSize(static_cast<uint32_t>(-1)), iFontIdx(1), uLastBlinkTime(0),
     bCursorOn(false), bEditing(false) {}
@@ -5471,22 +5351,4 @@ void StatsMenu::SetCurrentTab(char acTab) {
 
 bool StatsMenu::IsTargetingBodyPart() {
     return StatsMenu::pMe && StatsMenu::pMe->bLimbMode;
-}
-
-void NiAlphaAccumulator::SetInterfaceSort(bool abInterface) {
-    m_bInterfaceSort = abInterface;
-}
-
-int32_t NiSemaphore::Signal() {
-    NiAtomicIncrement(m_iCount);
-    m_hSemaphore->Release();
-    return m_iCount;
-}
-
-int32_t NiSemaphore::Wait(uint32_t aiTime) {
-    if (m_hSemaphore->Wait(aiTime) == BSSystemWait::TIMED_OUT) {
-        return 1;
-    }
-
-    return NiAtomicDecrement(m_iCount);
 }

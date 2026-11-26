@@ -3,7 +3,6 @@
 #include "BSCore/MemoryManager.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSVoiceType.h"
 #include "Fallout Shared/ExtraDataList.h"

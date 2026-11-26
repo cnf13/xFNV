@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESLandTexture.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkShape.h"
 #include "BSMain/IOManager.h"

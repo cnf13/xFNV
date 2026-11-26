@@ -1,6 +1,6 @@
 #include "Fallout/AI/Combat/CombatGoal.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/AudioMarkerData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/AI/Combat/CombatGoalActivateCombatItem.h"

@@ -2,7 +2,7 @@
 
 #include "BSMain/BSNiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiAnimationKey.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"

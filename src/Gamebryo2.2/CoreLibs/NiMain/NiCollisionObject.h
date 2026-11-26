@@ -42,3 +42,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiAVObject* NiCollisionObject::GetSceneGraphObject() {
+    return m_pkSceneObject;
+}

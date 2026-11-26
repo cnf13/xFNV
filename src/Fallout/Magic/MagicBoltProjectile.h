@@ -92,4 +92,4 @@ public:
     float fCollideTime;
 };
 
-extern SettingT<GameSettingCollection> gs_fSubSegmentVariance;
+extern SettingT<GameSettingCollection> fShockBranchSubSegmentVariance;

@@ -17,7 +17,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGPUProgram.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPropertyState.h"
@@ -216,11 +216,11 @@ void SpeedTreeLeafShader::SetupGeometryConstants(const NiPropertyState* apState)
         SpeedTreeLeafShader::fRustleTime;
     SpeedTreeLeafShader::kGroupedConstants.RockParams.z = pstlsprop->GetLeafData()->fRustle;
     SpeedTreeLeafShader::kGroupedConstants.RustleParams.z = pstlsprop->GetLeafData()->fRock;
-    SpeedTreeShader_pShaderData[0] = 0.0f;
-    SpeedTreeShader_pShaderData[1] = 0.0f;
-    SpeedTreeShader_pShaderData[2] = 0.0f;
-    SpeedTreeShader_pShaderData[3] = 0.0f;
-    SpeedTreeShader_pShaderData[1] = pstlsprop->GetLeafData()->fCurveScalar;
+    SpeedTreeShader::pShaderData[0] = 0.0f;
+    SpeedTreeShader::pShaderData[1] = 0.0f;
+    SpeedTreeShader::pShaderData[2] = 0.0f;
+    SpeedTreeShader::pShaderData[3] = 0.0f;
+    SpeedTreeShader::pShaderData[1] = pstlsprop->GetLeafData()->fCurveScalar;
     NiD3DShaderConstantMap* m_pObject = v13->m_spVertexConstantMap.m_pObject;
     if (m_pObject) {
         NiD3DVertexShader* v8 = NiD3DShader::m_spCurrentPass->m_spVertexShader.m_pObject;
@@ -373,7 +373,7 @@ void SpeedTreeLeafShader::CreateConstantMaps() {
             &SpeedTreeLeafShader::kGroupedConstants,
             false
         );
-        SpeedTreeShader_SetShaderConstants(m_spVertexConstantMap.m_pObject, 17u);
+        SpeedTreeShader::SetShaderConstants(m_spVertexConstantMap.m_pObject, 17u);
         m_spVertexConstantMap->AddEntry("leaf data", 0x10000009u, 0, 34u, 48u, "", 768u, 4u, pLeafMaps, false);
     }
 }
@@ -698,11 +698,11 @@ void SpeedTreeLeafShader::UpdatePipelineForInstance(
         SpeedTreeLeafShader::fRustleTime;
     SpeedTreeLeafShader::kGroupedConstants.RockParams.z = pstlsprop->GetLeafData()->fRustle;
     SpeedTreeLeafShader::kGroupedConstants.RustleParams.z = pstlsprop->GetLeafData()->fRock;
-    SpeedTreeShader_pShaderData[0] = 0.0f;
-    SpeedTreeShader_pShaderData[1] = 0.0f;
-    SpeedTreeShader_pShaderData[2] = 0.0f;
-    SpeedTreeShader_pShaderData[3] = 0.0f;
-    SpeedTreeShader_pShaderData[1] = pstlsprop->GetLeafData()->fCurveScalar;
+    SpeedTreeShader::pShaderData[0] = 0.0f;
+    SpeedTreeShader::pShaderData[1] = 0.0f;
+    SpeedTreeShader::pShaderData[2] = 0.0f;
+    SpeedTreeShader::pShaderData[3] = 0.0f;
+    SpeedTreeShader::pShaderData[1] = pstlsprop->GetLeafData()->fCurveScalar;
     NiD3DTextureStage* v19 = sp1StagePass[0]->m_kStages.m_pBase->m_pObject;
     NiD3DTextureStage* pkStage = v19;
     if (v19) {

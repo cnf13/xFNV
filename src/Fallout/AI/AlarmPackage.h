@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Package.h"
 #include "Fallout/AI/Combat/CombatTimeStamp.h"
 

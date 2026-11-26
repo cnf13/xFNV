@@ -17,3 +17,5 @@ const char16_t* BSContentPackage::DisplayName() const {
 const char* BSContentPackage::FileName() const {
     return &_10A47B3;
 }
+
+BSContentPackage::~BSContentPackage() {}

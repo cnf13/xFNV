@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSAudio/BSSoundHandle.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"

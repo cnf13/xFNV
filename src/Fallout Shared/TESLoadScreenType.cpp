@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESLoadScreenType.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMenu/Font.h"
 #include "Fallout Shared/TESFile.h"
@@ -24,28 +24,28 @@ void DisplayData::Init() {
 // The first window's fields in the game's order (justification first, font last), then the second's (justification
 // last), then the data type, the two fonts and the stat count.
 void LoadScreenType_Data::Endian() {
-    ENDIAN(DisplayData1.uJustification, false);
-    ENDIAN(DisplayData1.uDisplayHeight, false);
-    ENDIAN(DisplayData1.uDisplayPositionX, false);
-    ENDIAN(DisplayData1.uDisplayPositionY, false);
-    ENDIAN(DisplayData1.fDisplayRotationRads, false);
-    ENDIAN(DisplayData1.uDisplayWidth, false);
-    ENDIAN(DisplayData1.TextColorR, false);
-    ENDIAN(DisplayData1.TextColorG, false);
-    ENDIAN(DisplayData1.TextColorB, false);
-    ENDIAN(DisplayData2.uDisplayHeight, false);
-    ENDIAN(DisplayData2.uDisplayPositionX, false);
-    ENDIAN(DisplayData2.uDisplayPositionY, false);
-    ENDIAN(DisplayData2.fDisplayRotationRads, false);
-    ENDIAN(DisplayData2.uDisplayWidth, false);
-    ENDIAN(DisplayData2.TextColorR, false);
-    ENDIAN(DisplayData2.TextColorG, false);
-    ENDIAN(DisplayData2.TextColorB, false);
-    ENDIAN(DisplayData2.uJustification, false);
-    ENDIAN(DataType, false);
-    ENDIAN(DisplayData1.eDisplayFont, false);
-    ENDIAN(DisplayData2.eDisplayFont, false);
-    ENDIAN(uNumStatsToDisplay, false);
+    BSEndian(DisplayData1.uJustification, false);
+    BSEndian(DisplayData1.uDisplayHeight, false);
+    BSEndian(DisplayData1.uDisplayPositionX, false);
+    BSEndian(DisplayData1.uDisplayPositionY, false);
+    BSEndian(DisplayData1.fDisplayRotationRads, false);
+    BSEndian(DisplayData1.uDisplayWidth, false);
+    BSEndian(DisplayData1.TextColorR, false);
+    BSEndian(DisplayData1.TextColorG, false);
+    BSEndian(DisplayData1.TextColorB, false);
+    BSEndian(DisplayData2.uDisplayHeight, false);
+    BSEndian(DisplayData2.uDisplayPositionX, false);
+    BSEndian(DisplayData2.uDisplayPositionY, false);
+    BSEndian(DisplayData2.fDisplayRotationRads, false);
+    BSEndian(DisplayData2.uDisplayWidth, false);
+    BSEndian(DisplayData2.TextColorR, false);
+    BSEndian(DisplayData2.TextColorG, false);
+    BSEndian(DisplayData2.TextColorB, false);
+    BSEndian(DisplayData2.uJustification, false);
+    BSEndian(DataType, false);
+    BSEndian(DisplayData1.eDisplayFont, false);
+    BSEndian(DisplayData2.eDisplayFont, false);
+    BSEndian(uNumStatsToDisplay, false);
 }
 
 // The second window's justification and the stat count are set last.

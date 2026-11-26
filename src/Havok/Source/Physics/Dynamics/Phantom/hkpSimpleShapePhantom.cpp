@@ -220,10 +220,7 @@ void hkpSimpleShapePhantom::ensureDeterministicOrder() {
     if (!m_orderDirty.m_bool) {
         return;
     }
-    const int32_t iSize = m_collisionDetails.m_size;
-    if (iSize > 1) {
-        hkAlgorithm::quickSort(m_collisionDetails.m_data, 0, iSize - 1, 0);
-    }
+    hkAlgorithm::quickSort(m_collisionDetails.m_data, m_collisionDetails.m_size, OrderByUid());
     m_orderDirty.m_bool = 0;
 }
 
@@ -358,41 +355,4 @@ void hkpSimpleShapePhantom::getPenetrations(hkpCdBodyPairCollector& collector, c
 
 const hkClass& hkpSimpleShapePhantom::staticClass() {
     return hkpSimpleShapePhantomClass;
-}
-
-int32_t
-hkAlgorithm::quickSort(hkpSimpleShapePhantom::CollisionDetail* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    hkpSimpleShapePhantom::OrderByUid cmpLess;
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = d;
-        int32_t j = aiHigh;
-        hkpSimpleShapePhantom::CollisionDetail pivot = apArr[(d + j) >> 1];
-        do {
-            while (cmpLess(apArr[i], pivot)) {
-                i++;
-            }
-            while (cmpLess(pivot, apArr[j])) {
-                j--;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                hkpSimpleShapePhantom::CollisionDetail tmp = apArr[j];
-                apArr[j] = apArr[i];
-                apArr[i] = tmp;
-            }
-            --j;
-            ++i;
-        }
-        while (i <= j);
-        if (d < j) {
-            hkAlgorithm::quickSort(apArr, d, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return aiHigh;
-        }
-        d = i;
-    }
 }

@@ -5,7 +5,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSMultiBoundNode.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSBodyPart.h"
@@ -238,7 +238,7 @@ TESPackage* PackageList::FindCurrentPackage(Actor* apActor) {
                                 pTargetRef = pTarget->GetTargReference();
                             }
                             if (pPack->packConditions.IsTrue(apActor, pTargetRef)) {
-                                if (Interface::GetConsoleSelection() == apActor) {
+                                if (Interface::GetPickREFR() == apActor) {
                                     char acMessage[308];
                                     const char* pcEditorID = pPack->GetFormEditorID();
                                     PACKAGE_TYPE ePackType = pPack->GetPackType();

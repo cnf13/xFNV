@@ -16,7 +16,7 @@ public:
     };
 
     // The weight interpolator of one morph target and the weight it last produced.
-    class InterpItem : public NiMemObject {
+    class InterpItem {
     public:
         InterpItem();
 
@@ -115,3 +115,7 @@ public:
     // when set, cloning turns on m_bAlwaysUpdate in both the original and the clone
     static inline bool ms_bAlwaysUpdateClone;
 };
+
+inline NiMorphData::MorphTarget* NiGeomMorpherController::GetTarget(uint32_t uiIndex) {
+    return m_spMorphData->GetTarget(uiIndex);
+}

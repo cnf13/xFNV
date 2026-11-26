@@ -100,6 +100,10 @@ public:
     // The sound form whose file is apFilename, or null.
     static TESSound* FindSoundByFilename(const char* apFilename);
     static bool PickRandomFilename(char* pPath);
+    // The bush sound name for aiIndex (0..9), else null.
+    static const char* GetPassThroughSoundName(int32_t aiIndex);
+    // The BRUSH<bush><Sneak|Run|Walk> sound for the player's movement (Walk without a player).
+    static TESSound* GetPassThroughSound(int32_t aiIndex);
 
     BSStringT<char> strEditorID;
     SOUND_DATA data;
@@ -108,24 +112,18 @@ public:
     static inline randomNameHashesLastPick_t randomNameHashesLastPick{};
     static inline char lastSoundHash;
     static inline randomNameHashes_t randomNameHashes{};
-};
 
-// The bush sound name for aiIndex (0..9), else null.
-const char* GetBushSoundName(int32_t aiIndex);
-// The BRUSH<bush><Sneak|Run|Walk> sound for the player's movement (Walk without a player).
-TESSound* GetNthBrushPassthroughSound(int32_t aiIndex);
-
-// Ten names: GetBushSoundName indexes it with 0..9.
-using BushSoundNameArray = char* [10];
-inline BushSoundNameArray g_bushSoundNameArray{
-    const_cast<char*>("BushA"),
-    const_cast<char*>("BushB"),
-    const_cast<char*>("BushC"),
-    const_cast<char*>("BushD"),
-    const_cast<char*>("BushE"),
-    const_cast<char*>("BushF"),
-    const_cast<char*>("BushG"),
-    const_cast<char*>("BushH"),
-    const_cast<char*>("BushI"),
-    const_cast<char*>("BushJ")
+    // Ten names: GetPassThroughSoundName indexes it with 0..9.
+    static inline char* pPassthroughSoundNames[10]{
+        const_cast<char*>("BushA"),
+        const_cast<char*>("BushB"),
+        const_cast<char*>("BushC"),
+        const_cast<char*>("BushD"),
+        const_cast<char*>("BushE"),
+        const_cast<char*>("BushF"),
+        const_cast<char*>("BushG"),
+        const_cast<char*>("BushH"),
+        const_cast<char*>("BushI"),
+        const_cast<char*>("BushJ")
+    };
 };

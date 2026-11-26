@@ -1,4 +1,4 @@
-#include "Fallout Shared/GlobalFunc.h"
+#include "BSMain/MessageHandler.h"
 #include "SDK/FaceGen/assert.hpp"
 #include <stdint.h>
 

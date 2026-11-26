@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 
 class QuantityMenu : public Menu {

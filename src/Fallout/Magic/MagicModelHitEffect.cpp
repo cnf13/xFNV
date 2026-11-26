@@ -2,7 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/IOManager.h"
@@ -36,7 +36,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -47,6 +46,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 
 #include <limits>
@@ -342,7 +342,7 @@ void MagicModelHitEffect::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
             Animation* panim = pactor ? pactor->GetAnimation() : nullptr;
             float ftime = panim ? panim->GetTime() : -1.0f;
             BGSLoadFormBuffer* ptempLoadFormBuffer = LoadedDataSubBuffer.Create(nullptr);
-            TESObjectREFR::LoadControllerManagerBGS(pmanager, ptempLoadFormBuffer, ftime);
+            TESObjectREFR::LoadControllerManager(pmanager, ptempLoadFormBuffer, ftime);
             if (ptempLoadFormBuffer) {
                 delete ptempLoadFormBuffer;
             }

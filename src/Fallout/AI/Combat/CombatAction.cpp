@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/AI/Combat/CombatActionAcquireLineOfSight.h"
 #include "Fallout/AI/Combat/CombatActionActivateCombatItem.h"

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "Fallout Shared/TESAttackDamageForm.h"
 #include "Fallout Shared/TESForm.h"

@@ -1,12 +1,11 @@
 #include "Fallout Shared/Package.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/AiFormulas.h"
 #include "Fallout Shared/BGSIdleCollection.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -20,6 +19,7 @@
 #include "Fallout Shared/PackageLocation.h"
 #include "Fallout Shared/PackageSchedule.h"
 #include "Fallout Shared/PackageTarget.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESCombatStyle.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESDataHandler.h"
@@ -75,9 +75,9 @@ static SettingT<GameSettingCollection> sCrimeTypeAttack("sCrimeTypeAttack", "Att
 static SettingT<GameSettingCollection> sCrimeTypeMurder("sCrimeTypeMurder", "Murder");
 
 void PACKAGE_DATA::Endian() {
-    ENDIAN(iPackFlags, false);
-    ENDIAN(iFOBehaviorFlags, false);
-    ENDIAN(iPackageSpecificFlags, false);
+    BSEndian(iPackFlags, false);
+    BSEndian(iFOBehaviorFlags, false);
+    BSEndian(iPackageSpecificFlags, false);
 }
 
 TESPackage::TESPackage() {
@@ -1058,7 +1058,7 @@ bool TESPackage::IsActorAtRefTarget(MobileObject* apMobileObject, int32_t aiExtr
         }
     }
 
-    if (Interface::GetConsoleSelection() == pActor) {
+    if (Interface::GetPickREFR() == pActor) {
         float fDist = dist.XYLength();
         if (std::isfinite(fDist)) {
             char cMessage[308];

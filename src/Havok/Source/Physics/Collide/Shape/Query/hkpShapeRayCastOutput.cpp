@@ -53,3 +53,12 @@ hkpShapeRayCastCollectorOutput::hkpShapeRayCastCollectorOutput(const hkpShapeRay
   : m_normal(other->m_normal), m_hitFraction(other->m_hitFraction), m_extraInfo(other->m_extraInfo) {
     std::memcpy(m_pad, other->m_pad, sizeof(m_pad));
 }
+
+hkpShapeRayCastOutput& hkpShapeRayCastOutput::operator=(const hkpShapeRayCastOutput& __that) {
+    hkpShapeRayCastCollectorOutput::operator=(__that);
+    for (uint32_t i = 0; i < MAX_HIERARCHY_DEPTH; ++i) {
+        m_shapeKeys[i] = __that.m_shapeKeys[i];
+    }
+    m_shapeKeyIndex = __that.m_shapeKeyIndex;
+    return *this;
+}

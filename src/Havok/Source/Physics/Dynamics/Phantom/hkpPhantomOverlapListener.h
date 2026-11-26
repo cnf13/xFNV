@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 class hkpCollidable;
@@ -38,3 +39,9 @@ public:
     // DeletingDestruct's free (MemoryManager::Deallocate).
     static void operator delete(void* apMemory);
 };
+
+inline void hkpPhantomOverlapListener::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}
+
+inline hkpPhantomOverlapListener::~hkpPhantomOverlapListener() {}

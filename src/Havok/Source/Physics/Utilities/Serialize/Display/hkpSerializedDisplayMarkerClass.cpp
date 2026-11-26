@@ -39,3 +39,7 @@ hkClass hkpSerializedDisplayMarkerClass(
 void cleanupLoadedObjecthkpSerializedDisplayMarker(void* p) {
     static_cast<hkpSerializedDisplayMarker*>(p)->~hkpSerializedDisplayMarker();
 }
+
+const hkClass& hkpSerializedDisplayMarker::staticClass() {
+    return hkpSerializedDisplayMarkerClass;
+}

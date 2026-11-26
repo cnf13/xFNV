@@ -6,7 +6,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSRenderedTexture.h"
@@ -37,7 +37,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -49,6 +48,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cmath>
 #include <cstdint>
@@ -61,12 +61,11 @@ SettingT<INISettingCollection> fRenderedTerminalHPos("fRenderedTerminalHPos:Rend
 SettingT<INISettingCollection> fRenderedTerminalVPos("fRenderedTerminalVPos:RenderedTerminal", 0.38f);
 SettingT<INISettingCollection> fRenderedTerminalFOV("fRenderedTerminalFOV:RenderedTerminal", 0.15f);
 SettingT<INISettingCollection> bUseRenderedTerminals("bUseRenderedTerminals:RenderedTerminal", true);
-SettingT<INISettingCollection>
-    g_fScreenLightBaseIntensity_RenderedTerminal("fScreenLightBaseIntensity:RenderedTerminal", 0.3f);
-SettingT<INISettingCollection> gs_fScreenLightRadius_RenderedTerminal("fScreenLightRadius:RenderedTerminal", 32.0f);
-SettingT<INISettingCollection> gs_fScreenLightColorR_RenderedTerminal("fScreenLightColorR:RenderedTerminal", 1.0f);
-SettingT<INISettingCollection> gs_fScreenLightColorG_RenderedTerminal("fScreenLightColorG:RenderedTerminal", 1.0f);
-SettingT<INISettingCollection> gs_fScreenLightColorB_RenderedTerminal("fScreenLightColorB:RenderedTerminal", 1.0f);
+SettingT<INISettingCollection> fTermScreenLightBaseIntensity("fScreenLightBaseIntensity:RenderedTerminal", 0.3f);
+SettingT<INISettingCollection> fTermScreenLightRadius("fScreenLightRadius:RenderedTerminal", 32.0f);
+SettingT<INISettingCollection> fTermScreenLightColorR("fScreenLightColorR:RenderedTerminal", 1.0f);
+SettingT<INISettingCollection> fTermScreenLightColorG("fScreenLightColorG:RenderedTerminal", 1.0f);
+SettingT<INISettingCollection> fTermScreenLightColorB("fScreenLightColorB:RenderedTerminal", 1.0f);
 NiPointer<BSFadeNode> FORenderedTerminal::spGeometry;
 
 void PlayTerminalShutdownSound() {
@@ -319,16 +318,12 @@ void FORenderedTerminal::InitLight() {
             pLight->SetLinearAttenuation(0.0f);
             pLight->SetQuadraticAttenuation(0.0f);
             pLight->SetDimmer(1.0f);
-            pLight->SetSpecularColor(NiColor(gs_fScreenLightRadius_RenderedTerminal.Float(), 0.0f, 0.0f));
-            float fScreenLightColorB = gs_fScreenLightColorB_RenderedTerminal.Float();
-            float fScreenLightColorG = gs_fScreenLightColorG_RenderedTerminal.Float();
-            NiColor screenLightColor(
-                gs_fScreenLightColorR_RenderedTerminal.Float(),
-                fScreenLightColorG,
-                fScreenLightColorB
-            );
+            pLight->SetSpecularColor(NiColor(fTermScreenLightRadius.Float(), 0.0f, 0.0f));
+            float fScreenLightColorB = fTermScreenLightColorB.Float();
+            float fScreenLightColorG = fTermScreenLightColorG.Float();
+            NiColor screenLightColor(fTermScreenLightColorR.Float(), fScreenLightColorG, fScreenLightColorB);
             SetScreenLightColor(screenLightColor);
-            SetScreenLightBaseIntensity(g_fScreenLightBaseIntensity_RenderedTerminal.Float());
+            SetScreenLightBaseIntensity(fTermScreenLightBaseIntensity.Float());
             SetScreenLightFlickerIntensity(1.0f);
             NiUpdateData foo(0.0f, false, false);
             pLight->Update(foo);

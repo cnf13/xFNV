@@ -154,3 +154,7 @@ public:
     NiPointer<NiGPUProgram> m_spProgram;
     NiTObjectPtrSet<NiPointer<NiMaterialResource>> m_kUniforms;
 };
+
+inline const NiRTTI* NiGPUProgramCache::GetRTTI() const {
+    return &ms_RTTI;
+}

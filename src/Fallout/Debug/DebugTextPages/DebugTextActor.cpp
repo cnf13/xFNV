@@ -3,10 +3,6 @@
 #include "Fallout/AI/BaseProcess.h"
 #include "Fallout/AI/CachedValues.h"
 
-bool bhkRagdollController::QRagdollFeedbackActive() {
-    return bActiveRagdollFeedback;
-}
-
 float BaseProcess::GetCachedEndurance(CachedValuesOwner* apOwner) {
     if (pCachedValues) {
         if (pCachedValues->IsDirty(CachedValues::CVF_ENDURANCE)) {

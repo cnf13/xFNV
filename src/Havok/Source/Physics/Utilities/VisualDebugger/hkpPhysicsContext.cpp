@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Utilities/VisualDebugger/hkpPhysicsContext.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"

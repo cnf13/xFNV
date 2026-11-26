@@ -3,6 +3,7 @@
 #include "BSCore/BSSpinLock.h"
 #include "BSMain/Setting.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCollisionObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Havok/Source/Physics/Dynamics/Motion/hkpMotion.h"
 
@@ -146,3 +147,19 @@ public:
     static inline bool bAlwaysReportTransform;
     static inline int32_t iCount;
 };
+
+// Zero: a plain collision object does not move.
+inline NiPoint3 bhkNiCollisionObject::GetVelocity() {
+    return NiPoint3::ZERO;
+}
+
+inline void bhkNiCollisionObject::SetSyncMode(bhkNiCollisionObject::SYNCMODE aeMode) {
+    eHavokSyncMode = aeMode;
+}
+
+inline void bhkNiCollisionObject::SetNotify(bool abTF) {
+    SetBit(abTF, 4);
+    if (abTF) {
+        SetSetLocal(true);
+    }
+}

@@ -67,3 +67,9 @@ public:
     static NiRTTI ms_RTTI;
     static NiPointer<NiVertexColorProperty> ms_spDefault;
 };
+
+inline NiVertexColorProperty* NiVertexColorProperty::GetDefault() {
+    return ms_spDefault;
+}
+
+inline NiVertexColorProperty::NiVertexColorProperty() : m_uFlags(8) {}

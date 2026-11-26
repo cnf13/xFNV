@@ -6,11 +6,11 @@
 
 class NiD3DShaderConstantMap;
 
-using SpeedTreeShader_pShaderData_t = float[4];
-inline SpeedTreeShader_pShaderData_t SpeedTreeShader_pShaderData{};
+class SpeedTreeShader {
+public:
+    // Adds the tree data entry at register auiCount and the 16 wind matrix registers after it to apConstantMap.
+    static void SetShaderConstants(NiD3DShaderConstantMap* apConstantMap, uint32_t auiCount);
 
-using SpeedTreeShader_pWindMatrices_t = D3DXMATRIX[4];
-inline SpeedTreeShader_pWindMatrices_t SpeedTreeShader_pWindMatrices{};
-
-// Adds the tree data entry at register auiCount and the 16 wind matrix registers after it to apConstantMap.
-void SpeedTreeShader_SetShaderConstants(NiD3DShaderConstantMap* apConstantMap, uint32_t auiCount);
+    static inline float pShaderData[4]{};
+    static inline D3DXMATRIX pWindMatrices[4]{};
+};

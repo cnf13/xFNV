@@ -21,3 +21,12 @@ public:
 
     hkInplaceArray<hkpWorldRayCastOutput, 8> m_hits;
 };
+
+inline void hkpAllRayHitCollector::reset() {
+    m_hits.clear();
+    hkpRayHitCollector::reset();
+}
+
+inline const hkArray<hkpWorldRayCastOutput, hkContainerHeapAllocator>& hkpAllRayHitCollector::getHits() const {
+    return m_hits;
+}

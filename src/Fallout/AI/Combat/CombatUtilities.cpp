@@ -2,14 +2,14 @@
 
 #include "BSCore/BSPerformanceTimer.h"
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldM.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSBodyPart.h"
 #include "Fallout Shared/BGSEntryPoint.h"
 #include "Fallout Shared/BGSExplosion.h"
@@ -143,10 +143,6 @@ char FindSlot(uint32_t aiSlots, char acDesiredSlot) {
         }
     }
     return -1;
-}
-
-double NiATan(float afX) {
-    return std::atan(afX);
 }
 
 // Calls hkVector4's non-const operator() on the returned gravity.
@@ -1099,7 +1095,7 @@ bool CombatUtilities::CheckProjectileArc(
         if (i == 1) {
             arbHighArc = !arbHighArc;
         }
-        float fSpeedMultiplier = arbHighArc ? gs_fGrenadeHighArcSpeedPercentage.Float() : 1.0f;
+        float fSpeedMultiplier = arbHighArc ? fGrenadeHighArcSpeedMult.Float() : 1.0f;
         float fSpeed = apProjectile->GetSpeed() * fSpeedMultiplier;
         NiPoint3 kProjected = GetProjectedPointForTarget(
             aStartLocation,
@@ -1569,7 +1565,7 @@ double CombatUtilities::ComputeProjectileTime_(
     }
 
     if (abHighArc && afSpeed == 0.0) {
-        afSpeed = afSpeed * gs_fGrenadeHighArcSpeedPercentage.Float();
+        afSpeed = afSpeed * fGrenadeHighArcSpeedMult.Float();
     }
     float fDeltaZ = kDelta.z;
     float fDeltaXY = kDelta.XYLength();
@@ -1774,15 +1770,6 @@ NiPoint3 CombatUtilities::GetProjectedPointForTarget(
         fGravity,
         abHighArc
     );
-}
-
-// The Havok world's gravity, or zero without a world. The world is looked up before the read mark.
-const hkVector4& bhkWorld::GetGravity() {
-    ahkpWorld* pWorld = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
-    MarkForRead();
-    const hkVector4& kGravity = pWorld ? pWorld->getGravity() : hkVector4::getZero();
-    UnMarkForRead();
-    return kGravity;
 }
 
 SpecificItemCollector::SpecificItemCollector(COL_LAYER aePick, CFilter& arFilter) : iFilter(0) {

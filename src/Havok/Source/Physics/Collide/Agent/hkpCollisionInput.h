@@ -35,3 +35,9 @@ public:
     mutable hkPadSpu<int32_t> m_createPredictiveAgents;
     Aabb32Info m_aabb32Info;
 };
+
+// The three vectors' constructors are empty.
+inline hkpCollisionInput::Aabb32Info::Aabb32Info() {}
+
+// The constructor writes nothing: only m_aabb32Info's (empty) constructor runs.
+inline hkpCollisionInput::hkpCollisionInput() {}

@@ -3,10 +3,9 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Magic/EffectArchetypes.h"
@@ -83,7 +82,7 @@ bool EffectSetting::Load(TESFile* apFile) {
                 uint32_t uiID = 0;
                 apFile->GetChunkData<uint32_t>(uiID);
                 if (apFile->QEndian()) {
-                    ENDIAN(uiID, false);
+                    BSEndian(uiID, false);
                 }
                 TESForm::AddCompileIndex(uiID, apFile);
                 TESForm* pForm = TESForm::GetFormByNumericID(uiID);
@@ -111,29 +110,25 @@ bool EffectSetting::Load(TESFile* apFile) {
     return true;
 }
 
-float NiAbs(float fValue) {
-    return std::fabs(fValue);
-}
-
 void EffectSetting::EffectSettingData::Endian() {
-    ENDIAN<uint32_t>(iFlags, false);
-    ENDIAN<float>(fBaseCost, false);
-    ENDIAN<ActorValue::Index>(eAssociatedActorValue, false);
-    ENDIAN<TESForm*>(pAssociatedItem, false);
-    ENDIAN<ActorValue::Index>(iAssociatedSkill, false);
-    ENDIAN<ActorValue::Index>(iResistVariable, false);
-    ENDIAN<int16_t>(iNumCounterEffects, false);
-    ENDIAN<TESObjectLIGH*>(pLight, false);
-    ENDIAN<float>(fSpeed, false);
-    ENDIAN<TESEffectShader*>(pEffectShader, false);
-    ENDIAN<TESEffectShader*>(pEnchantEffect, false);
-    ENDIAN<TESSound*>(pCastSound, false);
-    ENDIAN<TESSound*>(pBoltSound, false);
-    ENDIAN<TESSound*>(pHitSound, false);
-    ENDIAN<TESSound*>(pAreaSound, false);
-    ENDIAN<float>(fCEEnchantFactor, false);
-    ENDIAN<float>(fCEBarterFactor, false);
-    ENDIAN<EffectArchetypes::ArchetypeID>(eArchetype, false);
+    BSEndian<uint32_t>(iFlags, false);
+    BSEndian<float>(fBaseCost, false);
+    BSEndian<ActorValue::Index>(eAssociatedActorValue, false);
+    BSEndian<TESForm*>(pAssociatedItem, false);
+    BSEndian<ActorValue::Index>(iAssociatedSkill, false);
+    BSEndian<ActorValue::Index>(iResistVariable, false);
+    BSEndian<int16_t>(iNumCounterEffects, false);
+    BSEndian<TESObjectLIGH*>(pLight, false);
+    BSEndian<float>(fSpeed, false);
+    BSEndian<TESEffectShader*>(pEffectShader, false);
+    BSEndian<TESEffectShader*>(pEnchantEffect, false);
+    BSEndian<TESSound*>(pCastSound, false);
+    BSEndian<TESSound*>(pBoltSound, false);
+    BSEndian<TESSound*>(pHitSound, false);
+    BSEndian<TESSound*>(pAreaSound, false);
+    BSEndian<float>(fCEEnchantFactor, false);
+    BSEndian<float>(fCEBarterFactor, false);
+    BSEndian<EffectArchetypes::ArchetypeID>(eArchetype, false);
 }
 
 EffectSetting::EffectSetting()
@@ -716,10 +711,6 @@ void EffectSetting::SetCounterEffects(BSSimpleList<EffectSetting*>* apCounterEff
         ++data.iNumCounterEffects;
         apCounterEffects = apCounterEffects->m_pkNext;
     }
-}
-
-int32_t BSstrcmp(const char* apString1, const char* apString2) {
-    return std::strcmp(apString1, apString2);
 }
 
 void TESFullName::SetFullName(const char* apFullName) {

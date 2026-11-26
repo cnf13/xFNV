@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSRandom.h"
 #include "BSCore/BSScrapArray.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSMain/Setting.h"
@@ -28,7 +29,6 @@ class PathingSolution;
 class TESObjectCELL;
 class TESWorldSpace;
 
-float RandomFloatNegPiToPi();
 int32_t EdgeSortFunction(const void* apEdge1, const void* apEdge2);
 
 // A navmesh triangle a line of sight crosses, and how many of its neighbours it has (Pathing's line of sight map

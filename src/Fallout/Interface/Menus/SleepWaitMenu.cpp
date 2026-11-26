@@ -48,8 +48,7 @@ void SleepWaitMenu::DoClick(int32_t aiID, Tile* apTarget) {
     }
     if (aiID == 4) {
         InterfaceManager::PlayMenuSound(MENU_SOUND_OK);
-        if ((this->bSleepingInBed && gs_bSaveOnRest_GamePlay.Bool()) ||
-            (!this->bSleepingInBed && gs_bSaveOnWait_GamePlay.Bool())) {
+        if ((this->bSleepingInBed && bSaveOnRest.Bool()) || (!this->bSleepingInBed && bSaveOnWait.Bool())) {
             pSaveLoadManager->Autosave();
         }
         if (this->bSleepingInBed) {
@@ -112,7 +111,7 @@ bool SleepWaitMenu::DoGamepad(int32_t aiButton, float afValue) {
     return false;
 }
 
-bool SleepWaitMenu::UpdateSleep() {
+bool SleepWaitMenu::UpdateSleeping() {
     if (appMain->GetControls()->GetUserAction(Controls::UACTN_RESTMENU, 2)) {
         bButtonReleased = true;
     }
@@ -144,24 +143,6 @@ bool SleepWaitMenu::UpdateSleep() {
         return true;
     }
 
-    return false;
-}
-
-bool SleepWaitMenu::UpdateSleeping() {
-    TileMenu* pMenuByClass = static_cast<TileMenu*>(Menu::GetMenuByClass(SleepWaitMenu::GetClassStatic()));
-    SleepWaitMenu* pSleepMenu = nullptr;
-    if (pMenuByClass) {
-        pSleepMenu = static_cast<SleepWaitMenu*>(pMenuByClass->Tile::GetMenu());
-    }
-    if (!InterfaceManager::Instance()) {
-        return false;
-    }
-    if (!InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return false;
-    }
-    if (pSleepMenu && pSleepMenu->UpdateSleep()) {
-        return true;
-    }
     return false;
 }
 

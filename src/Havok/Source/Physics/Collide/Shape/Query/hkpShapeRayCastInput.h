@@ -14,3 +14,6 @@ struct hkpShapeRayCastInput {
     uint32_t m_filterInfo;
     const hkpRayShapeCollectionFilter* m_rayShapeCollectionFilter;
 };
+
+// The ray's ends are left as they are.
+inline hkpShapeRayCastInput::hkpShapeRayCastInput() : m_filterInfo(0), m_rayShapeCollectionFilter(nullptr) {}

@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <stdint.h>
 
@@ -119,3 +120,15 @@ public:
     bool m_bReturnSmoothNormal;
     bool m_bReturnColor;
 };
+
+inline NiAVObject* NiPick::Record::GetAVObject() {
+    return m_spObject;
+}
+
+inline NiPick::Record* NiPick::Results::GetAt(uint32_t uiIndex) const {
+    return NiTPrimitiveArray<Record*>::GetAt(uiIndex);
+}
+
+inline void NiPick::SetTarget(NiAVObject* pObject) {
+    m_spRoot = pObject;
+}

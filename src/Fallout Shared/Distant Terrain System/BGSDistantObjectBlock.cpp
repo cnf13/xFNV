@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSStream.h"
 #include "BSMain/BSTaskManager.h"
@@ -22,7 +23,6 @@
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESObjectCELL.h"
 #include "Fallout Shared/TESWorldSpace.h"
-#include "Fallout Shared/eBool.h"
 #include "Fallout/AI/PlayerCharacter.h"
 #include "Fallout/Misc/Main.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiDX9Renderer.h"
@@ -452,7 +452,7 @@ void BGSDistantObjectBlock::SwitchToLow(
     bPrepared = false;
 }
 
-void BGSDistantObjectBlock::LoadFromTask(eBool abLoadData) {
+void BGSDistantObjectBlock::LoadFromTask(bool abLoadData) {
     if (spLoadTask.m_pObject && spLoadTask->IsTaskFinished()) {
         if (abLoadData) {
             spLoadTask->GetMesh(spMesh);
@@ -677,7 +677,7 @@ void BGSDistantObjectBlockLoadTask::Finish() {
             spNode = static_cast<BSMultiBoundNode*>(nullptr);
         }
         else {
-            pBlock->LoadFromTask(eTrue);
+            pBlock->LoadFromTask(true);
             pBlock->pNode->pManager->SetNeedsImmediateUpdate(true);
             if (!spMesh->IsSegmentedTriShape()) {
                 Warning("MODELS: Found a distant object block for %i:%i,%i but it is not segmented.", iLevel, iX, iY);
@@ -685,7 +685,7 @@ void BGSDistantObjectBlockLoadTask::Finish() {
         }
     }
     else if (!bCanceled && pBlock) {
-        pBlock->LoadFromTask(eFalse);
+        pBlock->LoadFromTask(false);
     }
 }
 

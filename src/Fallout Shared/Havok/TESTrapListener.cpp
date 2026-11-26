@@ -2,11 +2,10 @@
 
 #include "BSCore/BSList.h"
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkEntityListener.h"
 #include "BSHavok/bhkTTNode.h"
-#include "BSHavok/bhkTrapListener.h"
 #include "BSHavok/bhkWorld.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -197,10 +196,6 @@ void TESTrapListener::EmptyTriggerList() {
     pTriggers = nullptr;
 }
 
-bhkTrapListener::bhkTrapListener() : bhkEntityListener(0) {}
-
-bhkTrapListener::~bhkTrapListener() {}
-
 TrapEntry::TrapEntry(TESObjectREFR* apRef, const hkpCollidable* apCol) : ZoneEntry(apRef, apCol) {}
 
 // Runs every target entry of the trap. The node base sits at +0x10: each next node steps back to its entry.
@@ -387,52 +382,5 @@ bool TriggerEntry::Update(float afDelta) {
 }
 
 void TriggerEntry::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-hkpCdBodyPairCollector::hkpCdBodyPairCollector() : m_earlyOut(false) {}
-
-hkpCdBodyPairCollector::~hkpCdBodyPairCollector() {}
-
-void hkpCdBodyPairCollector::operator delete(void* apMemory) {
-    hkpCdPointCollector::operator delete(apMemory);
-}
-
-hkpAllCdBodyPairCollector::hkpAllCdBodyPairCollector() : m_hits(0) {
-    hkpAllCdBodyPairCollector::reset();
-}
-
-// Clears the hits, then the base's early-out flag.
-void hkpAllCdBodyPairCollector::reset() {
-    m_hits.clear();
-    hkpCdBodyPairCollector::reset();
-}
-
-hkpAllCdBodyPairCollector::~hkpAllCdBodyPairCollector() {}
-
-const hkArray<hkpRootCdBodyPair, hkContainerHeapAllocator>& hkpAllCdBodyPairCollector::getHits() const {
-    return m_hits;
-}
-
-void hkpAllCdBodyPairCollector::operator delete(void* p) {
-    if (!p) {
-        return;
-    }
-    hkMemoryAllocator& kAllocator = hkMemoryRouter::getInstance().heap();
-    kAllocator.blockFree(p, sizeof(hkpAllCdBodyPairCollector));
-}
-
-hkpPhantomListener::hkpPhantomListener() {}
-
-hkpPhantomListener::~hkpPhantomListener() {}
-
-void hkpPhantomListener::phantomShapeSetCallback(hkpPhantom* phantom) {
-    if (phantom->hkpWorldObject::getWorld()) {
-        phantomRemovedCallback(phantom);
-        phantomAddedCallback(phantom);
-    }
-}
-
-void hkpPhantomListener::operator delete(void* apMemory) {
     ourFree(apMemory);
 }

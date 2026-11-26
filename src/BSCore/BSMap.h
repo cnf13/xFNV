@@ -8,9 +8,10 @@ class ScrapHeap;
 class TESFaction;
 class TESObjectREFR;
 
-// The engine's heap entry points (BSCore/MemoryManager.h, which includes this header).
-void* ourMalloc(uint32_t aSize);
-void ourFree(void* apPtr);
+// The engine's heap entry points, defined in BSCore/NewOverloads.h, which includes MemoryManager.h. MemoryManager holds
+// a BSMap, so MemoryManager.h includes this one, and this one includes it at its end.
+inline void* ourMalloc(uint32_t aSize);
+inline void ourFree(void* apPtr);
 
 // One entry of a BSMap bucket's singly linked chain: 0xC bytes (the derived map's NewItem allocates 0xC).
 template <class TKEY, class TVAL>
@@ -245,3 +246,5 @@ void BSMap<TKEY, TVAL>::DeleteItem(BSMapItem<TKEY, TVAL>* pkItem) {
     pkItem->m_val = 0;
     ourFree(pkItem);
 }
+
+#include "BSCore/MemoryManager.h"

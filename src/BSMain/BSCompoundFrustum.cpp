@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/ScrapHeap.h"
 #include "BSMain/BSMultiBound.h"
 #include "BSMain/BSMultiBoundShape.h"

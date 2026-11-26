@@ -3,14 +3,15 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/InventoryChanges.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/ehvec.h"
 
 #include <stdint.h>
@@ -312,6 +313,9 @@ public:
     static BSStringT<char> strNextCaps;
     static BSStringT<char> strDoneCaps;
     static inline pEquippedInventoryListA_t pEquippedInventoryListA{};
+
+protected:
+    static SettingT<INISettingCollection> fStartingZoom;
 };
 
 extern SettingT<INISettingCollection> fRSMFaceSliderDefaultMin;

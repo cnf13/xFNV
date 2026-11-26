@@ -49,3 +49,7 @@ const void* getVtablehkpSerializedDisplayMarkerList() {
 void cleanupLoadedObjecthkpSerializedDisplayMarkerList(void* p) {
     static_cast<hkpSerializedDisplayMarkerList*>(p)->~hkpSerializedDisplayMarkerList();
 }
+
+const hkClass& hkpSerializedDisplayMarkerList::staticClass() {
+    return hkpSerializedDisplayMarkerListClass;
+}

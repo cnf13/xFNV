@@ -789,16 +789,7 @@ hkpStepResult hkpMultiThreadedSimulation::finishMtStep(hkJobQueue* jobQueue, hkJ
         hkpWorld* world = m_world;
         const int32_t first = m_numActiveIslandsAtBeginningOfStep;
         const int32_t numNew = world->m_activeSimulationIslands.m_size - first;
-        if (numNew > 1) {
-            hkAlgorithm::quickSortRecursive<
-                hkpSimulationIsland*,
-                hkBool (*)(const hkpSimulationIsland*, const hkpSimulationIsland*)>(
-                &world->m_activeSimulationIslands.m_data[first],
-                0,
-                numNew - 1,
-                &less_hkSimulationIslandPtr
-            );
-        }
+        hkAlgorithm::quickSort(&world->m_activeSimulationIslands.m_data[first], numNew, &less_hkSimulationIslandPtr);
     }
     for (int32_t i = m_numActiveIslandsAtBeginningOfStep; i < m_world->m_activeSimulationIslands.m_size; ++i) {
         m_world->m_activeSimulationIslands.m_data[i]->m_storageIndex = static_cast<uint16_t>(i);

@@ -5,6 +5,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSTimer.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
@@ -411,9 +412,7 @@ public:
     // Draws the gun scope model with the scope camera while the scope is up.
     static void Draw3DElements();
     // Shows the enemy health meter for the crosshair reference.
-    static void HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool abShow);
-    // Calls HandleHealthbarForCrosshairActor(apRef, false) once the player has 3D.
-    static void HandleHealthbarForCrosshairActor_(TESObjectREFR* apRef);
+    static void SetTargetType(TESObjectREFR* apRef, bool abShow);
     // Moves the compass and its icons.
     static void UpdateCompass(Tile* apCompass, Tile* apGeneralIcons, Tile* apMarkerIcons, Tile* apNPCIcons);
     // Sets a meter tile to afMeterPercent.
@@ -620,9 +619,9 @@ inline int32_t xp_currentActorLevel;
 using pLockLevelNames_t = Setting* [6];
 extern pLockLevelNames_t pLockLevelNames;
 
-extern SettingT<GameSettingCollection> gs_sQuestCompletedText;
+extern SettingT<GameSettingCollection> sQuestCompleted;
 
-extern SettingT<GameSettingCollection> gs_sQuestAddedText;
+extern SettingT<GameSettingCollection> sQuestAdded;
 
 // The action prompts by GetRefPromptType's prompt type (1 take, 7 talk).
 using psTargetTypes_t = Setting* [20];
@@ -632,9 +631,9 @@ extern psTargetTypes_t psTargetTypes;
 using psKeyboard_t = Setting* [238];
 extern psKeyboard_t psKeyboard;
 
-extern SettingT<INIPrefSettingCollection> gs_bDisableDynamicCrosshair_GamePlay;
+extern SettingT<INIPrefSettingCollection> bDisableDynamicCrosshair;
 
-extern SettingT<INIPrefSettingCollection> gs_bCrossHair_GamePlay;
+extern SettingT<INIPrefSettingCollection> bCrossHair;
 
 // The HUD timer time of the last quest name update.
 inline uint32_t uiMessageDelayTime;

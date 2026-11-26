@@ -3,9 +3,9 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/Animation.h"
@@ -27,6 +27,7 @@
 #include "Fallout Shared/Package.h"
 #include "Fallout Shared/PackageLocation.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESAmmo.h"
@@ -698,7 +699,7 @@ void ItemChange::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         for (uint32_t i = 0; i < uiSaveGameCount; ++i) {
             ExtraDataList* pExtraDataList;
             pExtraDataList = new ExtraDataList;
-            pExtraDataList->LoadGameBGS(apLoadGameBuffer);
+            pExtraDataList->LoadGame(apLoadGameBuffer);
             pExtraObjectList->AddTail(pExtraDataList);
         }
     }
@@ -732,7 +733,7 @@ void ItemChange::SetItemOwnership(TESForm* apowner) {
 
 // SaveGame of the old save format. With save blocks, the block's size is written back as a 16-bit value over the slot
 // reserved after the 'BLOK' marker.
-void ItemChange::SaveGameTES() {
+void ItemChange::SaveGame() {
     uint32_t uiBlockHeader;
     int32_t iCount;
     uint16_t usBlockSize;
@@ -1032,7 +1033,7 @@ void ItemChange::InitLoadGame_0() {
     for (BSSimpleList<ExtraDataList*>* pNode = pExtraObjectList; pNode && !pNode->IsEmpty(); pNode = pNode->m_pkNext) {
         ExtraDataList* pList = pNode->m_item;
         if (pList) {
-            pList->InitLoadGameTES(0, 0, nullptr, pContainerObj);
+            pList->InitLoadGame(0, 0, nullptr, pContainerObj);
         }
     }
 }
@@ -1709,7 +1710,7 @@ TESBoundObject* InventoryChanges::GetObjectbyType(ENUM_FORM_ID aeFormID, int32_t
     return pObj;
 }
 
-void InventoryChanges::InitLoadGameTES() {
+void InventoryChanges::InitLoadGame() {
     for (BSSimpleList<ItemChange*>* pNode = pListofChanges; pNode && !pNode->IsEmpty(); pNode = pNode->m_pkNext) {
         ItemChange* pChange = pNode->m_item;
         if (pChange) {
@@ -1741,7 +1742,7 @@ void InventoryChanges::SaveGame() {
     for (BSSimpleList<ItemChange*>* pList = pListofChanges; pList && !pList->IsEmpty(); pList = pList->m_pkNext) {
         ItemChange* pChange = pList->m_item;
         if (pChange) {
-            pChange->SaveGameTES();
+            pChange->SaveGame();
             ++usCount;
         }
     }
@@ -1908,7 +1909,7 @@ void InventoryChanges::LoadGame() {
 }
 
 // Saves each change with the buffer's form cleared and its change flags set to 0x400, then puts both back.
-void InventoryChanges::SaveGameBGS(BGSSaveFormBuffer* apSaveGameBuffer) {
+void InventoryChanges::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     TESForm* pForm = apSaveGameBuffer->GetForm();
     BGSChangeFlags kChangeFlags = apSaveGameBuffer->GetChangeFlags();
     apSaveGameBuffer->SetForm(nullptr);

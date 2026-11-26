@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Internal/KdTree/QueryUtils/hkKdTreeBundleCastCollector.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkKdTreeBundleCastCollector::~hkKdTreeBundleCastCollector() {}
 

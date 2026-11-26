@@ -6,6 +6,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSThread.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
@@ -344,6 +345,12 @@ public:
     static inline char bRendering;
     // The current quest objective and the player stats the loading screen shows, read once per load.
     static LoadingMenuDisplayData DisplayData;
+
+protected:
+    static SettingT<INISettingCollection> sTitleMusic;
+    static SettingT<INISettingCollection> fLoadingBkgdUpdateInterval;
+    static SettingT<INISettingCollection> fMainMenuBkgdUpdateInterval;
+    static SettingT<INISettingCollection> fLoadingInitUpdateInterval;
 };
 
 // Steps a welcome screen id, returning the old one.
@@ -351,11 +358,3 @@ LoadingMenu::WelcomeScreenID operator++(LoadingMenu::WelcomeScreenID& aeID, int3
 int32_t TryEnter(_RTL_CRITICAL_SECTION* apThis, [[maybe_unused]] void* apEdx);
 
 inline bool bMainMenuMovieIntroStarted;
-
-extern SettingT<INISettingCollection> gs_sTitleMusic_Loading;
-
-extern SettingT<INISettingCollection> gs_fLoadingInitUpdateInterval_Loading;
-
-extern SettingT<INISettingCollection> gs_fMainMenuBkgdUpdateInterval_Loading;
-
-extern SettingT<INISettingCollection> gs_fLoadingBkgdUpdateInterval_Loading;

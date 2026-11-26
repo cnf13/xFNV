@@ -24,3 +24,7 @@ public:
     // The menu this tile is the root of.
     Menu* pMenu;
 };
+
+inline const char* TileMenu::GetTypeName() {
+    return "MENU";
+}

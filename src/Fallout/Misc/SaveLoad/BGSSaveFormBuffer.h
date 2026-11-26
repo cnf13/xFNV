@@ -4,6 +4,7 @@
 #include "Fallout/Misc/SaveLoad/BGSChangeFlags.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadFormHeader.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
 
 // The buffer one form is saved into: the form's header and the form itself.
 class BGSSaveFormBuffer : public BGSSaveGameBuffer {

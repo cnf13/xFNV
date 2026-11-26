@@ -26,3 +26,5 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiAVObjectPalette::~NiAVObjectPalette() {}

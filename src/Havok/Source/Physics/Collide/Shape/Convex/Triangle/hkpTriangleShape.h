@@ -108,3 +108,11 @@ inline flipNormalBasedOnWeldingTypeTable_t flipNormalBasedOnWeldingTypeTable{1.0
 // element i + 1 of this table is read.
 using mod3Table_t = int32_t[6];
 inline mod3Table_t mod3Table{0, 1, 2, 0, 1, 2};
+
+// Assumes hkpConvexShape's constructor from the shape type and the radius (the SDK's).
+inline hkpTriangleShape::hkpTriangleShape(const hkVector4& v0, const hkVector4& v1, const hkVector4& v2, float radius)
+  : hkpConvexShape(HK_SHAPE_TRIANGLE, radius), m_weldingInfo(0), m_isExtruded(0), m_vertexA(v0), m_vertexB(v1),
+    m_vertexC(v2) {
+    m_weldingType = hkpWeldingUtility::WELDING_TYPE_NONE;
+    m_extrusion.setZero4();
+}

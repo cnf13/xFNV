@@ -2,6 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkBoxShape.h"
 #include "BSHavok/bhkCapsuleShape.h"
 #include "BSHavok/bhkCharacterController.h"
@@ -9,6 +10,7 @@
 #include "BSHavok/bhkCharacterProxy.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkCollisionObject.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkConvexShape.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkMultiSphereShape.h"
@@ -19,13 +21,13 @@
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
-#include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkTransformShape.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/BSXFlags.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/ScreenCustomSplatter.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeModel.h"
 #include "Fallout Shared/TES.h"
@@ -37,7 +39,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCollisionObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -50,6 +51,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
@@ -76,10 +78,10 @@
 
 // Whether trees get Havok phantoms.
 static SettingT<INISettingCollection> bTreeTops("bTreeTops:HAVOK", false);
-SettingT<GameSettingCollection> gs_iCollFreq("iCollFreq", 2);
+SettingT<GameSettingCollection> iCollFreq("iCollFreq", 2);
 SettingT<GameSettingCollection> iLowDamp("iLowDamp", 50);
-SettingT<GameSettingCollection> gs_iHighDamp("iHighDamp", 80);
-SettingT<GameSettingCollection> gs_iUpdateGroups("iUpdateGroups", 5);
+SettingT<GameSettingCollection> iHighDamp("iHighDamp", 80);
+SettingT<GameSettingCollection> iNumGroups("iUpdateGroups", 5);
 SettingT<GameSettingCollection> fUpdateInterval("fUpdateInterval", 0.25f);
 NiRTTI BSTreeNode::ms_RTTI("BSTreeNode", &NiNode::ms_RTTI);
 
@@ -397,7 +399,7 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
         if (pTree && pTree->GethkWorld()) {
             const char* pUserData = this->spModel->pSpeedTree->GetUserData();
             const char* pCollisionFreq = std::strstr(pUserData, "~CF");
-            int32_t iCollFreq = pCollisionFreq ? pCollisionFreq[3] - 48 : gs_iCollFreq.Int();
+            int32_t iCollFreq = pCollisionFreq ? pCollisionFreq[3] - 48 : ::iCollFreq.Int();
             double dCollFreq = static_cast<double>(iCollFreq);
             float fCollChance = fUpdateInterval.Float() * dCollFreq * 100.0;
             alignas(16) hkpAllCdBodyPairCollector collector;
@@ -454,7 +456,7 @@ void BSTreeNode::UpdateBSTreeNode(float afTime) {
                         hkVector4 vAV(pRigidBody->getAngularVelocity());
                         if (vLV.lengthSquared3() > 1.0) {
                             double dLength = vLV.length3();
-                            int32_t iDamp = RandomInt(iLowDamp.Int(), gs_iHighDamp.Int());
+                            int32_t iDamp = RandomInt(iLowDamp.Int(), iHighDamp.Int());
                             float fSpeed = (1.0 - static_cast<double>(iDamp) / 100.0) * dLength;
                             float fNewX = RandomFloatNeg1To1();
                             float fNewY = RandomFloatNeg1To1();
@@ -509,11 +511,11 @@ bool BSTreeNode::CheckForCollision(float afTime) {
         double dNextCheck = afTime + fUpdateInterval.Float();
         float fInterval = fUpdateInterval.Float();
         fNextCollisionCheck = static_cast<float>(
-            fInterval / static_cast<double>(gs_iUpdateGroups.Int()) * BSTreeNode::ucNextGroup + dNextCheck
+            fInterval / static_cast<double>(iNumGroups.Int()) * BSTreeNode::ucNextGroup + dNextCheck
         );
         ++BSTreeNode::ucNextGroup;
         BSTreeNode::ucNextGroup = static_cast<uint8_t>(
-            BSTreeNode::ucNextGroup % static_cast<int32_t>(gs_iUpdateGroups.UInt())
+            BSTreeNode::ucNextGroup % static_cast<int32_t>(iNumGroups.UInt())
         );
         return true;
     }
@@ -537,7 +539,7 @@ void BSTreeNode::MakeHavokLeaves(CSpeedTreeRT* apST, float afScale) {
     if (!uiCount) {
         return;
     }
-    float fScale = GameSetting::fTreeSizeConversion::Get() * afScale;
+    float fScale = BSTreeManager::GetSizeConversion() * afScale;
     NiNode* pLeafNode = GetLeafNode();
     alignas(16) uint8_t aPhantomInfoStorage[sizeof(hkSimpleShapePhantomCinfo)];
     hkSimpleShapePhantomCinfo* pPhantomInfo = ::new (aPhantomInfoStorage) hkSimpleShapePhantomCinfo;
@@ -634,47 +636,4 @@ bhkSimpleShapePhantom* BSTreeNode::GetLeafObject() {
         }
     }
     return pp;
-}
-
-hkCapsuleShapeCinfo::hkCapsuleShapeCinfo() {
-    m_vertexB.set(1.0, 0.0, 0.0, 0.0);
-}
-
-// This getter is const but GethkWorldRw is not; it is called on the const proxy.
-void bhkCharacterProxy::GetLinearVelocity(NiPoint3& arVel) const {
-    hkpCharacterProxy* pProxy = static_cast<hkpCharacterProxy*>(GethkObject());
-    if (pProxy) {
-        const_cast<bhkCharacterProxy*>(this)->bhkCharacterProxy::GethkWorldRw();
-        HK2NI(arVel, pProxy->getLinearVelocity());
-        const_cast<bhkCharacterProxy*>(this)->bhkCharacterProxy::GethkWorldRw();
-    }
-}
-
-bhkCollisionObject::bhkCollisionObject() {}
-
-bhkCollisionObject::~bhkCollisionObject() {}
-
-// Zero: a plain collision object does not move.
-NiPoint3 bhkNiCollisionObject::GetVelocity() {
-    return NiPoint3::ZERO;
-}
-
-bhkPCollisionObject::~bhkPCollisionObject() {}
-
-bhkSPCollisionObject::~bhkSPCollisionObject() {}
-
-hkpTransformShape* bhkTransformShape::operator*() const {
-    if (this) {
-        return static_cast<hkpTransformShape*>(GethkObject());
-    }
-
-    return nullptr;
-}
-
-hkTransformShapeCinfo::hkTransformShapeCinfo() : m_childShape(nullptr) {
-    m_transform.setIdentity();
-}
-
-const hkClass& hkContactPoint::staticClass() {
-    return hkContactPointClass;
 }

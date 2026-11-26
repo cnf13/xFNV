@@ -15,7 +15,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAlphaProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
@@ -38,9 +38,9 @@ bool MultiBoundMarkerData::Load(TESFile* apFile) {
     if (apFile && apFile->GetTESChunk() == XMBO_ID) {
         apFile->GetChunkData(this, 0xC);
         if (apFile->QEndian()) {
-            ENDIAN(HalfExtents.x, false);
-            ENDIAN(HalfExtents.y, false);
-            ENDIAN(HalfExtents.z, false);
+            BSEndian(HalfExtents.x, false);
+            BSEndian(HalfExtents.y, false);
+            BSEndian(HalfExtents.z, false);
         }
         bLoaded = true;
     }
@@ -179,52 +179,4 @@ bool MultiBoundMarkerData::MultiBoundIntersectsCell(TESObjectREFR* apRef, int32_
         }
     }
     return false;
-}
-
-void BSMultiBoundOBB::SetAxis(const NiMatrix3& arAxis) {
-    Axis = arAxis;
-}
-
-void NiAVObject::AttachProperty(NiProperty* pkProperty) {
-    if (pkProperty->Type() < static_cast<int32_t>(NiProperty::MAX_TYPES)) {
-        NiPointer<NiProperty> spProperty(pkProperty);
-        m_kPropertyList.AddHead(spProperty);
-    }
-}
-
-NiAlphaProperty::~NiAlphaProperty() {}
-
-NiProperty::NiProperty() {}
-
-void NiTAbstractPoolAllocator<uint32_t>::CreateFreeMem() {
-    uint32_t uiPrev;
-    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(
-        ourMalloc(
-            NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize <=
-                    SIZE_MAX / sizeof(NiTAbstractPoolAllocator<uint32_t>::AllocNode)
-                ? sizeof(NiTAbstractPoolAllocator<uint32_t>::AllocNode) *
-                    NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize
-                : SIZE_MAX
-        )
-    );
-    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize - 1]
-        .m_pkNext = nullptr;
-    uint32_t i = 1;
-    do {
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[i]
-            .m_pkNext = &NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[i + 1];
-        uiPrev = i++;
-    }
-    while (uiPrev < NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize - 2);
-
-    if (NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader) {
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem
-            ->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader;
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
-    }
-    else {
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
-        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem->m_pkNext = nullptr;
-    }
-    ++NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
 }

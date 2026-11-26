@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSRadiation.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSPlaceableWater.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -68,8 +68,8 @@ bool BGSRadiationStage::Load(TESFile* apFile) {
 }
 
 void BGSRadiationStageData::Endian() {
-    ENDIAN(iRads, false);
-    ENDIAN(pSickness, false);
+    BSEndian(iRads, false);
+    BSEndian(pSickness, false);
 }
 
 void BGSRadiationStageData::Clear() {

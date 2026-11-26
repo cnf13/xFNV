@@ -11,11 +11,11 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkWindListener.h"
@@ -34,9 +34,9 @@
 #include "BSMain/BSParticleSystemManager.h"
 #include "BSMain/BSPortal.h"
 #include "BSMain/BSPortalGraph.h"
-#include "BSMain/BSPortalSharedNode.h"
 #include "BSMain/BSRangeNode.h"
 #include "BSMain/BSStream.h"
+#include "BSMain/BSTaskManager.h"
 #include "BSMain/BSTempNodeManager.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/BSWindModifier.h"
@@ -46,8 +46,7 @@
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSMovie/MoviePlayer.h"
 #include "BSShader/BSFadeNode.h"
@@ -88,8 +87,6 @@
 #include "Fallout Shared/BSAnimGroupSequence.h"
 #include "Fallout Shared/BSCustomSplatterExtraData.h"
 #include "Fallout Shared/BSSplatterExtraData.h"
-#include "Fallout Shared/BSTaskThread.h"
-#include "Fallout Shared/BSTempNode.h"
 #include "Fallout Shared/BipedAnim.h"
 #include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/ContainerItemExtra.h"
@@ -133,6 +130,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -232,7 +230,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
@@ -251,6 +248,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStrips.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
@@ -300,30 +298,30 @@ static BSPerformanceTimer TimerUpdateMultibound("Renderer", "Update Multibound V
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 SettingT<INISettingCollection> bPreemptivelyUnloadCells("bPreemptivelyUnloadCells:General", false);
-SettingT<INISettingCollection> TES::uInteriorCellBufferGeneral("uInterior Cell Buffer:General", 3u);
+static SettingT<INISettingCollection> iInteriorBufferSize("uInterior Cell Buffer:General", 3u);
 SettingT<INISettingCollection> iNumHWThreads("iNumHWThreads:General", 1);
 static SettingT<INISettingCollection> sEnvReduceColor("sEnvReduceColor:Weather", "255,255,255,255");
 static SettingT<INISettingCollection> sLerpCloseColor("sLerpCloseColor:Weather", "255,255,255,255");
 static SettingT<INISettingCollection> sBumpFadeColor("sBumpFadeColor:Weather", "255,255,255,255");
 static SettingT<INISettingCollection> fAlphReduce("fAlphaReduce:Weather", 1.0f);
-SettingT<INISettingCollection> gs_iUpdateType_HAVOK("iUpdateType:HAVOK", 0);
-SettingT<INISettingCollection> gs_fMoveLimitMass_HAVOK("fMoveLimitMass:HAVOK", 95.0f);
-SettingT<INISettingCollection> bAddBipedWhenKeyframed_HAVOK("bAddBipedWhenKeyframed:HAVOK", true);
-SettingT<INISettingCollection> gs_fMaxPickTime_HAVOK("fMaxPickTime:HAVOK", 0.004f);
-SettingT<INISettingCollection> gs_fMaxPickTimeVATS_HAVOK("fMaxPickTimeVATS:HAVOK", 0.04f);
+SettingT<INISettingCollection> iHavokUpdateType("iUpdateType:HAVOK", 0);
+SettingT<INISettingCollection> fHavokMoveLimitMass("fMoveLimitMass:HAVOK", 95.0f);
+SettingT<INISettingCollection> bAddBipedWhenKeyframed("bAddBipedWhenKeyframed:HAVOK", true);
+SettingT<INISettingCollection> fMaxPickTime("fMaxPickTime:HAVOK", 0.004f);
+SettingT<INISettingCollection> fMaxPickTimeVATS("fMaxPickTimeVATS:HAVOK", 0.04f);
 static SettingT<INISettingCollection> fMaxPickTimeDebug("fMaxPickTimeDebug:HAVOK", 0.06f);
 static SettingT<INISettingCollection> fMaxPickTimeDebugVATS("fMaxPickTimeDebugVATS:HAVOK", 0.6f);
-SettingT<INISettingCollection> gs_iEntityBatchRemoveRate_HAVOK("iEntityBatchRemoveRate:HAVOK", 100);
-SettingT<INISettingCollection> gs_fChaseDeltaMult_HAVOK("fChaseDeltaMult:HAVOK", 0.05f);
-SettingT<GameSettingCollection> gs_fDebrisMinExtent("fDebrisMinExtent", 2.0f);
-SettingT<GameSettingCollection> gs_fDebrisMaxVelocity("fDebrisMaxVelocity", 25.0f);
-SettingT<INISettingCollection> gs_fDistanceMultiplier_LOD("fDistanceMultiplier:LOD", 1.2f);
-SettingT<INISettingCollection> gs_fFadeOutThreshold_LOD("fFadeOutThreshold:LOD", 0.3f);
-SettingT<INISettingCollection> gs_fFadeInThreshold_LOD("fFadeInThreshold:LOD", 0.7f);
-SettingT<INISettingCollection> gs_fFadeInTime_LOD("fFadeInTime:LOD", 1.2f);
-SettingT<INISettingCollection> gs_fFadeOutTime_LOD("fFadeOutTime:LOD", 1.2f);
-SettingT<INISettingCollection> gs_bCheckPurgedTextureList_General("bCheckPurgedTextureList:General", false);
-SettingT<INISettingCollection> gs_bQueueWarnings_General("bQueueWarnings:General", false);
+SettingT<INISettingCollection> iEntityBatchRemoveRate("iEntityBatchRemoveRate:HAVOK", 100);
+SettingT<INISettingCollection> fChaseDeltaMult("fChaseDeltaMult:HAVOK", 0.05f);
+SettingT<GameSettingCollection> fDebrisMinExtent("fDebrisMinExtent", 2.0f);
+SettingT<GameSettingCollection> fDebrisMaxVelocity("fDebrisMaxVelocity", 25.0f);
+SettingT<INISettingCollection> fDistanceMultiplier("fDistanceMultiplier:LOD", 1.2f);
+SettingT<INISettingCollection> fFadeOutThreshold("fFadeOutThreshold:LOD", 0.3f);
+SettingT<INISettingCollection> fFadeInThreshold("fFadeInThreshold:LOD", 0.7f);
+SettingT<INISettingCollection> fFadeInTime("fFadeInTime:LOD", 1.2f);
+SettingT<INISettingCollection> fFadeOutTime("fFadeOutTime:LOD", 1.2f);
+SettingT<INISettingCollection> bCheckPurgedTextureList("bCheckPurgedTextureList:General", false);
+SettingT<INISettingCollection> bQueueWarnings("bQueueWarnings:General", false);
 SettingT<INISettingCollection> bUseMultiThreadedTrees("bUseMultiThreadedTrees:BackgroundLoad", true);
 SettingT<GameSettingCollection> fFadeToBlackFadeSeconds("fFadeToBlackFadeSeconds", 0.3f);
 SettingT<GameSettingCollection> fCharacterControllerMultipleStepSpeed("fCharacterControllerMultipleStepSpeed", 25.0f);
@@ -350,9 +348,9 @@ SettingT<INISettingCollection> sSysUtil_SaveDataInsufficientSpace(
 );
 SettingT<INISettingCollection>
     sSysUtil_DiscEject("sSysUtil_DiscEject:LANGUAGE", "No Default string.  Must be loaded from INIFile");
-SettingT<INISettingCollection> gs_bShowLoadingAreaMessage_General("bShowLoadingAreaMessage:General", false);
+SettingT<INISettingCollection> bShowLoadingAreaMessage("bShowLoadingAreaMessage:General", false);
 SettingT<INISettingCollection>
-    gs_bSelectivePurgeUnusedOnFastTravel_BackgroundLoad("bSelectivePurgeUnusedOnFastTravel:BackgroundLoad", false);
+    TES::bSelectivePurgeUnusedOnFastTravel("bSelectivePurgeUnusedOnFastTravel:BackgroundLoad", false);
 SettingT<INISettingCollection>
     sSysUtil_DirtyDisc("sSysUtil_DirtyDisc:LANGUAGE", "No Default string.  Must be loaded from INIFile");
 SettingT<INISettingCollection> sThumbstick("sThumbstick:LANGUAGE", "No Default string.  Must be loaded from INIFile");
@@ -360,12 +358,6 @@ SettingT<INISettingCollection> sDPad("sDPad:LANGUAGE", "No Default string.  Must
 SettingT<RendererSettingCollection> fLODFadeOutMultActors("fLODFadeOutMultActors:LOD", 2.5f);
 SettingT<RendererSettingCollection> fLODFadeOutMultItems("fLODFadeOutMultItems:LOD", 3.0f);
 SettingT<RendererSettingCollection> fLODFadeOutMultObjects("fLODFadeOutMultObjects:LOD", 5.0f);
-
-// The shared model-data getter's class (TESActorBaseData) has its field at another offset than m_usVertices with
-// 8-byte pointers, so the field is read directly.
-uint16_t NiGeometry::GetVertexCount() {
-    return this->m_spModelData->m_usVertices;
-}
 
 void MakeNewGeomData(NiAVObject* apObject) {
     NiPointer<NiObject> spTempObject(nullptr);
@@ -401,29 +393,6 @@ int32_t PrintToFile(const char* apFileName, const char* apFormat, ...) {
     return 0;
 }
 
-float HK2NI(float afhk) {
-    float fResult = bhkConvert::fHk2BSScaleSC * afhk;
-    return fResult;
-}
-
-NiTransform& HK2NI(NiTransform& arNiTran, const hkTransform& arhkTran) {
-    HK2NI(arNiTran.m_Rotate, arhkTran.m_rotation);
-    HK2NI(arNiTran.m_Translate, arhkTran.getTranslation());
-    return arNiTran;
-}
-
-hkQuaternion& NI2HKMIGRATION_QUATERNION(hkQuaternion& arhkQ, const NiQuaternion& arNiQ) {
-    float fX = arNiQ.m_fX;
-    arhkQ.m_vec(0) = fX;
-    float fY = arNiQ.m_fY;
-    arhkQ.m_vec(1) = fY;
-    float fZ = arNiQ.m_fZ;
-    arhkQ.m_vec(2) = fZ;
-    float fW = arNiQ.m_fW;
-    arhkQ.m_vec(3) = fW;
-    return arhkQ;
-}
-
 void Init() {
     char cRootDir[268];
     AutoMemContext kMemContext(
@@ -449,7 +418,7 @@ void Init() {
         std::strcpy(cRootDir, kCurrentDirectory.c_str());
     }
     pError->SetRootDir(cRootDir);
-    bhkWorldCinfo::SetSimulationType(gs_iSimType_HAVOK.Int());
+    bhkWorldCinfo::SetSimulationType(iSimType.Int());
 }
 
 TES::ParticleObjectCache::ParticleObjectCache() : spModel(nullptr), pspClones(nullptr), pNext(nullptr) {}
@@ -477,16 +446,16 @@ TES::TES(const char* apPathname, NiNode* apRoot, NiNode* apLODLandRoot, Sky* apS
     AutoMemContext kMemContext(MEM_CONTEXT_GAME_OVERHEAD);
     NiObjectNET::SetDefaultCopyType(NiObjectNET::COPY_EXACT);
     Init();
-    bhkWorld::SetUpdateType(gs_iUpdateType_HAVOK);
+    bhkWorld::SetUpdateType(iHavokUpdateType);
     bhkWorld::SetRecFunction(bhkWorldNS::OA_ADD, &TESObjectREFR::FilteredAddObject);
-    bhkWorld::SetAddBipedWhenKeyframed(bAddBipedWhenKeyframed_HAVOK.Bool());
-    bhkWorld::SetDebrisMaxVelocity(gs_fDebrisMaxVelocity.Float());
-    bhkWorld::SetDebrisMinExtent(gs_fDebrisMinExtent.Float());
-    bhkWorld::SetChaseDeltaMult(gs_fChaseDeltaMult_HAVOK.Float());
-    bhkWorld::SetMaxPickTimeNormal(gs_fMaxPickTime_HAVOK.Float());
-    bhkWorld::SetMaxPickTimeVATS(gs_fMaxPickTimeVATS_HAVOK.Float());
-    bhkWorld::SetEntityBatchRemoveRate(static_cast<uint32_t>(gs_iEntityBatchRemoveRate_HAVOK.Int()));
-    bhkCharacterListener::SetMoveLimitMass(gs_fMoveLimitMass_HAVOK);
+    bhkWorld::SetAddBipedWhenKeyframed(bAddBipedWhenKeyframed.Bool());
+    bhkWorld::SetDebrisMaxVelocity(fDebrisMaxVelocity.Float());
+    bhkWorld::SetDebrisMinExtent(fDebrisMinExtent.Float());
+    bhkWorld::SetChaseDeltaMult(fChaseDeltaMult.Float());
+    bhkWorld::SetMaxPickTimeNormal(fMaxPickTime.Float());
+    bhkWorld::SetMaxPickTimeVATS(fMaxPickTimeVATS.Float());
+    bhkWorld::SetEntityBatchRemoveRate(static_cast<uint32_t>(iEntityBatchRemoveRate.Int()));
+    bhkCharacterListener::SetMoveLimitMass(fHavokMoveLimitMass);
     bhkCharacterController::SetMultipleStepSpeed(
         fCharacterControllerMultipleStepSpeed.Float() * fCharacterControllerMultipleStepSpeed.Float()
     );
@@ -494,13 +463,13 @@ TES::TES(const char* apPathname, NiNode* apRoot, NiNode* apLODLandRoot, Sky* apS
     TES::InitFadeOutMultipliers();
     BSFadeNode::SetFadeOutMultiplier(LOD_MULT_DISTANTLOD, 0.0f);
     BSFadeNode::SetFadeOutMultiplier(LOD_MULT_ACTOR_BODY_PART, -1.0f);
-    BSFadeNode::SetFadeOutThreshold(gs_fFadeOutThreshold_LOD.Float());
-    BSFadeNode::SetFadeInThreshold(gs_fFadeInThreshold_LOD.Float());
-    BSFadeNode::SetFadeInTime(gs_fFadeInTime_LOD.Float());
-    BSFadeNode::SetFadeOutTime(gs_fFadeOutTime_LOD.Float());
-    BSFadeNode::SetDistanceMultiplier(gs_fDistanceMultiplier_LOD.Float());
-    MessageHandler::SetWarningQueueing(gs_bQueueWarnings_General.Bool());
-    BSTexturePalette::SetCheckPurgedList(gs_bCheckPurgedTextureList_General.Bool());
+    BSFadeNode::SetFadeOutThreshold(fFadeOutThreshold.Float());
+    BSFadeNode::SetFadeInThreshold(fFadeInThreshold.Float());
+    BSFadeNode::SetFadeInTime(fFadeInTime.Float());
+    BSFadeNode::SetFadeOutTime(fFadeOutTime.Float());
+    BSFadeNode::SetDistanceMultiplier(fDistanceMultiplier.Float());
+    MessageHandler::SetWarningQueueing(bQueueWarnings.Bool());
+    BSTexturePalette::SetCheckPurgedList(bCheckPurgedTextureList.Bool());
     bhkNiCollisionObject::SetTransChangeCallback(&TESObjectREFR::TransChangeCallback);
     bhkNiCollisionObject::SetDebugDisplayCallback(&TESObjectREFR::DebugDisplayCallback);
     pGridCellA = new GridCellArray();
@@ -520,20 +489,20 @@ TES::TES(const char* apPathname, NiNode* apRoot, NiNode* apLODLandRoot, Sky* apS
     BGSSaveLoadGame::Create();
     BGSSaveLoadManager::Create();
     int32_t iGrids = uGridsToLoad.Int();
-    if (static_cast<uint32_t>(uExteriorCellBuffer) < static_cast<uint32_t>(iGrids * iGrids + iGrids + iGrids + 1)) {
-        uExteriorCellBuffer = iGrids + iGrids * iGrids + iGrids + 1;
+    if (static_cast<uint32_t>(iExteriorBufferSize) < static_cast<uint32_t>(iGrids * iGrids + iGrids + iGrids + 1)) {
+        iExteriorBufferSize = iGrids + iGrids * iGrids + iGrids + 1;
     }
-    if (!static_cast<uint32_t>(TES::uInteriorCellBufferGeneral)) {
-        TES::uInteriorCellBufferGeneral = 1;
+    if (!static_cast<uint32_t>(iInteriorBufferSize)) {
+        iInteriorBufferSize = 1;
     }
     pInteriorBuffer = static_cast<TESObjectCELL**>(
-        ourMalloc(TES::uInteriorCellBufferGeneral.UInt() * sizeof(TESObjectCELL*))
+        ourMalloc(iInteriorBufferSize.UInt() * sizeof(TESObjectCELL*))
     );
-    pExteriorBuffer = static_cast<TESObjectCELL**>(ourMalloc(uExteriorCellBuffer.UInt() * sizeof(TESObjectCELL*)));
-    for (uint32_t n = 0; n < static_cast<uint32_t>(TES::uInteriorCellBufferGeneral); ++n) {
+    pExteriorBuffer = static_cast<TESObjectCELL**>(ourMalloc(iExteriorBufferSize.UInt() * sizeof(TESObjectCELL*)));
+    for (uint32_t n = 0; n < static_cast<uint32_t>(iInteriorBufferSize); ++n) {
         pInteriorBuffer[n] = nullptr;
     }
-    for (uint32_t n = 0; n < static_cast<uint32_t>(uExteriorCellBuffer); ++n) {
+    for (uint32_t n = 0; n < static_cast<uint32_t>(iExteriorBufferSize); ++n) {
         pExteriorBuffer[n] = nullptr;
     }
     InitVars();
@@ -813,7 +782,7 @@ bool TES::IsCellLoaded(TESObjectCELL* apCell, bool abIgnorebuffered) {
 }
 
 bool TES::IsInteriorBuffered(TESObjectCELL* apCell) {
-    for (uint32_t index = 0; index < static_cast<uint32_t>(uInteriorCellBufferGeneral); ++index) {
+    for (uint32_t index = 0; index < static_cast<uint32_t>(iInteriorBufferSize); ++index) {
         if (pInteriorBuffer[index] == apCell) {
             return true;
         }
@@ -1642,12 +1611,12 @@ void TES::AddToExteriorBuffer(TESObjectCELL* apCell) {
     TESObjectCELL* pMoveCell = apCell;
     uint32_t uiStart = 0;
     if (!cFromStart) {
-        uint32_t uiBufferSize = static_cast<uint32_t>(uExteriorCellBuffer);
+        uint32_t uiBufferSize = static_cast<uint32_t>(iExteriorBufferSize);
         if (uiBufferSize > uGridsToLoad.Int() * uGridsToLoad.Int()) {
             uiStart = uGridsToLoad.Int() * uGridsToLoad.Int();
         }
     }
-    for (uint32_t i = uiStart; i < static_cast<uint32_t>(uExteriorCellBuffer); ++i) {
+    for (uint32_t i = uiStart; i < static_cast<uint32_t>(iExteriorBufferSize); ++i) {
         TESObjectCELL* pBufferCell = pExteriorBuffer[i];
         pExteriorBuffer[i] = pMoveCell;
         if (pBufferCell == apCell) {
@@ -1672,7 +1641,7 @@ void TES::SortExteriorBuffer() {
     // The grid count is halved as an unsigned value and the half grid is compared as a signed int.
     int32_t iHalfGrid = static_cast<int32_t>(static_cast<uint32_t>(uGridsToLoad.Int()) >> 1);
     uint32_t uiLastOutside = 0;
-    for (uint32_t i = uiStart; i < uExteriorCellBuffer.UInt() - 1; ++i) {
+    for (uint32_t i = uiStart; i < iExteriorBufferSize.UInt() - 1; ++i) {
         TESObjectCELL* pCell = pExteriorBuffer[i];
         if (!pCell) {
             break;
@@ -1716,7 +1685,7 @@ void TES::ClearDeadCountList() {
 // off the end is unloaded.
 void TES::AddToInteriorBuffer(TESObjectCELL* apCell) {
     if (IsInteriorBuffered(apCell)) {
-        for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(uInteriorCellBufferGeneral); ++uiIndex) {
+        for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(iInteriorBufferSize); ++uiIndex) {
             if (pInteriorBuffer[uiIndex] == apCell) {
                 for (; uiIndex != 0; --uiIndex) {
                     pInteriorBuffer[uiIndex] = pInteriorBuffer[uiIndex - 1];
@@ -1728,7 +1697,7 @@ void TES::AddToInteriorBuffer(TESObjectCELL* apCell) {
         }
     }
     else {
-        int32_t iLast = static_cast<int32_t>(static_cast<uint32_t>(uInteriorCellBufferGeneral) - 1);
+        int32_t iLast = static_cast<int32_t>(static_cast<uint32_t>(iInteriorBufferSize) - 1);
         for (int32_t iIndex = iLast; iIndex >= 0; --iIndex) {
             if (iIndex == iLast && pInteriorBuffer[iIndex]) {
                 pDataHandler->UnloadCell(pInteriorBuffer[iIndex]);
@@ -1750,7 +1719,7 @@ void TES::AddToInteriorBuffer(TESObjectCELL* apCell) {
 // locked; returns how many it unloaded.
 uint32_t TES::FreeInteriorBuffer(bool abBufferedonly) {
     uint32_t iFreed = 0;
-    for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(uInteriorCellBufferGeneral); ++uiIndex) {
+    for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(iInteriorBufferSize); ++uiIndex) {
         if (!pInteriorBuffer[uiIndex]) {
             continue;
         }
@@ -1772,7 +1741,7 @@ uint32_t TES::FreeInteriorBuffer(bool abBufferedonly) {
 }
 
 bool TES::IsExteriorBuffered(TESObjectCELL* apCell) {
-    for (uint32_t i = 0; i < static_cast<uint32_t>(uExteriorCellBuffer); ++i) {
+    for (uint32_t i = 0; i < static_cast<uint32_t>(iExteriorBufferSize); ++i) {
         if (pExteriorBuffer[i] == apCell) {
             return true;
         }
@@ -1785,7 +1754,7 @@ bool TES::IsExteriorBuffered(TESObjectCELL* apCell) {
 // many cells it unloaded.
 uint32_t TES::FreeExteriorBuffer(bool abBufferedonly, TESWorldSpace* apWorldSpace) {
     uint32_t iFreed = 0;
-    for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(uExteriorCellBuffer); ++uiIndex) {
+    for (uint32_t uiIndex = 0; uiIndex < static_cast<uint32_t>(iExteriorBufferSize); ++uiIndex) {
         if (!pExteriorBuffer[uiIndex]) {
             continue;
         }
@@ -2253,7 +2222,7 @@ void TES::LoadInterior(TESObjectCELL* apNewInterior, const NiPoint3* apPos) {
             BSShaderManager::GetShadowSceneNode(0)->AddShadowLight(pPlayer3D);
         }
         if (!IsInteriorBuffered(apNewInterior)) {
-            TESObjectCELL* pOldInt = GetInteriorBufferCellByIndex(TES::uInteriorCellBufferGeneral.UInt() - 1);
+            TESObjectCELL* pOldInt = GetInteriorBufferCellByIndex(iInteriorBufferSize.UInt() - 1);
             if (pOldInt) {
                 RemoveCellFromInteriorBuffer(pOldInt);
             }
@@ -3574,12 +3543,12 @@ void TES::DecrementPlaceableWaterCount() {
 }
 
 void TES::FinishLoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
-    for (int32_t i = 0; i < static_cast<int32_t>(TES::uInteriorCellBufferGeneral.UInt()); ++i) {
+    for (int32_t i = 0; i < static_cast<int32_t>(iInteriorBufferSize.UInt()); ++i) {
         if (pInteriorBuffer[i] && TES::pInstance->IsCellLoaded(pInteriorBuffer[i], true)) {
             pInteriorBuffer[i]->UpdateSounds();
         }
     }
-    for (int32_t j = 0; j < static_cast<int32_t>(uExteriorCellBuffer.UInt()); ++j) {
+    for (int32_t j = 0; j < static_cast<int32_t>(iExteriorBufferSize.UInt()); ++j) {
         if (pExteriorBuffer[j] && TES::pInstance->IsCellLoaded(pExteriorBuffer[j], true)) {
             pExteriorBuffer[j]->UpdateSounds();
         }
@@ -3700,7 +3669,7 @@ TESObjectCELL* TES::GetExteriorBufferCellByIndex(int32_t aiIndex) {
 }
 
 uint32_t TES::GetExteriorBufferSize() {
-    return uExteriorCellBuffer.UInt();
+    return iExteriorBufferSize.UInt();
 }
 
 void TES::SetAllowUnusedPurge(bool abAllow) {
@@ -3779,18 +3748,18 @@ bool TES::CellTestRunning2() {
 
 void TES::RemoveCellFromInteriorBuffer(TESObjectCELL* apCell) {
     uint32_t i;
-    for (i = 0; i < TES::uInteriorCellBufferGeneral.UInt(); ++i) {
+    for (i = 0; i < iInteriorBufferSize.UInt(); ++i) {
         if (apCell == pInteriorBuffer[i]) {
             pDataHandler->UnloadCell(apCell);
             pInteriorBuffer[i] = nullptr;
             break;
         }
     }
-    while (i < TES::uInteriorCellBufferGeneral.UInt() - 1) {
+    while (i < iInteriorBufferSize.UInt() - 1) {
         pInteriorBuffer[i] = pInteriorBuffer[i + 1];
         ++i;
     }
-    pInteriorBuffer[TES::uInteriorCellBufferGeneral.UInt() - 1] = nullptr;
+    pInteriorBuffer[iInteriorBufferSize.UInt() - 1] = nullptr;
     SetUpdateGridString();
 }
 
@@ -3998,7 +3967,7 @@ void TES::ShowCellNode(int32_t aiNode, bool abShow, bool abActiveCellsOnly) {
             iInteriorCount = 0;
         }
         else {
-            iInteriorCount = static_cast<int32_t>(TES::uInteriorCellBufferGeneral.UInt());
+            iInteriorCount = static_cast<int32_t>(iInteriorBufferSize.UInt());
         }
         for (int32_t i = -1; i < iInteriorCount; ++i) {
             TESObjectCELL* pInterior = i == -1 ? TES::GetInterior() : pInteriorBuffer[i];
@@ -4041,7 +4010,7 @@ void TES::ShowCellNode(int32_t aiNode, bool abShow, bool abActiveCellsOnly) {
             }
         }
         else {
-            for (int32_t j = 0; j < static_cast<int32_t>(uExteriorCellBuffer.UInt()); ++j) {
+            for (int32_t j = 0; j < static_cast<int32_t>(iExteriorBufferSize.UInt()); ++j) {
                 TESObjectCELL* pCell = pExteriorBuffer[j];
                 if (pCell) {
                     switch (aiNode) {
@@ -4154,7 +4123,7 @@ bool TES::ClearOldestBufferedCell() {
     if (GetInterior()) {
         int32_t iDimension = pGridCellA->GetDimension();
         uint32_t uiGridArea = pGridCellA->GetDimension() * iDimension;
-        for (uint32_t i = uExteriorCellBuffer.UInt() - 1; i >= uiGridArea; --i) {
+        for (uint32_t i = iExteriorBufferSize.UInt() - 1; i >= uiGridArea; --i) {
             if (pExteriorBuffer[i] &&
                 !IsCellLoaded(pExteriorBuffer[i], true) &&
                 !pExteriorBuffer[i]->IsRefListLocked()) {
@@ -4164,7 +4133,7 @@ bool TES::ClearOldestBufferedCell() {
             }
         }
         if (!pOldestCell) {
-            for (int32_t j = TES::uInteriorCellBufferGeneral.UInt() - 1; j >= 0; --j) {
+            for (int32_t j = iInteriorBufferSize.UInt() - 1; j >= 0; --j) {
                 if (this->pInteriorBuffer[j]) {
                     if (this->pInteriorBuffer[j] != GetInterior()) {
                         pOldestCell = this->pInteriorBuffer[j];
@@ -4188,7 +4157,7 @@ bool TES::ClearOldestBufferedCell() {
         }
     }
     else {
-        for (int32_t m = TES::uInteriorCellBufferGeneral.UInt() - 1; m >= 0; --m) {
+        for (int32_t m = iInteriorBufferSize.UInt() - 1; m >= 0; --m) {
             if (this->pInteriorBuffer[m]) {
                 pOldestCell = this->pInteriorBuffer[m];
                 this->pInteriorBuffer[m] = nullptr;
@@ -4199,7 +4168,7 @@ bool TES::ClearOldestBufferedCell() {
             SortExteriorBuffer();
             int32_t iDimension = pGridCellA->GetDimension();
             uint32_t uiGridArea = pGridCellA->GetDimension() * iDimension;
-            for (uint32_t n = uExteriorCellBuffer.UInt() - 1; n >= uiGridArea; --n) {
+            for (uint32_t n = iExteriorBufferSize.UInt() - 1; n >= uiGridArea; --n) {
                 if (pExteriorBuffer[n]) {
                     if (!IsCellLoaded(pExteriorBuffer[n], true) && !pExteriorBuffer[n]->IsRefListLocked()) {
                         pOldestCell = pExteriorBuffer[n];
@@ -4224,7 +4193,7 @@ bool TES::ClearOldestBufferedCell() {
 void TES::MoveToEndOfExteriorBuffer(TESObjectCELL* apCell) {
     if (apCell) {
         int32_t iIndex = 0;
-        int32_t iLast = static_cast<uint32_t>(uExteriorCellBuffer) - 1;
+        int32_t iLast = static_cast<uint32_t>(iExteriorBufferSize) - 1;
         while (iIndex < iLast) {
             if (apCell == pExteriorBuffer[iIndex]) {
                 while (iIndex < iLast) {
@@ -4266,7 +4235,7 @@ void TES::SaveWorld(const char* apFileName) {
 
 // Returns a reference to the setting's value; apText is unused.
 bool& TES::ShowLoadingMessage(const char* apText) {
-    return gs_bShowLoadingAreaMessage_General.Bool();
+    return bShowLoadingAreaMessage.Bool();
 }
 
 void TES::AddDeadCount(TESActorBase* apObject, int16_t ascount) {
@@ -4319,7 +4288,7 @@ uint16_t TES::GetSaveSize() {
 
 // Writes the death counts and the cell animation time into the old save buffer; when the save uses blocks, they
 // go in a 'BLOK' block whose 16-bit size is filled in at the end.
-void TES::SaveGameTES() {
+void TES::SaveGame() {
     uint16_t usBlockSize = 0;
     void* pBlockSize = nullptr;
     char* pStart = static_cast<char*>(pSaveLoadGameOLD->m_pBuffer);
@@ -4390,7 +4359,7 @@ void TES::SaveGameTES() {
     }
 }
 
-void TES::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
+void TES::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     uint32_t uiDeadCount = 0;
     uint32_t uiPosition = apSaveGameBuffer->StartVariableSizedValue();
     for (DeathCount* pDead : DeadCount) {
@@ -4592,7 +4561,7 @@ void TES::RangedNodeVisibilityChangedCB(NiNode* apNode, bool abVisible) {
 }
 
 bool TES::GetSelectivePurgeUnusedOnFastTravel() {
-    return gs_bSelectivePurgeUnusedOnFastTravel_BackgroundLoad;
+    return TES::bSelectivePurgeUnusedOnFastTravel;
 }
 
 void TES::InitSDM() {
@@ -4612,106 +4581,10 @@ void TES::KillSDM() {
     BSSplatterExtraData::KillSDM();
 }
 
-void BSAudio::EndAllMovingSounds() {}
-
-void BSCriticalSection::Enter(const char* apName) {
-    Lock(apName);
-}
-
-void BSCriticalSection::Leave() {
-    Unlock();
-}
-
-BSPerformanceTimer::BSPerformanceTimer(
-    const char* apSystem,
-    const char* apName,
-    bool abDisplayPerFrame,
-    bool abGlobalReset
-) {}
-
-void BSPerformanceTimer::Start() {}
-
-void BSPerformanceTimer::Stop() {}
-
-// m_to and kLength are reached by name rather than as neighbours of m_from, as the layout is not the exe's.
-void bhkPickData::CalcTo() {
-    if (QLength()) {
-        m_to.setAdd4(m_from, hkLength);
-    }
-}
-
-void bhkPickData::GetTo(NiPoint3& arTo) {
-    HK2NI(arTo, GethkTo());
-}
-
-bool bhkPickData::QLength() {
-    return hkLength.equals3(hkVector4::getZero(), 0.001f) == 0;
-}
-
-hkVector4* bhkPickData::GethkFrom() {
-    return &m_from;
-}
-
-void bhkPickData::GetFrom(NiPoint3& arFrom) {
-    HK2NI(arFrom, *GethkFrom());
-}
-
-void bhkRagdollController::SetRagdollAnim(bool abEnable) {
-    bhkRagdollController::bRagdollAnim.Bool() = abEnable;
-}
-
-const NiPoint3& BSMultiBoundAABB::QCenter() const {
-    return Center;
-}
-
-NiTPointerList<NiPointer<BSMultiBound>>& BSMultiBoundRoom::QJoinedMultiBoundList() {
-    return kJoinedMultiBoundList;
-}
-
-const NiTPointerList<BSOcclusionPlane*>& BSMultiBoundRoom::GetOccluders() const {
-    return lOccluderList;
-}
-
-void BSOcclusionPlane::ResetCullResult() {
-    kCullResult = BSMultiBoundShape::BS_CULL_UNTESTED;
-}
-
-BSPortalSharedNode* BSPortal::QSharedGeometryNode() {
-    return spSharedGeometry;
-}
-
-const NiTPointerList<NiPointer<BSMultiBoundRoom>>& BSPortalGraph::QRooms() const {
-    return lMultiBoundRoomList;
-}
-
-BSMultiBoundRoom* BSPortalGraph::QRoomRoot() {
-    return static_cast<BSMultiBoundRoom*>(spMultiBoundRoomRoot.m_pObject);
-}
-
-NiTPointerList<BSOcclusionPlane*>& BSPortalGraph::QOccluderList() {
-    return lOccluderList;
-}
-
-BSCompoundFrustum* BSPortalSharedNode::QCompoundFrustum() {
-    return pCompoundFrustum;
-}
-
-void BSRangeNode::SetVisibilityChangedCB(void (*apVisibilityChangedCB)(NiNode*, bool)) {
-    BSRangeNode::pVisibilityChangedCB = apVisibilityChangedCB;
-}
-
-float BSShaderManager::GetTimer(bool bDelta) {
-    return fTimerValues[bDelta];
-}
-
 // Returns the configured particle cap for a master particle system.
 uint16_t BGSAddonNode::GetMasterParticleCap() {
     return Data.usMasterParticleCap;
 }
-
-BSTempNode::BSTempNode(float afTime) : NiNode(0), fTime(afTime) {}
-
-BSTempNode::~BSTempNode() {}
 
 uint32_t GridArray::GetDimension() {
     return iDimension;
@@ -4789,36 +4662,4 @@ PlaceableWaterGroup* TESWaterSystem::GetLODWaterGroup() {
 
 float TESWorldSpace::GetLODWaterHeight() {
     return fLODWaterHeight;
-}
-
-NiAVObject* NiPick::Record::GetAVObject() {
-    return m_spObject;
-}
-
-NiPick::Record* NiPick::Results::GetAt(uint32_t uiIndex) const {
-    return NiTPrimitiveArray<Record*>::GetAt(uiIndex);
-}
-
-void NiPick::SetTarget(NiAVObject* pObject) {
-    m_spRoot = pObject;
-}
-
-const NiCamera* NiCullingProcess::GetCamera() const {
-    return m_pkCamera;
-}
-
-const NiFrustumPlanes& NiCullingProcess::GetFrustumPlanes() const {
-    return m_kPlanes;
-}
-
-uint16_t NiGeometryData::GetVertexCount() const {
-    return m_usVertices;
-}
-
-NiPoint3* NiGeometryData::GetVertices() const {
-    return m_pkVertex;
-}
-
-void NiNode::RemoveAllChildren() {
-    m_kChildren.RemoveAll();
 }

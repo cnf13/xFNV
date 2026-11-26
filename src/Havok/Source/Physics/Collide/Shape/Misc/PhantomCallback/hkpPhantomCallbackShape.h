@@ -32,3 +32,5 @@ public:
 
 // The class's reflection record.
 extern hkClass hkpPhantomCallbackShapeClass;
+
+inline hkpPhantomCallbackShape::hkpPhantomCallbackShape() : hkpShape(HK_SHAPE_PHANTOM_CALLBACK) {}

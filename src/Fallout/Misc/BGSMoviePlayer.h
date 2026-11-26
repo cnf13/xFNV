@@ -42,4 +42,5 @@ public:
     static SettingT<INISettingCollection> sIntroMovie;
     // The intro movie of the main menu (sMainMenuMovieIntro:General).
     static SettingT<INISettingCollection> sMainMenuMovieIntro;
+    static SettingT<INISettingCollection> sIntroSequence;
 };

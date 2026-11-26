@@ -11,7 +11,7 @@
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
@@ -174,4 +174,9 @@ void bhkUnaryAction::CopyCinfo(hkUnaryActionCinfo& arInfo) {
     bhkAction::CopyCinfo(arInfo);
     auto* pAction = this ? static_cast<hkpUnaryAction*>(phkObject) : nullptr;
     arInfo.m_body = pAction ? static_cast<hkpRigidBody*>(pAction->m_entity) : nullptr;
+}
+
+bhkUnaryAction::~bhkUnaryAction() {
+    bhkSerializable::Kill();
+    --iCount;
 }

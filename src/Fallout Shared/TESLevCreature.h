@@ -38,4 +38,5 @@ public:
     using TESBoundObject::SaveGame;
 
     uint32_t pTemplate;
+    static SettingT<GameSettingCollection> iLevCreaLevelDifferenceMax;
 };

@@ -86,3 +86,13 @@ void NiStandardizeFilePath(NiFixedString& kString);
 
 // An empty fixed string read in many places.
 extern NiFixedString EmptyFS;
+
+inline bool NiFixedString::EqualsNoCase(const char* pcStr) {
+    if (this->GetHandle() == pcStr) {
+        return true;
+    }
+    if (pcStr && this->GetHandle()) {
+        return NiStricmp(this->GetHandle(), pcStr) == 0;
+    }
+    return false;
+}

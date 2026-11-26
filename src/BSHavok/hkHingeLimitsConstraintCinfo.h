@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fallout/AI/Combat/MissileProjectile.h"
+#include "BSHavok/bhkConstraint.h"
 
 // Creation info for the hinge-limits constraint; parameters are held by the base's constraint data.
 struct hkHingeLimitsConstraintCinfo : hkConstraintCinfo {

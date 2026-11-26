@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraintChain.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 

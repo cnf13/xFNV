@@ -7,6 +7,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -17,7 +18,7 @@
 #include "BSMain/BSUtilities.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/TallGrassShaderProperty.h"
 #include "BSSystem/BSFile.h"
@@ -154,7 +155,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDevImageConverter.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
@@ -173,6 +173,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/rtti.h"
@@ -2148,7 +2149,7 @@ void TESSaveLoadGame::SaveGlobalData(BSFile* apFile) {
             m_pSaveLoadStats->AddExtraStat(iSize, "TES Class");
         }
         void* pTempBuffer = CreateBuffer(iSize);
-        TES::pInstance->SaveGameTES();
+        TES::pInstance->SaveGame();
         SaveBuffer(apFile, pTempBuffer, iSize);
         DestroyBuffer(pTempBuffer);
     }
@@ -2194,7 +2195,7 @@ void TESSaveLoadGame::SaveGlobalData(BSFile* apFile) {
             m_pSaveLoadStats->AddExtraStat(iSize, "Interface");
         }
         void* pTempBuffer = CreateBuffer(iSize);
-        Interface::SaveGameTES();
+        Interface::SaveGame();
         SaveBuffer(apFile, pTempBuffer, iSize);
         DestroyBuffer(pTempBuffer);
     }
@@ -3053,7 +3054,7 @@ void TESSaveLoadGame::LoadAnimationForReference(TESObjectREFR* apRef, uint32_t a
     m_pBuffer = apBuffer;
     pSaveLoadGameOLD->LoadGameDataOLD(acSize, 2u);
     if (pAnimation) {
-        pAnimation->LoadGameTES(apRef);
+        pAnimation->LoadGame(apRef);
     }
     m_pBuffer = pTempBuffer;
     if (pHighProcess) {
@@ -3229,7 +3230,7 @@ void TESSaveLoadGame::GetSaveGameDisplayData(
         BSstrcpy(apFileName, 255, "");
     }
     if (!RetrieveSaveGameData(apFile, reinterpret_cast<int32_t*>(apSaveGameNumber), apLevel, apTotalPlayingTime)) {
-        GetSaveGameData(
+        GetSaveGameDataOLD(
             apFile,
             apSaveGameNumber,
             nullptr,
@@ -3270,7 +3271,7 @@ void TESSaveLoadGame::GetSaveGameDisplayData(
     }
 }
 
-NiRefObject* TESSaveLoadGame::GetSaveGameData(
+NiRefObject* TESSaveLoadGame::GetSaveGameDataOLD(
     BSFile* apFile,
     uint32_t* apSaveGameNumber,
     char* Dst,
@@ -4200,8 +4201,4 @@ int32_t SaveDataDebugInfo::LoadFormHeaderCompare(LoadFormHeader* apCompare1, Loa
     }
 
     return -1;
-}
-
-uint32_t NiPixelData::GetSizeInBytes(uint32_t uiMipmapLevel, uint32_t uiFace) const {
-    return m_puiOffsetInBytes[uiMipmapLevel + 1] - m_puiOffsetInBytes[uiMipmapLevel];
 }

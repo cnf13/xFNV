@@ -2,6 +2,7 @@
 
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorCause.h"
@@ -18,10 +19,6 @@ struct hkpRootCdPoint;
 class MagicCaster;
 class NonActorMagicCaster;
 class TESObjectWEAP;
-
-// hkAlgorithm::quickSort for hkpRootCdPoint. Its comparator, an empty hkAlgorithm::less<hkpRootCdPoint>, is passed as a
-// byte, as hkAlgorithm::quickSort's aiLess (hkSort.h), because an empty class argument carries no bytes in C++.
-void quickSortRootCdPoints(hkpRootCdPoint* apArray, int32_t aiSize, uint8_t aiLess);
 
 // An explosion reference. Only part of the class is declared.
 class Explosion : public MobileObject {
@@ -180,13 +177,6 @@ public:
     static inline float fMolotovTestInitialStickForce = 5000.0f;
 };
 
-extern SettingT<INISettingCollection> gs_bReflectExplosions_Water;
-
 inline float fMolotovTestLifetime = 15.0f;
 
 inline float fMolotovTestForce = 1.0f;
-
-namespace hkAlgorithm {
-    // Sorts pArr[0..iSize) with a zeroed hkAlgorithm::less<hkpRootCdPoint>.
-    void quickSort(hkpRootCdPoint* pArr, int32_t iSize);
-} // namespace hkAlgorithm

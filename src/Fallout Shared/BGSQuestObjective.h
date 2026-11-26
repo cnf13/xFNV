@@ -2,6 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 
 #include <stdint.h>
 

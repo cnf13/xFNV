@@ -73,13 +73,13 @@ extern SettingT<INISettingCollection> fGrassMinStartFadeDistance;
 extern SettingT<INISettingCollection> fGrassDefaultStartFadeDistance;
 extern SettingT<INISettingCollection> fGrassMaxStartFadeDistance;
 
-extern SettingT<INISettingCollection> gs_bGrassPointLighting_Grass;
+extern SettingT<INISettingCollection> bGrassPointLighting;
 
-extern SettingT<INISettingCollection> gs_fGrassWindMagnitudeMin_Grass;
+extern SettingT<INISettingCollection> fGrassWindMagnitudeMin;
 
-extern SettingT<INISettingCollection> gs_bDrawShaderGrass_Grass;
+extern SettingT<INISettingCollection> bDrawShaderGrass;
 
-extern SettingT<INISettingCollection> gs_fGrassWindMagnitudeMax_Grass;
+extern SettingT<INISettingCollection> fGrassWindMagnitudeMax;
 
-extern SettingT<INISettingCollection> gs_iMinGrassSize_Grass;
+extern SettingT<INISettingCollection> iMinGrassSize;
 inline bool bTempTest;

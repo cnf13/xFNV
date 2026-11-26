@@ -32,3 +32,13 @@ public:
     static inline float fOffsetY;
     static kPackedRegions_t kPackedRegions;
 };
+
+inline ImageSpaceShaderMenuUnpack::ImageSpaceShaderMenuUnpack() {
+    pTextures.SetSize(2u);
+}
+
+inline void ImageSpaceShaderMenuUnpack::SetOffset(float afX, float afY) {
+    fOffsetX = afX;
+    fOffsetY = afY;
+    bChangedFlag = true;
+}

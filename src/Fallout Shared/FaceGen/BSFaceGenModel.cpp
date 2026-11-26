@@ -4,6 +4,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSShader/BSFadeNode.h"
@@ -18,9 +19,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenMorphDataHair.h"
 #include "Fallout Shared/FaceGen/BSFaceGenUtils.h"
 #include "Fallout Shared/FaceGen/EGMData.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
-#include "Fallout Shared/FaceGen/FffTriFileDataS.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/ModelLoader.h"
 #include "Fallout Shared/TES.h"
@@ -30,7 +28,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -46,8 +44,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexturingProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/FaceGen/EgtFileIO_Sdk.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/FaceGen/assert.hpp"
 #include "SDK/MSVC/exception.h"
@@ -940,49 +940,8 @@ void BSFaceGenModelMeshData::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-FffModeGS::FffModeGS(const FffModeGS& _Right) : scale(_Right.scale), vertPos(_Right.vertPos) {}
-
-FffModeGS::~FffModeGS() {}
-
-FffModeGS& FffModeGS::Assign(const FffModeGS& _Right) {
-    scale = _Right.scale;
-    vertPos = _Right.vertPos;
-    return *this;
-}
-
-FffModeTexS::FffModeTexS() {}
-
-FffModeTexS::FffModeTexS(const FffModeTexS& _Right)
-  : scale(_Right.scale), width(_Right.width), height(_Right.height), rowPad(_Right.rowPad),
-    img{_Right.img[0], _Right.img[1], _Right.img[2]} {}
-
-FffModeTexS::~FffModeTexS() {}
-
-FffModeTexS& FffModeTexS::Assign(const FffModeTexS& _Right) {
-    scale = _Right.scale;
-    width = _Right.width;
-    height = _Right.height;
-    rowPad = _Right.rowPad;
-    for (uint32_t i = 0; i < 3; ++i) {
-        img[i] = _Right.img[i];
-    }
-    return *this;
-}
-
-void FffModeTexS::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
 int32_t return_value(int32_t aiValue, ...) {
     return aiValue;
-}
-
-uint32_t BSMIN(uint16_t a, uint32_t b) {
-    if (a < b) {
-        return a;
-    }
-
-    return b;
 }
 
 FffModeTexS* CopyOpt(const FffModeTexS* _First, const FffModeTexS* _Last, FffModeTexS* _Dest) {
@@ -1023,22 +982,6 @@ FR2Vect3TC<float>* CopyOpt(FR2Vect3TC<float>* _First, FR2Vect3TC<float>* _Last, 
     return pEnd;
 }
 
-BSSystemFile::ErrorCode BSSystemFile::QLastError() const {
-    return eLastError;
-}
-
-BSSystemFile::ErrorCode BSSystemFile::GetSizeOfFile(const char* apcPath, uint64_t& auiSize) {
-    BSSystemFile kFile(apcPath, 0, 0, false);
-    BSSystemFile::ErrorCode eError = kFile.QLastError();
-    if (eError) {
-        auiSize = 0;
-    }
-    else {
-        eError = kFile.GetSize(auiSize);
-    }
-    return eError;
-}
-
 BSFaceGenModelExtraData::BSFaceGenModelExtraData(BSFaceGenModel* apModel) : NiExtraData(Tag()), spModel(apModel) {}
 
 BSFaceGenModelExtraData::~BSFaceGenModelExtraData() {}
@@ -1073,36 +1016,4 @@ EGMData::~EGMData() {
 
 void EGMData::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-FffTriFileDataS::~FffTriFileDataS() {}
-
-uint32_t FffTriFileDataS::numModelVtx() const {
-    uint32_t numVtx = vtxListSize();
-    for (uint32_t xx = 0; xx < statMorphList.size(); ++xx) {
-        if (statMorphList[xx].firstVtxOffset < numVtx) {
-            numVtx = statMorphList[xx].firstVtxOffset;
-        }
-    }
-    return numVtx;
-}
-
-// The element sits m_iStride bytes apart in the untyped vertex stream. The release build's bounds check is an empty
-// function.
-void NiGeometryDataIteratorNiPoint3::Set(int32_t iIndex, const NiPoint3& kValue) {
-    void* pvElement = static_cast<uint8_t*>(m_pvCurrentPosition) + m_iStride * static_cast<uint32_t>(iIndex);
-    *static_cast<NiPoint3*>(pvElement) = kValue;
-}
-
-void NiGeometry::SetConsistency(NiGeometryData::Consistency eConsistency) {
-    NiGeometryData* pModelData = this->m_spModelData;
-    pModelData->SetConsistency(eConsistency);
-}
-
-uint32_t NiSkinPartition::GetPartitionCount() const {
-    return m_uiPartitions;
-}
-
-NiSkinPartition::Partition* NiSkinPartition::GetPartitions() const {
-    return m_pkPartitions;
 }

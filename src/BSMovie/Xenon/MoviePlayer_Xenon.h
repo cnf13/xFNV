@@ -115,4 +115,4 @@ struct POS_TEX_VERTEX {
     float tv;
 };
 
-extern SettingT<INISettingCollection> gs_iPreloadSizeLimit_General;
+extern SettingT<INISettingCollection> iPreloadSizeLimit;

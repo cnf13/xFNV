@@ -1,11 +1,12 @@
 #include "Fallout Shared/FaceGen/BSFaceGenImage.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderUtil.h"
 #include "BSShader/BoltShader.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDevImageConverter.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -20,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-SettingT<INISettingCollection> gs_bFaceMipMaps_General("bFaceMipMaps:General", true);
+SettingT<INISettingCollection> BSFaceGenImage::bFaceMipMaps("bFaceMipMaps:General", true);
 
 // The const pixel iterator's operator*: reports a missing container or an end position through
 // _invalid_parameter_noinfo, then reads the element.
@@ -174,7 +175,7 @@ NiSourceTexture* BSFaceGenImage::GetCompressedImage(
                 kIter++;
             }
         }
-        if (gs_bFaceMipMaps_General) {
+        if (BSFaceGenImage::bFaceMipMaps) {
             pPixelDataDest = kImageConverter.NiDevImageConverter::GenerateMipmapLevels(pPixelData, nullptr);
             if (pPixelData) {
                 delete pPixelData;
@@ -230,14 +231,4 @@ std::vector<BSFaceGenRGBA, std::allocator<BSFaceGenRGBA>>* BSFaceGenImage::GetUn
         }
     }
     return &UncompressedImage;
-}
-
-// Indexes the width table by mipmap level and ignores the face argument.
-uint32_t NiPixelData::GetWidth(uint32_t uiMipmapLevel, uint32_t) const {
-    return m_puiWidth[uiMipmapLevel];
-}
-
-// The face stride uses the offset table's terminal entry at m_uiMipmapLevels.
-uint8_t* NiPixelData::GetPixels(uint32_t uiMipmapLevel, uint32_t uiFace) {
-    return m_pucPixels + m_puiOffsetInBytes[m_uiMipmapLevels] * uiFace + m_puiOffsetInBytes[uiMipmapLevel];
 }

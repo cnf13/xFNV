@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 // One free-list node: the element's storage, then the link to the next free node.
 template <class T>

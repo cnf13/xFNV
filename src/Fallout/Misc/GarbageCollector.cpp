@@ -3,6 +3,7 @@
 #include "BSAudio/BSSoundHandle.h"
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
 #include "BSHavok/bhkWorld.h"

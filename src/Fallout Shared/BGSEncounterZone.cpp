@@ -1,9 +1,10 @@
 #include "Fallout Shared/BGSEncounterZone.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
@@ -65,7 +66,7 @@ bool BGSEncounterZone::Load(TESFile* apFile) {
 }
 
 void ENCOUNTER_ZONE_DATA::Endian() {
-    ENDIAN(pZoneOwner, false);
+    BSEndian(pZoneOwner, false);
 }
 
 BGSEncounterZone::BGSEncounterZone() : TESForm() {

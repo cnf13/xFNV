@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -25,12 +25,12 @@
 #include "xfnv/Compiler.h"
 
 void IDLE_DATA::Endian() {
-    ENDIAN(sReplayDelay, false);
+    BSEndian(sReplayDelay, false);
 }
 
 void IDLE_PARENT_IDS::Endian() {
-    ENDIAN(iparentID, false);
-    ENDIAN(iprevID, false);
+    BSEndian(iparentID, false);
+    BSEndian(iprevID, false);
 }
 
 TESIdleForm::TESIdleForm() : TESForm(), TESModelAnim(), Conditions(), pChildIdles(nullptr), strEditorID() {

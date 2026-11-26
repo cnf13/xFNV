@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSCameraPathManager.h"
 #include "Fallout Shared/BGSCameraShot.h"
@@ -21,8 +21,8 @@
 #include "xfnv/Compiler.h"
 
 void CAMERA_PATH_LINKS::Endian() {
-    ENDIAN(uiParentPathID, false);
-    ENDIAN(uiPrevPathID, false);
+    BSEndian(uiParentPathID, false);
+    BSEndian(uiPrevPathID, false);
 }
 
 BGSCameraPath::BGSCameraPath() : pChildPaths(nullptr) {

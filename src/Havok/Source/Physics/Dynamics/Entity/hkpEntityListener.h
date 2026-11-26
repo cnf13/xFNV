@@ -19,3 +19,5 @@ public:
     // DeletingDestruct's free (ourFree).
     static void operator delete(void* apMemory);
 };
+
+inline hkpEntityListener::~hkpEntityListener() {}

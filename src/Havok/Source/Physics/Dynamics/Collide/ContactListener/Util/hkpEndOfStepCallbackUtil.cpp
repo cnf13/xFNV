@@ -36,6 +36,17 @@ hkBool hkpEndOfStepCallbackUtil::Collision::operator<(const Collision& other) co
     return kResult;
 }
 
+uint64_t hkpEndOfStepCallbackUtil::Collision::getUid() const {
+    return (static_cast<uint64_t>(m_mgr->m_constraint.m_entities[0]->getUid()) << 32) |
+           m_mgr->m_constraint.m_entities[1]->getUid();
+}
+
+hkBool hkpEndOfStepCallbackUtil::NewCollision::operator<(const NewCollision& other) const {
+    const uint64_t uid = getUid();
+    const uint64_t otherUid = other.getUid();
+    return uid < otherUid || (uid == otherUid && m_sequenceNumber < other.m_sequenceNumber);
+}
+
 // The contact points of the collision's manifold, last first, each one that is new or every one when the constraint
 // asks for contact point callbacks, reported to listener as an end-of-step manifold event.
 void hkpEndOfStepCallbackUtil::fireContactPointEventsForCollision(
@@ -75,90 +86,6 @@ void hkpEndOfStepCallbackUtil::fireContactPointEventsForCollision(
     }
 }
 
-void hkpEndOfStepCallbackUtil::sortNewCollisions(
-    hkpEndOfStepCallbackUtil::NewCollision* first,
-    int32_t low,
-    int32_t high,
-    uint8_t cmpLess
-) {
-    int32_t v3 = high;
-    int32_t v4 = low;
-    hkpEndOfStepCallbackUtil::NewCollision* v5 = first;
-    while (true) {
-        int32_t v15;
-        int32_t v6 = v4;
-        int32_t v7 = (v3 + v4) >> 1;
-        hkpEndOfStepCallbackUtil::NewCollision* v9 = &v5[v7];
-        int32_t v22 = v3;
-        hkpSimpleConstraintContactMgr* m_mgr = v9->m_mgr;
-        int32_t v21 = v6;
-        hkpSimpleConstraintContactMgr* v29 = v9->m_mgr;
-        int32_t m_sequenceNumber = v9->m_sequenceNumber;
-        while (true) {
-            uint32_t m_uid = m_mgr->m_constraint.m_entities[0]->getUid();
-            uint32_t v11 = m_mgr->m_constraint.m_entities[1]->getUid();
-            for (hkpEndOfStepCallbackUtil::NewCollision* i = &v5[v6];; ++i) {
-                uint32_t v13 = i->m_mgr->m_constraint.m_entities[0]->getUid();
-                uint32_t v14 = i->m_mgr->m_constraint.m_entities[1]->getUid();
-                if (((static_cast<uint64_t>(v13) << 32) | v14) >= ((static_cast<uint64_t>(m_uid) << 32) | v11) &&
-                    (v14 != v11 || (v13 != m_uid || i->m_sequenceNumber >= m_sequenceNumber))) {
-                    break;
-                }
-                ++v21;
-            }
-            uint64_t v23 = ((static_cast<uint64_t>(m_uid) << 32) | v11);
-            v15 = v22;
-            for (hkpEndOfStepCallbackUtil::NewCollision* j = &first[v22];; --j) {
-                uint32_t v17 = j->m_mgr->m_constraint.m_entities[0]->getUid();
-                uint32_t v18 = j->m_mgr->m_constraint.m_entities[1]->getUid();
-                if (v23 >= ((static_cast<uint64_t>(v17) << 32) | v18) &&
-                    (static_cast<uint32_t>(v23) != v18 || (m_uid != v17 || m_sequenceNumber >= j->m_sequenceNumber))) {
-                    break;
-                }
-                --v15;
-            }
-            v6 = v21;
-            v5 = first;
-            if (v15 < v21) {
-                break;
-            }
-            if (v15 != v21) {
-                hkpEndOfStepCallbackUtil::NewCollision* v19 = &first[v15];
-                hkpSimpleConstraintContactMgr* v25 = v19->m_mgr;
-                hkpContactListener* v26 = v19->m_listener;
-                hkpCollisionEvent::CallbackSource v27 = v19->m_source;
-                int32_t v28 = v19->m_sequenceNumber;
-                v19->m_mgr = first[v21].m_mgr;
-                hkpEndOfStepCallbackUtil::NewCollision* v20 = &first[v21];
-                v19->m_listener = v20->m_listener;
-                v19->m_source = v20->m_source;
-                v19->m_sequenceNumber = v20->m_sequenceNumber;
-                v20->m_mgr = v25;
-                v20->m_listener = v26;
-                v20->m_source = v27;
-                v20->m_sequenceNumber = v28;
-            }
-            --v15;
-            v6 = v21 + 1;
-            v22 = v15;
-            v21 = v6;
-            if (v6 > v15) {
-                break;
-            }
-            m_mgr = v29;
-        }
-        if (low < v15) {
-            hkpEndOfStepCallbackUtil::sortNewCollisions(first, low, v15, cmpLess);
-        }
-        v3 = high;
-        if (v6 >= high) {
-            break;
-        }
-        v4 = v6;
-        low = v6;
-    }
-}
-
 // Drops from removedCollisions every collision the list also holds (the two cancel out) and copies the rest of the list
 // into a new storage, which the list then takes over. That storage is allocated directly through the router's allocator
 // rather than through hkArrayUtil::_reserve.
@@ -174,7 +101,7 @@ void hkpEndOfStepCallbackUtil::removeCollisions(hkArray<Collision>& removedColli
         for (const T& kEntry : list) {
             int32_t iFound = -1;
             for (uint32_t j = 0; j < removedCollisions.m_size; ++j) {
-                if (removedCollisions.m_data[j].equals(kEntry).m_bool) {
+                if ((removedCollisions.m_data[j] == kEntry).m_bool) {
                     iFound = static_cast<int32_t>(j);
                     break;
                 }
@@ -255,10 +182,7 @@ void hkpEndOfStepCallbackUtil::postSimulationCallback(hkpWorld* world) {
     removeCollisions(m_removedCollisions, m_newCollisions);
     removeCollisions(m_removedCollisions, m_collisions);
     if (m_deterministicOrder.m_bool) {
-        if (m_newCollisions.m_size > 1) {
-            // The last argument is the empty comparator's byte, passed as 0.
-            sortNewCollisions(m_newCollisions.m_data, 0, m_newCollisions.m_size - 1, static_cast<uint8_t>(0));
-        }
+        hkAlgorithm::quickSort(m_newCollisions.m_data, m_newCollisions.m_size);
         mergeCollisions(m_newCollisions, m_collisions);
     }
     else {
@@ -285,7 +209,7 @@ void hkpEndOfStepCallbackUtil::postSimulationCallback(hkpWorld* world) {
 hkpEndOfStepCallbackUtil::~hkpEndOfStepCallbackUtil() {}
 
 // The same manager, listener and source, stored in apResult.
-hkBool hkpEndOfStepCallbackUtil::Collision::equals(const Collision& other) const {
+hkBool hkpEndOfStepCallbackUtil::Collision::operator==(const Collision& other) const {
     return m_mgr == other.m_mgr && m_listener == other.m_listener && m_source == other.m_source;
 }
 

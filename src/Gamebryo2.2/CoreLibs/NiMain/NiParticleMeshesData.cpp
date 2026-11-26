@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParticleMeshesData.h"
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiParticlesData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"

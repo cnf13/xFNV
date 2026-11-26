@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/IDebugText.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"

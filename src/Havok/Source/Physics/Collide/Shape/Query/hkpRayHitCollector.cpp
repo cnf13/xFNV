@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Collide/Shape/Query/hkpRayHitCollector.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
 
 void hkpRayHitCollector::reset() {

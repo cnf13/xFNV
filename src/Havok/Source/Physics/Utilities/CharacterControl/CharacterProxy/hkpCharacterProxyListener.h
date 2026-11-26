@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/MemoryManager.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 
@@ -49,3 +50,9 @@ public:
     // DeletingDestruct's free (MemoryManager::Deallocate).
     static void operator delete(void* apMemory);
 };
+
+inline void hkpCharacterProxyListener::operator delete(void* apMemory) {
+    MemoryManager::Instance().Deallocate(apMemory);
+}
+
+inline hkpCharacterProxyListener::~hkpCharacterProxyListener() {}

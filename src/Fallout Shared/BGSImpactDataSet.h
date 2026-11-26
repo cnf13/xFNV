@@ -1,15 +1,14 @@
 #pragma once
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/BSMap.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/BGSPreloadable.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout/AI/Combat/Projectile.h"
 
 class BGSImpactData;
 class ImpactSwap;
-
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
 
 // An impact data set form (IPDS). Its data members are not declared yet.
 class BGSImpactDataSet : public TESForm, public BGSPreloadable {

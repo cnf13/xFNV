@@ -98,3 +98,7 @@ static void cleanupLoadedObjecthkContactPointMaterial(void* p) {
 }
 
 // The reflection data of hkContactPointMaterial.
+
+const hkClass& hkContactPointMaterial::staticClass() {
+    return hkContactPointMaterialClass;
+}

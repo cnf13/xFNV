@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Tile.h"
 
 // A line of text the hacking terminal types out and blinks.

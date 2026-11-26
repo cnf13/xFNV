@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 // The file the memory manager writes its debug output to: every slot is abstract.
 class IMemoryManagerFile {
@@ -17,3 +18,7 @@ public:
         ourFree(apMemory);
     }
 };
+
+inline IMemoryManagerFile::IMemoryManagerFile() {}
+
+inline IMemoryManagerFile::~IMemoryManagerFile() {}

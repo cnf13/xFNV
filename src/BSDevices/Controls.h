@@ -408,7 +408,6 @@ public:
     static void DeleteInstance();
     // Controls::DeletingDestruct frees through ourFree.
     static void operator delete(void* apMemory);
-    static void InitializeInstance(HINSTANCE__* hinst);
     // Whether the controls list shows aeAction for a keyboard or mouse device (StartMenu::PopulateControlsListBox
     // passes its USERACTIONS loop variable).
     static bool Remappable(Controls::USERACTIONS aeAction);
@@ -616,3 +615,53 @@ extern SettingT<INISettingCollection> gs_fForegroundMouseMult_Controls;
 extern SettingT<INISettingCollection> gs_fForegroundMouseBase_Controls;
 extern SettingT<INISettingCollection> gs_fForegroundMouseAccelTop_Controls;
 extern SettingT<INISettingCollection> gs_fForegroundMouseAccelBase_Controls;
+
+inline int32_t Controls::GetButtonState(int32_t aiDevice, uint8_t aucKey, CONTROL_TOGGLE_FLAGS aeFlags) {
+    if (aiDevice <= 3) {
+        if (aiDevice == 3) {
+            return this->GetControllerButton(static_cast<GAMEPAD_BUTTON>(aucKey), aeFlags);
+        }
+        if (aiDevice == 0) {
+            return this->GetKeyboardButton(aucKey, aeFlags);
+        }
+        if (aiDevice == 1) {
+            return this->GetMouseButton(aucKey, aeFlags);
+        }
+    }
+    else if (aiDevice == 255) {
+        return 0;
+    }
+    if (aiDevice - 2 >= static_cast<int32_t>(this->uiJoyStickCount)) {
+        return 0;
+    }
+    // Keys from 32 up are hat directions; the key's high word (always 0) is passed as the hat.
+    if (aucKey < 32) {
+        return this->GetJoyStickButton(aiDevice - 2, aucKey, aeFlags);
+    }
+    uint32_t uiKey = aucKey;
+    return this->GetJoystickHat(aiDevice - 2, static_cast<uint16_t>(uiKey >> 16)) == static_cast<uint16_t>(uiKey);
+}
+
+inline Controls* Controls::GetInstance() {
+    return Controls::pInstance;
+}
+
+inline uint8_t Controls::RemapAction(USERACTIONS eAction, uint32_t uiIndex) {
+    return ucKeyBinds[uiIndex][eAction];
+}
+
+inline void Controls::EnableRumble(bool bTF) {
+    if (Controls::pInstance) {
+        Controls::pInstance->bIsControllerEnabled = bTF;
+    }
+}
+
+inline void Controls::DeleteInstance() {
+    if (pInstance) {
+        Controls* pControls = pInstance;
+        if (pControls) {
+            delete pControls;
+        }
+    }
+    pInstance = nullptr;
+}

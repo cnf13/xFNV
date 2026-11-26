@@ -9,7 +9,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpolator.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiStepFloatKey.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -248,11 +248,4 @@ void NiFlipController::AttachTexture(NiTexture* pkTexture, uint32_t uiIndex) {
 
 NiObject* NiFlipController::CreateObject() {
     return new NiFlipController;
-}
-
-uint32_t NiTexturingProperty::GetShaderArrayCount() const {
-    if (!m_pkShaderMaps) {
-        return 0;
-    }
-    return m_pkShaderMaps->GetSize();
 }

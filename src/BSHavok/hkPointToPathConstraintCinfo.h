@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fallout/AI/Combat/MissileProjectile.h"
+#include "BSHavok/bhkConstraint.h"
 
 // Creation info for a point-to-path constraint; the constructor initializes only the base's members.
 struct hkPointToPathConstraintCinfo : hkConstraintCinfo {

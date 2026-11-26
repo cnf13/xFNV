@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/Interface/ListBox.h"

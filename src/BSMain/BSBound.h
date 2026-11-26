@@ -43,3 +43,17 @@ public:
     static inline NiFixedString* pTag;
     static NiRTTI ms_RTTI;
 };
+
+inline void BSBound::GetBoundMin(NiPoint3& arPoint) {
+    NiPoint3 kMin;
+    arPoint = *&(kMin = Center - Extents);
+}
+
+inline void BSBound::GetBoundMax(NiPoint3& arPoint) {
+    NiPoint3 kMax;
+    arPoint = *&(kMax = Center + Extents);
+}
+
+inline const NiFixedString& BSBound::Tag() {
+    return *BSBound::pTag;
+}

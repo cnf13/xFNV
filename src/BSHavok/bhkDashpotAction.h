@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSHavok/bhkBinaryAction.h"
-#include "Fallout Shared/GlobalFunc.h"
+#include "BSHavok/bhkConvert.h"
 
 // The creation info of a dashpot action: the binary action's bodies, the two pivot points and the dashpot's
 // strength and damping.

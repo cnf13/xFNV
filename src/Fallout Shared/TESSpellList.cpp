@@ -3,7 +3,6 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/Magic/SpellItem.h"
 #include "Fallout Shared/TESActorBase.h"
@@ -512,7 +511,7 @@ BSSimpleList<SpellItem*>* TESSpellList::GetSpellList() {
     return &spellList;
 }
 
-void TESSpellList::SaveGameBGS(BGSSaveFormBuffer* apSaveGameBuffer) {
+void TESSpellList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_ACTOR_BASE_SPELLLIST)) {
         uint32_t uiSpellCount = 0;
         uint32_t uiSpellPosition = apSaveGameBuffer->StartVariableSizedValue();

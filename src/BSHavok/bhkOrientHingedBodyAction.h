@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSHavok/bhkUnaryAction.h"
+#include "BSHavok/hkOrientHingedBodyAction.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 
 class hkOrientHingedBodyAction;
@@ -41,6 +42,14 @@ public:
     static inline int32_t iCount;
 };
 
+inline hkOrientHingedBodyAction* bhkOrientHingedBodyAction::operator*() {
+    if (this) {
+        return static_cast<hkOrientHingedBodyAction*>(GethkObject());
+    }
+
+    return nullptr;
+}
+
 // The creation info of an hkOrientHingedBodyAction: the unary action's user data and entity, then the hinge and forward
 // axes, the spring's strength and its damping.
 class hkOrientHingedBodyActionCinfo : public hkUnaryActionCinfo {
@@ -76,3 +85,7 @@ static_assert(offsetof(hkOrientHingedBodyActionCinfo::Serialized, HingeAxisLS) =
 static_assert(offsetof(hkOrientHingedBodyActionCinfo::Serialized, ForwardLS) == 0x20);
 static_assert(offsetof(hkOrientHingedBodyActionCinfo::Serialized, fDamping) == 0x34);
 static_assert(sizeof(hkOrientHingedBodyActionCinfo::Serialized) == 0x40);
+
+inline void bhkOrientHingedBodyAction::SetEnabled(bool abEnable) {
+    (**this)->SetEnabled(abEnable);
+}

@@ -150,3 +150,14 @@ public:
         float defaultScale
     );
 };
+
+inline hkaSkeletonMapperUtils::Params::Params(const hkaSkeletonMapperUtils::Params& other)
+  : m_skeletonA(other.m_skeletonA), m_skeletonB(other.m_skeletonB), m_compareNames(other.m_compareNames),
+    m_positionMatchTolerance(other.m_positionMatchTolerance), m_rotationMatchTolerance(other.m_rotationMatchTolerance),
+    m_userChains(), m_userMappingsAtoB(), m_userMappingsBtoA(), m_autodetectSimple(other.m_autodetectSimple),
+    m_autodetectChains(other.m_autodetectChains), m_mappingType(other.m_mappingType),
+    m_motionParams(other.m_motionParams) {
+    m_userChains = other.m_userChains;
+    m_userMappingsAtoB = other.m_userMappingsAtoB;
+    m_userMappingsBtoA = other.m_userMappingsBtoA;
+}

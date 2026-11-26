@@ -1,6 +1,7 @@
 #include "Fallout Shared/BGSDefaultObjectManager.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/DEFAULT_OBJECT_DATA.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/TESFile.h"
@@ -32,7 +33,7 @@ bool BGSDefaultObjectManager::Load(TESFile* apFile) {
             );
             if (apFile->QEndian()) {
                 for (int32_t i = 0; i < DO_COUNT; ++i) {
-                    ENDIAN(pObjectArray[i], false);
+                    BSEndian(pObjectArray[i], false);
                 }
             }
         }

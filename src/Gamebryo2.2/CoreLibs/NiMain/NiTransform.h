@@ -30,3 +30,11 @@ public:
     NiPoint3 m_Translate;
     float m_fScale;
 };
+
+inline void NiTransform::Invert(NiTransform& kDest) const {
+    kDest.m_Rotate = m_Rotate.Transpose();
+    kDest.m_fScale = 1.0f / m_fScale;
+    NiPoint3 kNegated = -m_Translate;
+    NiPoint3 kRotated = kDest.m_Rotate * kNegated;
+    kDest.m_Translate = kDest.m_fScale * kRotated;
+}

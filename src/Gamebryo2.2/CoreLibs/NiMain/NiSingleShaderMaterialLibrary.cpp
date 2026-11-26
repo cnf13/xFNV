@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterial.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialLibrary.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderDesc.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderFactory.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiShaderLibrary.h"

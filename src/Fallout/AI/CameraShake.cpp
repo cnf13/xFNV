@@ -2,7 +2,7 @@
 
 #include "BSCore/BSTimer.h"
 #include "BSDevices/Controls.h"
-#include "BSHavok/bhkPickData.h"
+#include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout/Interface/ListBox.h"
@@ -33,11 +34,8 @@ public:
     void SetDistributePointsString();
     void SetDisplayString(Tile* apTile);
 
-    // Creates the menu; Create_ is a wrapper that first checks that the interface manager exists and has been
-    // initialised.
+    // Creates the menu (Interface::CreateCharGenMenu calls it once the interface manager is initialised).
     static Tile* Create(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAddValues, bool abShowTaggedSkills);
-    // Creates the menu once the interface manager is initialised; it returns Create's tile, else null.
-    static Tile* Create_(int32_t aiItemType, int32_t aiMaxPoints, bool abOnlyAddValues, bool abShowTaggedSkills);
     // The menu's id, eCharGenMenu.
     static int32_t GetClassStatic();
     static void operator delete(void* apMemory) {

@@ -1,7 +1,7 @@
 #include "Fallout Shared/ActorCause.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout/AI/Actor.h"

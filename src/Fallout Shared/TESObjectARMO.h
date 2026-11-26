@@ -107,8 +107,9 @@ public:
     bool bIsFoleyBase;
 };
 
-// The armor weight class names, light, heavy and medium (TESObjectARMO.cpp's settings; InventoryMenu.cpp's
-// pGSArmorWeight points to them).
+// The armor weight class names, light, heavy and medium.
 extern SettingT<GameSettingCollection> sArmorWeightLight;
 extern SettingT<GameSettingCollection> sArmorWeightHeavy;
 extern SettingT<GameSettingCollection> sArmorWeightMedium;
+// The armor weight class names as pointers to their settings, light, heavy and medium.
+extern SettingT<GameSettingCollection>* pGSArmorWeight[3];

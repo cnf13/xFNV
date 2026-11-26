@@ -110,3 +110,5 @@ public:
     hkVector4 m_lockedFootEndPositionInWS;
     hkVector4 m_footUnlockingOffset;
 };
+
+inline hkaRaycastInterface::~hkaRaycastInterface() {}

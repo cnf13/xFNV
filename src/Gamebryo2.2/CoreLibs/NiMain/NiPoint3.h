@@ -1,8 +1,9 @@
 #pragma once
 
+
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
-
 #include <limits>
 
 class NiNode;
@@ -110,3 +111,42 @@ inline NiPoint3 NiPoint3::UNIT_Y{0.0f, 1.0f, 0.0f};
 inline NiPoint3 NiPoint3::UNIT_Z{0.0f, 0.0f, 1.0f};
 
 inline NiPoint3 NiPoint3::UNIT_ALL{1.0f, 1.0f, 1.0f};
+
+// The cross product, unitized; a length not above 1e-6 (or NaN) gives the zero vector. The length is compared against
+// the double widening of 1e-6f.
+inline NiPoint3 NiPoint3::UnitCross(const NiPoint3& pt) const {
+    NiPoint3 kCross(y * pt.z - z * pt.y, z * pt.x - x * pt.z, x * pt.y - y * pt.x);
+    float fLength = kCross.Length();
+    if (fLength > 9.999999974752427e-07) {
+        return kCross / fLength;
+    }
+    return NiPoint3(0.0f, 0.0f, 0.0f);
+}
+
+inline NiPoint3 NiPoint3::Perpendicular() {
+    float v8 = std::fabs(static_cast<double>(x));
+    float v7 = std::fabs(static_cast<double>(y));
+    if (!(v7 > static_cast<double>(v8))) {
+        float v4 = std::fabs(static_cast<double>(z));
+        float v3 = std::fabs(static_cast<double>(y));
+        if (!(v3 > static_cast<double>(v4))) {
+            return UnitCross(NiPoint3::UNIT_Y);
+        }
+        return UnitCross(NiPoint3::UNIT_Z);
+    }
+
+    float v6 = std::fabs(static_cast<double>(z));
+    float v5 = std::fabs(static_cast<double>(x));
+    if (!(v5 > static_cast<double>(v6))) {
+        return UnitCross(NiPoint3::UNIT_X);
+    }
+    return UnitCross(NiPoint3::UNIT_Z);
+}
+
+// The products are rounded to float before the three-float constructor runs, and z is computed first.
+inline NiPoint3 NiPoint3::ComponentProduct(const NiPoint3& p0, const NiPoint3& p1) {
+    float fZ = p0.z * p1.z;
+    float fY = p0.y * p1.y;
+    float fX = p0.x * p1.x;
+    return NiPoint3(fX, fY, fZ);
+}

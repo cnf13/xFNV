@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiZBufferProperty.h"
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -98,3 +98,5 @@ void NiZBufferProperty::GetViewerStrings(NiTPrimitiveArray<char*>* pkStrings) {
 bool NiZBufferProperty::IsEqualFast(const NiZBufferProperty& kProp) const {
     return m_uFlags == kProp.m_uFlags;
 }
+
+NiZBufferProperty::~NiZBufferProperty() {}

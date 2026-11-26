@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Visualize/hkDebugDisplayHandler.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 hkDebugDisplayHandler::~hkDebugDisplayHandler() {}
 

@@ -1,6 +1,6 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Tile.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout/Interface/Menus/ComputersMenu.h"

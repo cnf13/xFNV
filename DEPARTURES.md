@@ -120,7 +120,7 @@ comments that only describe the exe's own layout.
 ## Data and files
 
 - **NIF Havok blocks.** Model files hold the 32-bit creation infos: each is read through a fixed-width `Serialized` form
-  and the native structure filled member by member (`src/BSHavok/bhkSerialized.h`, e.g. `bhkRigidBodyCinfo.h`,
+  and the native structure filled member by member (`src/BSHavok/bhkSerialized.h`, e.g. `bhkRigidBody.h`,
   `bhkMoppBvTreeShape.cpp`). A block of a bhk class outside NiStream's list is skipped by the size table and links to it
   read as null (`src/Gamebryo2.2/CoreLibs/NiMain/NiStream.cpp`).
 - **BSA directories.** The archive's 16-byte directory records, which hold a 32-bit pointer slot, are spread into the

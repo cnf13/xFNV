@@ -7,6 +7,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkNiCollisionObject.h"
@@ -16,7 +17,7 @@
 #include "BSMain/BSStream.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderBloodSplatter.h"
@@ -97,7 +98,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -116,6 +116,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cstdint>
 
@@ -125,14 +126,6 @@ SettingT<INISettingCollection> bCustomSplatterEnabled("bCustomSplatterEnabled:Sc
 NiPointer<NiCamera> ScreenCustomSplatter::spCamera;
 NiPointer<NiNode> ScreenCustomSplatter::spRoot;
 ScreenCustomSplatter::spTextures_t ScreenCustomSplatter::spTextures;
-
-float RandomFloatNeg1To1() {
-    return BSRandom::GetSingleton()->FloatNeg1To1();
-}
-
-bool RandomBool(float afPercentTrue) {
-    return BSRandom::GetSingleton()->Bool(afPercentTrue);
-}
 
 char SetCustomSplatterFade(float afFadeStart, bool abNoFade) {
     fBloodSplatterFadeStart_0 = afFadeStart;
@@ -464,10 +457,6 @@ void ScreenCustomSplatter::Shutdown() {
     for (NiPointer<NiTexture>& spTexture : ScreenCustomSplatter::spTextures) {
         spTexture = static_cast<NiTexture*>(nullptr);
     }
-}
-
-void BSShaderBloodSplatterProperty::SetTexture(uint32_t auiIndex, NiTexture* apTex) {
-    spTexture[auiIndex] = apTex;
 }
 
 // The tag string goes to the base constructor by address, and the splatter data is copied whole.

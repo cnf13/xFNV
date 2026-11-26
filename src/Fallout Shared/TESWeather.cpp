@@ -1,7 +1,7 @@
 #include "Fallout Shared/TESWeather.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/TESCondition.h"
@@ -23,8 +23,8 @@ TESWeather::WeatherSound::WeatherSound(uint32_t auiSoundFormID, SoundType aeType
   : uiSoundFormID(auiSoundFormID), eType(aeType) {}
 
 void TESWeather::WeatherSound::Endian() {
-    ENDIAN(uiSoundFormID, false);
-    ENDIAN(eType, false);
+    BSEndian(uiSoundFormID, false);
+    BSEndian(eType, false);
 }
 
 void TESWeather::WeatherSoundList::FlushList() {
@@ -178,7 +178,7 @@ bool TESWeather::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     for (int32_t i = 0; i < 4; ++i) {
                         for (int32_t j = 0; j < 6; ++j) {
-                            ENDIAN(uiCloudColorData[i][j], false);
+                            BSEndian(uiCloudColorData[i][j], false);
                         }
                     }
                 }
@@ -200,7 +200,7 @@ bool TESWeather::Load(TESFile* apFile) {
                 if (apFile->QEndian()) {
                     for (int32_t i = 0; i < 10; ++i) {
                         for (int32_t j = 0; j < 6; ++j) {
-                            ENDIAN(uiColorData[i][j], false);
+                            BSEndian(uiColorData[i][j], false);
                         }
                     }
                 }
@@ -223,7 +223,7 @@ bool TESWeather::Load(TESFile* apFile) {
                 apFile->GetChunkData(fFogData, 0x18);
                 if (apFile->QEndian()) {
                     for (int32_t i = 0; i < iCount; ++i) {
-                        ENDIAN(fFogData[i], false);
+                        BSEndian(fFogData[i], false);
                     }
                 }
                 break;
@@ -232,7 +232,7 @@ bool TESWeather::Load(TESFile* apFile) {
                 apFile->GetChunkData(fHDRData, 0x38);
                 if (apFile->QEndian()) {
                     for (float& fHDR : fHDRData) {
-                        ENDIAN(fHDR, false);
+                        BSEndian(fHDR, false);
                     }
                 }
                 break;
@@ -247,7 +247,7 @@ bool TESWeather::Load(TESFile* apFile) {
             case LNAM_ID:
                 apFile->GetChunkData(&iNumCloudLayers, 4);
                 if (apFile->QEndian()) {
-                    ENDIAN(iNumCloudLayers, false);
+                    BSEndian(iNumCloudLayers, false);
                 }
                 break;
             case SNAM_ID: {

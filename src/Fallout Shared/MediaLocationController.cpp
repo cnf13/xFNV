@@ -742,10 +742,6 @@ bool MediaLocationController::Update(bool abInCombat) {
     return bIsActive;
 }
 
-uint32_t BSAudio::GetSynchTime() {
-    return SynchTimer.iMilliseconds;
-}
-
 uint8_t TESClimate::GetTransTime(TransTime aeTT) {
     if (aeTT < NUM_TRANS_TIMES && aeTT >= SUNRISE_BEGIN) {
         return ucData[aeTT];

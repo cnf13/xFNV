@@ -7,7 +7,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/TESSound.h"
 #include "Fallout/Audio/FalloutAudio.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
@@ -19,12 +19,12 @@
 SettingT<INISettingCollection> BSAudio::bEnableAudio("bEnableAudio:Audio", true);
 SettingT<INISettingCollection> BSAudio::fDialogMinDistance("fDialogMinDistance:Audio", 70.0f);
 SettingT<INISettingCollection> BSAudio::fDialogMaxDistance("fDialogMaxDistance:Audio", 50000.0f);
-SettingT<INISettingCollection> gs_fDawnTime_Audio("fDawnTime:Audio", 5.0f);
-SettingT<INISettingCollection> gs_fDayTime_Audio("fDayTime:Audio", 8.0f);
-SettingT<INISettingCollection> gs_fDuskTime_Audio("fDuskTime:Audio", 18.0f);
-SettingT<INISettingCollection> gs_fNightTime_Audio("fNightTime:Audio", 20.0f);
+SettingT<INISettingCollection> BSAudio::fDawnTime("fDawnTime:Audio", 5.0f);
+SettingT<INISettingCollection> BSAudio::fDayTime("fDayTime:Audio", 8.0f);
+SettingT<INISettingCollection> BSAudio::fDuskTime("fDuskTime:Audio", 18.0f);
+SettingT<INISettingCollection> BSAudio::fNightTime("fNightTime:Audio", 20.0f);
 BSSoundHandle BSAudio::kVatsLoopHandle;
-SettingT<INISettingCollection> gs_bMultiThreadAudio_Audio("bMultiThreadAudio:Audio", false);
+SettingT<INISettingCollection> bMultiThreadAudio("bMultiThreadAudio:Audio", false);
 
 AudioTick::AudioTick() : iMilliseconds(600000), iFlags(0) {
     iLastUpdateTime = GetTickCount();
@@ -56,7 +56,7 @@ BSAudio::BSAudio()
     pfnSynchPausedCallback(nullptr), pfnSynchUnPausedCallback(nullptr) {
     Setting::Info* isMultiThreaded;
     // Takes the setting's address, which is never null.
-    isMultiThreaded = &gs_bMultiThreadAudio_Audio.uValue;
+    isMultiThreaded = &bMultiThreadAudio.uValue;
     bMultiThread = isMultiThreaded->b;
 }
 
@@ -162,7 +162,7 @@ BSSoundHandle BSAudio::GetSoundHandleByName(const char* apSoundName, uint32_t ai
 
 BSSoundHandle BSAudio::GetSoundHandleByFilename(const char* apFilename, uint32_t aiTypeFlags, void* apSettingsContext) {
     AutoMemContext kMemContext(MEM_CONTEXT_AUDIO);
-    BSSoundHandle kHandle = BSAudioManager::QInstance().GetSoundHandleByFilePath(
+    BSSoundHandle kHandle = BSAudioManager::QInstance().GetSoundHandleByFilename(
         apFilename,
         aiTypeFlags,
         static_cast<TESSound*>(apSettingsContext)
@@ -220,7 +220,7 @@ void BSAudio::SetMultiThreaded(bool abUseMultipleThreads) {
     AutoMemContext kMemContext(MEM_CONTEXT_AUDIO);
     // Takes the setting's address, which is never null.
     if (bAudioEnabled &&
-        (bMultiThreadAudio = &gs_bMultiThreadAudio_Audio.uValue, bMultiThreadAudio->b || !abUseMultipleThreads)) {
+        (bMultiThreadAudio = &::bMultiThreadAudio.uValue, bMultiThreadAudio->b || !abUseMultipleThreads)) {
         if (!abUseMultipleThreads || bMultiThread) {
             if (!abUseMultipleThreads && bMultiThread) {
                 BSAudioManager::QInstance().SuspendAudioThread();

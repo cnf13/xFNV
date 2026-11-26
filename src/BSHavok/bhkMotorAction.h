@@ -1,7 +1,7 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkUnaryAction.h"
-#include "Fallout Shared/GlobalFunc.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Physics/Dynamics/Action/hkpMotorAction.h"

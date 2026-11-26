@@ -365,10 +365,7 @@ hkpMoppTreeNode* hkpMoppDefaultSplitter::split(
             &extent.m_min,
             &extent.m_max
         );
-        const int32_t numPrimitives = params.m_numPrimitives;
-        if (numPrimitives > 1) {
-            hkAlgorithm::quickSortRecursive(params.m_primitives, 0, numPrimitives - 1, uint8_t{0});
-        }
+        hkAlgorithm::quickSort(params.m_primitives, params.m_numPrimitives);
         lastPlane = plane;
         findSplittingPlanePositions(node, plane, params, extent, depth);
     }
@@ -397,10 +394,7 @@ hkpMoppTreeNode* hkpMoppDefaultSplitter::split(
             &extent.m_min,
             &extent.m_max
         );
-        const int32_t numPrimitives = params.m_numPrimitives;
-        if (numPrimitives > 1) {
-            hkAlgorithm::quickSortRecursive(params.m_primitives, 0, numPrimitives - 1, uint8_t{0});
-        }
+        hkAlgorithm::quickSort(params.m_primitives, params.m_numPrimitives);
         lastPlane = plane;
         findSplittingPlanePositions(node, plane, params, extent, depth);
     }
@@ -472,9 +466,7 @@ void hkpMoppDefaultSplitter::distributeMiddle(
     float absMin;
     float absMax;
     m_mediator->projectPrimitives(m_planeDirections[axis].m_direction, axis, middle, numMiddle, &absMin, &absMax);
-    if (numMiddle > 1) {
-        hkAlgorithm::quickSortRecursive(startMiddle, 0, numMiddle - 1, uint8_t{0});
-    }
+    hkAlgorithm::quickSort(startMiddle, numMiddle);
     bool toLeft = static_cast<int32_t>(
                       static_cast<intptr_t>(
                           reinterpret_cast<uintptr_t>(endLeft) - reinterpret_cast<uintptr_t>(startLeft)
@@ -891,42 +883,5 @@ void hkpMoppDefaultSplitter::hkpMoppMaxList::removeElementsLessThan(float positi
         *v11 = nullptr;
         --m_currentNumElements;
         --v3;
-    }
-}
-
-// The pivot is the middle primitive, copied whole; only its extent's minimum is compared. The swap goes through a
-// temporary, in the game's order.
-void hkAlgorithm::quickSortRecursive(hkpMoppCompilerPrimitive* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess) {
-    int32_t d = aiLow;
-    for (;;) {
-        int32_t i = d;
-        int32_t j = aiHigh;
-        alignas(16) const hkpMoppCompilerPrimitive str = apArr[(d + aiHigh) >> 1];
-        do {
-            while (apArr[i] < str) {
-                i++;
-            }
-            while (str < apArr[j]) {
-                j--;
-            }
-            if (j < i) {
-                break;
-            }
-            if (j != i) {
-                alignas(16) const hkpMoppCompilerPrimitive zal = apArr[j];
-                apArr[j] = apArr[i];
-                apArr[i] = zal;
-            }
-            j--;
-            i++;
-        }
-        while (i <= j);
-        if (d < j) {
-            hkAlgorithm::quickSortRecursive(apArr, d, j, aiLess);
-        }
-        if (i >= aiHigh) {
-            return;
-        }
-        d = i;
     }
 }

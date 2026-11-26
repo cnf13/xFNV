@@ -64,9 +64,6 @@ void identifyDeactivatedSubgroups(
     hkFixedArray<int8_t>& groupSparse
 );
 hkBool worldOperationUtil_less_hkSimulationIslandPtr(const hkpSimulationIsland* a, const hkpSimulationIsland* b);
-
-// The dirty islands' comparator. The sort that takes it is hkAlgorithm::quickSortRecursive.
-using hkpSimulationIslandLess = hkBool (*)(const hkpSimulationIsland*, const hkpSimulationIsland*);
 namespace hkAlgorithm {}
 
 // The world's island and entity bookkeeping.

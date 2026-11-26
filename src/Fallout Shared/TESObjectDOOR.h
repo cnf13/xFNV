@@ -94,10 +94,10 @@ public:
 inline MobileObject* pstaticdoor;
 inline bool bStaticWasInInterior;
 
-extern SettingT<GameSettingCollection> gs_sRandomDoorTeleportFailureMessage;
+extern SettingT<GameSettingCollection> sRandomDoorTeleportFailureMessage;
 
-extern SettingT<GameSettingCollection> gs_fRandomDoorDistance;
+extern SettingT<GameSettingCollection> fRandomDoorDistance;
 
-extern SettingT<GameSettingCollection> gs_fAutoDoorActivateDistance;
+extern SettingT<GameSettingCollection> fAutoDoorActivateDistance;
 
-extern SettingT<INIPrefSettingCollection> gs_bSaveOnTravel_GamePlay;
+extern SettingT<INIPrefSettingCollection> bSaveOnTravel;

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSRandom.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/ContainerItemExtra.h"
@@ -23,11 +23,6 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadFormBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveFormBuffer.h"
 #include "SDK/MSVC/rtti.h"
-
-// The next unsigned random number of the BSRandom singleton.
-uint32_t Random() {
-    return BSRandom::GetSingleton()->UnsignedInt();
-}
 
 LEVELED_OBJECT::LEVELED_OBJECT() : pForm(nullptr), sCount(1), sLevel(1), pItemExtra(nullptr) {}
 
@@ -717,9 +712,9 @@ TESLeveledList* TESLeveledList::GetFormAsLeveledList(TESForm* apForm) {
 }
 
 void LEVELED_OBJECT_FILE::Endian() {
-    ENDIAN(sLevel, false);
-    ENDIAN(iFormID, false);
-    ENDIAN(sCount, false);
+    BSEndian(sLevel, false);
+    BSEndian(iFormID, false);
+    BSEndian(sCount, false);
 }
 
 float TESGlobal::GetValue() {

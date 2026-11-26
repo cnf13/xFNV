@@ -1,6 +1,6 @@
 #include "Fallout Shared/Havok/CameraCaster.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
 #include "BSHavok/bhkShapePhantom.h"
@@ -9,6 +9,7 @@
 #include "BSHavok/bhkUtilFunctions.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/AI/BaseProcess.h"
@@ -268,100 +269,4 @@ void CameraCaster::Init(float afRadius, uint32_t aiGroup) {
 
 void CameraCaster::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-// The Bethesda world of the controller's shape phantom's Havok world; the phantom is deliberately not null-checked.
-bhkWorld* bhkCharacterController::GetWorld() {
-    return bhkWorld::Getbhk(GethkShapePhantom()->getWorld());
-}
-
-void bhkShapePhantom::SetPosition(const hkVector4& arPos) {
-    hkpShapePhantom* pPhantom = static_cast<hkpShapePhantom*>(**this);
-    if (pPhantom) {
-        MarkWrite();
-        pPhantom->setPosition(arPos, 0.0f);
-        UnMarkWrite();
-    }
-}
-
-// The read mark is empty in the game's build: only the Havok world's lookup remains.
-void bhkWorld::MarkForRead() {
-    ahkpWorld* pw = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
-    if (pw) {
-        pw->markForRead();
-    }
-}
-
-void bhkWorld::UnMarkForRead() {
-    ahkpWorld* pw = static_cast<ahkpWorld*>(const_cast<hkpWorld*>(GethkWorld()));
-    if (pw) {
-        pw->unmarkForRead();
-    }
-}
-
-// The Havok world's user data is the bhkWorld that wraps it (bhkWorld::Link sets it).
-bhkWorld* bhkWorld::Getbhk(const hkpWorld* apWorld) {
-    if (apWorld) {
-        return const_cast<ahkpWorld*>(static_cast<const ahkpWorld*>(apWorld))->getUserData();
-    }
-    return nullptr;
-}
-
-void hkMemoryAllocator::bufFreeRayCastOutputs(void* p, int32_t numElem) {
-    bufFree(p, sizeof(hkpWorldRayCastOutput) * numElem);
-}
-
-// No early out until the owner lowers the distance (reset()'s HK_REAL_MAX).
-hkpCdPointCollector::hkpCdPointCollector() : m_earlyOutDistance(HK_REAL_MAX) {}
-
-hkpCdPointCollector::~hkpCdPointCollector() {}
-
-// HK_DECLARE_CLASS_ALLOCATOR's operator delete: the block goes back to the thread's Havok heap.
-void hkpCdPointCollector::operator delete(void* p) {
-    if (p) {
-        hkMemoryRouter::getInstance().heap().blockFree(p, sizeof(hkpCdPointCollector));
-    }
-}
-
-// The three vectors' constructors are empty.
-hkpCollisionInput::Aabb32Info::Aabb32Info() {}
-
-// The constructor writes nothing: only m_aabb32Info's (empty) constructor runs.
-hkpCollisionInput::hkpCollisionInput() {}
-
-hkpLinearCastInput::hkpLinearCastInput() : m_maxExtraPenetration(0x1p-23f), m_startPointTolerance(0x1p-23f) {}
-
-void hkpAllCdPointCollector::reset() {
-    m_hits.clear();
-    hkpCdPointCollector::reset();
-}
-
-// HK_DECLARE_CLASS_ALLOCATOR's operator delete: the block goes back to the thread's Havok heap.
-void hkpAllCdPointCollector::operator delete(void* p) {
-    if (p) {
-        hkMemoryRouter::getInstance().heap().blockFree(p, sizeof(hkpAllCdPointCollector));
-    }
-}
-
-hkpRootCdPoint::hkpRootCdPoint() {}
-
-hkpRootCdPoint::hkpRootCdPoint(const hkpRootCdPoint& __that) = default;
-
-hkpRootCdPoint& hkpRootCdPoint::Assign(const hkpRootCdPoint& __that) {
-    m_contact = __that.m_contact;
-    m_rootCollidableA = __that.m_rootCollidableA;
-    m_shapeKeyA = __that.m_shapeKeyA;
-    for (uint32_t i = 0; i < 8; ++i) {
-        m_shapeKeysA[i] = __that.m_shapeKeysA[i];
-    }
-    m_rootCollidableB = __that.m_rootCollidableB;
-    m_shapeKeyB = __that.m_shapeKeyB;
-    for (uint32_t i = 0; i < 8; ++i) {
-        m_shapeKeysB[i] = __that.m_shapeKeysB[i];
-    }
-    return *this;
-}
-
-void hkpConvexShape::setRadius(float radius) {
-    m_radius = radius;
 }

@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiGeometryGroup.h"
 
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiGeometryBufferData.h"
 
 NiGeometryGroup::NiGeometryGroup() : m_uiRefCount(0), m_pkD3DDevice(nullptr) {}

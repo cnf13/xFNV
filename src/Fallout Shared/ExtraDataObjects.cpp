@@ -5,7 +5,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/BSMultiBound.h"
@@ -13,7 +13,6 @@
 #include "BSMain/BSOcclusionPlane.h"
 #include "BSMain/BSPortal.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "BSShader/BSShaderNoLightingProperty.h"
 #include "Fallout Shared/ActorCause.h"
 #include "Fallout Shared/AiFormulas.h"
@@ -43,6 +42,7 @@
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Region System/TESRegionList.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESAmmo.h"
@@ -138,19 +138,19 @@ void RADIO_DATA::Copy(RADIO_DATA* apCopy) {
 }
 
 void RADIO_DATA::Endian() {
-    ENDIAN(fRadius, false);
-    ENDIAN(eRangeType, false);
-    ENDIAN(fStaticPct, false);
-    ENDIAN(pPositionRef, false);
+    BSEndian(fRadius, false);
+    BSEndian(eRangeType, false);
+    BSEndian(fStaticPct, false);
+    BSEndian(pPositionRef, false);
 }
 
 WORLD_LOCATION::WORLD_LOCATION() {}
 
 void WORLD_LOCATION::Endian() {
-    ENDIAN(pLocationForm, false);
-    ENDIAN(locPt.x, false);
-    ENDIAN(locPt.y, false);
-    ENDIAN(locPt.z, false);
+    BSEndian(pLocationForm, false);
+    BSEndian(locPt.x, false);
+    BSEndian(locPt.y, false);
+    BSEndian(locPt.z, false);
 }
 
 ExtraAction::ExtraAction() : BSExtraData(EXTRA_ACTION), eAction(1), pActionRef(nullptr) {}
@@ -226,8 +226,8 @@ void ExtraActivateRef::Copy(BSExtraData* apCopy) {
 REF_ACTIVATE_DATA::REF_ACTIVATE_DATA() : pActivateRef(nullptr), fActivateDelay(0.0) {}
 
 void REF_ACTIVATE_DATA::Endian() {
-    ENDIAN(pActivateRef, false);
-    ENDIAN(fActivateDelay, false);
+    BSEndian(pActivateRef, false);
+    BSEndian(fActivateDelay, false);
 }
 
 REF_ACTIVATE_DATA* GetActivateDataFromList(TESObjectREFR* apRef, BSSimpleList<REF_ACTIVATE_DATA*>* apList) {
@@ -375,7 +375,7 @@ void CollisionData::SetLayer(COL_LAYER aeLayer) {
 }
 
 void CollisionData::Endian() {
-    ENDIAN(eLayer, false);
+    BSEndian(eLayer, false);
 }
 
 ExtraCollisionData::ExtraCollisionData() : BSExtraData(EXTRA_COLLISION_DATA) {}
@@ -575,7 +575,7 @@ bool ExtraEnableStateParent::ShouldPopOut() {
 }
 
 void REF_ENABLE_PARENT_DATA::Endian() {
-    ENDIAN(pParent, false);
+    BSEndian(pParent, false);
 }
 
 ExtraEncounterZone::ExtraEncounterZone() : BSExtraData(EXTRA_ENCOUNTERZONE), pZone(nullptr) {}
@@ -760,7 +760,7 @@ void ExtraLitWaterRefs::ClearReferenceData() {
 LockData::LockData() : cLockLevel(0), pKey(nullptr), cFlags(0), iNumTries(0), iTimesUnlocked(0) {}
 
 void LockData::Endian() {
-    ENDIAN(pKey, false);
+    BSEndian(pKey, false);
 }
 
 bool LockData::IsBroken() {
@@ -1075,8 +1075,8 @@ bool ExtraRank::Compare(BSExtraData* apCompare) {
 REF_REFLECTOR_DATA::REF_REFLECTOR_DATA() : pRef(nullptr), iEffectFlags(0) {}
 
 void REF_REFLECTOR_DATA::Endian() {
-    ENDIAN(pRef, false);
-    ENDIAN(iEffectFlags, false);
+    BSEndian(pRef, false);
+    BSEndian(iEffectFlags, false);
 }
 
 REF_REFLECTED_DATA::REF_REFLECTED_DATA() : pRef(nullptr), iEffectFlags(0) {}
@@ -1613,8 +1613,8 @@ void ExtraOcclusionPlaneRefData::Clear() {
 PortalLinkedRefData::PortalLinkedRefData() : pLinkedRefs{nullptr, nullptr} {}
 
 void PortalLinkedRefData::Endian() {
-    ENDIAN(pLinkedRefs[0], false);
-    ENDIAN(pLinkedRefs[1], false);
+    BSEndian(pLinkedRefs[0], false);
+    BSEndian(pLinkedRefs[1], false);
 }
 
 ExtraPortalRefData::ExtraPortalRefData() : BSExtraData(EXTRA_PORTAL_REF_DATA) {}
@@ -1629,7 +1629,7 @@ void ExtraPortalRefData::Clear() {
 REF_PATROL_DATA::REF_PATROL_DATA() {}
 
 void REF_PATROL_DATA::Endian() {
-    ENDIAN(fTimeAtRef, false);
+    BSEndian(fTimeAtRef, false);
 }
 
 float* REF_PATROL_DATA::SetTimeAtRef(float* apTimeAtRef) {
@@ -1653,14 +1653,14 @@ Script* PatrolRefData::GetOnPatrolScript() {
 PRIMITIVE_DATA::PRIMITIVE_DATA() : aColor(0.0f, 0.0f, 0.0f, 0.0f) {}
 
 void PRIMITIVE_DATA::Endian() {
-    ENDIAN(aRadii.x, false);
-    ENDIAN(aRadii.y, false);
-    ENDIAN(aRadii.z, false);
-    ENDIAN(aColor.r, false);
-    ENDIAN(aColor.g, false);
-    ENDIAN(aColor.b, false);
-    ENDIAN(aColor.a, false);
-    ENDIAN(eType, false);
+    BSEndian(aRadii.x, false);
+    BSEndian(aRadii.y, false);
+    BSEndian(aRadii.z, false);
+    BSEndian(aColor.r, false);
+    BSEndian(aColor.g, false);
+    BSEndian(aColor.b, false);
+    BSEndian(aColor.a, false);
+    BSEndian(eType, false);
 }
 
 ExtraSound::ExtraSound(BSSoundHandle aSound) : BSExtraData(79) {
@@ -2592,8 +2592,8 @@ NAVMESH_PORTAL::NAVMESH_PORTAL(const NAVMESH_PORTAL& aPortal)
   : pNavMesh(aPortal.pNavMesh), iTriIndex(aPortal.iTriIndex) {}
 
 void NAVMESH_PORTAL::Endian() {
-    ENDIAN(NavMeshID, false);
-    ENDIAN(iTriIndex, false);
+    BSEndian(NavMeshID, false);
+    BSEndian(iTriIndex, false);
 }
 
 ExtraNavMeshPortal::ExtraNavMeshPortal(NAVMESH_PORTAL aPortal) : BSExtraData(90u), Portal(aPortal) {}
@@ -2727,17 +2727,4 @@ bool DoorTeleportData::InitItem(TESForm* apOwner) {
 
 void MobileObject::SetCurrentAIProcess(BaseProcess* appross) {
     pCurrentProcess = appross;
-}
-
-void NiFixedString::operator delete(void* apMemory) {
-    ourFree(apMemory);
-}
-
-// The empty string's handle has no reference count. The count is raw memory, the untyped word GetRealBufferStart
-// returns; it is decremented through the int32_t NiAtomicDecrement.
-void NiGlobalStringTable::DecHandleRefCount(GlobalStringHandle& arHandle) {
-    if (arHandle != NULL_STRING) {
-        const char* pcBuffer = GetRealBufferStart(arHandle);
-        NiAtomicDecrement(*reinterpret_cast<int32_t*>(const_cast<char*>(pcBuffer)));
-    }
 }

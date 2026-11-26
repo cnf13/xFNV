@@ -1,11 +1,8 @@
 #include "SDK/FaceGen/TriFileIO.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
-#include "Fallout Shared/FaceGen/BSFaceGenManager.h"
-#include "Fallout Shared/FaceGen/BSFaceGenModel.h"
-#include "Fallout Shared/FaceGen/FffTriFileDataS.h"
-#include "Fallout Shared/ModelLoader.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/FaceGen/BSFaceGenBinaryFile.h"
+#include "SDK/FaceGen/TriFileIO.h"
 #include "SDK/FaceGen/lastError.hpp"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/exception.h"
@@ -775,3 +772,31 @@ char fffIsTriFile(std::basic_string<char, std::char_traits<char>, std::allocator
 	char cResult = kFile.isCorrectFileId(*a1);
 	return cResult;
 }
+
+// The morph delta vector's at().
+const FR2Vect3TC<float>&
+VectorSubscript(const std::vector<FR2Vect3TC<float>, std::allocator<FR2Vect3TC<float>>>* apThis, uint32_t _Pos) {
+    if (_Pos >= apThis->size()) {
+        rt::_invalid_parameter_noinfo();
+    }
+    return (*apThis)[_Pos];
+}
+
+FffTriFileDataS::FffTriFileDataS() {}
+
+uint32_t FffTriFileDataS::vtxListSize() const {
+    return static_cast<uint32_t>(vtxList.size());
+}
+
+const FR2Vect3TC<float>& FffTriFileDataS::vtxListAt(uint32_t i) const {
+    if (i >= vtxListSize()) {
+        rt::_invalid_parameter_noinfo();
+    }
+    return vtxList.data()[i];
+}
+
+void FffTriFileDataS::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+FffTriFileDataS::~FffTriFileDataS() {}

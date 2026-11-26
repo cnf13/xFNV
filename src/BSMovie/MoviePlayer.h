@@ -172,6 +172,6 @@ public:
 // The movie player singleton.
 inline MoviePlayer* pMoviePlayer;
 
-extern SettingT<INISettingCollection> gs_bPreloadIntroSequence_General;
+extern SettingT<INISettingCollection> bPreloadIntroSequence;
 
-extern SettingT<INISettingCollection> gs_iIntroSequencePriority_General;
+extern SettingT<INISettingCollection> iIntroSequencePriority;

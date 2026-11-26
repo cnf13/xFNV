@@ -64,86 +64,6 @@ enum PLAYER_ACTION : int32_t;
 
 // Flags apObject and the nodes under it as the player's bones.
 void MarkPlayerBones(NiAVObject* apObject);
-bool Cmd_DisableHardcoreTracking(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool au_re_Cmd_IsAlwaysHardcore(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_GetOwnerLastTarget_Execute(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_ShowRecipeMenu(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_GetCasinoWinningsLevel(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_SetCasinoWinningsLevel(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_UnlockChallenge(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
-bool Cmd_RemoveRecurringFromChallenge(
-    const SCRIPT_PARAMETER* apParameters,
-    const char* apCompiledParams,
-    TESObjectREFR* apRefObject,
-    TESObjectREFR* apContainer,
-    Script* apScript,
-    ScriptLocals* apScriptLocals,
-    double& afReturnValue,
-    uint32_t& auiOffset
-);
 // An IterateInventory callback: reads its first argument as an ItemChange and passes its second to
 // BSStringT<char>::operator+=.
 uint8_t apCallback(ItemChange* apItem, BSStringT<char>* apData);
@@ -1439,23 +1359,23 @@ inline float fReloadTimer;
 // Where the third-person chase camera sat when SetFirstPerson last switched the view.
 extern NiPoint3 chaseCameraPos;
 
-extern SettingT<INIPrefSettingCollection> gs_fXenonVertLookSpeed_Controls;
+extern SettingT<INIPrefSettingCollection> fXenonVertLookSpeed;
 
-extern SettingT<INISettingCollection> gs_bBorderRegionsEnabled_General;
+extern SettingT<INISettingCollection> bEnableBorderRegion;
 
-extern SettingT<INIPrefSettingCollection> gs_fXenonHorizLookSpeed_Controls;
+extern SettingT<INIPrefSettingCollection> fXenonHorizLookSpeed;
 
-extern SettingT<INIPrefSettingCollection> gs_iDifficulty_GamePlay;
+extern SettingT<INIPrefSettingCollection> iDifficulty;
 
 // The first-person gun wobble rotation AddGunWobble last built.
 extern NiMatrix3 GunWobbleRot;
 
-extern SettingT<INIPrefSettingCollection> gs_bInvertYValues_Controls;
+extern SettingT<INIPrefSettingCollection> bInvertYValues;
 
 // The references the player's placement must keep clear of.
 extern BSSimpleList<TESObjectREFR*> ConflictingObjects;
 
-extern SettingT<INISettingCollection> gs_fMaxAnalogWalkSpeed_Controls;
+extern SettingT<INISettingCollection> fMaxAnalogWalkSpeed;
 
 // The VATS flags that force the first-person view and put the player back in it afterwards.
 inline bool bVATSForce1stPerson;

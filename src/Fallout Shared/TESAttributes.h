@@ -22,9 +22,9 @@ public:
     // Loads the attributes when the save changed them (CHANGE_ACTOR_BASE_ATTRIBUTES).
     void LoadGame(BGSLoadFormBuffer* apLoadGameBuffer);
     // Saves the attributes to the old-format save.
-    void SaveGameTES(uint32_t aiFlags);
+    void SaveGame(uint32_t aiFlags);
     // Loads the attributes from the old-format save.
-    void LoadGameTES(uint32_t aiFlags, uint32_t aiCurrentFlags);
+    void LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags);
     // The bytes the attributes add to a save.
     uint16_t GetSaveSize(uint32_t aiFlags);
     // The value of attribute aeAttribute.

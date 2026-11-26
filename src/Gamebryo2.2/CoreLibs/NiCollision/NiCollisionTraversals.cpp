@@ -1,9 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiCollisionTraversals.h"
 
 #include "BSCore/MemoryManager.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
-#include "Fallout Shared/NiGeometryDataIteratorNiColorA.h"
-#include "Fallout Shared/TempEffects/NiGeometryDataIteratorNiPoint2.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiCollisionUtils.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiPick.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"

@@ -6,11 +6,12 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
+#include "BSMain/BSTaskManager.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "BSSystem/Archive.h"
@@ -54,7 +55,6 @@
 #include "Fallout Shared/BGSTerminal.h"
 #include "Fallout Shared/BGSTextureSet.h"
 #include "Fallout Shared/BGSVoiceType.h"
-#include "Fallout Shared/BSTaskThread.h"
 #include "Fallout Shared/ExtraDataList.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/TESHavokUtilities.h"
@@ -76,6 +76,7 @@
 #include "Fallout Shared/Region System/TESRegionDataManager.h"
 #include "Fallout Shared/Region System/TESRegionList.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBase.h"
@@ -193,11 +194,11 @@ static BSSpinLock GetNextIDLock;
 
 // The warnings for a plugin whose masters changed since it was saved (one per
 // file, then a general one).
-static SettingT<INISettingCollection> sMasterMismatchWarning(
+static SettingT<INISettingCollection> sMasterMismatch(
     "sMasterMismatchWarning:GeneralWarnings",
     "One of the files that \"%s\" is dependent on has changed since the last save."
 );
-static SettingT<INISettingCollection> sGeneralMasterMismatchWarning(
+static SettingT<INISettingCollection> sGMMismatch(
     "sGeneralMasterMismatchWarning:GeneralWarnings",
     "One or more plugins could not find the correct versions of the master files they depend on. Errors may occur "
     "during load or game play. Check the \"Warnings.txt\" file for more information.\r\n"
@@ -218,24 +219,6 @@ SettingT<INISettingCollection> bFileSkipIconChecks("bFileSkipIconChecks:TestAllC
 SettingT<INISettingCollection> bFileShowIcons("bFileShowIcons:TestAllCells", true);
 SettingT<INISettingCollection> bFileShowTextures("bFileShowTextures:TestAllCells", true);
 static SettingT<INISettingCollection> bKeepPlugin("bKeepPluginWhenMerging:General", false);
-
-// The engine's start-up log: an empty body in this build, which reads no argument, writes no memory and leaves the
-// return value alone.
-void InitializationFlow(...) {}
-
-int32_t BSsplitpath(
-    const char* apPath,
-    char* apDevice,
-    int32_t aiDeviceLen,
-    char* apDir,
-    int32_t aiDirLen,
-    char* apFile,
-    int32_t aiFileLen,
-    char* apExt,
-    int32_t aiExtLen
-) {
-    return _splitpath_s(apPath, apDevice, aiDeviceLen, apDir, aiDirLen, apFile, aiFileLen, apExt, aiExtLen);
-}
 
 int32_t makepath(char* apPath, uint32_t auiPathLen, char* apDevice, char* apDir, char* apFile, char* apExt) {
     return _makepath_s(apPath, auiPathLen, apDevice, apDir, apFile, apExt);
@@ -1092,7 +1075,7 @@ bool TESDataHandler::CompileFiles(bool abDownloadedContentOnly) {
             if (!pFile->GetMaster() && !bMasterSave && pFile->MastersChanged()) {
                 bMastersChanged = true;
                 const char* pName = pFile->GetFilename();
-                Warning(sMasterMismatchWarning.String(), pName);
+                Warning(sMasterMismatch.String(), pName);
             }
             if (pFile->GetActive()) {
                 pActiveFile = pFile;
@@ -1131,7 +1114,7 @@ bool TESDataHandler::CompileFiles(bool abDownloadedContentOnly) {
 
     iNextID = 0xFF000800;
     if (bMastersChanged) {
-        Warning(sGeneralMasterMismatchWarning.String());
+        Warning(sGMMismatch.String());
     }
     MessageHandler::IncDisableWarningCount(false);
     if (pActiveFile) {
@@ -3000,7 +2983,7 @@ bool TESDataHandler::ConstructObject(
                     for (uint32_t i = 0; i < uiCount; ++i) {
                         uint32_t uiID = pIDs[i];
                         if (pFile->QEndian()) {
-                            // the engine's ENDIAN<long>
+                            // the engine's BSEndian<long>
                             uiID = std::byteswap<uint32_t>(uiID);
                         }
                         const uint32_t uiFileIndex = uiID >> 24;
@@ -5629,9 +5612,6 @@ void TESDataHandler::operator delete(void* apMemory) {
     ourFree(apMemory);
 }
 
-BSSemaphore::BSSemaphore(int32_t aiCount)
-  : iCount(aiCount), hSemaphore(new BSSystemSemaphore(aiCount, aiCount + 1)), iMaxCount(aiCount + 1) {}
-
 // Stores the index assigned to the addon node.
 void BGSAddonNode::SetIndex(uint32_t aiIndex) {
     iIndex = aiIndex;
@@ -5664,8 +5644,8 @@ void TESForm::ClearFiles() {
 // Swaps the grid position read from a big-endian file; the flags byte is left alone. IDLE_PARENT_IDS::Endian shares
 // the code.
 void EXTERIOR_DATA::Endian() {
-    ENDIAN(iCellX, false);
-    ENDIAN(iCellY, false);
+    BSEndian(iCellX, false);
+    BSEndian(iCellY, false);
 }
 
 bool TESObjectWEAP::IsEmbeddedWeapon() {
@@ -5685,32 +5665,4 @@ bool BGSSaveLoadGame::SetThreadAllowChanges(bool abValue) {
         uiThreadSpecificFlags |= THREAD_FLAG_DISALLOW_CHANGES;
     }
     return bThreadAllowChanges;
-}
-
-NiTexturingProperty::Map* NiTexturingProperty::GetDarkMap() {
-    return m_kMaps[DARK_INDEX];
-}
-
-NiTexturingProperty::Map* NiTexturingProperty::GetDetailMap() {
-    return m_kMaps[DETAIL_INDEX];
-}
-
-NiTexturingProperty::Map* NiTexturingProperty::GetGlossMap() {
-    return m_kMaps[GLOSS_INDEX];
-}
-
-NiTexturingProperty::Map* NiTexturingProperty::GetGlowMap() {
-    return m_kMaps[GLOW_INDEX];
-}
-
-NiTexturingProperty::BumpMap* NiTexturingProperty::GetBumpMap() {
-    return static_cast<BumpMap*>(m_kMaps[BUMP_INDEX]);
-}
-
-NiTexturingProperty::Map* NiTexturingProperty::GetDecalMap(uint32_t uiIndex) {
-    return m_kMaps[DECAL_BASE + uiIndex];
-}
-
-uint32_t NiTexturingProperty::GetDecalMapCount() {
-    return GetField(DECALCOUNT_MASK, DECALCOUNT_POS);
 }

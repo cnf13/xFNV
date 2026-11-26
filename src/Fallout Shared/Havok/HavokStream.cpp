@@ -39,7 +39,7 @@
 #include <new>
 #include <xmmintrin.h>
 
-SettingT<INISettingCollection> gs_iSimType_HAVOK("iSimType:HAVOK", 1);
+SettingT<INISettingCollection> iSimType("iSimType:HAVOK", 1);
 
 void KillHavokSystem() {
     bhkWorld::QuitSystem();
@@ -415,17 +415,3 @@ hkStreamWriter* HavokStreambufFactory::openWriter(const char* apName) {
 void HavokStreambufFactory::operator delete(void* apMemory) {
     hkReferencedObject::deleteObject(apMemory);
 }
-
-hkFileSystem::hkFileSystem() {}
-
-hkFileSystem::~hkFileSystem() {}
-
-hkResult hkFileSystem::listDirectory(const char* basePath, hkFileSystem::DirectoryListing& listingOut) {
-    return HK_FAILURE;
-}
-
-hkStreamReader::hkStreamReader() {}
-
-hkStreamReader::~hkStreamReader() {}
-
-hkStreamWriter::hkStreamWriter() {}

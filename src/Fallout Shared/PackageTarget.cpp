@@ -1,5 +1,6 @@
 #include "Fallout Shared/PackageTarget.h"
 
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/PackageLocation.h"
@@ -27,9 +28,9 @@ void PackageTarget::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 }
 
 void PACK_TARG_FILE::Endian() {
-    ENDIAN(iFormID, false);
-    ENDIAN(iValue, false);
-    ENDIAN(fAcquireRadius, false);
+    BSEndian(iFormID, false);
+    BSEndian(iValue, false);
+    BSEndian(fAcquireRadius, false);
 }
 
 PackageTarget::PackageTarget() {

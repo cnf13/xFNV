@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/Distant Terrain System/BGSTerrainManager.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Pathfinding/NavMesh.h"

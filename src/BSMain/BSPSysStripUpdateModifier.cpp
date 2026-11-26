@@ -2,9 +2,9 @@
 
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiAnimationKey.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiParticleInfo.h"
+#include "Gamebryo2.2/CoreLibs/NiParticle/NiParticleInfo.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"

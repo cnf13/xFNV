@@ -1,11 +1,11 @@
 #include "Fallout Shared/FaceGen/BSFaceGenMorph.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/FaceGen/BSFaceGenBaseMorphExtraData.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModel.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTConvertingStrideIterator.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"

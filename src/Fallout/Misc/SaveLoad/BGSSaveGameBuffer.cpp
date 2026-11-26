@@ -1,7 +1,7 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout/Interface/InterfaceManager.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadDefines.h"
@@ -188,9 +188,4 @@ void BGSSaveGameBuffer::ShiftBuffer(uint32_t aiPosition, int32_t aiAmount) {
         }
         iBufferPosition = iShiftedPosition;
     }
-}
-
-// The int32_t sizes are passed on to memmove_s as 32-bit unsigned values, zero-extended.
-int32_t BSmemmove(void* apDest, int32_t aiDestSize, void* apSrc, int32_t aiCount) {
-    return memmove_s(apDest, static_cast<uint32_t>(aiDestSize), apSrc, static_cast<uint32_t>(aiCount));
 }

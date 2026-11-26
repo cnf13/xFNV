@@ -10,7 +10,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDefaultAVObjectPalette.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -566,5 +566,3 @@ bool NiControllerManager::AddSequence(
 NiObject* NiControllerManager::CreateObject() {
     return new NiControllerManager;
 }
-
-NiAVObjectPalette::~NiAVObjectPalette() {}

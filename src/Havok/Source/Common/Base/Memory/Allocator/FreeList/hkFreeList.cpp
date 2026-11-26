@@ -1,8 +1,8 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeList.h"
 
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Algorithm/Sort/hkSort.h"
 #include "Havok/Source/Common/Base/Container/LocalArray/hkLocalBuffer.h"
-#include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocatorServer.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -94,7 +94,7 @@ hkBool hkFreeList::incrementalFindGarbage(int32_t aiNumBlocks, int32_t& aiNumBlo
 // from m_top, which is then dropped), they stay off and the result is 1; otherwise they go back on the front of the
 // list, sorted by address, and the result is 0.
 int32_t hkFreeList::_calcBlockFree(hkFreeList::Block* block) {
-    hkLocalBuffer<void*> kElements(static_cast<int32_t>(block->m_numElements), nullptr);
+    hkLocalBuffer<Element*> kElements(static_cast<int32_t>(block->m_numElements), nullptr);
 
     uint8_t* pStart = block->m_start;
     uint8_t* pEnd = pStart + m_elementSize * block->m_numElements;
@@ -131,22 +131,15 @@ int32_t hkFreeList::_calcBlockFree(hkFreeList::Block* block) {
     }
 
     if (numFound > 0) {
-        if (numFound > 1) {
-            hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-                kElements.begin(),
-                0,
-                numFound - 1,
-                &hkFreeListAllocator::_comparePointers
-            );
-        }
-        Element* pPrev = static_cast<Element*>(kElements[0]);
+        hkAlgorithm::quickSort(kElements.begin(), numFound, &_compareElements);
+        Element* pPrev = kElements[0];
         for (int32_t i = 1; i < numFound; ++i) {
-            Element* pNext = static_cast<Element*>(kElements[i]);
+            Element* pNext = kElements[i];
             pPrev->m_next = pNext;
             pPrev = pNext;
         }
-        static_cast<Element*>(kElements[numFound - 1])->m_next = m_free;
-        m_free = static_cast<Element*>(kElements[0]);
+        kElements[numFound - 1]->m_next = m_free;
+        m_free = kElements[0];
     }
     return 0;
 }
@@ -399,29 +392,22 @@ void hkFreeList::walkMemory(void (*callback)(void*, uint32_t, hkBool, int32_t, v
         ++numBlocks;
     }
     const uint32_t uiBlocksBytes = sizeof(void*) * numBlocks;
-    void** ppBlocks = static_cast<void**>(m_memoryServer->criticalAlloc(uiBlocksBytes));
+    Block** ppBlocks = static_cast<Block**>(m_memoryServer->criticalAlloc(uiBlocksBytes));
     if (!ppBlocks) {
         return;
     }
-    void** ppBlockOut = ppBlocks;
+    Block** ppBlockOut = ppBlocks;
     for (Block* pBlock = m_blocks; pBlock; pBlock = pBlock->m_next) {
         *ppBlockOut++ = pBlock;
     }
-    if (numBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-            ppBlocks,
-            0,
-            numBlocks - 1,
-            &hkFreeListAllocator::_comparePointers
-        );
-    }
+    hkAlgorithm::quickSort(ppBlocks, numBlocks, &_compareBlocks);
 
     int32_t numFree = static_cast<int32_t>(static_cast<uint32_t>(m_blockEnd - m_top) / m_elementSize);
     for (Element* pElement = m_free; pElement; pElement = pElement->m_next) {
         ++numFree;
     }
     const uint32_t uiFreeBytes = sizeof(void*) * numFree;
-    void** ppFree = static_cast<void**>(m_memoryServer->criticalAlloc(uiFreeBytes));
+    Element** ppFree = static_cast<Element**>(m_memoryServer->criticalAlloc(uiFreeBytes));
     if (!ppFree) {
         m_memoryServer->ourFree(ppBlocks);
         return;
@@ -431,26 +417,19 @@ void hkFreeList::walkMemory(void (*callback)(void*, uint32_t, hkBool, int32_t, v
         ppFree[iFree++] = pElement;
     }
     for (uint8_t* pTop = m_top; pTop < m_blockEnd; pTop += m_elementSize) {
-        ppFree[iFree++] = pTop;
+        ppFree[iFree++] = reinterpret_cast<Element*>(pTop);
     }
-    if (numFree > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-            ppFree,
-            0,
-            numFree - 1,
-            &hkFreeListAllocator::_comparePointers
-        );
-    }
+    hkAlgorithm::quickSort(ppFree, numFree, &_compareElements);
 
-    void** ppNextFree = ppFree;
-    void** ppFreeEnd = ppFree + numFree;
+    Element** ppNextFree = ppFree;
+    Element** ppFreeEnd = ppFree + numFree;
     int32_t i = 0;
     // The blocks while free elements are left: each element is free when it is the next free one.
     for (; i < numBlocks; ++i) {
         if (ppNextFree >= ppFreeEnd) {
             break;
         }
-        Block* pBlock = static_cast<Block*>(ppBlocks[i]);
+        Block* pBlock = ppBlocks[i];
         // The elements are raw memory walked by address: the element's address is compared with the block's end as an
         // unsigned integer, wrap included, because a pointer compare lets clang test only a nonzero byte count.
         const uintptr_t uiEnd = reinterpret_cast<uintptr_t>(pBlock->m_start) + m_elementSize * pBlock->m_numElements;
@@ -468,7 +447,7 @@ void hkFreeList::walkMemory(void (*callback)(void*, uint32_t, hkBool, int32_t, v
     }
     // The remaining blocks: every element allocated.
     for (; i < numBlocks; ++i) {
-        Block* pBlock = static_cast<Block*>(ppBlocks[i]);
+        Block* pBlock = ppBlocks[i];
         uint8_t* pElement = pBlock->m_start;
         for (uint32_t j = 0; j < pBlock->m_numElements; ++j) {
             callback(pElement, m_elementSize, hkBool(true), pool, param);
@@ -512,22 +491,15 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
         ++iNumBlocks;
     }
     uint32_t uiBlocksSize = iNumBlocks * static_cast<uint32_t>(sizeof(void*));
-    void** ppBlocks = static_cast<void**>(m_memoryServer->criticalAlloc(uiBlocksSize));
+    Block** ppBlocks = static_cast<Block**>(m_memoryServer->criticalAlloc(uiBlocksSize));
     if (!ppBlocks) {
         return -1;
     }
-    void** ppBlockOut = ppBlocks;
+    Block** ppBlockOut = ppBlocks;
     for (Block* pBlock = m_blocks; pBlock; pBlock = pBlock->m_next) {
         *ppBlockOut++ = pBlock;
     }
-    if (iNumBlocks > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-            ppBlocks,
-            0,
-            iNumBlocks - 1,
-            &hkFreeListAllocator::_comparePointers
-        );
-    }
+    hkAlgorithm::quickSort(ppBlocks, iNumBlocks, &_compareBlocks);
 
     // The division is unsigned.
     int32_t iNumElements = static_cast<uint32_t>(m_blockEnd - m_top) / m_elementSize;
@@ -535,7 +507,7 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
         ++iNumElements;
     }
     uint32_t uiElementsSize = iNumElements * static_cast<uint32_t>(sizeof(void*));
-    void** ppElements = static_cast<void**>(m_memoryServer->criticalAlloc(uiElementsSize));
+    Element** ppElements = static_cast<Element**>(m_memoryServer->criticalAlloc(uiElementsSize));
     if (!ppElements) {
         m_memoryServer->criticalFree(ppBlocks, uiBlocksSize);
         return -1;
@@ -545,36 +517,29 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
         ppElements[iElement++] = pElement;
     }
     for (uint8_t* pTop = m_top; pTop < m_blockEnd; pTop += m_elementSize) {
-        ppElements[iElement++] = pTop;
+        ppElements[iElement++] = reinterpret_cast<Element*>(pTop);
     }
     m_blockEnd = nullptr;
     m_top = nullptr;
-    if (iNumElements > 1) {
-        hkAlgorithm::quickSortRecursive<void*, hkBool (*)(const void*, const void*)>(
-            ppElements,
-            0,
-            iNumElements - 1,
-            &hkFreeListAllocator::_comparePointers
-        );
-    }
+    hkAlgorithm::quickSort(ppElements, iNumElements, &_compareElements);
 
     // Both arrays are sorted: walk the blocks and the elements together. A block whose elements are a run of the free
     // elements, from its start to its end, is all free: it goes onto m_freeBlocks and its entries are cleared from
     // both arrays.
-    void** ppCur = ppElements;
-    void** ppEnd = ppElements + iNumElements;
+    Element** ppCur = ppElements;
+    Element** ppEnd = ppElements + iNumElements;
     int32_t iNumFreed = 0;
     for (uint32_t i = 0; i < static_cast<uint32_t>(iNumBlocks); ++i) {
         if (ppCur >= ppEnd) {
             break;
         }
-        Block* pBlock = static_cast<Block*>(ppBlocks[i]);
+        Block* pBlock = ppBlocks[i];
         uint32_t uiElementSize = m_elementSize;
         uint32_t uiNumElements = pBlock->m_numElements;
         uint8_t* pElement = pBlock->m_start;
         uint8_t* pBlockEnd = pElement + uiElementSize * uiNumElements;
         do {
-            if (static_cast<uint8_t*>(*ppCur) != pElement || pElement >= pBlockEnd) {
+            if (reinterpret_cast<uint8_t*>(*ppCur) != pElement || pElement >= pBlockEnd) {
                 break;
             }
             ++ppCur;
@@ -586,12 +551,12 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
             pBlock->m_next = m_freeBlocks;
             m_freeBlocks = pBlock;
             ppBlocks[i] = nullptr;
-            for (void** ppClear = ppCur - uiNumElements; ppClear < ppCur; ++ppClear) {
+            for (Element** ppClear = ppCur - uiNumElements; ppClear < ppCur; ++ppClear) {
                 *ppClear = nullptr;
             }
         }
         else {
-            while (ppCur < ppEnd && static_cast<uint8_t*>(*ppCur) < pBlockEnd) {
+            while (ppCur < ppEnd && reinterpret_cast<uint8_t*>(*ppCur) < pBlockEnd) {
                 ++ppCur;
             }
         }
@@ -600,7 +565,7 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
     // The lists are rebuilt through the address of each last link.
     Block** ppBlockLink = &m_blocks;
     for (uint32_t i = 0; i < static_cast<uint32_t>(iNumBlocks); ++i) {
-        Block* pBlock = static_cast<Block*>(ppBlocks[i]);
+        Block* pBlock = ppBlocks[i];
         if (pBlock) {
             *ppBlockLink = pBlock;
             ppBlockLink = &pBlock->m_next;
@@ -608,8 +573,8 @@ XFNV_NO_BUILTIN("memset") int32_t hkFreeList::findGarbage() {
     }
     *ppBlockLink = nullptr;
     Element** ppElementLink = &m_free;
-    for (void** ppElement = ppElements; ppElement < ppEnd; ++ppElement) {
-        Element* pFree = static_cast<Element*>(*ppElement);
+    for (Element** ppElement = ppElements; ppElement < ppEnd; ++ppElement) {
+        Element* pFree = *ppElement;
         if (pFree) {
             *ppElementLink = pFree;
             ppElementLink = &pFree->m_next;

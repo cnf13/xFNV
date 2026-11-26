@@ -1,11 +1,12 @@
 #include "Fallout Shared/Sky/SkyObject.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTaskManager.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 SkyObject::SkyObject() : spRoot(nullptr) {}
 

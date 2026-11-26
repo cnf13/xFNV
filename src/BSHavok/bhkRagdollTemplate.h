@@ -73,3 +73,7 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline bhkRagdollTemplateData* bhkRagdollTemplate::GetRagdollTemplateData(uint32_t aiIndex) {
+    return RagdollTemplateA[aiIndex];
+}

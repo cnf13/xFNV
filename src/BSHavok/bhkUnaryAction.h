@@ -50,3 +50,7 @@ struct hkUnaryActionCinfo : public hkActionCinfo {
 
 static_assert(offsetof(hkUnaryActionCinfo::Serialized, m_body) == 0x4);
 static_assert(sizeof(hkUnaryActionCinfo::Serialized) == 0x8);
+
+inline bhkUnaryAction::bhkUnaryAction() {
+    ++iCount;
+}

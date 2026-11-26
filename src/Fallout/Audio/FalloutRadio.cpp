@@ -9,11 +9,12 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSTalkingActivator.h"
 #include "Fallout Shared/MenuGameSettings.h"
 #include "Fallout Shared/Script.h"
@@ -234,7 +235,7 @@ void FalloutRadio::StationState::LoadGame(BGSLoadGameBuffer* apLoadGameBuffer) {
         Conversation* pNewConvo;
         pNewConvo = new Conversation;
         pConvo = pNewConvo;
-        pConvo->LoadGameBGS(static_cast<BGSLoadFormBuffer*>(apLoadGameBuffer));
+        pConvo->LoadGame(static_cast<BGSLoadFormBuffer*>(apLoadGameBuffer));
     }
 }
 
@@ -269,7 +270,7 @@ void FalloutRadio::StationState::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     bool bhasConvo = pConvo != nullptr;
     apSaveGameBuffer->SaveDataEndian(reinterpret_cast<char*>(&bhasConvo), sizeof(bhasConvo), 0);
     if (bhasConvo) {
-        pConvo->SaveGameBGS(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer));
+        pConvo->SaveGame(static_cast<BGSSaveFormBuffer*>(apSaveGameBuffer));
     }
 }
 

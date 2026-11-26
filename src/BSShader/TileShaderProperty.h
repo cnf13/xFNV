@@ -81,3 +81,7 @@ public:
 };
 
 NiSmartPointer(TileShaderProperty);
+
+inline void TileShaderProperty::SetTintColor(const NiColorA& aTintColor) {
+    TintColor = aTintColor;
+}

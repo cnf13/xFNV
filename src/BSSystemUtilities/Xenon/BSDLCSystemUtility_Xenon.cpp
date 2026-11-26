@@ -20,12 +20,6 @@ char return_1_1() {
     return 1;
 }
 
-int32_t BSstricmp(const char* apString1, const char* apString2) {
-    return _stricmp(apString1, apString2);
-}
-
-BSContentPackage::~BSContentPackage() {}
-
 // The lists are built and emptied by BSSimpleList's own constructor and destructor.
 BSDLCSystemUtility::BSDLCSystemUtility() : m_state(0), m_pOfferCountCtx(nullptr), m_pOfferListCtx(nullptr) {}
 

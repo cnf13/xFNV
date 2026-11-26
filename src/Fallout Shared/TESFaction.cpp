@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BaseFormComponent.h"
 #include "Fallout Shared/Script.h"
@@ -131,40 +131,6 @@ bool TESFaction::Load(TESFile* apFile) {
     return true;
 }
 
-bool Cmd_GetPCFactionAttack(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
-    afReturnValue = 0.0;
-    if (apParam1 && static_cast<TESFaction*>(apParam1)->GetPCHasAttackedMember()) {
-        afReturnValue = 1.0;
-    }
-
-    if (Script::bSystemOutput) {
-        if (0.0 == afReturnValue) {
-            Interface::PrintLine("PC did not attack a faction member.");
-        }
-        else {
-            Interface::PrintLine("PC attacked a faction member.");
-        }
-    }
-    return true;
-}
-
-bool Cmd_GetPCEnemyofFaction(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
-    afReturnValue = 0.0;
-    if (apParam1 && static_cast<TESFaction*>(apParam1)->GetPCAnEnemy()) {
-        afReturnValue = 1.0;
-    }
-
-    if (Script::bSystemOutput) {
-        if (0.0 == afReturnValue) {
-            Interface::PrintLine("PC is not an enemy of this faction.");
-        }
-        else {
-            Interface::PrintLine("PC Is an Enemy of the faction.");
-        }
-    }
-    return true;
-}
-
 RANK_DATA::RANK_DATA() : cMaleRankTitle(), cFemaleRankTitle(), TextureInsignia() {}
 
 RANK_DATA::~RANK_DATA() {}
@@ -174,7 +140,7 @@ void RANK_DATA::operator delete(void* apMemory) {
 }
 
 void FACTION_DATA::Endian() {
-    ENDIAN(iFlags, false);
+    BSEndian(iFlags, false);
 }
 
 TESFaction::TESFaction() : TESForm(), TESFullName(), TESReactionForm(), m_rankDataList() {
@@ -261,7 +227,7 @@ void TESFaction::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 
 void TESFaction::SaveGame(uint32_t aiFlags) {
     TESForm::SaveGame(aiFlags);
-    SaveGameTES(aiFlags);
+    TESReactionForm::SaveGame(aiFlags);
     if ((aiFlags & CHANGE_FACTION_FLAGS) != 0) {
         SaveGameDataOLD(&data, sizeof(data));
     }
@@ -282,7 +248,7 @@ void TESFaction::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
 
 void TESFaction::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
     TESForm::LoadGame(aiFlags, aiCurrentFlags);
-    LoadGameTES(aiFlags, aiCurrentFlags);
+    TESReactionForm::LoadGame(aiFlags, aiCurrentFlags);
     if ((aiFlags & CHANGE_FACTION_FLAGS) != 0) {
         LoadGameDataOLD(&data, sizeof(data));
     }

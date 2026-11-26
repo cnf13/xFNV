@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSBipedModelList.h"
@@ -37,8 +37,8 @@
 #include <limits>
 
 void CONTAINER_OBJECT_FILE::Endian() {
-    ENDIAN(iObjectID, false);
-    ENDIAN(iCount, false);
+    BSEndian(iObjectID, false);
+    BSEndian(iCount, false);
 }
 
 ContainerObject::ContainerObject() : i_count(1), pObj(nullptr), pItemExtra(nullptr) {}

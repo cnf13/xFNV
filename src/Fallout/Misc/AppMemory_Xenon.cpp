@@ -1,5 +1,6 @@
 #include "BSCore/MemoryHeap.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/ZeroOverheadHeap.h"
 
 void MemoryManager::SpecifyMemoryLayout() {

@@ -57,7 +57,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -1155,7 +1155,7 @@ void SPECIALBookMenu::InitBook() {
     );
     Pages[8].Buttons.Add(pPrevious);
 
-    LoadBBTextures();
+    LoadButtonAndTextImages();
     // Every page's refresh callbacks, each item and button fetched once for the argument and once for the call.
     for (int32_t i = 0; i < 9; ++i) {
         for (uint32_t uiItem = 0; uiItem < Pages[i].TextItems.iSize; ++uiItem) {
@@ -1169,7 +1169,7 @@ void SPECIALBookMenu::InitBook() {
     }
 }
 
-void SPECIALBookMenu::LoadBBTextures() {
+void SPECIALBookMenu::LoadButtonAndTextImages() {
     char acPlatform[8];
     char acDest[264];
     char acPath[260];
@@ -1291,7 +1291,7 @@ void SPECIALBookMenu::Draw3DElements() {
         BSCullingProcess* pCuller = Main::GetWorldSceneGraph()->pCuller;
         pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         NiCamera* pcam = SPECIALBookMenu::sp3DCamera.m_pObject;
-        NiCamera::HandleEyeFinityFOVScale(pcam, 0.15f);
+        HandleEyeFinityFOVScale(pcam, 0.15f);
         NiPointer<BSShaderAccumulator> spaccum(InterfaceManager::Instance()->Get3dAccumulator());
         pCuller->SetAccumulator(spaccum.m_pObject);
         BSShaderUtil::AccumulateScene(pcam, BSShaderManager::GetShadowSceneNode(1), *pCuller);

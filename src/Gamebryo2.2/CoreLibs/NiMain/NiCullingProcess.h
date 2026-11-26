@@ -113,3 +113,11 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline const NiCamera* NiCullingProcess::GetCamera() const {
+    return m_pkCamera;
+}
+
+inline const NiFrustumPlanes& NiCullingProcess::GetFrustumPlanes() const {
+    return m_kPlanes;
+}

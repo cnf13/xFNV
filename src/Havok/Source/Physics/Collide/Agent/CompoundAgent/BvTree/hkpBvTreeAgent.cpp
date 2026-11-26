@@ -1,10 +1,11 @@
 #include "Havok/Source/Physics/Collide/Agent/CompoundAgent/BvTree/hkpBvTreeAgent.h"
 
 #include "Havok/Source/Animation/Animation/Ik/LookAt/hkaLookAtIkSolver.h"
+#include "Havok/Source/Common/Base/Algorithm/Sort/hkSort.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
-#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Container/LocalArray/hkLocalArray.h"
 #include "Havok/Source/Common/Base/DebugUtil/StatisticsCollector/hkStatisticsCollector.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkRotation.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
@@ -14,31 +15,30 @@
 #include "Havok/Source/Common/Base/Memory/Allocator/FreeList/hkFreeListAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
-#include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
 #include "Havok/Source/Common/Base/Memory/Util/hkMemUtil.h"
+#include "Havok/Source/Common/Base/Memory/Util/Stack/hkStackMemory.h"
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Object/hkBaseObject.h"
 #include "Havok/Source/Common/Base/Object/hkReferencedObject.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/Thread/Thread/hkThreadLocalData.h"
 #include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
-#include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
-#include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
+#include "Havok/Source/Common/Base/Types/Physics/hkStepInfo.h"
+#include "Havok/Source/Common/Base/Types/Physics/MotionState/hkMotionState.h"
 #include "Havok/Source/Physics/Collide/Agent/Collidable/hkpCdBody.h"
-#include "Havok/Source/Physics/Collide/Agent/CompoundAgent/BvTreeStream/hkpBvTreeStreamAgent.h"
 #include "Havok/Source/Physics/Collide/Agent/ContactMgr/hkpContactMgr.h"
-#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdBodyPairCollector.h"
-#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
-#include "Havok/Source/Physics/Collide/Agent/Query/hkpLinearCastCollisionInput.h"
-#include "Havok/Source/Physics/Collide/Agent/Util/Null/hkpNullAgent.h"
-#include "Havok/Source/Physics/Collide/Agent/Util/Symmetric/hkpSymmetricAgent.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionAgent.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionInput.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpCollisionQualityInfo.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionData.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionInput.h"
 #include "Havok/Source/Physics/Collide/Agent/hkpProcessCollisionOutput.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdBodyPairCollector.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpCdPointCollector.h"
+#include "Havok/Source/Physics/Collide/Agent/Query/hkpLinearCastCollisionInput.h"
+#include "Havok/Source/Physics/Collide/Agent/Util/Null/hkpNullAgent.h"
+#include "Havok/Source/Physics/Collide/Agent/Util/Symmetric/hkpSymmetricAgent.h"
 #include "Havok/Source/Physics/Collide/Dispatch/hkpCollisionDispatcher.h"
 #include "Havok/Source/Physics/Collide/Filter/hkpCollisionFilter.h"
 #include "Havok/Source/Physics/Collide/Filter/hkpShapeCollectionFilter.h"
@@ -134,11 +134,7 @@ void hkpAgentDispatchUtil<KEY, INFO, HELPER>::update(
     hkpConstraintOwner& constraintOwner,
     HELPER& helper
 ) {
-    // The comparator object (hkAlgorithm::less, an empty class), passed as its one byte.
-    uint8_t lessCmp = 0;
-    if (keys.m_size > 1) {
-        quickSortRecursive(keys.m_data, 0, keys.m_size - 1, lessCmp);
-    }
+    hkAlgorithm::quickSort(keys.m_data, keys.m_size);
     INFO* entry = partners.m_data;
     // The ends on the addresses, as in fastUpdate.
     INFO* entryEnd = reinterpret_cast<INFO*>(

@@ -1,8 +1,10 @@
 #include "Fallout Shared/GridCell.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/bhkWorldM.h"
 #include "BSMain/BSCullingProcess.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderManager.h"
@@ -25,7 +27,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDynamicEffect.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMaterialProperty.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -37,6 +38,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriStripsData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiVector4.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 
 // Flips every call, so the edge cells alternate between dynamic and large-only updates.
@@ -46,7 +48,7 @@ static uint8_t bSwitch;
 SettingT<INISettingCollection> uGridsToLoad("uGridsToLoad:General", 5u);
 // TES.h declares this; it is defined here, after the uGridsToLoad setting its default reads, so that setting is
 // constructed first whatever order the files are linked in.
-SettingT<INISettingCollection> uExteriorCellBuffer(
+SettingT<INISettingCollection> iExteriorBufferSize(
     "uExterior Cell Buffer:General",
     uGridsToLoad.UInt() * uGridsToLoad.UInt() + uGridsToLoad.UInt() + uGridsToLoad.UInt() + 1
 );
@@ -595,33 +597,4 @@ void GridCellArray::FixGridsToLoadINISetting() {
     else if ((uGridsToLoad.UInt() & 1) == 0) {
         uGridsToLoad = static_cast<int32_t>(uGridsToLoad.UInt() + 1);
     }
-}
-
-void BSShaderAccumulator::SetAccumulate(bool abTF) {
-    bAccumulate = abTF;
-}
-
-void ShadowLightShader::SetProjectedShadowMaskLL(NiPoint2 aLL) {
-    ShadowLightShader::kShadowProjData.x = aLL.x;
-    ShadowLightShader::kShadowProjData.y = aLL.y;
-}
-
-void NiDynamicEffect::IncRevisionID() {
-    ++m_uiRevID;
-}
-
-void NiMaterialProperty::SetAmbientColor(const NiColor& c) {}
-
-void NiMaterialProperty::SetDiffuseColor(const NiColor& c) {}
-
-NiTexture* NiTexturingProperty::Map::GetTexture() const {
-    return m_spTexture.m_pObject;
-}
-
-NiTexture* NiTexturingProperty::GetBaseTexture() {
-    Map* pkMap = m_kMaps[BASE_INDEX];
-    if (pkMap) {
-        return pkMap->GetTexture();
-    }
-    return nullptr;
 }

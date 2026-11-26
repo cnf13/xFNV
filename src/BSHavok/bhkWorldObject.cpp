@@ -15,7 +15,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefCount.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -549,3 +549,5 @@ bhkWorldObject::GetProperty(hkpPropertyValue* apResult, const hkpWorldObject* ap
     apResult->m_data = static_cast<uint64_t>(static_cast<int64_t>(iData));
     return apResult;
 }
+
+hkWorldObjectCinfo::~hkWorldObjectCinfo() {}

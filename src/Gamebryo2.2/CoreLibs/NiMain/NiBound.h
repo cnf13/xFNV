@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPlane.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
@@ -53,3 +53,11 @@ public:
     // Merge keeps the centre when the two centres are no farther apart than this.
     static inline float ms_fTolerance = 1e-06f;
 };
+
+inline const NiPoint3& NiBound::GetCenter() const {
+    return m_kCenter;
+}
+
+inline void NiBound::SetCenter(float x, float y, float z) {
+    m_kCenter = NiPoint3(x, y, z);
+}

@@ -2,6 +2,7 @@
 
 #include "BSMain/Setting.h"
 #include "Fallout Shared/TESAnimGroup.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include <stdint.h>
 
@@ -35,7 +36,6 @@ char RotateSlot(char acSlot, char acAmount);
 char GetSlotFromAngle(float afAngle);
 uint32_t ReserveSlot(uint32_t aiSlots, char acSlot);
 char FindSlot(uint32_t aiSlots, char acDesiredSlot);
-double NiATan(float afX);
 
 // CombatUtilities has only static members.
 class CombatUtilities {

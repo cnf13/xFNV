@@ -100,3 +100,10 @@ public:
     // The process-wide add-moving-sound callback, called by the audio manager.
     static inline AddMovingSoundCallback* pfnAddMovingSoundCallback;
 };
+
+inline BSSoundHandle::BSSoundHandle(uint32_t aiID)
+  : iSoundID(static_cast<int32_t>(aiID)), bAssumeSuccess(false), eState(ASSUMED_STATE_INITIALIZED) {}
+
+inline uint32_t BSSoundHandle::GetID() const {
+    return iSoundID;
+}

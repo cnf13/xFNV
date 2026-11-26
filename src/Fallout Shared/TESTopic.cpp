@@ -5,6 +5,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "Fallout Shared/ContainerItemExtra.h"

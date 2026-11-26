@@ -8,7 +8,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustumPlanes.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -167,3 +167,5 @@ void BSMultiBoundSphere::CopyMembers(BSMultiBoundSphere* pDest, NiCloningProcess
 NiObject* BSMultiBoundSphere::CreateObject() {
     return new BSMultiBoundSphere;
 }
+
+BSMultiBoundSphere::~BSMultiBoundSphere() {}

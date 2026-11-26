@@ -62,7 +62,7 @@ public:
     void LoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
     // Reads the position, the rotation and the linked door's form ID (into pLinkedDoor, resolved later)
     // from the old-format save (TESSaveLoadGame).
-    void LoadGameTES();
+    void LoadGame();
     BGSWorldLocation* GetTeleportWorldLocation(BGSWorldLocation* apResult);
     // Compares the door, position, rotation and flags of the two.
     bool Compare(DoorTeleportData* apCompare);
@@ -71,7 +71,7 @@ public:
     uint16_t GetSaveSize();
     // Resolves the linked door's saved form ID; ExtraDataList::InitLoadGame calls it on ExtraTeleport::pTeleportData.
     void InitLoadGame(BGSLoadGameBuffer* apLoadGameBuffer);
-    // Resolves the saved form ID in pLinkedDoor. No return value: its one caller, ExtraDataList::InitLoadGameTES, does
+    // Resolves the saved form ID in pLinkedDoor. No return value: its one caller, ExtraDataList::InitLoadGame, does
     // not use a result.
     void FinishInitLoadGame();
     // Writes the XTEL chunk.

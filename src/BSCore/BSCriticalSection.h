@@ -23,3 +23,11 @@ public:
     // The Win32 section (0x28 bytes; the exe's is 0x18), handed to the critical-section imports as is.
     _RTL_CRITICAL_SECTION CriticalSection;
 };
+
+inline void BSCriticalSection::Enter(const char* apName) {
+    Lock(apName);
+}
+
+inline void BSCriticalSection::Leave() {
+    Unlock();
+}

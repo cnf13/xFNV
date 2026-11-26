@@ -4,7 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiTextKeyExtraData.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiTransformController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"

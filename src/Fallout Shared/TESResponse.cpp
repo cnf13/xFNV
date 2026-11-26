@@ -2,12 +2,14 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSTalkingActivator.h"
 #include "Fallout Shared/BGSVoiceType.h"
 #include "Fallout Shared/GlobalFunc.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESFile.h"
@@ -28,11 +30,11 @@
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
 
-SettingT<INISettingCollection> gs_sFileTypeGame_Voice("sFileTypeGame:Voice", "mp3");
+SettingT<INISettingCollection> TESResponse::sFileTypeGame("sFileTypeGame:Voice", "mp3");
 SettingT<INISettingCollection> TESResponse::sFileTypeSource("sFileTypeSource:Voice", "wav");
 SettingT<INISettingCollection> TESResponse::sFileTypeLip("sFileTypeLip:Voice", "lip");
 SettingT<INISettingCollection> TESResponse::sFileTypeLTF("sFileTypeLTF:Voice", "ltf");
-SettingT<GameSettingCollection> gs_iStandardEmotionValue("iStandardEmotionValue", 100);
+SettingT<GameSettingCollection> TESResponse::iStandardEmotionValue("iStandardEmotionValue", 100);
 
 void TESResponse::Load(TESFile* apFile) {
     if (apFile && apFile->GetTESChunk() == TRDT_ID) {
@@ -56,10 +58,10 @@ RESPONSE_DATA::RESPONSE_DATA()
     bUseEmotion(true) {}
 
 void RESPONSE_DATA::Endian() {
-    ENDIAN(eEmotion, false);
-    ENDIAN(iEmotionValue, false);
-    ENDIAN(pConversationTopic, false);
-    ENDIAN(pVoiceSound, false);
+    BSEndian(eEmotion, false);
+    BSEndian(iEmotionValue, false);
+    BSEndian(pConversationTopic, false);
+    BSEndian(pVoiceSound, false);
 }
 
 TESResponse::TESResponse() : Data(), cResponseText(), pSpeakerIdle(nullptr), pListenerIdle(nullptr), pNext(nullptr) {
@@ -121,7 +123,7 @@ bool TESResponse::GetAudioFullPath(
             return false;
         }
     }
-    const char* pExtension = gs_sFileTypeGame_Voice.String();
+    const char* pExtension = TESResponse::sFileTypeGame.String();
     TestAudioFullPath(aFullPath, pDirPath, pMPFileName, pVoiceTypeName, fileName.pString, pExtension);
     return true;
 }
@@ -296,7 +298,7 @@ void TESResponse::InitItem(TESForm* apOwner) {
         }
     }
     if (Data.eEmotion) {
-        Data.iEmotionValue = gs_iStandardEmotionValue.Int();
+        Data.iEmotionValue = TESResponse::iStandardEmotionValue.Int();
     }
 }
 

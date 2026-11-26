@@ -40,3 +40,5 @@ void bhkAcousticSpacePhantomCallbackShape::phantomLeaveEvent(
         pworld->QAcousticSpaceListener()->contactPointRemovedCallback(point);
     }
 }
+
+bhkAcousticSpacePhantomCallbackShape::bhkAcousticSpacePhantomCallbackShape() {}

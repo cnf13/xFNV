@@ -57,6 +57,15 @@ public:
     // Whether tree leaves are shown: trees are enabled and the manager shows leaves.
     static bool AreLeavesVisible();
     static bool GetUseCanopyShadows();
+    static bool CanTreesLoad();
+    static float GetForceCurveScalar();
+    static float GetForceBranchDimming();
+    static float GetForceLeafDimming();
+    static float GetForceMinimumBudAngle();
+    static float GetForceMaximumBudAngle();
+    static float GetNearDistanceBase();
+    static float GetFarDistanceBase();
+    static float GetSizeConversion();
     // The tree near distance: the base distance scaled by the tree LOD multiplier.
     static float GetNearDistance();
     // The tree far distance: the base distance scaled by the tree LOD multiplier.
@@ -101,6 +110,25 @@ public:
     static SettingT<INISettingCollection> bForceFullLOD;
     static SettingT<INISettingCollection> fTreeLODExponent;
     static SettingT<INISettingCollection> fTreeForceLLA;
+
+protected:
+    // These are constructed with SettingT<GameSettingCollection>'s float constructor.
+    static SettingT<GameSettingCollection> fTreeNearDistanceBase;
+    static SettingT<GameSettingCollection> fTreeFarDistanceBase;
+    static SettingT<GameSettingCollection> fTreeSizeConversion;
+    static SettingT<GameSettingCollection> fLeafRustleTimeScale;
+    static SettingT<GameSettingCollection> fLeafRockSpeedSwayInfluence;
+    static SettingT<GameSettingCollection> fLeafRustleSpeedSwayInfluence;
+    static SettingT<GameSettingCollection> fLeafRockAmountSwayInfluence;
+    static SettingT<GameSettingCollection> fLeafRustleAmountSwayInfluence;
+    static SettingT<INISettingCollection> bEnableTrees;
+    static SettingT<INISettingCollection> fTreeForceCS;
+    static SettingT<INISettingCollection> fTreeForceBranchDimming;
+    static SettingT<INISettingCollection> fTreeForceLeafDimming;
+    static SettingT<INISettingCollection> fTreeForceMinBudAngle;
+    static SettingT<INISettingCollection> fTreeForceMaxBudAngle;
+    static SettingT<INISettingCollection> iCanopyShadowScale;
+    static SettingT<INISettingCollection> fCanopyShadowGrassMult;
 };
 
 // The tables BSTreeManager::UpdateWindMatrices reads and writes: a table of eight floats and a table of four floats.
@@ -109,45 +137,38 @@ using LeafSwayPhaseTable = float[4];
 
 inline BSTreeManager* pTreeManager;
 
-extern SettingT<INISettingCollection> gs_fCanopyShadowGrassMult_SpeedTree;
+inline bool BSTreeManager::CanTreesLoad() {
+    return BSTreeManager::bEnableTrees.Bool();
+}
 
-extern SettingT<INISettingCollection> gs_iCanopyShadowScale_SpeedTree;
+inline float BSTreeManager::GetForceCurveScalar() {
+    return BSTreeManager::fTreeForceCS.Float();
+}
 
-// The value getters of BSTreeManager's tree settings (bEnableTrees, fTreeForceCS, ...).
-namespace SpeedTree {
-    namespace bEnableTrees {
-        bool Get();
-    }
-    namespace fTreeForceCS {
-        float Get();
-    }
-    namespace fTreeForceBranchDimming {
-        float Get();
-    }
-    namespace fTreeForceLeafDimming {
-        float Get();
-    }
-    namespace fTreeForceMinBudAngle {
-        float Get();
-    }
-    namespace fTreeForceMaxBudAngle {
-        float Get();
-    }
-    // Clamps afValue to [0, 1] (NaN gives 0) and stores it as the grass's canopy shadow multiplier.
-    namespace fCanopyShadowGrassMult {
-        void Set(float afValue);
-    }
-} // namespace SpeedTree
+inline float BSTreeManager::GetForceBranchDimming() {
+    return BSTreeManager::fTreeForceBranchDimming.Float();
+}
 
-// Getters of the tree settings BSTreeManager::fTreeNearDistanceBase and BSTreeManager::fTreeSizeConversion.
-namespace GameSetting {
-    namespace fTreeNearDistanceBase {
-        float Get();
-    }
-    namespace fTreeFarDistanceBase {
-        float Get();
-    }
-    namespace fTreeSizeConversion {
-        float Get();
-    }
-} // namespace GameSetting
+inline float BSTreeManager::GetForceLeafDimming() {
+    return BSTreeManager::fTreeForceLeafDimming.Float();
+}
+
+inline float BSTreeManager::GetForceMinimumBudAngle() {
+    return BSTreeManager::fTreeForceMinBudAngle.Float();
+}
+
+inline float BSTreeManager::GetForceMaximumBudAngle() {
+    return BSTreeManager::fTreeForceMaxBudAngle.Float();
+}
+
+inline float BSTreeManager::GetNearDistanceBase() {
+    return BSTreeManager::fTreeNearDistanceBase.Float();
+}
+
+inline float BSTreeManager::GetFarDistanceBase() {
+    return BSTreeManager::fTreeFarDistanceBase.Float();
+}
+
+inline float BSTreeManager::GetSizeConversion() {
+    return BSTreeManager::fTreeSizeConversion.Float();
+}

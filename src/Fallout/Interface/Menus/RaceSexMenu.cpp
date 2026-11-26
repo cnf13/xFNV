@@ -14,8 +14,7 @@
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
 #include "BSMenu/TileImage.h"
@@ -31,13 +30,13 @@
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"
 #include "Fallout Shared/FaceGen/BSFaceGenModelExtraData.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
 #include "Fallout Shared/FaceGen/FaceGenDatas.h"
 #include "Fallout Shared/FaceGenNpcData.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/InventoryChanges.h"
 #include "Fallout Shared/MenuGameSettings.h"
 #include "Fallout Shared/ModelLoader.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESActorBaseData.h"
@@ -79,11 +78,12 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeom.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "SDK/FaceGen/MatrixVT.h"
 #include "SDK/MSVC/tchar.h"
 
 #include <cstring>
 
-static SettingT<INISettingCollection> gs_fRSMStartingZoom_Interface("fRSMStartingZoom:Interface", 0.7f);
+SettingT<INISettingCollection> RaceSexMenu::fStartingZoom("fRSMStartingZoom:Interface", 0.7f);
 
 // The game settings this file defines, with their IDs and values, in initialization order.
 BSStringT<char> RaceSexMenu::strNextCaps;
@@ -1215,7 +1215,7 @@ void RaceSexMenu::_Create(RaceSexMenuContext aeContext) {
     const char* pTitle = kTitle.String();
     const char* pConfirm = sRSMConfirmDone.String();
     strConfirmationMsg.SPrintF("%s %s?", pConfirm, pTitle);
-    float fZoom = BSMIN(1.0f, gs_fRSMStartingZoom_Interface.Float());
+    float fZoom = BSMIN(1.0f, RaceSexMenu::fStartingZoom.Float());
     fZoomPct = BSMAX(0.0f, fZoom);
     fZoomTarget = fZoomPct;
     pOptionListsA[0]->UpdateCurrentSelection();

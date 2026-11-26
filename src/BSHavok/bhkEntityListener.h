@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntityListener.h"
 

@@ -1,4 +1,5 @@
 #include "Fallout/AI/HighProcess.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 
 #include "BSAudio/BSAudio.h"
@@ -27,7 +28,7 @@
 #include "BSMain/BSPortal.h"
 #include "BSMain/NiBSBoneLODController.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "BSSystem/BSTMessageQueue.h"
@@ -165,11 +166,11 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBillboardNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiDefaultAVObjectPalette.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/BodyPairCollector/hkpAllCdBodyPairCollector.h"
 #include "Havok/Source/Physics/Collide/Shape/Convex/Box/hkpBoxShape.h"
@@ -6833,7 +6834,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         DialogueItem* pTopic;
         pTopic = new DialogueItem;
         pGreetTopic = pTopic;
-        pGreetTopic->LoadGameBGS(apLoadGameBuffer);
+        pGreetTopic->LoadGame(apLoadGameBuffer);
     }
     isaveGameCount = apLoadGameBuffer->LoadVariableSizedValue();
     if (isaveGameCount) {
@@ -6847,7 +6848,7 @@ void HighProcess::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
         for (uint32_t iloop = 0; iloop < isaveGameCount; ++iloop) {
             AvoidAreaStruct* pavoidArea;
             pavoidArea = new AvoidAreaStruct;
-            pavoidArea->LoadGameBGS(apLoadGameBuffer);
+            pavoidArea->LoadGame(apLoadGameBuffer);
             pListOfAvoidAreas->AddHead(pavoidArea);
         }
     }
@@ -11990,7 +11991,7 @@ void HighProcess::ProcessWander(Actor* apActor, const NiPoint3* apCenter, float 
             else {
                 fDelayTimer = 0.0f;
             }
-            if (Interface::GetConsoleSelection() == apActor) {
+            if (Interface::GetPickREFR() == apActor) {
                 char Format[308];
                 std::sprintf(
                     Format,
@@ -13649,7 +13650,7 @@ bool HighProcess::ProcessWanderOneHour(Actor* apActor, float afTimeDelta) {
     }
     TESWorldSpace* pWorldSpace = apActor->GetWorldSpace();
     apActor->SetPathfindingGoal(wanderPoint, apActor->GetParentCell(), pWorldSpace, 100.0f, nullptr);
-    if (Interface::GetConsoleSelection() == apActor) {
+    if (Interface::GetPickREFR() == apActor) {
         char buffer[308];
         std::sprintf(
             buffer,
@@ -13695,7 +13696,7 @@ bool HighProcess::AimAtTarget(Actor* apActor, TESObjectREFR* apTarget, bool abHi
         float fSpeedMult;
         NiPoint3 projectedPoint;
         if (abHighArc) {
-            fSpeedMult = gs_fGrenadeHighArcSpeedPercentage.Float();
+            fSpeedMult = fGrenadeHighArcSpeedMult.Float();
         }
         else {
             fSpeedMult = 1.0;
@@ -14442,20 +14443,6 @@ bool HighProcess::FindDoorsToSendYellAlarm(TESObjectREFR* apRef, void* aiFilterD
     }
 
     return false;
-}
-
-NiPoint3 bhkBoxShape::GetHalfExtents() {
-    NiPoint3 halfExtents;
-    return HK2NI(halfExtents, GethkHalfExtents());
-}
-
-const hkVector4& bhkBoxShape::GethkHalfExtents() {
-    hkpBoxShape* pb = static_cast<hkpBoxShape*>(**this);
-    if (pb) {
-        return pb->m_halfExtents;
-    }
-
-    return hkVector4::getZero();
 }
 
 Script* TESPackage::GetOnChangeScript() {

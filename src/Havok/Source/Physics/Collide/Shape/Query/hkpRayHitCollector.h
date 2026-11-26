@@ -24,3 +24,9 @@ public:
 
     float m_earlyOutHitFraction;
 };
+
+inline hkpRayHitCollector::hkpRayHitCollector() {
+    reset();
+}
+
+inline hkpRayHitCollector::~hkpRayHitCollector() {}

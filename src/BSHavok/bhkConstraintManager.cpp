@@ -13,7 +13,6 @@
 #include "BSHavok/bhkWheelConstraint.h"
 #include "BSHavok/hkPointToPathConstraintCinfo.h"
 #include "BSMain/BSCloningProcess.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"

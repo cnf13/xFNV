@@ -1,6 +1,6 @@
 #include "SpeedTree/IndexedGeometry.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "SDK/MSVC/crtdefs.h"
 #include "SDK/MSVC/string.h"
 #include "SpeedTree/LibVector_Source/IdvVector.h"

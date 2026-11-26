@@ -1,20 +1,19 @@
 #include "BSHavok/bhkTriSampledHeightFieldBvTreeShape.h"
 
+#include "BSCore/BSCoreDefines.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/bhkBvTreeShape.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkStream.h"
 #include "BSHavok/hkBSHeightFieldShape.h"
-#include "Fallout Shared/Havok/CellMopp.h"
-#include "Fallout Shared/TESFile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4Util.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
@@ -69,10 +68,10 @@ void bhkTriSampledHeightFieldBvTreeShape::LoadBinary(NiStream& arStream) {
             CreateCinfo(bCreated)
         );
         bhkStream::Endian(cinfo.m_scale);
-        ENDIAN(cinfo.m_xRes, false);
-        ENDIAN(cinfo.m_zRes, false);
-        ENDIAN(cinfo.m_minHeight, false);
-        ENDIAN(cinfo.m_maxHeight, false);
+        BSEndian(cinfo.m_xRes, false);
+        BSEndian(cinfo.m_zRes, false);
+        BSEndian(cinfo.m_minHeight, false);
+        BSEndian(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
 }
@@ -87,19 +86,19 @@ void bhkTriSampledHeightFieldBvTreeShape::SaveBinary(NiStream& arStream) {
     );
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.m_scale);
-        ENDIAN(cinfo.m_xRes, false);
-        ENDIAN(cinfo.m_zRes, false);
-        ENDIAN(cinfo.m_minHeight, false);
-        ENDIAN(cinfo.m_maxHeight, false);
+        BSEndian(cinfo.m_xRes, false);
+        BSEndian(cinfo.m_zRes, false);
+        BSEndian(cinfo.m_minHeight, false);
+        BSEndian(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
     bhkBvTreeShape::SaveBinary(arStream);
     if (*static_cast<const uint8_t*>(static_cast<const void*>(&arStream.m_bSaveLittleEndian)) != 1) {
         bhkStream::Endian(cinfo.m_scale);
-        ENDIAN(cinfo.m_xRes, false);
-        ENDIAN(cinfo.m_zRes, false);
-        ENDIAN(cinfo.m_minHeight, false);
-        ENDIAN(cinfo.m_maxHeight, false);
+        BSEndian(cinfo.m_xRes, false);
+        BSEndian(cinfo.m_zRes, false);
+        BSEndian(cinfo.m_minHeight, false);
+        BSEndian(cinfo.m_maxHeight, false);
         cinfo.pData = nullptr;
     }
 }
@@ -315,3 +314,5 @@ void hkBSHeightFieldShape::collideSpheres(
         output[0](3) = absoluteDepth;
     }
 }
+
+hkTriSampledHeightFieldBvTreeShapeCinfo::hkTriSampledHeightFieldBvTreeShapeCinfo() {}

@@ -1,6 +1,6 @@
 #include "Havok/Source/Physics/Dynamics/World/Listener/hkpWorldPostSimulationListener.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 
 hkpWorldPostSimulationListener::~hkpWorldPostSimulationListener() {}

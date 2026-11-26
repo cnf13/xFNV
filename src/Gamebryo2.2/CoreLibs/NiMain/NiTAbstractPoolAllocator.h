@@ -2,7 +2,8 @@
 
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/MemoryManager.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "BSCore/NewOverloads.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 // Base of the node allocators of the lists and maps. A node holds the free-list link, a data pointer and one element;
 // a list or map reuses the node memory as its own item type. The pool's state (block list, free list, lock) is static
@@ -113,3 +114,36 @@ public:
     // The nodes CreateFreeMem allocates at a time.
     static uint32_t ms_uiBlockSize;
 };
+
+inline void NiTAbstractPoolAllocator<uint32_t>::CreateFreeMem() {
+    uint32_t uiPrev;
+    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem = static_cast<NiTAbstractPoolAllocator<uint32_t>::AllocNode*>(
+        ourMalloc(
+            NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize <=
+                    SIZE_MAX / sizeof(NiTAbstractPoolAllocator<uint32_t>::AllocNode)
+                ? sizeof(NiTAbstractPoolAllocator<uint32_t>::AllocNode) *
+                    NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize
+                : SIZE_MAX
+        )
+    );
+    NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize - 1]
+        .m_pkNext = nullptr;
+    uint32_t i = 1;
+    do {
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[i]
+            .m_pkNext = &NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem[i + 1];
+        uiPrev = i++;
+    }
+    while (uiPrev < NiTAbstractPoolAllocator<uint32_t>::ms_uiBlockSize - 2);
+
+    if (NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader) {
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem
+            ->m_pkNext = NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader;
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
+    }
+    else {
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkBlockHeader = NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
+        NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem->m_pkNext = nullptr;
+    }
+    ++NiTAbstractPoolAllocator<uint32_t>::ms_pkFreeMem;
+}

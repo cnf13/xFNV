@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -112,7 +113,7 @@ public:
     void SpinWheel();
     bool SetBet(int32_t aiIndex);
     bool IsBetChipHidden(int32_t aiIndex);
-    void SetupPossibleBets();
+    void PrepareBetTiles();
     bool RemoveBet(int32_t aiIndex);
     void RemoveBetNif(int32_t aiIndex);
     void SetWinningSlotLuckyAndAnimToPlay();
@@ -151,7 +152,7 @@ public:
     NiControllerManager* pTableAnimManager;
     // One spin animation per SpinWheel animation index.
     NiControllerSequence* pTableAnimations[3];
-    // The bet tiles' hover radii, set by SetupPossibleBets: fValidRadius is 0.49 of fRadius, and fSpecialRadius has one
+    // The bet tiles' hover radii, set by PrepareBetTiles: fValidRadius is 0.49 of fRadius, and fSpecialRadius has one
     // per special bet tile (tiles 144 to 158; see ComputeHoveredTileID).
     float fRadius;
     float fValidRadius;
@@ -188,13 +189,13 @@ public:
     static NiPointer<NiCamera> sp3DCamera;
 };
 
-extern SettingT<GameSettingCollection> gs_sOddtext;
+extern SettingT<GameSettingCollection> sOddText;
 
 // The game settings DoIdle reads.
 extern SettingT<GameSettingCollection> sYouWinText;
 
 extern SettingT<GameSettingCollection> sYouLoseText;
 
-extern SettingT<GameSettingCollection> sCasinoEarningsText;
+extern SettingT<GameSettingCollection> sEarningsText;
 
-extern SettingT<GameSettingCollection> gs_sBlacktext;
+extern SettingT<GameSettingCollection> sBlackText;

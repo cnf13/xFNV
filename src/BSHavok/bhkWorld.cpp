@@ -44,12 +44,12 @@
 #include "BSHavok/bhkNiTriStripsShape.h"
 #include "BSHavok/bhkOnStartupCallback.h"
 #include "BSHavok/bhkOrientHingedBodyAction.h"
-#include "BSHavok/bhkPCollisionObject.h"
 #include "BSHavok/bhkPackedNiTriStripsShape.h"
+#include "BSHavok/bhkPCollisionObject.h"
 #include "BSHavok/bhkPhantom.h"
 #include "BSHavok/bhkPhantomOverlapListener.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkPlaneShape.h"
+#include "BSHavok/bhkPoseArray.h"
 #include "BSHavok/bhkPrismaticConstraint.h"
 #include "BSHavok/bhkRagdollConstraint.h"
 #include "BSHavok/bhkRagdollLimitsConstraint.h"
@@ -57,9 +57,9 @@
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkRigidBodyT.h"
-#include "BSHavok/bhkSPCollisionObject.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
+#include "BSHavok/bhkSPCollisionObject.h"
 #include "BSHavok/bhkSphereShape.h"
 #include "BSHavok/bhkSpringAction.h"
 #include "BSHavok/bhkStiffSpringConstraint.h"
@@ -73,10 +73,10 @@
 #include "BSHavok/bhkWorldObject.h"
 #include "BSHavok/hkPackedNiTriStripsShape.h"
 #include "BSMain/BSXFlags.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderProperty.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/BGSAcousticSpaceListener.h"
-#include "Fallout Shared/Havok/SpecificItemCollector.h"
 #include "Fallout Shared/Havok/TESWaterListener.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadManager.h"
@@ -93,12 +93,11 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArrayUtil.h"
-#include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
 #include "Havok/Source/Common/Base/Container/hkContainerAllocators.h"
+#include "Havok/Source/Common/Base/Container/String/hkStringPtr.h"
 #include "Havok/Source/Common/Base/Math/Matrix/hkTransform.h"
 #include "Havok/Source/Common/Base/Math/Quaternion/hkQuaternion.h"
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
-#include "Havok/Source/Common/Base/Math/hkMath.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Memory/System/FreeList/hkFreeListMemorySystem.h"
@@ -106,8 +105,8 @@
 #include "Havok/Source/Common/Base/Monitor/hkMonitorStream.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
 #include "Havok/Source/Common/Base/System/Error/hkError.h"
-#include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/System/hkBaseSystem.h"
+#include "Havok/Source/Common/Base/System/Io/OStream/hkOStream.h"
 #include "Havok/Source/Common/Base/Thread/Pool/hkJobThreadPool.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 #include "Havok/Source/Common/Internal/GeometryProcessing/ConvexHull/hkgpConvexHull.h"
@@ -125,18 +124,19 @@
 #include "Havok/Source/Physics/Collide/Filter/hkpShapeCollectionFilter.h"
 #include "Havok/Source/Physics/Collide/Query/CastUtil/hkpWorldRayCaster.h"
 #include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpAllRayHitCollector.h"
+#include "Havok/Source/Physics/Collide/Query/Collector/RayCollector/hkpClosestRayHitCollector.h"
 #include "Havok/Source/Physics/Dynamics/Action/hkpAction.h"
 #include "Havok/Source/Physics/Dynamics/Action/hkpMotorAction.h"
 #include "Havok/Source/Physics/Dynamics/Constraint/hkpConstraintInstance.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpEntity.h"
 #include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
 #include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
-#include "Havok/Source/Physics/Dynamics/World/Util/hkpWorldOperationUtil.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpPhysicsSystem.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpSimulationIsland.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorld.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldCinfo.h"
 #include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
+#include "Havok/Source/Physics/Dynamics/World/Util/hkpWorldOperationUtil.h"
 #include "Havok/Source/Physics/Utilities/Actions/AngularDashpot/hkpAngularDashpotAction.h"
 #include "Havok/Source/Physics/Utilities/Actions/Dashpot/hkpDashpotAction.h"
 #include "Havok/Source/Physics/Utilities/Actions/MouseSpring/hkpMouseSpringAction.h"
@@ -658,7 +658,7 @@ bool bhkWorld::PickObject(bhkPickData& arPickData) {
             }
         }
         else {
-            SpecificItemCollector* pClosestCollector = arPickData.pCloseCollector;
+            hkpClosestRayHitCollector* pClosestCollector = arPickData.pCloseCollector;
             if (pClosestCollector) {
                 pClosestCollector->reset();
                 char* pCache = arPickData.pCache;
@@ -2765,36 +2765,6 @@ void bhkTaskletManagerCallback::bhkThreadState::Destruct(bhkThreadState* apThis)
     DeleteCriticalSection(&apThis->StateLock);
 }
 
-hkMemoryAllocator::~hkMemoryAllocator() {}
-
-void hkpBroadPhaseCastCollector::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
-hkpCollidableCollidableFilter::~hkpCollidableCollidableFilter() {}
-
-void hkpCollidableCollidableFilter::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
-hkpRayCollidableFilter::~hkpRayCollidableFilter() {}
-
-void hkpRayCollidableFilter::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
-hkpRayShapeCollectionFilter::~hkpRayShapeCollectionFilter() {}
-
-void hkpRayShapeCollectionFilter::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
-hkpShapeCollectionFilter::~hkpShapeCollectionFilter() {}
-
-void hkpShapeCollectionFilter::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
-}
-
 const void* getVtablehkpMotorAction() {
     return hkGetVtableOf<hkpMotorAction>();
 }
@@ -2908,10 +2878,6 @@ void finishLoadedObjecthkpConstrainedSystemFilter(void* p, int32_t finishing) {
     ::new (apFilter) hkpConstrainedSystemFilter(aFlag);
 }
 
-const hkClass& hkpConstrainedSystemFilter::staticClass() {
-    return hkpConstrainedSystemFilterClass;
-}
-
 // The class registry's finish-loaded-object callback for a disable-entity collision filter: the null check, then the
 // filter's finish constructor.
 void finishLoadedObjecthkpDisableEntityCollisionFilter(void* p, int32_t finishing) {
@@ -2966,13 +2932,6 @@ const void* getVtablehkpSerializedDisplayMarker() {
     return hkGetVtableOf<hkpSerializedDisplayMarker>();
 }
 
-// The marker adds nothing to destroy.
-hkpSerializedDisplayMarker::~hkpSerializedDisplayMarker() {}
-
-const hkClass& hkpSerializedDisplayMarker::staticClass() {
-    return hkpSerializedDisplayMarkerClass;
-}
-
 // The type info's finish-loaded-object callback for hkpSerializedDisplayMarkerList: its finish constructor.
 void finishLoadedObjecthkpSerializedDisplayMarkerList(void* p, int32_t finishing) {
     if (p) {
@@ -2980,10 +2939,6 @@ void finishLoadedObjecthkpSerializedDisplayMarkerList(void* p, int32_t finishing
         kFlag.m_finishing = finishing;
         ::new (p) hkpSerializedDisplayMarkerList(kFlag);
     }
-}
-
-const hkClass& hkpSerializedDisplayMarkerList::staticClass() {
-    return hkpSerializedDisplayMarkerListClass;
 }
 
 // The type info's finish-loaded-object callback for hkpDisplayBindingDataRigidBody: its finish constructor.
@@ -3127,4 +3082,26 @@ ahkpWorld::~ahkpWorld() {}
 
 bhkWorld* ahkpWorld::getUserData() {
     return m_userData;
+}
+
+void bhkPickData::NiSetFrom(const NiPoint3& arFrom) {
+    hkVector4 hkv;
+    this->SetFrom(NI2HK(hkv, arFrom));
+}
+
+void bhkPickData::NiSetTo(const NiPoint3& arTo) {
+    hkVector4 kTo;
+    SetTo(NI2HK(kTo, arTo));
+}
+
+// Builds the hit point in a Havok vector and converts it back to game units.
+void bhkPickData::NiCalcHitPoint(NiPoint3& arPoint) {
+    hkVector4 kPoint;
+    CalcHitPoint(kPoint);
+    HK2NI(arPoint, kPoint);
+}
+
+void bhkPickData::NiSetLength(const NiPoint3& arLength) {
+    hkVector4 kHkLength;
+    SetLength(NI2HK(kHkLength, arLength));
 }

@@ -1,6 +1,6 @@
 #include "Fallout Shared/BGSIdleMarker.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSShader/BSFadeNode.h"
 #include "Fallout Shared/BGSIdleCollection.h"
@@ -11,7 +11,7 @@
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "xfnv/Compiler.h"
 
 // Reads the marker's chunks: the idle collection's flags, count, idle list and timer, and a package target built from
@@ -62,7 +62,7 @@ bool BGSIdleMarker::Load(TESFile* apFile) {
                             for (int32_t i = 0; i < cIdleCount; ++i) {
                                 // Until InitItem resolves it, each slot holds an untyped form ID, which is swapped as a
                                 // 32-bit value.
-                                ENDIAN(reinterpret_cast<uint32_t&>(pIdleArray[i]), false);
+                                BSEndian(reinterpret_cast<uint32_t&>(pIdleArray[i]), false);
                             }
                         }
                     }

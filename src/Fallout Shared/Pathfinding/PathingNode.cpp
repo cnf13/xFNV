@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/PathingNode.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/Pathfinding/PathingLocation.h"
 #include "Fallout Shared/TESForm.h"

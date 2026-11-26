@@ -1,6 +1,7 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/BSCoreDefines.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -14,9 +15,6 @@ class BSMultiBoundShape;
 class BSOcclusionPlane;
 class BSPortal;
 class NiTriStrips;
-
-template <class T>
-void ENDIAN(T& arValue, bool abUnused);
 
 // A reference's editor primitive (box, sphere, plane or line).
 class BGSPrimitive {

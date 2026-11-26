@@ -6,6 +6,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Controls.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/BSSceneGraph.h"
@@ -56,7 +57,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustum.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -68,6 +68,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiSourceTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 
 #include <cmath>
@@ -1103,7 +1104,7 @@ void LoveTesterMenu::Draw3DElements() {
         BSCullingProcess* pCuller = Main::GetWorldSceneGraph()->pCuller;
         pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
         NiCamera* pCamera = LoveTesterMenu::sp3DCamera.m_pObject;
-        NiCamera::HandleEyeFinityFOVScale(pCamera, 0.65f);
+        HandleEyeFinityFOVScale(pCamera, 0.65f);
         NiPointer<BSShaderAccumulator> spAccum(InterfaceManager::Instance()->Get3dAccumulator());
         pCuller->SetAccumulator(spAccum.m_pObject);
         BSShaderUtil::AccumulateScene(pCamera, BSShaderManager::GetShadowSceneNode(1), *pCuller);

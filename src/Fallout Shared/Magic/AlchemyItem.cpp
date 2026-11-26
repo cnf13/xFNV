@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSEquipType.h"
@@ -33,10 +33,10 @@
 // Swaps the cost, the addiction, its chance and the consumption sound read from a big-endian file; the flags at +4
 // are left alone.
 void AlchemyItemData::Endian() {
-    ENDIAN(iCostOverride, false);
-    ENDIAN(pAddictionItem, false);
-    ENDIAN(fAddictionChance, false);
-    ENDIAN(pConsumptionSound, false);
+    BSEndian(iCostOverride, false);
+    BSEndian(pAddictionItem, false);
+    BSEndian(fAddictionChance, false);
+    BSEndian(pConsumptionSound, false);
 }
 
 AlchemyItem::AlchemyItem()
@@ -344,11 +344,6 @@ void BGSPickupPutdownSounds::SetPutdownSound(TESSound* apSound) {
 }
 
 BaseFormComponent::BaseFormComponent() {}
-
-// The warning printer reads no argument and returns 0.
-int32_t Warning(const char* apMessage, ...) {
-    return 0;
-}
 
 MagicItem::MagicItem() : TESFullName(), EffectItemList() {}
 

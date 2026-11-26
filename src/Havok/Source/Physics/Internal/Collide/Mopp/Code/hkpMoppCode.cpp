@@ -145,3 +145,7 @@ const hkClass& hkpMoppCodeReindexedTerminal::staticClass() {
 const hkClass& hkpMoppCode::CodeInfo::staticClass() {
     return hkpMoppCodeCodeInfoClass;
 }
+
+const hkClass& hkpMoppCode::staticClass() {
+    return hkpMoppCodeClass;
+}

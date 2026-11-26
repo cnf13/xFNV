@@ -1,6 +1,7 @@
 #include "Fallout Shared/BGSProjectile.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSMain/IOManager.h"
@@ -164,20 +165,20 @@ void BGSProjectileData::Initialize() {
 }
 
 void BGSProjectileData::Endian() {
-    ENDIAN(iFlags, false);
-    ENDIAN(fGravity, false);
-    ENDIAN(fSpeed, false);
-    ENDIAN(fRange, false);
-    ENDIAN(fTracerChance, false);
-    ENDIAN(fExplosionProximity, false);
-    ENDIAN(fExplosionTimer, false);
-    ENDIAN(fMuzzleFlashDuration, false);
-    ENDIAN(fFadeOutTime, false);
-    ENDIAN(fForce, false);
-    ENDIAN(fRotationX, false);
-    ENDIAN(fRotationY, false);
-    ENDIAN(fRotationZ, false);
-    ENDIAN(fBounceMultiplier, false);
+    BSEndian(iFlags, false);
+    BSEndian(fGravity, false);
+    BSEndian(fSpeed, false);
+    BSEndian(fRange, false);
+    BSEndian(fTracerChance, false);
+    BSEndian(fExplosionProximity, false);
+    BSEndian(fExplosionTimer, false);
+    BSEndian(fMuzzleFlashDuration, false);
+    BSEndian(fFadeOutTime, false);
+    BSEndian(fForce, false);
+    BSEndian(fRotationX, false);
+    BSEndian(fRotationY, false);
+    BSEndian(fRotationZ, false);
+    BSEndian(fBounceMultiplier, false);
 }
 
 BGSProjectile::BGSProjectile() {

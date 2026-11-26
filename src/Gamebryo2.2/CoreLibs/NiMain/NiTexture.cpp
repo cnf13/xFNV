@@ -2,7 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiMain/BSDegradePriority.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"

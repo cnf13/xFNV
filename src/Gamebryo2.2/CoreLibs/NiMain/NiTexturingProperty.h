@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
@@ -283,3 +283,92 @@ inline MapNameText5 aBump{"Bump"};
 inline MapNameText5 aGlow{"Glow"};
 inline MapNameText6 aGloss{"Gloss"};
 inline MapNameText7 aDetail{"Detail"};
+
+inline NiTexture* NiTexturingProperty::Map::GetTexture() const {
+    return m_spTexture.m_pObject;
+}
+
+inline NiTexture* NiTexturingProperty::GetBaseTexture() {
+    Map* pkMap = m_kMaps[BASE_INDEX];
+    if (pkMap) {
+        return pkMap->GetTexture();
+    }
+    return nullptr;
+}
+
+// Allocate the base map only when its slot is empty.
+inline void NiTexturingProperty::SetBaseFilterMode(FilterMode eMode) {
+    Map* pkMap = m_kMaps[BASE_INDEX];
+    if (!pkMap) {
+        pkMap = ::new Map;
+        m_kMaps.SetAt(BASE_INDEX, pkMap);
+    }
+    pkMap->SetFilterMode(eMode);
+}
+
+inline void NiTexturingProperty::Map::SetTexture(NiTexture* pkTexture) {
+    m_spTexture = pkTexture;
+}
+
+// Sets the base map's clamp mode, creating the base map when there is none.
+inline void NiTexturingProperty::SetBaseClampMode(ClampMode eMode) {
+    Map* pkBaseMap = m_kMaps[0];
+    if (!pkBaseMap) {
+        pkBaseMap = ::new Map;
+        m_kMaps.SetAt(0, pkBaseMap);
+    }
+    pkBaseMap->SetClampMode(eMode);
+}
+
+inline NiTexturingProperty::Map* NiTexturingProperty::GetDarkMap() {
+    return m_kMaps[DARK_INDEX];
+}
+
+inline NiTexturingProperty::Map* NiTexturingProperty::GetDetailMap() {
+    return m_kMaps[DETAIL_INDEX];
+}
+
+inline NiTexturingProperty::Map* NiTexturingProperty::GetGlossMap() {
+    return m_kMaps[GLOSS_INDEX];
+}
+
+inline NiTexturingProperty::Map* NiTexturingProperty::GetGlowMap() {
+    return m_kMaps[GLOW_INDEX];
+}
+
+inline NiTexturingProperty::BumpMap* NiTexturingProperty::GetBumpMap() {
+    return static_cast<BumpMap*>(m_kMaps[BUMP_INDEX]);
+}
+
+inline NiTexturingProperty::Map* NiTexturingProperty::GetDecalMap(uint32_t uiIndex) {
+    return m_kMaps[DECAL_BASE + uiIndex];
+}
+
+inline uint32_t NiTexturingProperty::GetDecalMapCount() {
+    return GetField(DECALCOUNT_MASK, DECALCOUNT_POS);
+}
+
+inline void NiTexturingProperty::SetBaseMap(NiTexturingProperty::Map* pkMap) {
+    NiTexturingProperty::Map* pkOld = m_kMaps[BASE_INDEX];
+    if (pkMap != pkOld) {
+        delete pkOld;
+        m_kMaps.SetAt(BASE_INDEX, pkMap);
+    }
+}
+
+// Allocate the base map only when its slot is empty, then call the texture setter.
+inline void NiTexturingProperty::SetBaseTexture(NiTexture* pkTexture) {
+    Map* pkMap = m_kMaps[BASE_INDEX];
+    if (!pkMap) {
+        pkMap = ::new Map;
+        m_kMaps.SetAt(BASE_INDEX, pkMap);
+    }
+    pkMap->SetTexture(pkTexture);
+}
+
+inline uint32_t NiTexturingProperty::GetShaderArrayCount() const {
+    if (!m_pkShaderMaps) {
+        return 0;
+    }
+    return m_pkShaderMaps->GetSize();
+}

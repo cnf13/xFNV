@@ -2,7 +2,6 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
@@ -10,6 +9,7 @@
 #include "Fallout Shared/ExtraDataObjects.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Package.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESActorBase.h"
 #include "Fallout Shared/TESClass.h"
 #include "Fallout Shared/TESNPC.h"
@@ -68,7 +68,7 @@ SettingT<GameSettingCollection> fSneakActionMult("fSneakActionMult", 1.0f);
 SettingT<GameSettingCollection> fDetectionSneakLightMod("fDetectionSneakLightMod", 0.0f);
 SettingT<GameSettingCollection> fSneakLightMoveMult("fSneakLightMoveMult", 0.01f);
 SettingT<GameSettingCollection> fSneakLightRunMult("fSneakLightRunMult", 0.2f);
-SettingT<GameSettingCollection> gs_fSneakSleepBonus("fSneakSleepBonus", -0.2f);
+SettingT<GameSettingCollection> fSneakSleepMod("fSneakSleepBonus", -0.2f);
 SettingT<GameSettingCollection> fSneakAlertMod("fSneakAlertMod", 0.2f);
 SettingT<GameSettingCollection> fSneakPerceptionSkillMin("fSneakPerceptionSkillMin", 10.0f);
 SettingT<GameSettingCollection> fSneakPerceptionSkillMax("fSneakPerceptionSkillMax", 90.0f);
@@ -162,7 +162,7 @@ SettingT<GameSettingCollection> fPickPocketTargetSkillMult("fPickPocketTargetSki
 SettingT<GameSettingCollection> fPickPocketAmountBase("fPickPocketAmountBase", 0.0f);
 SettingT<GameSettingCollection> fPickPocketAmountMult("fPickPocketAmountMult", -3.0f);
 SettingT<GameSettingCollection> fAIEnergyLevelBase("fAIEnergyLevelBase", 0.0f);
-SettingT<GameSettingCollection> gs_fAIEngergyLevelMult("fAIEngergyLevelMult", 1.0f);
+SettingT<GameSettingCollection> fAIEnergyLevelMult("fAIEngergyLevelMult", 1.0f);
 SettingT<GameSettingCollection> fAIMaxWanderTime("fAIMaxWanderTime", 100.0f);
 SettingT<GameSettingCollection> fAIIdleWaitTime("fAIIdleWaitTime", 1.0f);
 SettingT<GameSettingCollection> fPickPocketMinChance("fPickPocketMinChance", 5.0f);
@@ -376,7 +376,7 @@ SettingT<GameSettingCollection> fAVDNPCFatigueLevelMult("fAVDNPCFatigueLevelMult
 SettingT<GameSettingCollection> fAVDActionPointsMult("fAVDActionPointsMult", 2.0f);
 SettingT<GameSettingCollection> fAVDActionPointsBase("fAVDActionPointsBase", 65.0f);
 SettingT<GameSettingCollection> fAVDCarryWeightMult("fAVDCarryWeightMult", 25.0f);
-SettingT<GameSettingCollection> gs_fAVDCarryWeightsBase("fAVDCarryWeightsBase", 150.0f);
+SettingT<GameSettingCollection> fAVDCarryWeightBase("fAVDCarryWeightsBase", 150.0f);
 SettingT<GameSettingCollection> fAVDDefaultBodyPartCondition("fAVDDefaultBodyPartCondition", 100.0f);
 SettingT<GameSettingCollection> fAVDHealRateEndurance6Bonus("fAVDHealRateEndurance6Bonus", 1.0f);
 SettingT<GameSettingCollection> fAVDHealRateEndurance7Bonus("fAVDHealRateEndurance7Bonus", 1.0f);
@@ -648,7 +648,7 @@ int32_t AiFormulas::GetActorDetectedTarget(
             (static_cast<double>(aiPercepA) / 10.0) +
         fSneakPerceptionSkillMin.Float();
     double dAlertMult = fSneakAlertMod.Float() * static_cast<double>(abAlert) + 1.0;
-    double dSleepMult = gs_fSneakSleepBonus.Float() * static_cast<double>(absleeping) + dAlertMult;
+    double dSleepMult = fSneakSleepMod.Float() * static_cast<double>(absleeping) + dAlertMult;
     float fPerceptionScore = (fSneakCombatMod.Float() * static_cast<double>(abInCombat) + dSleepMult + fAmbushMod) *
         fPerception;
     if (abInvisibilityB) {
@@ -798,7 +798,7 @@ float AiFormulas::GetFollowRadiusSlow(float afbasePackRadius) {
 float AiFormulas::AVDeriveCarryWeight(ActorValueOwner* apActor, [[maybe_unused]] ActorValue::Index aiWhich) {
     double dStrength = apActor->GetClampedActorFloatValue(ActorValue::STRENGTH);
     double dScaled = fAVDCarryWeightMult.Float() * dStrength;
-    return static_cast<float>(gs_fAVDCarryWeightsBase.Float() + dScaled);
+    return static_cast<float>(fAVDCarryWeightBase.Float() + dScaled);
 }
 
 float AiFormulas::AVDeriveFromPrimary(ActorValueOwner* apActor, ActorValue::Index aiWhich) {
@@ -958,6 +958,6 @@ float AiFormulas::AVDeriveUnarmedDamage(ActorValueOwner* apActor, ActorValue::In
 }
 
 double AiFormulas::ComputeTimeTillNextWander(int32_t aiEnergyLevel) {
-    float fEnergy = static_cast<double>(aiEnergyLevel) * gs_fAIEngergyLevelMult.Float() + fAIEnergyLevelBase.Float();
+    float fEnergy = static_cast<double>(aiEnergyLevel) * fAIEnergyLevelMult.Float() + fAIEnergyLevelBase.Float();
     return static_cast<float>((fAIMaxWanderTime.Float() - fEnergy) / 2.0);
 }

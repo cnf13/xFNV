@@ -23,3 +23,8 @@ public:
 
     float m_earlyOutDistance;
 };
+
+// No early out until the owner lowers the distance (reset()'s HK_REAL_MAX).
+inline hkpCdPointCollector::hkpCdPointCollector() : m_earlyOutDistance(HK_REAL_MAX) {}
+
+inline hkpCdPointCollector::~hkpCdPointCollector() {}

@@ -3,7 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTCaseInsensitiveStringMap.h"
 #include "BSMain/MessageHandler.h"
@@ -957,7 +957,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
         int32_t iValue = *reinterpret_cast<int32_t*>(&pBuffer[sOffset]);
         sOffset += 4;
         if (apFile->QEndian()) {
-            ENDIAN(iValue, false);
+            BSEndian(iValue, false);
         }
         pValue->SetFormValue(iValue);
     }
@@ -966,7 +966,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
         uint32_t iHealth = *reinterpret_cast<uint32_t*>(&pBuffer[sOffset]);
         sOffset += 4;
         if (apFile->QEndian()) {
-            ENDIAN(iHealth, false);
+            BSEndian(iHealth, false);
         }
         pHealth->iHealth = iHealth;
     }
@@ -977,7 +977,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
         float fWeight = fRead;
         sOffset += 4;
         if (apFile->QEndian()) {
-            ENDIAN(fWeight, false);
+            BSEndian(fWeight, false);
         }
         pWeight->SetFormWeight(fWeight);
     }
@@ -988,7 +988,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
         float fQuality = fRead;
         sOffset += 4;
         if (apFile->QEndian()) {
-            ENDIAN(fQuality, false);
+            BSEndian(fQuality, false);
         }
         // Truncates the float to an int and stores its low byte.
         pQuality->cQuality = static_cast<uint8_t>(static_cast<int32_t>(fQuality));
@@ -998,7 +998,7 @@ void TESForm::LoadData(TESFile* apFile, void* apData, uint16_t asSize) {
         uint16_t sDamage = *reinterpret_cast<uint16_t*>(&pBuffer[sOffset]);
         sOffset += 2;
         if (apFile->QEndian()) {
-            ENDIAN(sDamage, false);
+            BSEndian(sDamage, false);
         }
         pAttack->SetDamage(sDamage);
     }
@@ -1281,21 +1281,21 @@ void TESForm::__SaveData(void* apData, uint32_t aiSize) {
                 if (pValue) {
                     *reinterpret_cast<uint32_t*>(pData) = pValue->iValue;
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN(*reinterpret_cast<uint32_t*>(pData), false);
+                        BSEndian(*reinterpret_cast<uint32_t*>(pData), false);
                     }
                     pData += 4;
                 }
                 if (pHealth) {
                     *reinterpret_cast<uint32_t*>(pData) = pHealth->iHealth;
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN(*reinterpret_cast<uint32_t*>(pData), false);
+                        BSEndian(*reinterpret_cast<uint32_t*>(pData), false);
                     }
                     pData += 4;
                 }
                 if (pWeight) {
                     float fWeight = pWeight->GetWeight();
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN<float>(fWeight, false);
+                        BSEndian<float>(fWeight, false);
                     }
                     ourMemcpy(pData, &fWeight, 4u);
                     pData += 4;
@@ -1303,7 +1303,7 @@ void TESForm::__SaveData(void* apData, uint32_t aiSize) {
                 if (pQuality) {
                     float fQuality = static_cast<float>(pQuality->cQuality);
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN<float>(fQuality, false);
+                        BSEndian<float>(fQuality, false);
                     }
                     ourMemcpy(pData, &fQuality, 4u);
                     pData += 4;
@@ -1311,7 +1311,7 @@ void TESForm::__SaveData(void* apData, uint32_t aiSize) {
                 if (pAttack) {
                     *reinterpret_cast<uint16_t*>(pData) = pAttack->GetAttackDamage();
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN(*reinterpret_cast<uint16_t*>(pData), false);
+                        BSEndian(*reinterpret_cast<uint16_t*>(pData), false);
                     }
                     pData += 2;
                 }
@@ -1585,7 +1585,7 @@ void TESForm::__AddChunkData(CHUNK_ID aeChunkID, const void* apData, uint32_t ai
 
 [[clang::disable_tail_calls]] void TESForm::AddChunk(CHUNK_ID aeChunkID, uint16_t asData) {
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(asData, false);
+        BSEndian(asData, false);
     }
 
     TESForm::__AddChunkData(aeChunkID, &asData, 2);
@@ -1593,7 +1593,7 @@ void TESForm::__AddChunkData(CHUNK_ID aeChunkID, const void* apData, uint32_t ai
 
 [[clang::disable_tail_calls]] void TESForm::AddChunk(CHUNK_ID aeChunkID, uint32_t aiData) {
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(aiData, false);
+        BSEndian(aiData, false);
     }
 
     TESForm::__AddChunkData(aeChunkID, &aiData, 4);
@@ -1601,7 +1601,7 @@ void TESForm::__AddChunkData(CHUNK_ID aeChunkID, const void* apData, uint32_t ai
 
 [[clang::disable_tail_calls]] void TESForm::AddChunk(CHUNK_ID aeChunkID, float afData) {
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(afData, false);
+        BSEndian(afData, false);
     }
 
     TESForm::__AddChunkData(aeChunkID, &afData, 4);
@@ -1609,7 +1609,7 @@ void TESForm::__AddChunkData(CHUNK_ID aeChunkID, const void* apData, uint32_t ai
 
 [[clang::disable_tail_calls]] void TESForm::AddChunk(CHUNK_ID aeChunkID, int32_t aiData) {
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(aiData, false);
+        BSEndian(aiData, false);
     }
 
     TESForm::__AddChunkData(aeChunkID, &aiData, 4);
@@ -1710,7 +1710,7 @@ void TESForm::CompressSaveBuffer() {
                     ourMemcpy(pbuffer, pFORM, sizeof(FORM));
                     itempsize = ioriginalsize;
                     if (TESForm::QEndianSwapOnSave()) {
-                        ENDIAN<uint32_t>(itempsize, false);
+                        BSEndian<uint32_t>(itempsize, false);
                     }
                     ourMemcpy(&pbuffer[1], &itempsize, 4u);
                     ourMemcpy(&pbuffer[1].length, pcompressionbuffer, icompressedsize);
@@ -1733,7 +1733,7 @@ void TESForm::AddChunkArray32(CHUNK_ID aeChunkID, const void* apData, uint32_t a
         );
         ourMemcpy(pSwapped, apData, iSize);
         for (uint32_t i = 0; i < aiCount; ++i) {
-            ENDIAN(pSwapped[i], false);
+            BSEndian(pSwapped[i], false);
         }
         __AddChunkData(aeChunkID, pSwapped, iSize);
         ourFree(pSwapped);
@@ -1751,7 +1751,7 @@ void TESForm::AddChunkArray16(CHUNK_ID aeChunkID, const void* apData, uint32_t a
         );
         ourMemcpy(pSwapped, apData, iSize);
         for (uint32_t i = 0; i < aiCount; ++i) {
-            ENDIAN(pSwapped[i], false);
+            BSEndian(pSwapped[i], false);
         }
         __AddChunkData(aeChunkID, pSwapped, iSize);
         ourFree(pSwapped);

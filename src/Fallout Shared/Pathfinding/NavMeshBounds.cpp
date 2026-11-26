@@ -1,7 +1,7 @@
 #include "Fallout Shared/Pathfinding/NavMeshBounds.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Pathfinding/NavMeshMath.h"
 #include "Fallout Shared/TESFile.h"
@@ -142,29 +142,29 @@ NiPoint3 NavMeshBounds::DistanceFromPointToBounds(const NiPoint3& aPoint) {
 void NavMeshBounds::FillBoundsChunk(char* apChunkBuffer) {
     NiPoint3 kPoint = BoundingBoxMin;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(kPoint.x, false);
-        ENDIAN(kPoint.y, false);
-        ENDIAN(kPoint.z, false);
+        BSEndian(kPoint.x, false);
+        BSEndian(kPoint.y, false);
+        BSEndian(kPoint.z, false);
     }
     ourMemcpy(apChunkBuffer, &kPoint, sizeof(NiPoint3));
     apChunkBuffer += sizeof(NiPoint3);
     kPoint = BoundingBoxMax;
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(kPoint.x, false);
-        ENDIAN(kPoint.y, false);
-        ENDIAN(kPoint.z, false);
+        BSEndian(kPoint.x, false);
+        BSEndian(kPoint.y, false);
+        BSEndian(kPoint.z, false);
     }
     ourMemcpy(apChunkBuffer, &kPoint, sizeof(NiPoint3));
     apChunkBuffer += sizeof(NiPoint3);
     uint16_t usCount = static_cast<uint16_t>(Vertices.GetSize());
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(usCount, false);
+        BSEndian(usCount, false);
     }
     ourMemcpy(apChunkBuffer, &usCount, sizeof(uint16_t));
     apChunkBuffer += sizeof(uint16_t);
     usCount = static_cast<uint16_t>(Triangles.GetSize());
     if (TESForm::QEndianSwapOnSave()) {
-        ENDIAN(usCount, false);
+        BSEndian(usCount, false);
     }
     ourMemcpy(apChunkBuffer, &usCount, sizeof(uint16_t));
     apChunkBuffer += sizeof(uint16_t);
@@ -177,9 +177,9 @@ void NavMeshBounds::FillBoundsChunk(char* apChunkBuffer) {
     ourMemcpy(pPoints, &Vertices.GetAt(0), uiBytes);
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
-            ENDIAN(pPoints[i].x, false);
-            ENDIAN(pPoints[i].y, false);
-            ENDIAN(pPoints[i].z, false);
+            BSEndian(pPoints[i].x, false);
+            BSEndian(pPoints[i].y, false);
+            BSEndian(pPoints[i].z, false);
         }
     }
     ourMemcpy(apChunkBuffer, pPoints, uiBytes);
@@ -194,7 +194,7 @@ void NavMeshBounds::FillBoundsChunk(char* apChunkBuffer) {
     if (TESForm::QEndianSwapOnSave()) {
         for (uint32_t i = 0; i < uiCount; ++i) {
             for (uint16_t& usVertex : pTriangles[i].Vertices) {
-                ENDIAN(usVertex, false);
+                BSEndian(usVertex, false);
             }
         }
     }
@@ -221,27 +221,27 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
     Clear();
     BoundingBoxMin = *reinterpret_cast<NiPoint3*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<float>(BoundingBoxMin.x, false);
-        ENDIAN<float>(BoundingBoxMin.y, false);
-        ENDIAN<float>(BoundingBoxMin.z, false);
+        BSEndian<float>(BoundingBoxMin.x, false);
+        BSEndian<float>(BoundingBoxMin.y, false);
+        BSEndian<float>(BoundingBoxMin.z, false);
     }
     apChunkBuffer += sizeof(NiPoint3);
     BoundingBoxMax = *reinterpret_cast<NiPoint3*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<float>(BoundingBoxMax.x, false);
-        ENDIAN<float>(BoundingBoxMax.y, false);
-        ENDIAN<float>(BoundingBoxMax.z, false);
+        BSEndian<float>(BoundingBoxMax.x, false);
+        BSEndian<float>(BoundingBoxMax.y, false);
+        BSEndian<float>(BoundingBoxMax.z, false);
     }
     apChunkBuffer += sizeof(NiPoint3);
     uint16_t sizeOfVertexArray = *reinterpret_cast<uint16_t*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<uint16_t>(sizeOfVertexArray, false);
+        BSEndian<uint16_t>(sizeOfVertexArray, false);
     }
     Vertices.SetSize(sizeOfVertexArray, true);
     apChunkBuffer += sizeof(uint16_t);
     uint16_t sizeOfTriangleArray = *reinterpret_cast<uint16_t*>(apChunkBuffer);
     if (apFile->QEndian()) {
-        ENDIAN<uint16_t>(sizeOfTriangleArray, false);
+        BSEndian<uint16_t>(sizeOfTriangleArray, false);
     }
     Triangles.SetSize(sizeOfTriangleArray, true);
     apChunkBuffer += sizeof(uint16_t);
@@ -250,9 +250,9 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
         BSmemcpy(&Vertices.GetAt(0), iVertexBytes, apChunkBuffer, iVertexBytes);
         if (apFile->QEndian()) {
             for (uint32_t i = 0; i < sizeOfVertexArray; ++i) {
-                ENDIAN<float>(Vertices.GetAt(static_cast<int32_t>(i)).x, false);
-                ENDIAN<float>(Vertices.GetAt(static_cast<int32_t>(i)).y, false);
-                ENDIAN<float>(Vertices.GetAt(static_cast<int32_t>(i)).z, false);
+                BSEndian<float>(Vertices.GetAt(static_cast<int32_t>(i)).x, false);
+                BSEndian<float>(Vertices.GetAt(static_cast<int32_t>(i)).y, false);
+                BSEndian<float>(Vertices.GetAt(static_cast<int32_t>(i)).z, false);
             }
         }
         char* pTriangleChunk = &apChunkBuffer[sizeof(NiPoint3) * Vertices.iSize];
@@ -260,9 +260,9 @@ void NavMeshBounds::SetFromBoundsChunk(char* apChunkBuffer, TESFile* apFile, int
         BSmemcpy(&Triangles.GetAt(0), iTriangleBytes, pTriangleChunk, iTriangleBytes);
         if (apFile->QEndian()) {
             for (uint32_t i = 0; i < sizeOfTriangleArray; ++i) {
-                ENDIAN<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[0], false);
-                ENDIAN<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[1], false);
-                ENDIAN<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[2], false);
+                BSEndian<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[0], false);
+                BSEndian<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[1], false);
+                BSEndian<uint16_t>(Triangles.GetAt(static_cast<int32_t>(i)).Vertices[2], false);
             }
         }
     }

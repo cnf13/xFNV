@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
+
 class hkpSimulationIsland;
 
 // The interface the world reports a simulation island going to sleep or waking up to. It holds no state.
@@ -14,3 +16,11 @@ public:
     // DeletingDestruct's free (ourFree).
     static void operator delete(void* apMemory);
 };
+
+inline hkpIslandActivationListener::hkpIslandActivationListener() {}
+
+inline void hkpIslandActivationListener::operator delete(void* apMemory) {
+    ourFree(apMemory);
+}
+
+inline hkpIslandActivationListener::~hkpIslandActivationListener() {}

@@ -1,6 +1,6 @@
 #include "Fallout/Misc/SaveLoad/BGSLoadGameBuffer.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadBuffer.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadDefines.h"
 #include "Fallout/Misc/SaveLoad/BGSSaveLoadFile.h"

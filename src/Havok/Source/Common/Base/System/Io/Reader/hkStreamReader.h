@@ -38,3 +38,5 @@ public:
     // Reads one byte; returns it, or -1 at the end of the stream.
     int32_t readChar();
 };
+
+inline hkStreamReader::hkStreamReader() {}

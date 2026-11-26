@@ -3,12 +3,13 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSMessageIcon.h"
 #include "Fallout Shared/MenuGameSettings.h"
 #include "Fallout Shared/Package.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESCondition.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
@@ -202,7 +203,7 @@ void FakeModalMessageMenuCallback() {
 }
 
 void REPUTATION_DATA::Endian() {
-    ENDIAN(fMaximumValue, false);
+    BSEndian(fMaximumValue, false);
 }
 
 TESReputation::TESReputation() {

@@ -7,7 +7,7 @@
 #include "BSCore/BSSpinLock.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkCollisionFilter.h"
@@ -21,7 +21,6 @@
 #include "BSMain/BSPortal.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/ShadowSceneNode.h"
 #include "Fallout Shared/ActorCause.h"
@@ -178,7 +177,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointLight.h"
@@ -191,6 +189,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTexture.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiSystem.h"
 #include "SDK/MSVC/rtti.h"
@@ -387,7 +386,7 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             apFile->GetChunkData(pRegionIDs, uiSize);
             for (uint32_t i = 0; i < uiCount; ++i) {
                 if (apFile->QEndian()) {
-                    ENDIAN(pRegionIDs[i], false);
+                    BSEndian(pRegionIDs[i], false);
                 }
                 TESForm::AddCompileIndex(pRegionIDs[i], apFile);
                 TESRegion* pRegion = pDataHandler->GetRegionList()->HasRegion(pRegionIDs[i]);
@@ -488,9 +487,9 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             ::new (&kNormal) NiPoint3(0.0f, 0.0f, 0.97f);
             apFile->GetChunkData(&kNormal, 0xC);
             if (apFile->QEndian()) {
-                ENDIAN(kNormal.x, false);
-                ENDIAN(kNormal.y, false);
-                ENDIAN(kNormal.z, false);
+                BSEndian(kNormal.x, false);
+                BSEndian(kNormal.y, false);
+                BSEndian(kNormal.z, false);
             }
             SetDistantDataNormal(kNormal);
             break;
@@ -607,8 +606,8 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             );
             if (apFile->QEndian()) {
                 // Swaps the form ID slot as a raw 32-bit value.
-                ENDIAN(reinterpret_cast<uint32_t&>(kOldData.pActivateRef), false);
-                ENDIAN(kOldData.fActivateDelay, false);
+                BSEndian(reinterpret_cast<uint32_t&>(kOldData.pActivateRef), false);
+                BSEndian(kOldData.fActivateDelay, false);
             }
             REF_ACTIVATE_DATA* pData = new REF_ACTIVATE_DATA;
             pData->pActivateRef = kOldData.pActivateRef;
@@ -625,13 +624,13 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             TESFile::WidenFormIDRecords(&kDecal, 1, 0x1C, sizeof(kDecal), {{0, offsetof(REF_DECAL_DATA, pDecalRef)}});
             if (apFile->QEndian()) {
                 // Swaps the form ID slot as a raw 32-bit value.
-                ENDIAN(reinterpret_cast<uint32_t&>(kDecal.pDecalRef), false);
-                ENDIAN(kDecal.Intersect.x, false);
-                ENDIAN(kDecal.Intersect.y, false);
-                ENDIAN(kDecal.Intersect.z, false);
-                ENDIAN(kDecal.Normal.x, false);
-                ENDIAN(kDecal.Normal.y, false);
-                ENDIAN(kDecal.Normal.z, false);
+                BSEndian(reinterpret_cast<uint32_t&>(kDecal.pDecalRef), false);
+                BSEndian(kDecal.Intersect.x, false);
+                BSEndian(kDecal.Intersect.y, false);
+                BSEndian(kDecal.Intersect.z, false);
+                BSEndian(kDecal.Normal.x, false);
+                BSEndian(kDecal.Normal.y, false);
+                BSEndian(kDecal.Normal.z, false);
             }
             AddDecalRef(kDecal.pDecalRef, kDecal.Intersect, kDecal.Normal);
             break;
@@ -738,8 +737,8 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
             );
             if (apFile->QEndian()) {
                 // Swaps the form ID slot as a raw 32-bit value.
-                ENDIAN(reinterpret_cast<uint32_t&>(kReflected.pRef), false);
-                ENDIAN(kReflected.iEffectFlags, false);
+                BSEndian(reinterpret_cast<uint32_t&>(kReflected.pRef), false);
+                BSEndian(kReflected.iEffectFlags, false);
             }
             if (kReflected.iEffectFlags & REF_REFLECTED_DATA::FLAG_REFLECTION) {
                 SetReflectedByRef(kReflected.pRef, true);
@@ -899,22 +898,18 @@ void ExtraDataList::Load(TESFile* apFile, TESForm* apOwner) {
     }
 }
 
-uint32_t BSGetCurrentThreadID() {
-    return GetCurrentThreadId();
-}
-
 // Every field is deliberately left unset.
 REF_DECAL_DATA::REF_DECAL_DATA() {}
 
 // Swaps the decal reference and the hit point's and normal's floats of a record read from a big-endian file.
 void REF_DECAL_DATA::Endian() {
-    ENDIAN(pDecalRef, false);
-    ENDIAN(Intersect.x, false);
-    ENDIAN(Intersect.y, false);
-    ENDIAN(Intersect.z, false);
-    ENDIAN(Normal.x, false);
-    ENDIAN(Normal.y, false);
-    ENDIAN(Normal.z, false);
+    BSEndian(pDecalRef, false);
+    BSEndian(Intersect.x, false);
+    BSEndian(Intersect.y, false);
+    BSEndian(Intersect.z, false);
+    BSEndian(Normal.x, false);
+    BSEndian(Normal.y, false);
+    BSEndian(Normal.z, false);
 }
 
 // Every field is deliberately left unset.
@@ -922,15 +917,15 @@ OCCLUSION_PLANE_DATA::OCCLUSION_PLANE_DATA() {}
 
 // Swaps the nine floats read from a big-endian file, in field order.
 void OCCLUSION_PLANE_DATA::Endian() {
-    ENDIAN(rHalfExtents.x, false);
-    ENDIAN(rHalfExtents.y, false);
-    ENDIAN(rCenter.x, false);
-    ENDIAN(rCenter.y, false);
-    ENDIAN(rCenter.z, false);
-    ENDIAN(rAxis.x, false);
-    ENDIAN(rAxis.y, false);
-    ENDIAN(rAxis.z, false);
-    ENDIAN(fAngle, false);
+    BSEndian(rHalfExtents.x, false);
+    BSEndian(rHalfExtents.y, false);
+    BSEndian(rCenter.x, false);
+    BSEndian(rCenter.y, false);
+    BSEndian(rCenter.z, false);
+    BSEndian(rAxis.x, false);
+    BSEndian(rAxis.y, false);
+    BSEndian(rAxis.z, false);
+    BSEndian(fAngle, false);
 }
 
 BSExtraData::BSExtraData(uint8_t acType) : cEtype(acType), pNext(nullptr) {}
@@ -2111,7 +2106,7 @@ void ExtraDataList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
 }
 
 // The save keeps form IDs in the pointer fields and list items; this resolves them to the forms.
-void ExtraDataList::InitLoadGameTES(
+void ExtraDataList::InitLoadGame(
     uint32_t aiFlags,
     uint32_t aiCurrentFlags,
     TESObjectREFR* apRef,
@@ -3354,14 +3349,14 @@ void ExtraDataList::LoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags, TESObjec
                         reinterpret_cast<TESObjectREFR*>(static_cast<uintptr_t>(uiTargetID))
                     );
                     MagicTarget* pMagicTarget = pTarget;
-                    ActiveEffect::LoadActiveEffectListTES(pMagicTarget->GetActiveEffectList(), nullptr);
+                    ActiveEffect::LoadActiveEffectList(pMagicTarget->GetActiveEffectList(), nullptr);
                     AddExtra(pTarget);
                 }
                 break;
             case EXTRA_TELEPORT:
                 if ((aiFlags & CHANGE_DOOR_EXTRA_TELEPORT) != 0) {
                     DoorTeleportData* pTeleport = new DoorTeleportData;
-                    pTeleport->LoadGameTES();
+                    pTeleport->LoadGame();
                     SetTeleportPtr(pTeleport);
                 }
                 break;
@@ -8901,7 +8896,7 @@ void ExtraDataList::DuplicateExtraListForContainer(ExtraDataList* apCopy) {
     BaseExtraList::ExtraCritSection.Unlock();
 }
 
-void ExtraDataList::LoadGameBGS(BGSLoadFormBuffer* apLoadGameBuffer) {
+void ExtraDataList::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     int32_t iactorBaseChangeFlags;
     uint8_t cflags;
     char cpackDataType;
@@ -10273,30 +10268,6 @@ void ExtraDataList::RemoveExtraSayTopicInfoOnceADayExtra() {
     }
 }
 
-BSSoundHandle::BSSoundHandle(uint32_t aiID)
-  : iSoundID(static_cast<int32_t>(aiID)), bAssumeSuccess(false), eState(ASSUMED_STATE_INITIALIZED) {}
-
-uint32_t BSSoundHandle::GetID() const {
-    return iSoundID;
-}
-
-// Releases one level of the lock and clears the owner when the count reaches 0. The owner is cleared with a plain
-// store, not an interlocked compare-exchange.
-void BSSpinLock::Unlock() {
-    InitializationFlow();
-    if (--uiLockCount == 0) {
-        uiOwningThread = 0;
-    }
-}
-
-void* ourRealloc(void* apPtr, uint32_t aSize) {
-    return MemoryManager::Instance().Reallocate(apPtr, aSize);
-}
-
-const NiMatrix3 BSOcclusionPlane::QRotation() const {
-    return kRotation;
-}
-
 void ActorCause::IncRefCount() {
     NiAtomicIncrement(iRefCount);
 }
@@ -10419,7 +10390,7 @@ bool ExtraRoomRefData::Compare(BSExtraData* apCompare) {
 
 void OcclusionPlaneLinkedRefData::Endian() {
     for (TESObjectREFR*& pLinkedRef : pLinkedRefs) {
-        ENDIAN<TESObjectREFR*>(pLinkedRef, false);
+        BSEndian<TESObjectREFR*>(pLinkedRef, false);
     }
 }
 
@@ -10498,23 +10469,6 @@ ExtraTresPassPackage::ExtraTresPassPackage() : BSExtraData(EXTRA_TRESPASS_PACKAG
 
 NAVMESH_PORTAL::NAVMESH_PORTAL() : pNavMesh(nullptr), iTriIndex(0) {}
 
-int32_t BSAtomicCompareExchange(volatile int32_t* apAddress, int32_t aiCompare, int32_t aiValue) {
-    return InterlockedCompareExchange32(apAddress, aiValue, aiCompare);
-}
-
-// InterlockedCompareExchange takes a LONG, so the cast reads the same unsigned word as signed.
-uint32_t BSAtomicCompareExchange(volatile uint32_t* apAddress, uint32_t aiCompare, uint32_t aiValue) {
-    return static_cast<uint32_t>(InterlockedCompareExchange32(
-        reinterpret_cast<volatile int32_t*>(apAddress),
-        static_cast<int32_t>(aiValue),
-        static_cast<int32_t>(aiCompare)
-    ));
-}
-
-void* BSAtomicCompareExchange(void* volatile* apAddress, void* apCompare, void* apValue) {
-    return InterlockedCompareExchangePtr(apAddress, apValue, apCompare);
-}
-
 NavMeshPtr::NavMeshPtr(const NavMeshPtr& arPtr) : NiPointer<NavMesh>(arPtr) {}
 
 NavMeshPtr& NavMeshPtr::operator=(const NavMeshPtr& ptr) {
@@ -10581,20 +10535,4 @@ bool BGSSaveLoadGame::GetLoadingMovedRefs() {
 
 bool BGSSaveLoadGame::GetReconstructingForms() {
     return (uiThreadSpecificFlags & THREAD_FLAG_RECONSTRUCTING_FORMS) != 0;
-}
-
-float NiCos(float fRadians) {
-    return std::cos(fRadians);
-}
-
-float NiSin(float fRadians) {
-    return std::sin(fRadians);
-}
-
-void* ourMalloc(uint32_t aSize) {
-    return MemoryManager::Instance().Allocate(aSize);
-}
-
-void ourFree(void* apPtr) {
-    MemoryManager::Instance().Deallocate(apPtr);
 }

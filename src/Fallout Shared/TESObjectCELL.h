@@ -4,6 +4,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSSpinLock.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSDecalManager.h"
@@ -810,6 +811,9 @@ public:
     // The exterior references reflected and refracted by the auto water.
     static BSSimpleList<TESObjectREFR*> AutoWaterReflectList;
     static BSSimpleList<TESObjectREFR*> AutoWaterRefractList;
+
+protected:
+    static SettingT<GameSettingCollection> iHoursToRespawnCell;
 };
 
 inline TESObjectCELL* pLastCheckedPointCell;

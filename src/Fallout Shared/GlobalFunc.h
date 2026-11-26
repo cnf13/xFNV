@@ -1,8 +1,18 @@
 #pragma once
 
+#include "BSCore/BSCoreMath.h"
+#include "BSCore/BSCoreUtils.h"
+#include "BSCore/BSRandom.h"
+#include "BSCore/BSString.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldNS.h"
+#include "BSMain/BSUtilities.h"
+#include "BSMain/MessageHandler.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFrustumPlanes.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
+#include "Havok/Source/Physics/Dynamics/Entity/hkpRigidBody.h"
+#include "Havok/Source/Physics/Dynamics/Phantom/hkpPhantom.h"
+#include "Havok/Source/Physics/Dynamics/World/hkpWorldObject.h"
 
 #include <stdint.h>
 
@@ -156,41 +166,12 @@ enum LANGUAGE : int32_t {
     LANGUAGE_COUNT = 0x5,
 };
 
-float BSMAX(float afA, float afB);
-float BSMIN(float afA, float afB);
 // The smaller of a double and a float, as a double; the float wins ties and NaN compares.
 double dMin(double adA, float afB);
 // The heading (z rotation) aDirection points along, in radians.
 float GetZAngleFromVector(const NiPoint3& aDirection);
-// Wraps aVal into [aMin, aMax].
-void BSWrap(float& aVal, float aMin, float aMax);
-int32_t BSMAX(int32_t aiA, int32_t aiB);
-uint32_t BSMAX(uint32_t auiA, uint32_t auiB);
-int32_t BSMIN(int32_t aiA, int32_t aiB);
-uint32_t BSMIN(uint32_t auiA, uint32_t auiB);
-int32_t BSAbs(int32_t alValue);
-// Case-insensitive strstr: the first place apString2 occurs in apString1, ignoring case; null when it does not.
-const char* BSstristr(const char* apString1, const char* apString2);
 // Wraps an angle in radians into [0, 2*pi).
 float ClampAngle(float afAngle);
-// The engine's printf-style warning printer. It is compiled empty: it reads no argument and returns
-// 0. The body is in Fallout Shared/Magic/AlchemyItem.cpp.
-int32_t Warning(const char* apMessage, ...);
-// The float rounded to an integer in the FPU's current rounding mode.
-int32_t FloatToInt(float someFloat);
-// The value on the line through (y1, x1) and (y2, x2) at value: x1 + (value - y1) / (y2 - y1) * (x2 - x1), rounded
-// to float.
-float FLerp(float x1, float x2, float y1, float y2, float value);
-// afVal rounded to the nearest multiple of afNearest.
-float BSRoundToNearest(float afVal, float afNearest);
-// A random float in [0, 1] from the BSRandom singleton.
-float RandomFloat0To1();
-// A random angle in [0, 2*pi) from the BSRandom singleton.
-float RandomFloatTwoPi();
-// A random integer in [aiMin, aiMax].
-int32_t RandomInt(int32_t aiMin, int32_t aiMax);
-// Clamps aVal into [aMin, aMax]: aMax when aMax < aVal, else aMin when aVal < aMin (the float instantiation).
-void BSClamp(float& aVal, float aMin, float aMax);
 // The generic clamp: aMax when aVal > aMax, else aMin when aVal < aMin.
 template <class T>
 void BSClamp(T& aVal, T aMin, T aMax);
@@ -216,8 +197,6 @@ bool FixNormals(
     bool abDisplayMatches,
     bool abExtrudeMatches
 );
-// The system tick count in milliseconds.
-uint32_t BSGetTickCount();
 int32_t GetCollisionObjectCountInSceneGraph(
     NiAVObject* apRoot,
     bool abIgnoreWeaponBone,
@@ -245,7 +224,6 @@ bool LineVsRect(
 );
 // Whether apObj has a morpher controller.
 bool HasMorpherController(NiObjectNET* apObj);
-hkpWorldObject* hkGetWorldObject(const hkpCollidable* collidable);
 // Whether a pick from aOrigin along aDir reaches apTarget within afDistance; abClearResults
 // clears apPick's results first.
 bool PickDistance(
@@ -266,26 +244,14 @@ bool PickDistanceRecursive(
 );
 // Whether aBound lies in apCamera's frustum.
 bool BoundInFrustum(const NiBound& aBound, NiCamera* apCamera);
-float FloatCeil(float aIn);
-// Compare-and-swap: stores aiValue in *apAddress when it equals aiCompare and returns the old value.
-int32_t BSAtomicCompareExchange(volatile int32_t* apAddress, int32_t aiCompare, int32_t aiValue);
-// Overload for a volatile unsigned word, used for BSSpinLock's owner.
-uint32_t BSAtomicCompareExchange(volatile uint32_t* apAddress, uint32_t aiCompare, uint32_t aiValue);
-// The overload for a node pointer word: CompareAndSwapEx's
-// pointer-width form passes the lock-free queues' and maps' links to the same function.
-void* BSAtomicCompareExchange(void* volatile* apAddress, void* apCompare, void* apValue);
 // Always true.
 bool ReturnTrue();
 // Sets (abSet) or clears bit 8 of *apFlags and returns apFlags. Defined in ModelLoader.cpp.
 uint8_t* MLSetFlag_8(char abSet, uint8_t* apFlags);
 // Splits the location form into its cell or worldspace.
 bool GetLocationCellOrWorld(TESForm* apLocation, TESObjectCELL*& arpCell, TESWorldSpace*& arpWorld);
-float NiATan2(float fNumerator, float fDenominator);
-hkpPhantom* hkpGetPhantom(const hkpCollidable* collidable);
-hkpRigidBody* hkpGetRigidBody(const hkpCollidable* collidable);
 // The scene graph object of the collidable's owner.
 NiAVObject* GetAVObjectForCollidable(const hkpCollidable* aphkCol);
-void BSmemcpy(void* apDest, int32_t aiDestSize, const void* apSrc, int32_t aiCount);
 // Writes the platform and language variant of texture path apInPath into apOutPath; whether
 // there is one.
 bool SwapPlatformLanguageTexturePath(const char* apInPath, char* apOutPath, uint32_t aiOutPathSize);
@@ -360,78 +326,6 @@ NiFixedString* get_g_EditorMarker1();
 NiFixedString* get_g_EditorMarker2();
 // A bhkWorld::RecFunction (the record data by reference).
 void GetCollisionObjectByIndex(bhkNiCollisionObject* apCollision, bhkWorldNS::ObjectRecData& arData);
-
-// Bethesda's own four-float vector in Havok's layout: the columns of bhkMatrix3 and the translation of bhkTransform.
-// Unlike hkVector4, whose default constructor stores nothing, it starts out as the zero vector. Kept on Havok's
-// 16-byte alignment so the classes built from it stay laid out like their hk counterparts.
-class alignas(16) bhkVector4 {
-public:
-    bhkVector4();
-
-    void set(float afX, float afY, float afZ, float afW);
-    void setZero4();
-    // x, y and z set to afValue, w kept.
-    void setAll3(float afVal);
-    // Passes the four components to arDst's set (Havok's own) and returns arDst.
-    hkVector4& ToHK(hkVector4& arDst) const;
-    // Copies arSrc's x, y and z, with w 0 (no scaling to Havok units), and returns this.
-    bhkVector4& NI2HKNS(const NiPoint3& arSrc);
-    // Copies arSrc's x, y and z scaled to Havok units, with w 0, and returns this.
-    bhkVector4& NI2HK(const NiPoint3& arSrc);
-    // Copies arSrc's four components and returns this.
-    bhkVector4& operator=(const hkVector4& arSrc);
-
-    float fX;
-    float fY;
-    float fZ;
-    float fW;
-};
-
-// The warning categories a context-tagged Warning call names.
-enum WARNING_TYPES : int32_t {
-    WARN_DEFAULT = 0,
-    WARN_COMBAT = 1,
-    WARN_ANIMATION = 2,
-    WARN_AI = 3,
-    WARN_SCRIPTS = 4,
-    WARN_SAVELOAD = 5,
-    WARN_DIALOGUE = 6,
-    WARN_QUESTS = 7,
-    WARN_PACKAGES = 8,
-    WARN_EDITOR = 9,
-    WARN_MODELS = 10,
-    WARN_TEXTURES = 11,
-    WARN_PLUGINS = 12,
-    WARN_MASTERFILE = 13,
-    WARN_FORMS = 14,
-    WARN_MAGIC = 15,
-    WARN_SHADERS = 16,
-    WARN_PATHFINDING = 17,
-    WARN_MENUS = 18,
-    WARN_AUDIO = 19,
-    WARN_CELLS = 20,
-    WARN_HAVOK = 21,
-    WARN_WATER = 22,
-    WARN_INGAME_MESSAGE = 23,
-    MAX_WARNING_TYPES = 24,
-};
-
-// The same empty printer as Warning, called with a warning category first.
-template <class... A>
-int32_t Warning([[maybe_unused]] WARNING_TYPES aWarningContext, const char* apMessage, A... vList) {
-    // The C-variadic printer reads no argument (it returns 0), so the category is not passed on.
-    return Warning(apMessage, vList...);
-}
-
-template <class T>
-void BSClamp(T& aVal, T aMin, T aMax) {
-    if (aVal > aMax) {
-        aVal = aMax;
-    }
-    else if (aVal < aMin) {
-        aVal = aMin;
-    }
-}
 
 // FixNormals' match for a source vertex, kept in a NiTMap<uint32_t, VertexDist> by source vertex: the
 // nearest destination vertex, a second one as near (else the destination's vertex count) and their distance.

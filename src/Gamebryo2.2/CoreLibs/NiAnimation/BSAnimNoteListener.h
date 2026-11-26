@@ -8,6 +8,19 @@
 
 class IBSAnimNoteReceiver;
 
+// What a BSAnimNoteListener hands the animation notes it hears to.
+class IBSAnimNoteReceiver {
+public:
+    IBSAnimNoteReceiver();
+    virtual ~IBSAnimNoteReceiver();
+
+    // Handles one note.
+    virtual void Update(BSAnimNote* apNote) = 0;
+
+    // The deleting destructors free through ourFree.
+    static void operator delete(void* apMemory);
+};
+
 // A controller manager's list of the receivers its sequences' animation notes go to.
 class BSAnimNoteListener {
 public:
@@ -28,3 +41,5 @@ public:
     // The registered receivers.
     NiTPrimitiveArray<BSAnimReceiverType*> ReceiverA;
 };
+
+inline IBSAnimNoteReceiver::~IBSAnimNoteReceiver() {}

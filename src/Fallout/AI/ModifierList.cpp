@@ -1,7 +1,7 @@
 #include "Fallout/AI/ModifierList.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/ActorValueInfo.h"
 #include "Fallout Shared/TESSaveLoadGame.h"
@@ -224,7 +224,7 @@ bool ModifierList::WriteModifier(Modifier* apModifier) {
     return true;
 }
 
-void ModifierList::RevertBGS(BGSLoadFormBuffer* apBuffer) {
+void ModifierList::Revert(BGSLoadFormBuffer* apBuffer) {
     DeleteAllModifiers();
 }
 
@@ -261,7 +261,7 @@ void ModifierList::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
     apSaveGameBuffer->SaveVariableSizedValue(uiCount, uiPosition);
 }
 
-void ModifierList::LoadGameTES() {
+void ModifierList::LoadGame() {
     char cKey;
     float fValue;
     uint16_t usCount;

@@ -8,7 +8,7 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSSystem/BSTMessageQueue.h"
 #include "BSSystem/Win32/BSWin32TaskletData.h"
 #include "Fallout Shared/GamePlayFormulas.h"

@@ -4,6 +4,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMap.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
+#include "Havok/Source/Common/Base/Types/Geometry/Aabb/hkAabb.h"
 
 class Actor;
 class bhkAabbPhantom;

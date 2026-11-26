@@ -188,3 +188,7 @@ public:
 using NiTArrayNiAGDDataBlockPtr = NiTArray<
     NiAdditionalGeometryData::NiAGDDataBlock*,
     NiTMallocInterface<NiAdditionalGeometryData::NiAGDDataBlock*>>;
+
+inline uint16_t NiAdditionalGeometryData::GetVertexCount() const {
+    return m_usVertexCount;
+}

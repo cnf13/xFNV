@@ -1,7 +1,7 @@
 #include "Fallout/Dialogue/Conversation.h"
 
 #include "BSCore/BSSimpleList.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/TESDataHandler.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESObjectREFR.h"
@@ -93,7 +93,7 @@ DialogueItem* Conversation::GetDialogueItemByIndex(int16_t aiIndex) {
     return nullptr;
 }
 
-uint16_t Conversation::GetSaveSizeTES() {
+uint16_t Conversation::GetSaveSize() {
     uint16_t usSize = 0;
     if (pSaveLoadGameOLD->UseSaveGameBlocks()) {
         // The block tag and the block size.
@@ -133,7 +133,7 @@ uint16_t Conversation::GetSaveSizeTES() {
     return usSize;
 }
 
-void Conversation::SaveGameTES() {
+void Conversation::SaveGame() {
     int16_t sBlockSize = 0;
     uint8_t* pBlockSize = nullptr;
     uint8_t* pBufferStart = static_cast<uint8_t*>(pSaveLoadGameOLD->m_pBuffer);
@@ -151,7 +151,7 @@ void Conversation::SaveGameTES() {
     uint16_t* pCount = static_cast<uint16_t*>(pSaveLoadGameOLD->m_pBuffer);
     pSaveLoadGameOLD->SaveGameDataOLD(&sCount, sizeof(sCount));
     for (BSSimpleList<DialogueItem*>* pList = &lDialogueItems; pList && !pList->IsEmpty(); pList = pList->m_pkNext) {
-        pList->m_item->SaveGameTES();
+        pList->m_item->SaveGame();
         ++sCount;
     }
     *pCount = sCount;
@@ -201,7 +201,7 @@ void Conversation::SaveGameTES() {
     }
 }
 
-void Conversation::LoadGameTES() {
+void Conversation::LoadGame() {
     uint32_t uiBlockTag;
     uint16_t usCount;
     int16_t sCurrentItem;
@@ -305,13 +305,13 @@ void Conversation::LoadGameTES() {
     }
 }
 
-void Conversation::InitLoadGameTES() {
+void Conversation::InitLoadGame() {
     for (BSSimpleList<DialogueItem*>* pList = &lDialogueItems; pList && !pList->IsEmpty(); pList = pList->m_pkNext) {
         pList->m_item->InitLoadGame();
     }
 }
 
-void Conversation::SaveGameBGS(BGSSaveFormBuffer* apBuffer) {
+void Conversation::SaveGame(BGSSaveFormBuffer* apBuffer) {
     int16_t sCurrentItem;
     uint32_t uiSaveGameCount = 0;
     uint32_t uiSaveGameBufferPos = apBuffer->StartVariableSizedValue();
@@ -331,12 +331,12 @@ void Conversation::SaveGameBGS(BGSSaveFormBuffer* apBuffer) {
     apBuffer->SaveDataEndian(&sCurrentItem, sizeof(sCurrentItem), 0);
 }
 
-void Conversation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
+void Conversation::LoadGame(BGSLoadFormBuffer* apBuffer) {
     uint32_t uiSaveGameCount = apBuffer->LoadVariableSizedValue();
     for (uint32_t uiLoop = 0; uiLoop < uiSaveGameCount; ++uiLoop) {
         DialogueItem* pDialogueItem;
         pDialogueItem = new DialogueItem;
-        pDialogueItem->LoadGameBGS(apBuffer);
+        pDialogueItem->LoadGame(apBuffer);
         lDialogueItems.AddTail(pDialogueItem);
     }
     int16_t sCurrentItem = -1;

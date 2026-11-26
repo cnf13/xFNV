@@ -6,10 +6,11 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSUtilities.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSRenderedTexture.h"
 #include "BSShader/BSShaderManager.h"
 #include "Fallout Shared/ActorValueOwner.h"
@@ -152,7 +153,7 @@ bool TESWaterForm::Load(TESFile* apFile) {
                 TESFile::WidenFormIDRecords(pWaterWeatherControl, 3, 4, sizeof(TESWaterForm*), {{0, 0}});
                 if (apFile->QEndian()) {
                     for (TESWaterForm*& pControl : pWaterWeatherControl) {
-                        ENDIAN(pControl, false);
+                        BSEndian(pControl, false);
                     }
                 }
             }
@@ -675,52 +676,52 @@ void WaterShaderData::Initialize() {
 
 // Swaps the fields read from a big-endian file, in field order. The blend byte needs no swap.
 void WaterShaderData::Endian() {
-    ENDIAN(fWindVelocity, false);
-    ENDIAN(fWindDirection, false);
-    ENDIAN(fWaveAmplitude, false);
-    ENDIAN(fWaveFrequency, false);
-    ENDIAN(fSunPower, false);
-    ENDIAN(fReflectionAmount, false);
-    ENDIAN(fFresnelAmount, false);
-    ENDIAN(fWaveSpeed, false);
-    ENDIAN(fFogDistNear, false);
-    ENDIAN(fFogDistFar, false);
-    ENDIAN(iShallowWaterColor, false);
-    ENDIAN(iDeepWaterColor, false);
-    ENDIAN(iReflectionWaterColor, false);
-    ENDIAN(fRainForce, false);
-    ENDIAN(fRainVelocity, false);
-    ENDIAN(fRainFalloff, false);
-    ENDIAN(fRainDampener, false);
-    ENDIAN(fRainSize, false);
-    ENDIAN(fDisplacementForce, false);
-    ENDIAN(fDisplacementVelocity, false);
-    ENDIAN(fDisplacementFalloff, false);
-    ENDIAN(fDisplacementDampener, false);
-    ENDIAN(fDisplacementSize, false);
-    ENDIAN(fNoiseScale, false);
-    ENDIAN(fNoiseWindDirection0, false);
-    ENDIAN(fNoiseWindDirection1, false);
-    ENDIAN(fNoiseWindDirection2, false);
-    ENDIAN(fNoiseWindSpeed0, false);
-    ENDIAN(fNoiseWindSpeed1, false);
-    ENDIAN(fNoiseWindSpeed2, false);
-    ENDIAN(fDepthFalloffStart, false);
-    ENDIAN(fDepthFalloffEnd, false);
-    ENDIAN(fFogAmount, false);
-    ENDIAN(fUVScale, false);
-    ENDIAN(fUnderwaterFogAmount, false);
-    ENDIAN(fUnderwaterFogDistNear, false);
-    ENDIAN(fUnderwaterFogDistFar, false);
-    ENDIAN(fRefractivityAmount, false);
-    ENDIAN(fShininess, false);
-    ENDIAN(fHDRMultiplier, false);
-    ENDIAN(fLightRadius, false);
-    ENDIAN(fLightBrightness, false);
-    ENDIAN(fHeightUVScale0, false);
-    ENDIAN(fHeightUVScale1, false);
-    ENDIAN(fHeightUVScale2, false);
-    ENDIAN(fAmplitude0, false);
-    ENDIAN(fAmplitude1, false);
-    ENDIAN(fAmplitude2, false);
+    BSEndian(fWindVelocity, false);
+    BSEndian(fWindDirection, false);
+    BSEndian(fWaveAmplitude, false);
+    BSEndian(fWaveFrequency, false);
+    BSEndian(fSunPower, false);
+    BSEndian(fReflectionAmount, false);
+    BSEndian(fFresnelAmount, false);
+    BSEndian(fWaveSpeed, false);
+    BSEndian(fFogDistNear, false);
+    BSEndian(fFogDistFar, false);
+    BSEndian(iShallowWaterColor, false);
+    BSEndian(iDeepWaterColor, false);
+    BSEndian(iReflectionWaterColor, false);
+    BSEndian(fRainForce, false);
+    BSEndian(fRainVelocity, false);
+    BSEndian(fRainFalloff, false);
+    BSEndian(fRainDampener, false);
+    BSEndian(fRainSize, false);
+    BSEndian(fDisplacementForce, false);
+    BSEndian(fDisplacementVelocity, false);
+    BSEndian(fDisplacementFalloff, false);
+    BSEndian(fDisplacementDampener, false);
+    BSEndian(fDisplacementSize, false);
+    BSEndian(fNoiseScale, false);
+    BSEndian(fNoiseWindDirection0, false);
+    BSEndian(fNoiseWindDirection1, false);
+    BSEndian(fNoiseWindDirection2, false);
+    BSEndian(fNoiseWindSpeed0, false);
+    BSEndian(fNoiseWindSpeed1, false);
+    BSEndian(fNoiseWindSpeed2, false);
+    BSEndian(fDepthFalloffStart, false);
+    BSEndian(fDepthFalloffEnd, false);
+    BSEndian(fFogAmount, false);
+    BSEndian(fUVScale, false);
+    BSEndian(fUnderwaterFogAmount, false);
+    BSEndian(fUnderwaterFogDistNear, false);
+    BSEndian(fUnderwaterFogDistFar, false);
+    BSEndian(fRefractivityAmount, false);
+    BSEndian(fShininess, false);
+    BSEndian(fHDRMultiplier, false);
+    BSEndian(fLightRadius, false);
+    BSEndian(fLightBrightness, false);
+    BSEndian(fHeightUVScale0, false);
+    BSEndian(fHeightUVScale1, false);
+    BSEndian(fHeightUVScale2, false);
+    BSEndian(fAmplitude0, false);
+    BSEndian(fAmplitude1, false);
+    BSEndian(fAmplitude2, false);
 }

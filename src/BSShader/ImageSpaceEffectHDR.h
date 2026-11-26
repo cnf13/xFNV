@@ -80,3 +80,23 @@ inline HDRConstantGroup90 kHDRConstants11ADE88{
     0,  0,   0,   63, 0, 0, 0,   64, 10, 215, 35,  62, 0, 0, 0,   0,  0,  0,   192, 63, 0, 0, 0,   64,
     10, 215, 35,  62, 0, 0, 0,   0,  0,  0,   32,  64, 0, 0, 0,   64, 10, 215, 163, 61
 };
+
+inline float ImageSpaceEffectHDR::GetBrightScale() {
+    return pfData[6];
+}
+
+inline float ImageSpaceEffectHDR::GetEyeAdaptSpeed() {
+    return pfData[0];
+}
+
+inline float ImageSpaceEffectHDR::GetTargetLUM() {
+    return pfData[4];
+}
+
+inline float ImageSpaceEffectHDR::GetUpperLUMClamp() {
+    return pfData[5];
+}
+
+inline float ImageSpaceEffectHDR::GetBrightClamp() {
+    return pfData[7];
+}

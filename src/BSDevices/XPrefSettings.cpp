@@ -2,7 +2,7 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 
 INIPrefSettingCollection::INIPrefSettingCollection() : INISettingCollection() {}
 

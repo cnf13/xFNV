@@ -1,11 +1,12 @@
 #include "Fallout Shared/TESLevItem.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/LEVELED_OBJECT_FILE.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESLeveledList.h"
@@ -18,7 +19,7 @@
 // (TESLevItem::Load's function-local static plastload).
 static LEVELED_OBJECT* plastload;
 
-SettingT<GameSettingCollection> gs_iLevItemLevelDifferenceMax("iLevItemLevelDifferenceMax", 0);
+SettingT<GameSettingCollection> TESLevItem::iLevItemLevelDifferenceMax("iLevItemLevelDifferenceMax", 0);
 
 TESLevItem::TESLevItem() : TESBoundObject(), TESLeveledList() {
     SetFormType(0x34u);
@@ -139,5 +140,5 @@ bool TESLevItem::Compare(TESForm* apCompare) {
 }
 
 int32_t TESLevItem::GetMaxLevelDifference() {
-    return gs_iLevItemLevelDifferenceMax.UInt();
+    return TESLevItem::iLevItemLevelDifferenceMax.UInt();
 }

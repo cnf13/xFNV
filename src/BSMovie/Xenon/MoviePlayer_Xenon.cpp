@@ -532,7 +532,7 @@ bool Movie::OpenBink(const char* apFileName, bool abSkipWarning, bool abPreloadB
     uint32_t uiFlags = 0;
     if ((abPreloadBink || abForcePreload) && rt::_stat64i32(Destination, &Stat) != -1) {
         Setting::Info* p_uValue;
-        p_uValue = &gs_iPreloadSizeLimit_General.uValue;
+        p_uValue = &iPreloadSizeLimit.uValue;
         // The compare of the file size with the limit is signed.
         if (Stat.st_size <= p_uValue->i || abForcePreload) {
             uiFlags |= BINKPRELOADALL;
@@ -696,7 +696,7 @@ void MoviePlayer::StartSequence(
     m_fTimeBeforeMovieSkippable = afTimeBeforeMovieSkippable;
     if (aiSequencePriority == -1) {
         Setting::Info* iIntroSequencePriorit;
-        iIntroSequencePriorit = &gs_iIntroSequencePriority_General.uValue;
+        iIntroSequencePriorit = &iIntroSequencePriority.uValue;
         SetSequenceThreadPriority(static_cast<int32_t>(iIntroSequencePriorit->uint));
     }
     else {

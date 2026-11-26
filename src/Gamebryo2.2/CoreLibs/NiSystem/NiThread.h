@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSystemObjects.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiProcessorAffinity.h"
 
 class NiThreadProcedure;

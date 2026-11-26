@@ -8,14 +8,16 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
+#include "BSDevices/XPrefSettings.h"
 #include "BSMain/BSCullingProcess.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
@@ -103,7 +105,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -114,6 +115,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerList.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/stdio.h"
 #include "SDK/MSVC/string.h"
@@ -416,7 +418,7 @@ void QuestUpdateManager::AddQuestNamesHead(QuestUpdateManager::QuestUpdate* pQue
 
 HUDMainMenu::HUDMainMenu()
   : Menu(), pTiles{}, pActive(nullptr), fSeenLevel(0.0f), uiMessageStartTime(0), pCurrSubtitle(nullptr),
-    pLastObject(nullptr), iHUDVisibilityUserSettings((gs_bCrossHair_GamePlay ? 64 : 0) | 0x1FFBF), eMenuMode(HMM_START),
+    pLastObject(nullptr), iHUDVisibilityUserSettings((bCrossHair ? 64 : 0) | 0x1FFBF), eMenuMode(HMM_START),
     bScopeVisible(false), pBreathMeterAnim(nullptr), bXPMeterFinishedMoving(false), bForceObjectiveReminders(false),
     pQuestList(nullptr), pCurrentEnemy(nullptr), iEnemyHealthTimer(0), uiQuestReminderTimer(appTimer.iLastTime),
     uiDDTdisplayTimer(0xFFFFFFFFu), uiEnemyDDTdisplayTimer(0xFFFFFFFFu), bKillQuestUpdates(false),
@@ -908,8 +910,7 @@ bool HUDMainMenu::ShowSubtitle(
     else {
         pActor = nullptr;
     }
-    if (apString &&
-        (gs_bGeneralSubtitles_Gameplay.Bool() || (pActor && static_cast<uint8_t>(pActor->GetShowSubtitles())))) {
+    if (apString && (bGeneralSubtitles.Bool() || (pActor && static_cast<uint8_t>(pActor->GetShowSubtitles())))) {
         HUDMainMenu::SubtitleData* pNewSubtitle = new HUDMainMenu::SubtitleData;
         BSstrcpy(pNewSubtitle->strText, 260, apString);
         pNewSubtitle->SpeakerLoc = aSpeakerLoc;
@@ -1498,7 +1499,7 @@ void HUDMainMenu::UpdateQuestText() {
                         HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
                         QuestUpdateManager::HQUT_COMPLETE
                     ) {
-                        pQuest->Set(4036, gs_sQuestCompletedText.String(), true);
+                        pQuest->Set(4036, sQuestCompleted.String(), true);
                     }
                     else if (
                         HUDMainMenu::pQuestUpdateManager->GetQuestNamesItem()->eUpdateType ==
@@ -1515,7 +1516,7 @@ void HUDMainMenu::UpdateQuestText() {
                     }
                 }
                 else {
-                    pQuest->Set(4036, gs_sQuestAddedText.String(), true);
+                    pQuest->Set(4036, sQuestAdded.String(), true);
                 }
                 pQuest->Set(4003, 1);
                 pQuest->Set(4009, 0);
@@ -4791,7 +4792,7 @@ void HUDMainMenu::Draw3DElements() {
     BSCullingProcess* pCuller = static_cast<BSCullingProcess*>(pWorld->GetCullingProcess());
     pCuller->PushCullMode(BSCullingProcess::BSCP_CULL_ALLPASS);
     NiCamera* pScopeCamera = HUDMainMenu::spScopeCamera;
-    NiCamera::HandleEyeFinityFOVScale(pScopeCamera, fScopeEyeFinityScale);
+    HandleEyeFinityFOVScale(pScopeCamera, fScopeEyeFinityScale);
     {
         alignas(NiPointer<BSShaderAccumulator>) uint8_t aAccumulatorStorage[sizeof(NiPointer<BSShaderAccumulator>)];
         NiPointer<BSShaderAccumulator>& spAccumulator = *::new (aAccumulatorStorage) NiPointer<BSShaderAccumulator>(
@@ -4809,14 +4810,14 @@ void HUDMainMenu::Draw3DElements() {
     }
 }
 
-void HUDMainMenu::HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool abShow) {
+void HUDMainMenu::SetTargetType(TESObjectREFR* apRef, bool abShow) {
     char cHostile = 0;
     char cDead = 1;
     if (!apRef ||
         !HUDMainMenu::pme ||
-        gs_bDisableDynamicCrosshair_GamePlay.Bool() ||
+        bDisableDynamicCrosshair.Bool() ||
         !abShow ||
-        (gs_bTrueIronSights_GamePlay.Bool() && pPlayer->GetIronSights())) {
+        (bTrueIronSights.Bool() && pPlayer->GetIronSights())) {
         if (HUDMainMenu::pme->pTiles[62]->GetFloat(4084) == 1.0) {
             HUDMainMenu::pme->pTiles[21]->Set(4003, 0);
             HUDMainMenu::pme->pTiles[22]->Set(4003, 0);
@@ -4854,12 +4855,6 @@ void HUDMainMenu::HandleHealthbarForCrosshairActor(TESObjectREFR* apRef, bool ab
     }
     bHostileUnderCrosshair = !cDead && cHostile;
     bLongDistancePick = abShow;
-}
-
-void HUDMainMenu::HandleHealthbarForCrosshairActor_(TESObjectREFR* apRef) {
-    if (pPlayer && pPlayer->Get3D()) {
-        HUDMainMenu::HandleHealthbarForCrosshairActor(apRef, false);
-    }
 }
 
 // For each map marker the HUDTravelLocData local passed to SetLocationText has bForceLastLocation written only for a
@@ -5608,10 +5603,6 @@ double HUDMainMenu::GetCompassAngle(NiPoint3 aDest, NiPoint3 aStart) {
 }
 
 HUDMainMenu::SubtitleData::SubtitleData() {}
-
-BSTimer::BSTimer() {
-    Init(BSGetTickCount());
-}
 
 int32_t TESWaterForm::GetHealthRestoration() {
     return iHealthRestoration;

@@ -48,3 +48,7 @@ extern hkClass hkContactPointMaterialClass;
 
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkContactPointMaterialTypeInfo;
+
+inline float hkContactPointMaterial::getFriction() const {
+    return m_friction;
+}

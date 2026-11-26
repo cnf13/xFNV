@@ -7,8 +7,6 @@ class NiGeometry;
 class NiParticleSystem;
 class TESModel;
 
-void NiSinCos_Fast(float afAngle, float* apSin, float* apCos);
-
 // The weather particle systems: rain or snow, kept as a pair of particle roots while the weather type blends
 // from one to the other.
 class Precipitation {

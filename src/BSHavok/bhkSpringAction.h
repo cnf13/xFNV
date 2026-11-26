@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BSHavok/bhkBinaryAction.h"
-#include "Fallout Shared/GlobalFunc.h"
+#include "BSHavok/bhkConvert.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 struct hkSpringActionCinfo;

@@ -2,7 +2,7 @@
 
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSMessageIcon.h"
 #include "Fallout Shared/BGSPickupPutdownSounds.h"
@@ -25,7 +25,7 @@
 #include "xfnv/Compiler.h"
 
 void CARAVANDECKDATA::Endian() {
-    ENDIAN(uiValue, false);
+    BSEndian(uiValue, false);
 }
 
 TESCaravanCard::TESCaravanCard() {

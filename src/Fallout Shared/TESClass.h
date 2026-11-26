@@ -63,10 +63,10 @@ public:
     void SetMajorSkill(int32_t aiIndex, ActorValue::Index aeSkill);
     ActorValue::Index GetTrainingSkill();
     bool CheckData();
-    void SaveGameTES();
+    void SaveGame();
     // Reads the class data and the full name and icon strings back from the old-format save. Hides
-    // TESAttributes::LoadGameTES, which no code calls through a TESClass.
-    void LoadGameTES();
+    // TESAttributes::LoadGame, which no code calls through a TESClass.
+    void LoadGame();
     int16_t GetSaveSize();
 
     static int32_t GetTagSkillCount();

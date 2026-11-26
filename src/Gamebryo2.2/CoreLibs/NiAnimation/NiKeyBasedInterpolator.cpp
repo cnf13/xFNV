@@ -1,7 +1,7 @@
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiKeyBasedInterpolator.h"
 
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiInterpolator.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"

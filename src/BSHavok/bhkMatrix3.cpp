@@ -1,4 +1,4 @@
-#include "BSHavok/bhkMatrix3.h"
+#include "BSHavok/bhkConvert.h"
 
 // The engine's constructor leaves each column to bhkVector4's constructor, which clears it.
 bhkMatrix3::bhkMatrix3() {}

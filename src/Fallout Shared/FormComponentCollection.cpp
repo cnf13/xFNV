@@ -1,6 +1,6 @@
 #include "Fallout Shared/FormComponentCollection.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSAmmoForm.h"
 #include "Fallout Shared/BGSBipedModelList.h"

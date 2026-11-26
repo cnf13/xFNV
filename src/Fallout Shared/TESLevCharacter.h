@@ -32,4 +32,5 @@ public:
     using TESBoundAnimObject::SaveGame;
 
     uint32_t pTemplate;
+    static SettingT<GameSettingCollection> iLevCharLevelDifferenceMax;
 };

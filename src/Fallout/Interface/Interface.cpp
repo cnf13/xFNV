@@ -7,14 +7,16 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSDevices/Controls.h"
+#include "BSDevices/XPrefSettings.h"
 #include "BSMain/BSCloningProcess.h"
+#include "BSMain/BSSceneGraph.h"
 #include "BSMain/BSStream.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/DebugText.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
@@ -27,32 +29,47 @@
 #include "BSSystem/FileFinder.h"
 #include "Fallout Shared/ActorValue.h"
 #include "Fallout Shared/BGSBodyPart.h"
+#include "Fallout Shared/BGSEntryPoint.h"
 #include "Fallout Shared/BSAnimGroupSequence.h"
+#include "Fallout Shared/CombatFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/InventoryChanges.h"
+#include "Fallout Shared/Magic/AlchemyItem.h"
+#include "Fallout Shared/Magic/EnchantmentItem.h"
+#include "Fallout Shared/Magic/IngredientItem.h"
 #include "Fallout Shared/MenuGameSettings.h"
 #include "Fallout Shared/ModelLoader.h"
 #include "Fallout Shared/Region System/TESRegion.h"
 #include "Fallout Shared/Renderer.h"
 #include "Fallout Shared/Script.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBase.h"
+#include "Fallout Shared/TESAmmo.h"
+#include "Fallout Shared/TESEnchantableForm.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESGlobal.h"
 #include "Fallout Shared/TESObject.h"
+#include "Fallout Shared/TESObjectARMO.h"
 #include "Fallout Shared/TESObjectDOOR.h"
+#include "Fallout Shared/TESObjectIMOD.h"
 #include "Fallout Shared/TESObjectREFR.h"
+#include "Fallout Shared/TESObjectWEAP.h"
 #include "Fallout Shared/TESRecipe.h"
 #include "Fallout Shared/TESSaveLoadGame.h"
 #include "Fallout Shared/TESScript.h"
 #include "Fallout Shared/TESTopic.h"
+#include "Fallout Shared/TESWeightForm.h"
 #include "Fallout Shared/TESWorldSpace.h"
 #include "Fallout/AI/AILinearTaskThreadManager.h"
 #include "Fallout/AI/Actor.h"
+#include "Fallout/AI/BaseProcess.h"
+#include "Fallout/AI/Combat/CombatUtilities.h"
 #include "Fallout/AI/Combat/Projectile.h"
 #include "Fallout/AI/CombatController.h"
 #include "Fallout/AI/MobileObject.h"
 #include "Fallout/AI/PlayerCharacter.h"
+#include "Fallout/Dialogue/MenuTopic.h"
 #include "Fallout/Interface/FOHUDEffectManager.h"
 #include "Fallout/Interface/FOPipboyManager.h"
 #include "Fallout/Interface/FORenderedMenu.h"
@@ -114,26 +131,18 @@
 #include <cstdarg>
 #include <cstdint>
 
-SettingT<INIPrefSettingCollection> gs_bDialogueSubtitles_GamePlay("bDialogueSubtitles:GamePlay", true);
-SettingT<INIPrefSettingCollection> gs_bGeneralSubtitles_Gameplay("bGeneralSubtitles:GamePlay", false);
-SettingT<INIPrefSettingCollection> gs_bCrossHair_GamePlay("bCrossHair:GamePlay", true);
-SettingT<INIPrefSettingCollection> gs_bSaveOnRest_GamePlay("bSaveOnRest:GamePlay", true);
-SettingT<INIPrefSettingCollection> gs_bSaveOnWait_GamePlay("bSaveOnWait:GamePlay", true);
-SettingT<INIPrefSettingCollection> gs_bSaveOnTravel_GamePlay("bSaveOnTravel:GamePlay", true);
+SettingT<INIPrefSettingCollection> bDialogueSubtitles("bDialogueSubtitles:GamePlay", true);
+SettingT<INIPrefSettingCollection> bGeneralSubtitles("bGeneralSubtitles:GamePlay", false);
+SettingT<INIPrefSettingCollection> bCrossHair("bCrossHair:GamePlay", true);
+SettingT<INIPrefSettingCollection> bSaveOnRest("bSaveOnRest:GamePlay", true);
+SettingT<INIPrefSettingCollection> bSaveOnWait("bSaveOnWait:GamePlay", true);
+SettingT<INIPrefSettingCollection> bSaveOnTravel("bSaveOnTravel:GamePlay", true);
 static SettingT<INIPrefSettingCollection> bSaveOnInteriorExteriorSwitch("bSaveOnInteriorExteriorSwitch:GamePlay", true);
-SettingT<INIPrefSettingCollection> gs_bDisableDynamicCrosshair_GamePlay("bDisableDynamicCrosshair:GamePlay", false);
-SettingT<INIPrefSettingCollection> gs_bTrueIronSights_GamePlay("bTrueIronSights:GamePlay", true);
+SettingT<INIPrefSettingCollection> bDisableDynamicCrosshair("bDisableDynamicCrosshair:GamePlay", false);
+SettingT<INIPrefSettingCollection> bTrueIronSights("bTrueIronSights:GamePlay", true);
 Interface::QUEUED_OPEN Interface::QueuedMenuOpen;
 Interface::QUEUED_OPEN Interface::QueuedMessageOpen;
 BSSpinLock Interface::QueuedMenuLock;
-
-char GetIsMapMenuFogOfWar() {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
-        return GetMapMenuFogOfWar();
-    }
-
-    return 0;
-}
 
 int32_t BSMAX_2(int32_t aiA, char acB) {
     if (aiA <= acB) {
@@ -145,12 +154,6 @@ int32_t BSMAX_2(int32_t aiA, char acB) {
 
 void ModalMessageMenuCallback() {
     iModalMessageMenuResult = Interface::GetMessageMenuResult();
-}
-
-void ToggleMapFogOfWar(bool abFogOfWar) {
-    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
-        SetMapMenuFogOfWar(abFogOfWar);
-    }
 }
 
 Interface::QUEUED_OPEN::QUEUED_OPEN()
@@ -231,7 +234,7 @@ void Interface::SetMapMenuVisible(bool abVisibility, bool abAnyVisibleState) {
         else {
             if (pStat) {
                 pStat->GetMenu()->StartFadeOut();
-                StatsMenu::Close();
+                StatsMenu::ResetHealingMode();
             }
             if (pRepair) {
                 pRepair->GetMenu()->StartFadeOut();
@@ -292,7 +295,7 @@ void Interface::SetInventoryMenuVisible(bool abVisibility, bool abAnyVisibleStat
             if (!ucIsVis) {
                 if (pStat) {
                     pStat->GetMenu()->StartFadeOut();
-                    StatsMenu::Close();
+                    StatsMenu::ResetHealingMode();
                 }
                 if (pMap) {
                     pMap->GetMenu()->StartFadeOut();
@@ -389,18 +392,18 @@ char Interface::GetInventoryPageNumber() {
     return InterfaceManager::Instance()->GetInventoryPageNumber();
 }
 
-int32_t Interface::GetLastPipboyTab() {
+int32_t Interface::GetCurrentMainMenu() {
     if (!InterfaceManager::Instance()) {
         return -1;
     }
     if (!InterfaceManager::Instance()->IsDoneFirstInit()) {
         return -1;
     }
-    return InterfaceManager::Instance()->GetLastPipboyTab();
+    return InterfaceManager::Instance()->GetCurrentMainMenu();
 }
 
 uint32_t Interface::GetContainerMode() {
-    return GetContainerMenuMode();
+    return ContainerMenu::GetContainerMode();
 }
 
 void Interface::ForceReload() {
@@ -1412,10 +1415,10 @@ bool Interface::IsConsoleVisible() {
     return MenuConsole::Instance(true)->IsVisible();
 }
 
-TESObjectREFR* Interface::GetConsoleSelection() {
+TESObjectREFR* Interface::GetPickREFR() {
     InterfaceManager* pManager = InterfaceManager::Instance();
     if (pManager != nullptr && pManager->IsDoneFirstInit()) {
-        return pManager->GetConsoleSelection();
+        return pManager->GetPickedREFR();
     }
     return nullptr;
 }
@@ -1613,7 +1616,7 @@ void Interface::SetRegionText(TESRegion* apRegion, BSStringT<char> xDisplayText,
 void Interface::CreateSleepMenu(bool abSleep) {
     if (InterfaceManager::Instance() &&
         InterfaceManager::Instance()->bFirstInit &&
-        InterfaceManager::IsPipboyClosed()) {
+        Interface::IsPipboyClosed()) {
         Tile* pTile = Menu::GetMenuByClass(1012);
         SleepWaitMenu* pMenu = nullptr;
         if (pTile) {
@@ -1950,6 +1953,23 @@ void Interface::SetSurgeryCursorPos(int32_t aiXPos, int32_t aiYPos) {
     }
 }
 
+void Interface::CreateLevelUpMenu() {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
+        LevelUpMenu::Create();
+    }
+}
+
+void Interface::CreateCharGenMenu(
+    int32_t aiItemType,
+    int32_t aiMaxPoints,
+    bool abOnlyAddValues,
+    bool abShowTaggedSkills
+) {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
+        CharGenMenu::Create(aiItemType, aiMaxPoints, abOnlyAddValues, abShowTaggedSkills);
+    }
+}
+
 NiNode* Interface::GetDebugTextRoot() {
     return InterfaceManager::Instance()->GetDebugTextRoot();
 }
@@ -2004,8 +2024,8 @@ void Interface::CreateRecipeMenu(TESObjectREFR* apVendor, TESForm* pCategory) {
 }
 
 InterfaceManager*
-Interface::SetQueuedPipboyTab(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, int32_t aiMenuToSet) {
-    return InterfaceManager::Instance()->SetQueuedPipboyTab(aucOverPipBoyScreen, afMouseX, afMouseY, aiMenuToSet);
+Interface::SetPipboyPickResults(uint8_t aucOverPipBoyScreen, float afMouseX, float afMouseY, int32_t aiMenuToSet) {
+    return InterfaceManager::Instance()->SetPipboyPickResults(aucOverPipBoyScreen, afMouseX, afMouseY, aiMenuToSet);
 }
 
 void Interface::MessageMenuYesToAll() {
@@ -2114,12 +2134,12 @@ void Interface::CloseAllSupportMenus([[maybe_unused]] bool abExceptSubtitleMenu)
     bClosingAllSupportMenus = 0;
 }
 
-void Interface::SaveGameTES() {
+void Interface::SaveGame() {
     int8_t cStatsMenuTab = Interface::GetStatsPageNumber();
     int8_t cInventoryMenuTab = Interface::GetInventoryPageNumber();
     int8_t cMagicMenuTab = Interface::GetMagicPageNumber();
     int8_t cMapMenuTab = Interface::GetMapPageNumber();
-    int32_t iLastPipboyTab = Interface::GetLastPipboyTab();
+    int32_t iLastPipboyTab = Interface::GetCurrentMainMenu();
     if (cStatsMenuTab < 1) {
         cStatsMenuTab = 1;
     }
@@ -2193,7 +2213,7 @@ void Interface::SetItemModMenuVisible(bool abVisibility, bool abAnyVisibleState,
             if (!ucIsVis) {
                 if (pStat) {
                     pStat->GetMenu()->StartFadeOut();
-                    StatsMenu::Close();
+                    StatsMenu::ResetHealingMode();
                 }
                 if (pMap) {
                     pMap->GetMenu()->StartFadeOut();
@@ -2396,7 +2416,7 @@ void Interface::SetRepairMenuVisible(bool abVisibility, bool abAnyVisibleState, 
             if (!bIsVisible) {
                 if (pStat) {
                     pStat->GetMenu()->StartFadeOut();
-                    StatsMenu::Close();
+                    StatsMenu::ResetHealingMode();
                 }
                 if (pMap) {
                     pMap->GetMenu()->StartFadeOut();
@@ -2490,10 +2510,6 @@ int16_t Interface::GetSaveSize() {
         return 9;
     }
     return 8;
-}
-
-uint8_t Controls::RemapAction(USERACTIONS eAction, uint32_t uiIndex) {
-    return ucKeyBinds[uiIndex][eAction];
 }
 
 // The terminal's fade is its geometry's last fade percent, or fully shown without geometry.
@@ -2591,4 +2607,579 @@ void MessageMenu_SetDisabled(uint8_t abDisable) {
             MessageMenu::Create();
         }
     }
+}
+
+double GetEyefinityScreenAspect() {
+    return 0.75f;
+}
+
+// The Eyefinity group is drawn at 4:3 per screen: the frustum's width is scaled by 0.75 and by one screen's aspect
+// ratio, and the vertical field of view is afScale times fDefaultFOV in radians, widened by 1.1 and capped at
+// 1.53938043117523193359375. Compares and rounds in double; NaN takes the cap.
+void HandleEyeFinityFOVScale(NiCamera* apCamera, float afScale) {
+    if (!apCamera) {
+        return;
+    }
+    if (!Renderer::is_bEyeFinity()) {
+        return;
+    }
+    float fAspectRatio = static_cast<float>(GetEyefinityScreenAspect());
+    apCamera->AdjustAspectRatio(fAspectRatio, false);
+    double dWidth = Renderer::GetEyefinitySLSWidth();
+    float fScreenRatio = static_cast<float>(dWidth / Renderer::GetEyefinitySLSHeight());
+    double dFOV;
+    if (afScale * BSSceneGraph::fDefaultFOV.Float() * 0.01745329238474369049072265625 * 1.10000002384185791015625 <
+        1.53938043117523193359375) {
+        dFOV = afScale * BSSceneGraph::fDefaultFOV.Float() * 0.01745329238474369049072265625 *
+            1.10000002384185791015625;
+    }
+    else {
+        dFOV = 1.53938043117523193359375;
+    }
+    float fFOV = static_cast<float>(dFOV);
+    NiFrustum kFrustum(false);
+    kFrustum.m_fLeft = -std::tan(fFOV) * fAspectRatio * fScreenRatio;
+    kFrustum.m_fRight = std::tan(fFOV) * fAspectRatio * fScreenRatio;
+    kFrustum.m_fBottom = -std::tan(fFOV) * fAspectRatio;
+    kFrustum.m_fTop = std::tan(fFOV) * fAspectRatio;
+    kFrustum.m_bOrtho = false;
+    kFrustum.m_fNear = 1.0f;
+    kFrustum.m_fFar = 5000.0f;
+    apCamera->SetViewFrustum(kFrustum);
+}
+
+// These five are declared in InterfaceManager.h, so they keep external linkage: defined inside the anonymous
+// namespace above they are different, internal entities, and the header's declarations stay undefined.
+void Interface::ToggleFullHelp() {
+    if (InterfaceManager::Instance()) {
+        if (InterfaceManager::Instance()->IsDoneFirstInit()) {
+            // Tests the flag as a raw byte: any byte but 0 reads as set, and it stores 0 or 1.
+            bool bNewFullHelp = static_cast<uint8_t>(InterfaceManager::Instance()->bFullHelp) == 0;
+            InterfaceManager::Instance()->bFullHelp = bNewFullHelp;
+        }
+    }
+}
+
+bool Interface::GetFullHelp() {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
+        return InterfaceManager::Instance()->bFullHelp;
+    }
+
+    return false;
+}
+
+bool Interface::GetFogOfWarEnabled() {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
+        return MapMenu::QFogOfWar();
+    }
+
+    return false;
+}
+
+void Interface::SetFogOfWarEnabled(bool abFogOfWar) {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
+        MapMenu::SetFogOfWar(abFogOfWar);
+    }
+}
+
+// Returns null on both failed tests: the null singleton, then IsDoneFirstInit.
+void Interface::CreateBarterMenu(TESObjectREFR* apRef, int32_t aiMode) {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
+        BarterMenu::Create(apRef, aiMode);
+    }
+}
+
+void Interface::CreateLockPickMenu(TESObjectREFR* apRef, int32_t aiLockLevel, bool abFlag) {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->IsDoneFirstInit()) {
+        LockPickMenu::Create(apRef, aiLockLevel, abFlag);
+    }
+}
+
+TESObjectREFR* Interface::InDialogWith() {
+    if (InterfaceManager::Instance() && InterfaceManager::Instance()->bFirstInit) {
+        DialogMenu* pDialogMenu = nullptr;
+        Tile* pMenuTile = Menu::GetMenuByClass(1009);
+        if (pMenuTile) {
+            Menu* pMenu = pMenuTile->GetMenu();
+            pDialogMenu = dynamic_cast<DialogMenu*>(pMenu);
+        }
+        if (pDialogMenu) {
+            return pDialogMenu->pSpeaker;
+        }
+    }
+
+    return nullptr;
+}
+
+bool Interface::UpdateSleeping() {
+    TileMenu* pMenuByClass = static_cast<TileMenu*>(Menu::GetMenuByClass(SleepWaitMenu::GetClassStatic()));
+    SleepWaitMenu* pSleepMenu = nullptr;
+    if (pMenuByClass) {
+        pSleepMenu = static_cast<SleepWaitMenu*>(pMenuByClass->Tile::GetMenu());
+    }
+    if (!InterfaceManager::Instance()) {
+        return false;
+    }
+    if (!InterfaceManager::Instance()->IsDoneFirstInit()) {
+        return false;
+    }
+    if (pSleepMenu && pSleepMenu->UpdateSleeping()) {
+        return true;
+    }
+    return false;
+}
+
+void Interface::SetCrosshairTargetType(TESObjectREFR* apRef) {
+    if (pPlayer && pPlayer->Get3D()) {
+        HUDMainMenu::SetTargetType(apRef, false);
+    }
+}
+
+void Interface::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
+    bIsReverting = true;
+    Interface::ClearAllSubtitlesAndMessages();
+    HUDMainMenu::Revert();
+    if (Interface::InDialog()) {
+        MobileObject* pPartner = static_cast<MobileObject*>(Interface::InDialogWith());
+        pPlayer->FocusOnActor(pPartner, 0.0f, true);
+        MenuTopicManager::Destroy();
+    }
+    Interface::CloseVATSMenu();
+    VATSMenu::ClearTargetList();
+    Interface::CloseAllSupportMenus(false);
+    MessageMenu::ClearMessageQueue();
+    StatsMenu::ClearPerks();
+    MapMenu::ClearSelectedNote();
+    MapMenu::ClearAudioLogSubtites();
+    Interface::PopFromEnterStack(1, true);
+    InterfaceManager::Instance()->EnterRenderedMenu(nullptr);
+    InterfaceManager::Instance()->ePipboyState = InterfaceManager::PS_CLOSED;
+    InterfaceManager::Instance()->xTutorialManager.Reset();
+}
+
+// Menus laid out in screen pixels rather than the 1280-wide menu space: the pip-boy menu (id 0x70), the computers,
+// hacking and race/sex menus (classes 0x421, 0x41F, 0x40C). Both values are truncated before the compares.
+bool Interface::IsRenderedMenu(Menu* apMenu) {
+    TileMenu* menuTile = apMenu ? apMenu->GetMenuTile() : nullptr;
+    if (!menuTile) {
+        return false;
+    }
+    const int32_t id = static_cast<int32_t>(menuTile->GetFloat(Tile::kTileValue_ID));
+    const int32_t menuClass = static_cast<int32_t>(menuTile->GetFloat(Tile::kTileValue_Class));
+    return id == 0x70 || menuClass == 0x421 || menuClass == 0x41F || menuClass == 0x40C;
+}
+
+// The item data tile's last 13 children, last first, are its stat rows: 0 damage resistance, 1 damage per second, 2
+// weight, 3 value, 4 condition, 5 ammo or armor class, 6 effects, 7 to 9 the three mod rows, 10 strength requirement
+// (may be missing), 11 damage, 12 damage threshold; missing children are null. Each row gets its value and title, and
+// uiVisible picks the rows shown. It reads apItem's value, weight and object before the null checks.
+void Interface::PopulateItemStatsDisplay(ItemChange* apItem, Tile* apTile) {
+    uint32_t uiVisible = 0;
+    int32_t iTitleTrait = Tile::TextToTrait("_Title");
+    int32_t iValueTrait = Tile::TextToTrait("_Value");
+    int32_t iConditionTrait = Tile::kTileValue_User5;
+    float fMod2Offset = 0.0f;
+    float fMod3Offset = 0.0f;
+    float fValue = apItem->GetItemValue();
+    bool bHardcore = pPlayer->IsHardcore();
+    float fWeight = TESWeightForm::GetFormWeight(apItem->GetItemChangeObject(), bHardcore);
+    if (!apItem || !apTile) {
+        return;
+    }
+    Tile* pTiles[13];
+    NiTListItem<Tile*>* pPos = apTile->xChildren.GetTailPos();
+    int32_t i;
+    for (i = 0; pPos && i < 13; ++i) {
+        pTiles[i] = apTile->xChildren.GetPrev(pPos);
+    }
+    for (; i < 13; ++i) {
+        pTiles[i] = nullptr;
+    }
+    Tile* pArrows = Tile::GetTileByName(apTile, "CNDArrows");
+    Tile* pMeter = Tile::GetTileByName(apTile, "ConditionMeter");
+    pArrows->Set(Tile::kTileValue_Height, pMeter->GetFloat(Tile::kTileValue_Height), true);
+    pArrows->Set(Tile::kTileValue_Y, pMeter->GetFloat(Tile::kTileValue_Y), true);
+    bool bHasMods = apItem->GetModSlots() != 0;
+    switch (apItem->GetItemChangeObject()->GetFormType()) {
+        case AMMO_ID: {
+            uiVisible = 0xC;
+            TESAmmo* pAmmo = static_cast<TESAmmo*>(apItem->GetItemChangeObject());
+            char acAmmoEffects[256];
+            pAmmo->BuildMenuString(acAmmoEffects, 0x100);
+            if (BSstrlen(acAmmoEffects) > 0) {
+                pTiles[6]->Set(iValueTrait, acAmmoEffects, true);
+                uiVisible |= 0x40;
+            }
+            else {
+                uiVisible &= ~0x40u;
+            }
+            break;
+        }
+        case WEAP_ID: {
+            TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(apItem->GetItemChangeObject());
+            pTiles[4]->Set(Tile::kTileValue_User6, 1);
+            // The player's loaded ammo and the player as the weapon's holder, when the item is the player's weapon.
+            TESAmmo* pLoadedAmmo = nullptr;
+            Actor* pHolder = nullptr;
+            if (pPlayer->GetCurrentAIProcess() &&
+                pPlayer->GetCurrentAIProcess()->GetCurrentWeapon() &&
+                pWeapon == pPlayer->GetCurrentAIProcess()->GetCurrentWeapon()->GetItemChangeObject()) {
+                TESAmmo* pAmmo;
+                if (pPlayer->GetCurrentAIProcess()->GetCurrentAmmo()) {
+                    pAmmo = static_cast<TESAmmo*>(
+                        pPlayer->GetCurrentAIProcess()->GetCurrentAmmo()->GetItemChangeObject()
+                    );
+                }
+                else {
+                    pAmmo = nullptr;
+                }
+                pLoadedAmmo = pAmmo;
+                pHolder = pPlayer;
+            }
+            fWeight = pWeapon->GetFormWeight(apItem->HasModEffectActive(WEAPON_MOD_DECREASE_WEIGHT));
+            if (fWeight >= 10.0) {
+                float fHeavyMult = 1.0f;
+                BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::NOT_YET_IMPLEMENTED, pPlayer, &fHeavyMult);
+                fWeight = fWeight * fHeavyMult;
+            }
+            float fCondition = static_cast<float>(apItem->GetItemHealth(true) / 100.0);
+            uint32_t uiStrRequired = pWeapon->GetStrRequired();
+            float fDamage = 0.0f;
+            float fDPS = 0.0f;
+            fDPS = CombatUtilities::CalculateItemDPS(
+                pPlayer,
+                pWeapon,
+                fCondition,
+                true,
+                apItem,
+                false,
+                false,
+                -1,
+                0.0f,
+                0.0f,
+                false,
+                false,
+                pLoadedAmmo
+            );
+            // A NaN condition still asks for the damage.
+            if (fCondition <= 0.0) {
+                fDamage = 0.0f;
+            }
+            else {
+                fDamage = CombatFormulas::CalcWeaponDamageForDisplay(pWeapon, fCondition, apItem, pLoadedAmmo);
+            }
+            char acBuffer[128];
+            BSsprintf(acBuffer, 0x80, "%d", static_cast<int32_t>(BSRoundToNearest(fDPS, 1.0f)));
+            pTiles[1]->Set(iValueTrait, acBuffer, true);
+            Actor* pProjectileHolder = pHolder;
+            uint32_t uiProjectiles = pWeapon->GetNumProjectiles(
+                apItem->HasModEffectActive(WEAPON_MOD_SPLIT_BEAM),
+                false,
+                pProjectileHolder
+            );
+            if (uiProjectiles > 1) {
+                float fPerProjectile = static_cast<float>(fDamage / static_cast<double>(uiProjectiles));
+                BSsprintf(acBuffer, 0x80, "%.1fx%d", fPerProjectile, uiProjectiles);
+            }
+            else {
+                BSsprintf(acBuffer, 0x80, "%d", static_cast<int32_t>(BSRoundToNearest(fDamage, 1.0f)));
+            }
+            pTiles[11]->Set(iValueTrait, acBuffer, true);
+            pTiles[4]->Set(iConditionTrait, BSMIN(fCondition, 1.0f), true);
+            float fStrBonus = 0.0f;
+            BGSEntryPoint::HandleEntryPoint(
+                BGSEntryPoint::WEAPON_HANDLING_STRENGTH_BONUS,
+                pPlayer,
+                pWeapon,
+                &fStrBonus
+            );
+            // The bonus is converted by truncation (a float to unsigned conversion), and the difference is clamped at 0
+            // on its sign bit.
+            uint32_t uiStrBonus = static_cast<uint32_t>(static_cast<int64_t>(fStrBonus));
+            uiStrRequired -= uiStrBonus;
+            if (static_cast<int32_t>(uiStrRequired) < 0) {
+                uiStrRequired = 0;
+            }
+            BSsprintf(acBuffer, 0x80, "%d", uiStrRequired);
+            if (pTiles[10]) {
+                pTiles[10]->Set(iValueTrait, acBuffer, true);
+            }
+            if (pWeapon->GetCurrentAmmo(pHolder)) {
+                ItemChange* pWeaponInfo = pPlayer->GetCurrentAIProcess()->GetCurrentWeapon();
+                ItemChange* pAmmoInfo = pPlayer->GetCurrentAIProcess()->GetCurrentAmmo();
+                const char* pAmmoName = static_cast<TESAmmo*>(pWeapon->GetCurrentAmmo(pHolder))->GetShortName();
+                TESForm* pAmmoForm = pWeapon->GetCurrentAmmo(pHolder);
+                InventoryChanges* pChanges = InventoryChanges::GetInventoryChanges(pPlayer);
+                int32_t iAmmoCount = pChanges->GetObjectCount(static_cast<TESBoundObject*>(pAmmoForm));
+                int32_t iClipRounds = 0;
+                if (!pAmmoName || !*pAmmoName) {
+                    pAmmoName = static_cast<TESAmmo*>(pWeapon->GetCurrentAmmo(pHolder))->TESFullName::GetFullName();
+                }
+                // The item is the equipped weapon when both share their first instance: the loaded rounds are the ammo
+                // item's count, else a clip's worth of the carried ammo.
+                if (pWeaponInfo &&
+                    pWeaponInfo->GetExtraDataList() &&
+                    apItem->GetExtraDataList() &&
+                    pWeaponInfo->GetExtraDataList()->GetItem() == apItem->GetExtraDataList()->GetItem()) {
+                    int32_t iLoaded;
+                    if (pAmmoInfo) {
+                        iLoaded = pAmmoInfo->GetCount();
+                    }
+                    else {
+                        iLoaded = 0;
+                    }
+                    iClipRounds = iLoaded;
+                }
+                else {
+                    iClipRounds = BSMIN(
+                        pWeapon->GetFormClipRounds(apItem->HasModEffectActive(WEAPON_MOD_INCREASE_CLIP_SIZE)),
+                        iAmmoCount
+                    );
+                }
+                bool bRegenerates = pWeapon->GetAmmoRegenRate(false) != 0.0;
+                if (bRegenerates) {
+                    BSsprintf(acBuffer, 0x80, "%s", pAmmoName);
+                }
+                else {
+                    BSsprintf(acBuffer, 0x80, "%s (%i/%i)", pAmmoName, iClipRounds, iAmmoCount - iClipRounds);
+                }
+            }
+            else {
+                BSstrcpy(acBuffer, 0x80, "--");
+            }
+            pTiles[5]->Set(iTitleTrait, acBuffer, true);
+            uiVisible = 0xC3E;
+            break;
+        }
+        case ARMO_ID:
+        case CLOT_ID: {
+            pTiles[4]->Set(Tile::kTileValue_User6, 0);
+            float fCondition = static_cast<float>(apItem->GetItemHealth(true) / 100.0);
+            uiVisible = 0x3C;
+            char acBuffer[128];
+            BSstrcpy(acBuffer, 0x80, "--");
+            TESObjectARMO* pArmor = dynamic_cast<TESObjectARMO*>(apItem->GetItemChangeObject());
+            if (pArmor) {
+                if (pArmor->IsHeavy()) {
+                    BSstrcpy(acBuffer, 0x80, pGSArmorWeight[1]->String());
+                }
+                else if (pArmor->IsMedium()) {
+                    BSstrcpy(acBuffer, 0x80, pGSArmorWeight[2]->String());
+                }
+                else {
+                    BSstrcpy(acBuffer, 0x80, pGSArmorWeight[0]->String());
+                }
+            }
+            pTiles[5]->Set(iTitleTrait, acBuffer, true);
+            float fArmorRating = CombatFormulas::CalcArmorRating(
+                static_cast<uint16_t>(
+                    static_cast<int32_t>(static_cast<TESObjectARMO*>(apItem->GetItemChangeObject())->GetArmorRating())
+                ),
+                fCondition
+            );
+            float fThreshold = CombatFormulas::CalcArmorRating(
+                static_cast<uint16_t>(static_cast<int32_t>(
+                    static_cast<TESObjectARMO*>(apItem->GetItemChangeObject())->GetDamageThreshold()
+                )),
+                fCondition
+            );
+            if (fArmorRating == 0.0 && fThreshold == 0.0) {
+                uiVisible |= 1;
+                BSstrcpy(acBuffer, 0x80, "--");
+                pTiles[0]->Set(iValueTrait, acBuffer, true);
+            }
+            else {
+                if (fArmorRating != 0.0) {
+                    BSsprintf(acBuffer, 0x80, "%d", static_cast<int32_t>(FloatCeil(fArmorRating)));
+                    pTiles[0]->Set(iValueTrait, acBuffer, true);
+                    uiVisible |= 1;
+                }
+                if (fThreshold != 0.0) {
+                    BSsprintf(acBuffer, 0x80, "%d", static_cast<int32_t>(FloatCeil(fThreshold)));
+                    pTiles[12]->Set(iValueTrait, acBuffer, true);
+                    uiVisible |= 0x1000;
+                }
+            }
+            uint32_t uiMaxHealth;
+            if (TESHealthForm::GetFormHealth(apItem->GetItemChangeObject())) {
+                uiMaxHealth = TESHealthForm::GetFormHealth(apItem->GetItemChangeObject());
+            }
+            else {
+                uiMaxHealth = 1;
+            }
+            float fHealthRatio = static_cast<float>(apItem->GetItemHealth(false) / static_cast<double>(uiMaxHealth));
+            pTiles[4]->Set(iConditionTrait, BSMIN(1.0f, fHealthRatio), true);
+            break;
+        }
+        default: uiVisible = 0xC; break;
+    }
+    EffectItemList* pEffects = nullptr;
+    if (apItem->GetItemChangeObject()->GetFormType() == INGR_ID) {
+        pEffects = static_cast<IngredientItem*>(apItem->GetItemOwnership());
+    }
+    else if (apItem->GetItemChangeObject()->GetFormType() == ALCH_ID) {
+        pEffects = static_cast<AlchemyItem*>(apItem->GetItemChangeObject());
+    }
+    else {
+        EnchantmentItem* pEnchantment = TESEnchantableForm::GetFormEnchanting(apItem->GetItemChangeObject());
+        if (pEnchantment && !pEnchantment->GetFlag(EnchantmentItem::HIDE_EFFECT)) {
+            pEffects = pEnchantment;
+        }
+    }
+    if (pEffects && pEffects->GetItem()) {
+        char acEffects[256];
+        pEffects->BuildMenuString(acEffects, 0x100);
+        if (BSstrlen(acEffects) > 0) {
+            pTiles[6]->Set(iValueTrait, acEffects, true);
+            uiVisible |= 0x40;
+        }
+        else {
+            uiVisible &= ~0x40u;
+        }
+    }
+    else if (apItem->GetItemChangeObject()->GetFormType() != AMMO_ID) {
+        uiVisible &= ~0x40u;
+    }
+    if (apItem->GetItemChangeObject()->GetFormType() == IMOD_ID) {
+        TESObjectIMOD* pItemMod = static_cast<TESObjectIMOD*>(apItem->GetItemChangeObject());
+        pTiles[6]->Set(iValueTrait, pItemMod->GetDescription(nullptr, DESC_ID), true);
+        uiVisible |= 0x40;
+    }
+    if (bHasMods) {
+        TESObjectWEAP* pWeapon = static_cast<TESObjectWEAP*>(apItem->GetItemChangeObject());
+        TESObjectIMOD* pMod = nullptr;
+        uint8_t ucModSlots = apItem->GetModSlots();
+        bool bTitleSet = false;
+        char acModName[128];
+        if (ucModSlots & 1) {
+            uiVisible |= 0x80;
+            pTiles[7]->Set(iTitleTrait, sModEffects.String(), true);
+            bTitleSet = true;
+            fMod2Offset = static_cast<float>(fMod2Offset + 41.0);
+            fMod3Offset = static_cast<float>(fMod3Offset + 41.0);
+            pMod = pWeapon->GetModItem(1);
+            if (pMod) {
+                BSstrcpy(acModName, 0x80, pMod->TESFullName::GetFullName());
+            }
+            else {
+                BSstrcpy(acModName, 0x80, "Mod 1");
+            }
+            pTiles[7]->Set(iValueTrait, acModName, true);
+        }
+        if (ucModSlots & 2) {
+            uiVisible |= 0x100;
+            pMod = pWeapon->GetModItem(2);
+            if (pMod) {
+                BSstrcpy(acModName, 0x80, pMod->TESFullName::GetFullName());
+            }
+            else {
+                BSstrcpy(acModName, 0x10, "Mod 2");
+            }
+            pTiles[8]->Set(iValueTrait, acModName, true);
+            if (!bTitleSet) {
+                pTiles[8]->Set(iTitleTrait, sModEffects.String(), true);
+                bTitleSet = true;
+            }
+            fMod3Offset = static_cast<float>(fMod3Offset + 41.0);
+        }
+        if (ucModSlots & 4) {
+            pMod = pWeapon->GetModItem(4);
+            if (pMod) {
+                BSstrcpy(acModName, 0x80, pMod->TESFullName::GetFullName());
+            }
+            else {
+                BSstrcpy(acModName, 0x10, "Mod 3");
+            }
+            pTiles[9]->Set(iValueTrait, acModName, true);
+            uiVisible |= 0x200;
+            if (!bTitleSet) {
+                pTiles[9]->Set(iTitleTrait, sModEffects.String(), true);
+                bTitleSet = true;
+            }
+        }
+        uiVisible &= ~0x40u;
+    }
+    else {
+        uiVisible &= ~0x80u;
+    }
+    char acValue[16];
+    if (fValue > 0.0) {
+        // The count times the value at x87 precision, passed as a double.
+        if (fValue < 1.0) {
+            BSsprintf(acValue, 0x10, "%.1f", static_cast<double>(apItem->GetCount()) * fValue);
+        }
+        else {
+            BSsprintf(acValue, 0x10, "%.0f", static_cast<double>(apItem->GetCount()) * fValue);
+        }
+    }
+    else {
+        BSstrcpy(acValue, 0x10, "--");
+    }
+    pTiles[3]->Set(iValueTrait, acValue, true);
+    float fLightItems = 0.0f;
+    BGSEntryPoint::HandleEntryPoint(BGSEntryPoint::HAS_LIGHT_ITEMS_WEIGH_NOTHING, pPlayer, &fLightItems);
+    if (fLightItems > 0.0) {
+        if (fPackRatThreshold.Float() >= fWeight) {
+            fWeight = fWeight * fPackRatModifier.Float();
+        }
+    }
+    char acWeight[32];
+    if (fWeight > 0.0) {
+        BSsprintf(acWeight, 0x20, "%.2f", static_cast<double>(apItem->GetCount()) * fWeight);
+    }
+    else {
+        BSstrcpy(acWeight, 0x20, "--");
+    }
+    pTiles[2]->Set(iValueTrait, acWeight, true);
+    if (BSstrcmp(sLanguage.String(), "ENGLISH")) {
+        pTiles[0]->Set(iTitleTrait, sInventoryDamageResistance.String(), true);
+        pTiles[1]->Set(iTitleTrait, sInventoryDamagePerSecond.String(), true);
+        pTiles[11]->Set(iTitleTrait, sInventoryDamage.String(), true);
+        pTiles[2]->Set(iTitleTrait, sInventoryWeightUpper.String(), true);
+        pTiles[3]->Set(iTitleTrait, sInventoryValue.String(), true);
+        pTiles[4]->Set(iTitleTrait, sInventoryCondition.String(), true);
+        pTiles[6]->Set(iTitleTrait, sInventoryEffects.String(), true);
+        pTiles[7]->Set(iTitleTrait, sModEffects.String(), true);
+        pTiles[10]->Set(iTitleTrait, sInventoryStrReq.String(), true);
+    }
+    pTiles[0]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 1) != 0));
+    pTiles[12]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x1000) != 0));
+    pTiles[1]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 2) != 0));
+    pTiles[11]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x800) != 0));
+    pTiles[2]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 4) != 0));
+    pTiles[3]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 8) != 0));
+    pTiles[4]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x10) != 0));
+    pTiles[5]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x20) != 0));
+    pTiles[6]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x40) != 0));
+    pTiles[7]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x80) != 0));
+    pTiles[8]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x100) != 0));
+    pTiles[9]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x200) != 0));
+    if (pTiles[10]) {
+        pTiles[10]->Set(Tile::kTileValue_Visible, static_cast<int32_t>((uiVisible & 0x400) != 0));
+        pTiles[10]->Set(Tile::kTileValue_Alpha, 255.0f, true);
+    }
+    float fY = static_cast<float>(apTile->GetFloat(Tile::kTileValue_Height) / 2.0 - 20.0);
+    if ((uiVisible & 0x10) || (uiVisible & 0x20)) {
+        fY = fY + fY;
+    }
+    pTiles[6]->Set(Tile::kTileValue_Y, fY, true);
+    pTiles[7]->Set(Tile::kTileValue_Y, fY, true);
+    float fMod2Y = fY + fMod2Offset;
+    pTiles[8]->Set(Tile::kTileValue_Y, fMod2Y, true);
+    float fMod3Y = fY + fMod3Offset;
+    pTiles[9]->Set(Tile::kTileValue_Y, fMod3Y, true);
+}
+
+TESObjectREFR* Interface::GetTelekinesisREFR() {
+    if (!InterfaceManager::Instance()) {
+        return nullptr;
+    }
+    if (!InterfaceManager::Instance()->IsDoneFirstInit()) {
+        return nullptr;
+    }
+    return InterfaceManager::Instance()->pTelekinesisRef;
+}
+
+bool Interface::IsPipboyClosed() {
+    return InterfaceManager::Instance()->ePipboyState == 0;
 }

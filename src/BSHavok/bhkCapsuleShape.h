@@ -1,7 +1,7 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkConvexShape.h"
-#include "Fallout Shared/GlobalFunc.h"
 
 struct hkCapsuleShapeCinfo;
 class hkContactPoint;
@@ -60,3 +60,7 @@ struct hkCapsuleShapeCinfo : public hkConvexShapeCinfo {
 // The info is its own serialized form (bhkSerialized.h): with no pointer member its layout is the file's, so
 // bhkSerializable::LoadCInfo's raw read of QCinfoSize() bytes over it is right.
 static_assert(offsetof(hkCapsuleShapeCinfo, m_vertexB) == 0x20 && sizeof(hkCapsuleShapeCinfo) == 0x30);
+
+inline hkCapsuleShapeCinfo::hkCapsuleShapeCinfo() {
+    m_vertexB.set(1.0, 0.0, 0.0, 0.0);
+}

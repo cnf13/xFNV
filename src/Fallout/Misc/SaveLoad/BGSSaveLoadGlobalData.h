@@ -88,8 +88,6 @@ using NiTMapBaseTESGlobalBool = NiTMapBase<DFALL<NiTMapItem<TESGlobal*, bool>>, 
 
 // The per-system reverts that RevertGlobalData calls.
 namespace RevertGlobalData {
-    // Reverts the interface manager and closes the menus.
-    void InterfaceManagerAndMenus(BGSLoadGameBuffer* apLoadGameBuffer);
     // Removes the active image space modifiers.
     void ImageSpaceModifiers();
 } // namespace RevertGlobalData

@@ -84,3 +84,7 @@ public:
     float fZPos;
     float fUnused;
 };
+
+inline void BoltShader::SetSubSegmentCount(int32_t aiSubSegments) {
+    iSubSegments = aiSubSegments;
+}

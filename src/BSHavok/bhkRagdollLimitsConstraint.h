@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSHavok/bhkConstraint.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 
 // The creation info of a ragdoll limits constraint. It adds no fields to hkConstraintCinfo.
 class hkRagdollLimitsConstraintCinfo : public hkConstraintCinfo {

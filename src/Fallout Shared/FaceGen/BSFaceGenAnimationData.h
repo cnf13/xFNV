@@ -2,7 +2,6 @@
 
 #include "BSCore/BSSpinLock.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/FaceGen/BSFaceGenKeyframe.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -344,52 +343,32 @@ public:
     static SettingT<GameSettingCollection> fTrackJustAcquiredDuration;
     static SettingT<GameSettingCollection> fEyePitchMaxOffsetEmotionFear;
     static SettingT<GameSettingCollection> fEyePitchMinOffsetEmotionFear;
+
+protected:
+    static SettingT<GameSettingCollection> fSpeechDelay;
+    static SettingT<GameSettingCollection> fBlinkDownTime;
+    static SettingT<GameSettingCollection> fBlinkUpTime;
+    static SettingT<GameSettingCollection> fBlinkDelayMin;
+    static SettingT<GameSettingCollection> fBlinkDelayMax;
+    static SettingT<GameSettingCollection> fLookDownDisableBlinkingAmt;
+    static SettingT<GameSettingCollection> fEyePitchMaxOffsetEmotionHappy;
+    static SettingT<GameSettingCollection> fEyePitchMinOffsetEmotionHappy;
+    static SettingT<GameSettingCollection> fEyeHeadingMaxOffsetEmotionHappy;
+    static SettingT<GameSettingCollection> fEyeHeadingMinOffsetEmotionHappy;
+    static SettingT<GameSettingCollection> fEyePitchMaxOffsetEmotionSad;
+    static SettingT<GameSettingCollection> fEyePitchMinOffsetEmotionSad;
+    static SettingT<GameSettingCollection> fEyeHeadingMaxOffsetEmotionSad;
+    static SettingT<GameSettingCollection> fEyeHeadingMinOffsetEmotionSad;
+    static SettingT<GameSettingCollection> fEyePitchMaxOffsetEmotionAngry;
+    static SettingT<GameSettingCollection> fEyePitchMinOffsetEmotionAngry;
+    static SettingT<GameSettingCollection> fEyeHeadingMaxOffsetEmotionAngry;
+    static SettingT<GameSettingCollection> fEyeHeadingMinOffsetEmotionAngry;
+    static SettingT<GameSettingCollection> fEyeHeadingMaxOffsetEmotionFear;
+    static SettingT<GameSettingCollection> fEyeHeadingMinOffsetEmotionFear;
+    static SettingT<GameSettingCollection> fEyePitchMaxOffsetEmotionNeutral;
+    static SettingT<GameSettingCollection> fEyePitchMinOffsetEmotionNeutral;
+    static SettingT<GameSettingCollection> fEyeHeadingMaxOffsetEmotionNeutral;
+    static SettingT<GameSettingCollection> fEyeHeadingMinOffsetEmotionNeutral;
 };
 
 NiSmartPointer(BSFaceGenAnimationData);
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionAngry;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionHappy;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionSad;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionAngry;
-
-extern SettingT<GameSettingCollection> gs_fLookDownDisableBlinkingAmt;
-
-extern SettingT<GameSettingCollection> gs_fBlinkDelayMin;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionSad;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionNeutral;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionNeutral;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionFear;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMaxOffsetEmotionHappy;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionSad;
-
-extern SettingT<GameSettingCollection> gs_fBlinkUpTime;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionNeutral;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionFear;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionHappy;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionNeutral;
-
-extern SettingT<GameSettingCollection> gs_fBlinkDelayMax;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionSad;
-
-extern SettingT<GameSettingCollection> gs_fEyePitchMinOffsetEmotionAngry;
-
-extern SettingT<GameSettingCollection> gs_fBlinkDownTime;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMinOffsetEmotionAngry;
-
-extern SettingT<GameSettingCollection> gs_fEyeHeadingMaxOffsetEmotionHappy;

@@ -1,6 +1,6 @@
 #include "Fallout Shared/Date.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/Misc/Calendar.h"
 
 Date::Date() : sDate(0), sYear(0) {}

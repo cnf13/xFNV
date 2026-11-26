@@ -9,6 +9,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSCore/ScrapHeap.h"
 #include "BSHavok/WeaponObject.h"
@@ -32,7 +33,6 @@
 #include "BSHavok/bhkRagdollPenetrationUtil.h"
 #include "BSHavok/bhkRefObject.h"
 #include "BSHavok/bhkRigidBody.h"
-#include "BSHavok/bhkRigidBodyCinfo.h"
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkShapeCollection.h"
@@ -67,8 +67,7 @@
 #include "BSMain/MessageHandler.h"
 #include "BSMain/NiObjectGarbage.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
-#include "BSMain/SettingCollectionMap.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/TileMenu.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShader.h"
@@ -118,7 +117,6 @@
 #include "Fallout Shared/ExtraDataObjects.h"
 #include "Fallout Shared/FOScriptFunctions.h"
 #include "Fallout Shared/FaceGen/BSFaceGenNiNode.h"
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
 #include "Fallout Shared/GamePlayFormulas.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/BGSAcousticSpaceListener.h"
@@ -156,6 +154,7 @@
 #include "Fallout Shared/ScreenSplatter.h"
 #include "Fallout Shared/Script.h"
 #include "Fallout Shared/ScriptCompileData.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/Sky/Sky.h"
 #include "Fallout Shared/Sky/SkyTextureManager.h"
 #include "Fallout Shared/SpeedTree/BSTreeManager.h"
@@ -292,10 +291,10 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryData.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLight.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiLines.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -318,6 +317,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "Gamebryo2.2/CoreLibs/NiXenonRenderer/NiGeometryBufferData.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -1264,7 +1264,7 @@ void TESObjectREFR::SaveGame(BGSSaveFormBuffer* apSaveGameBuffer) {
         TESObjectREFR::GetExtra()->SaveGame(apSaveGameBuffer);
     }
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_INVENTORY | CHANGE_REFR_LEVELED_INVENTORY)) {
-        InventoryChanges::GetInventoryChanges(this)->SaveGameBGS(apSaveGameBuffer);
+        InventoryChanges::GetInventoryChanges(this)->SaveGame(apSaveGameBuffer);
     }
     if (apSaveGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_ANIMATION) && !IsActor()) {
         char* pSavedAnimation = TESObjectREFR::GetExtra()->GetSavedAnimation();
@@ -1478,7 +1478,7 @@ void TESObjectREFR::LoadGame(BGSLoadFormBuffer* apLoadGameBuffer) {
     }
     uint32_t uiExtraFlags = static_cast<uint32_t>(cIsActor ? (-1543104448) : (-1543365568));
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(uiExtraFlags)) {
-        TESObjectREFR::GetExtra()->LoadGameBGS(apLoadGameBuffer);
+        TESObjectREFR::GetExtra()->LoadGame(apLoadGameBuffer);
     }
     if (apLoadGameBuffer->GetChangeFlags().CheckFlags(CHANGE_REFR_INVENTORY | CHANGE_REFR_LEVELED_INVENTORY)) {
         TESObjectREFR::GetExtra()->RemoveContainerChanges();
@@ -1532,14 +1532,14 @@ void TESObjectREFR::InitLoadGame(uint32_t aiFlags, uint32_t aiCurrentFlags) {
         Set3D(nullptr, true);
     }
     if ((aiFlags & CHANGE_REFR_INVENTORY) != 0 && HasContainer()) {
-        InventoryChanges::GetInventoryChanges(this)->InitLoadGameTES();
+        InventoryChanges::GetInventoryChanges(this)->InitLoadGame();
     }
 
     // The result only guards the disabled/deleted Set3D block below, whose masks are 0; the call stays.
     if (IsMobileObject()) {}
     if (IsActor()) {
         TESBoundObject* pBaseObject = data.pObjectReference;
-        TESObjectREFR::GetExtra()->InitLoadGameTES(aiFlags, aiCurrentFlags, this, pBaseObject);
+        TESObjectREFR::GetExtra()->InitLoadGame(aiFlags, aiCurrentFlags, this, pBaseObject);
     }
 }
 
@@ -2665,7 +2665,7 @@ BSSoundHandle TESObjectREFR::VoiceSoundFunction(
                     TESObjectREFR::SayToCallBack(reinterpret_cast<void*>(static_cast<uintptr_t>(iFormID)), false);
                 }
             }
-            if (gs_bGeneralSubtitles_Gameplay.Bool() ||
+            if (bGeneralSubtitles.Bool() ||
                 (IsActor() && static_cast<uint8_t>(static_cast<Actor*>(this)->GetShowSubtitles()))) {
                 if (fSoundDuration <= 0.0) {
                     fSoundDuration = 2.0f;
@@ -4140,14 +4140,14 @@ void TESObjectREFR::LoadAnimation(BGSLoadGameBuffer* apLoadGameBuffer) {
             SetSequencePosition(pManager, cSequenceName, std::numeric_limits<float>::max());
         }
     }
-    TESObjectREFR::LoadControllerManagerBGS(pManager, apLoadGameBuffer, -1.0f);
+    TESObjectREFR::LoadControllerManager(pManager, apLoadGameBuffer, -1.0f);
 }
 
 // The saved flags and body count are read first. With the same body count the flags are restored, the 3D is made
 // keyframed (an actor that is not unconscious, dead, dying or knocked out) or dynamic, updated, its bodies loaded, and
 // updated again. Otherwise an actor's ragdoll animation is disabled and the 3D knocked down. The form ID is fetched
 // before the editor ID.
-void TESObjectREFR::LoadHavokDataBGS(BGSLoadGameBuffer* apLoadGameBuffer) {
+void TESObjectREFR::LoadHavokData(BGSLoadGameBuffer* apLoadGameBuffer) {
     NiNode* p3D = TESObjectREFR::Get3D();
     if (!p3D) {
         uint32_t uiFormID = GetFormID();
@@ -4483,7 +4483,7 @@ bool TESObjectREFR::Activate(
 
             if (!m_Extra.IsActivateParentOnly() || m_Extra.GetActivateData(apActionRef)) {
                 if (apActionRef && !bFadingOut) {
-                    if (Interface::GetConsoleSelection() == this) {
+                    if (Interface::GetPickREFR() == this) {
                         char cMessage[268];
                         const char* pFullName = TESFullName::GetFullName(GetObjectReference());
                         const char* pFormTypeString = GetObjectReference()->GetFormTypeString();
@@ -10207,7 +10207,7 @@ void TESObjectREFR::SayForceGoodbyeGreetingToPlayer(
                 DialogueItem* pItem = pactor->pCurrentProcess->GetSubtitleItem();
                 if (pItem) {
                     DialogueResponse* pResponse = pItem->GetCurrentResponse();
-                    if (GetIsFullHelp()) {
+                    if (Interface::GetFullHelp()) {
                         char acSubtitle[268];
                         std::sprintf(acSubtitle, "'%s' :%s", GetFullName(), pResponse->cText.pString);
                         NiPoint3 kSpeakerLoc = GetLocationOnReference();
@@ -11298,7 +11298,7 @@ bool TESObjectREFR::IsLockedOut(TESObjectREFR* apTerminal) {
     return *reinterpret_cast<float*>(&iEntryPointValue) == 0.0;
 }
 
-void TESObjectREFR::LoadControllerManagerBGS(
+void TESObjectREFR::LoadControllerManager(
     NiControllerManager* apManager,
     BGSLoadGameBuffer* apBuffer,
     float afTime
@@ -11716,10 +11716,6 @@ void UpdateLODMultInvisibility(TESObjectREFR* apRef, NiNode* apNode) {
     }
 }
 
-void hkQuaternion_operator_assign(hkQuaternion* apThis, const hkQuaternion& q) {
-    apThis->m_vec = q.m_vec;
-}
-
 void TESObjectREFR::LoadHavokDataForCollisionObject(bhkNiCollisionObject* apObject, bhkWorld::ObjectRecData& arData) {
     NiPoint3 kAngVel;
     NiPoint3 kLinVel;
@@ -11776,199 +11772,12 @@ HavokSaveData::HavokSaveData()
 REFR_PLACEMENT_DATA::REFR_PLACEMENT_DATA() {}
 
 void REFR_PLACEMENT_DATA::Endian() {
-    ENDIAN(kPosition.x, false);
-    ENDIAN(kPosition.y, false);
-    ENDIAN(kPosition.z, false);
-    ENDIAN(kRotation.x, false);
-    ENDIAN(kRotation.y, false);
-    ENDIAN(kRotation.z, false);
-}
-
-bhkAcousticSpacePhantomCallbackShape::bhkAcousticSpacePhantomCallbackShape() {}
-
-bhkShapeCollection* bhkBvTreeShape::GetShapeCollection() {
-    hkpShape* pShape = GethkShapeCollection();
-    if (pShape) {
-        return static_cast<bhkShapeCollection*>(bhkShapeCollection::Getbhk(pShape));
-    }
-
-    return nullptr;
-}
-
-hkpShapeCollection* bhkBvTreeShape::GethkShapeCollection() const {
-    // bhkBvTreeShape::operator* is bhkShape's null-safe getter.
-    const hkpShape* pShape = **this;
-    if (!pShape) {
-        return nullptr;
-    }
-    // The collection's container is its second base; static_cast keeps the null test.
-    return const_cast<hkpShapeCollection*>(static_cast<const hkpShapeCollection*>(pShape->getContainer()));
-}
-
-bhkCollisionObject::bhkCollisionObject(NiAVObject* apObject) : bhkNiCollisionObject(static_cast<NiNode*>(apObject)) {}
-
-bhkEntity::bhkEntity() {
-    ++iCount;
-}
-
-void bhkNiCollisionObject::SetNotify(bool abTF) {
-    SetBit(abTF, 4);
-    if (abTF) {
-        SetSetLocal(true);
-    }
-}
-
-const hkVector4& bhkRigidBody::GetLinearVelocity() {
-    hkpRigidBody* pBody = **this;
-    return pBody ? pBody->getLinearVelocity() : hkVector4::getZero();
-}
-
-const hkVector4& bhkRigidBody::GetAngularVelocity() {
-    hkpRigidBody* pBody = **this;
-    return pBody ? pBody->getAngularVelocity() : hkVector4::getZero();
-}
-
-void bhkRigidBody::GetAngularVelocity(NiPoint3& arPos) {
-    HK2NINS(arPos, GetAngularVelocity());
-}
-
-void bhkRigidBody::SetLinearVelocity(const hkVector4& arVel) {
-    hkpRigidBody* pBody = **this;
-    if (pBody) {
-        MarkWrite();
-        pBody->setLinearVelocity(arVel);
-        UnMarkWrite();
-    }
-}
-
-void bhkRigidBody::SetAngularVelocity(const hkVector4& arVel) {
-    hkpRigidBody* pBody = **this;
-    if (pBody) {
-        MarkWrite();
-        pBody->setAngularVelocity(arVel);
-        UnMarkWrite();
-    }
-}
-
-// Sets the body's linear velocity from a Gamebryo vector (converted by NI2HK, with the world scale).
-void bhkRigidBody::SetLinearVelocity(const NiPoint3& arVel) {
-    hkVector4 hkv;
-    this->SetLinearVelocity(NI2HK(hkv, arVel));
-}
-
-// Sets the body's angular velocity from a Gamebryo vector (converted by NI2HKNS, without the world scale).
-void bhkRigidBody::SetAngularVelocity(const NiPoint3& arVel) {
-    hkVector4 hkv;
-    this->SetAngularVelocity(NI2HKNS(hkv, arVel));
-}
-
-bool bhkRigidBody::IsActive() {
-    hkpEntity* pEntity = **this;
-    if (!pEntity) {
-        return false;
-    }
-    return pEntity->isActive();
-}
-
-float bhkRigidBody::GethkMaxLinearVelocity() {
-    hkUFloat8 apMemory;
-    hkpRigidBody* pb = **this;
-    if (pb) {
-        hkUFloat8* p_m_maxLinearVelocity;
-        hkpMotion* pdm = pb->getStoredDynamicMotion();
-        if (pdm) {
-            p_m_maxLinearVelocity = &pdm->m_motionState.m_maxLinearVelocity;
-        }
-        else {
-            float f = pb->getMaxLinearVelocity();
-            apMemory = hkUFloat8(f);
-            p_m_maxLinearVelocity = &apMemory;
-        }
-        return *p_m_maxLinearVelocity;
-    }
-
-    return 0.0f;
-}
-
-void bhkRigidBodyCinfo::SetMotionType(hkpMotion::MotionType aeType) {
-    hk.m_motionType = aeType;
-}
-
-void bhkRigidBodyCinfo::SetRotation(const hkQuaternion& arRot) {
-    hkQuaternion_operator_assign(&hk.m_rotation, arRot);
-}
-
-void bhkRigidBodyCinfo::SetShape(const bhkShape* apShape) {
-    m_shape = **apShape;
-    hk.m_shape = m_shape;
-}
-
-hkpShape* bhkShape::Gethk() {
-    return static_cast<hkpShape*>(phkObject);
-}
-
-bhkShape* bhkShapeCollection::Getbhk(hkpShape* apShape) {
-    return bhkShape::Getbhk(apShape);
-}
-
-hkShapePhantomCinfo::~hkShapePhantomCinfo() {}
-
-bhkShapePhantom::bhkShapePhantom() {
-    ++iCount;
-    ResetPhantomFlags();
-}
-
-bhkShapePhantom::~bhkShapePhantom() {
-    bhkSerializable::Kill();
-    --iCount;
-}
-
-void bhkShapePhantom::SetTransform(const NiTransform& arTrans) {
-    hkTransform hkt;
-    hkTransform* pTransform = &NI2HK(hkt, arTrans);
-    bhkShapePhantom::setTransform(pTransform);
-}
-
-hkSimpleShapePhantomCinfo::hkSimpleShapePhantomCinfo() {}
-
-hkSimpleShapePhantomCinfo::~hkSimpleShapePhantomCinfo() {}
-
-bhkSimpleShapePhantom::bhkSimpleShapePhantom(const hkSimpleShapePhantomCinfo& arInfo) {
-    bhkSimpleShapePhantom::Init(arInfo);
-    ++iCount;
-    ResetPhantomFlags();
-}
-
-bhkSphereRepShape::bhkSphereRepShape() {
-    ++iCount;
-}
-
-bhkSphereShape::bhkSphereShape(float afRadius, bool abBS) {
-    ++iCount;
-    if (abBS) {
-        Init(NI2HK(afRadius));
-    }
-    else {
-        Init(afRadius);
-    }
-}
-
-bhkTrapListener* bhkWorld::QTrapListener() {
-    return pTrapListener;
-}
-
-bool bhkWorldObject::ForceAdd(bhkWorld* apWorld) {
-    return Add(apWorld);
-}
-
-hkWorldObjectCinfo::hkWorldObjectCinfo() : m_collisionFilterInfo(0), m_shape(nullptr) {
-    m_broadPhaseType = hkpWorldObject::BROAD_PHASE_ENTITY;
-}
-
-hkWorldObjectCinfo::~hkWorldObjectCinfo() {}
-
-const NiPoint3& FurnitureMark::QPosition() {
-    return Position;
+    BSEndian(kPosition.x, false);
+    BSEndian(kPosition.y, false);
+    BSEndian(kPosition.z, false);
+    BSEndian(kRotation.x, false);
+    BSEndian(kRotation.y, false);
+    BSEndian(kRotation.z, false);
 }
 
 NiPoint3& BGSPrimitive::QRadii() {
@@ -11978,10 +11787,6 @@ NiPoint3& BGSPrimitive::QRadii() {
 BSFadeNode* BGSPrimitive::GetNode() {
     return spNode;
 }
-
-IBSAnimNoteReceiver::IBSAnimNoteReceiver() {}
-
-IBSAnimNoteReceiver::~IBSAnimNoteReceiver() {}
 
 void BSAnimNoteReceiver::SetObjectRefr(TESObjectREFR* apObjRefr) {
     pObjRefr = apObjRefr;
@@ -12147,43 +11952,3 @@ BSStringT<char>* DialogueResponse::GetText() {
 void BGSSaveFormBuffer::RemoveChange(int32_t aiFlags) {
     Header.iChangeFlags.RemoveFlags(aiFlags);
 }
-
-bool NiControllerManager::GetCumulativeAnimations() {
-    return m_bCumulative;
-}
-
-void NiNode::DetachAllChildren() {
-    uint32_t icount = m_kChildren.m_usSize;
-    for (uint32_t i = 0; i < icount; ++i) {
-        NiAVObject* pchild = m_kChildren[i].m_pObject;
-        if (pchild) {
-            pchild->DetachParent();
-        }
-    }
-    m_kChildren.RemoveAll();
-}
-
-// KEEP: unregistered. With a null apNode the return value is whatever the frame setup left in the return register:
-// the address of the function's exception registration record on the stack. src cannot express that return (the
-// strict check DIFFs on it, checkbody 29d4f0babe86).
-void NiNode::SetWireframe(NiNode* apNode) {
-    if (apNode) {
-        BSShaderNoLightingProperty* pProperty = new BSShaderNoLightingProperty;
-        pProperty->SetFlag(BSShaderProperty::BSSP_FLAG_WIREFRAME, true);
-        apNode->AttachProperty(pProperty);
-        BSShaderManager::PrepareObject(apNode, false, false);
-    }
-}
-
-NiVBChip* NiGeometryBufferData::GetVBChip(uint32_t uiIndex) {
-    if (uiIndex >= m_uiStreamCount) {
-        return nullptr;
-    }
-    return m_ppkVBChip[uiIndex];
-}
-
-hkUFloat8::hkUFloat8(const float f) {
-    *this = f;
-}
-
-hkpPhantomCallbackShape::hkpPhantomCallbackShape() : hkpShape(HK_SHAPE_PHANTOM_CALLBACK) {}

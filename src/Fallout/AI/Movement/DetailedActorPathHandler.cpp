@@ -9,7 +9,7 @@
 #include "BSHavok/bhkCharacterController.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/IDebugText.h"
 #include "Fallout Shared/AiFormulas.h"
 #include "Fallout Shared/Animation.h"
@@ -30,7 +30,6 @@
 #include "Fallout Shared/Pathfinding/PathingLocation.h"
 #include "Fallout Shared/Pathfinding/PathingNode.h"
 #include "Fallout Shared/Pathfinding/PathingRequest.h"
-#include "Fallout Shared/Sky/Precipitation.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESActorBaseData.h"
 #include "Fallout Shared/TESFile.h"
@@ -53,7 +52,6 @@
 #include "Fallout/Misc/SaveLoad/BGSSaveGameBuffer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint2.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -61,31 +59,31 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 #include <cmath>
 #include <cstdint>
 #include <limits>
 #include <new>
 
-static SettingT<INISettingCollection> fAvoidanceDefaultWaitTime("fAvoidanceDefaultWaitTime:Pathfinding", 5.0f);
-static SettingT<INISettingCollection> fAvoidanceIgnoreTime("fAvoidanceIgnoreTime:Pathfinding", 5.0f);
-static SettingT<INISettingCollection> fAvoidanceIgnoreMinTime("fAvoidanceIgnoreMinTime:Pathfinding", 2.5f);
-static SettingT<INISettingCollection> fAvoidanceDetectionTime("fAvoidanceDetectionTime:Pathfinding", 0.5f);
-static SettingT<INISettingCollection> fAvoidanceAvoidNodeCost("fAvoidanceAvoidNodeCost", 2.0f);
+static SettingT<INISettingCollection> fINIAvoidanceDefaultWaitTime("fAvoidanceDefaultWaitTime:Pathfinding", 5.0f);
+static SettingT<INISettingCollection> fINIAvoidanceIgnoreTime("fAvoidanceIgnoreTime:Pathfinding", 5.0f);
+static SettingT<INISettingCollection> fINIAvoidanceIgnoreMinTime("fAvoidanceIgnoreMinTime:Pathfinding", 2.5f);
+static SettingT<INISettingCollection> fINIAvoidanceDetectionTime("fAvoidanceDetectionTime:Pathfinding", 0.5f);
+static SettingT<INISettingCollection> fINIAvoidanceAvoidNodeCost("fAvoidanceAvoidNodeCost", 2.0f);
 
 // The game settings this file defines, with their IDs and values, in initialization order.
-SettingT<INISettingCollection> gs_bUseActorAvoidance_Pathfinding("bUseActorAvoidance:Pathfinding", true);
+SettingT<INISettingCollection> bINIUseActorAvoidance("bUseActorAvoidance:Pathfinding", true);
 static SettingT<INISettingCollection>
     bINIUseFartherCheckForAvoidance("bUseFartherCheckForAvoidance:Pathfinding", false);
-SettingT<INISettingCollection> fAvoidanceMinWaitTime("fAvoidanceMinWaitTime:Pathfinding", 0.25f);
-SettingT<INISettingCollection> gs_fAvoidanceTimeCheck_Pathfinding("fAvoidanceTimeCheck:Pathfinding", 0.75f);
-SettingT<INISettingCollection> gs_fRepathingWaitDistance_Pathfinding("fRepathingWaitDistance:Pathfinding", 20.0f);
-SettingT<INISettingCollection> gs_fAvoidanceAvoidAllRadius_Pathfinding("fAvoidanceAvoidAllRadius:Pathfinding", 100.0f);
-SettingT<INISettingCollection> gs_fAITurnSpeedScale_Pathfinding("fAITurnSpeedScale:Pathfinding", 1.5f);
-SettingT<INISettingCollection> gs_fAICombatTurnSpeedScale_Pathfinding("fAICombatTurnSpeedScale:Pathfinding", 2.5f);
-SettingT<INISettingCollection> gs_fCreatureTurnSpeedScale_Pathfinding("fCreatureTurnSpeedScale:Pathfinding", 1.25f);
-SettingT<INISettingCollection>
-    gs_fCreatureCombatTurnSpeedScale_Pathfinding("fCreatureCombatTurnSpeedScale:Pathfinding", 1.25f);
+SettingT<INISettingCollection> fINIAvoidanceMinWaitTime("fAvoidanceMinWaitTime:Pathfinding", 0.25f);
+SettingT<INISettingCollection> fINIAvoidanceTimeCheck("fAvoidanceTimeCheck:Pathfinding", 0.75f);
+SettingT<INISettingCollection> fINIRepathingWaitDistance("fRepathingWaitDistance:Pathfinding", 20.0f);
+SettingT<INISettingCollection> fINIAvoidanceAvoidAllRadius("fAvoidanceAvoidAllRadius:Pathfinding", 100.0f);
+SettingT<INISettingCollection> fINITurnSpeedScale("fAITurnSpeedScale:Pathfinding", 1.5f);
+SettingT<INISettingCollection> fINICombatTurnSpeedScale("fAICombatTurnSpeedScale:Pathfinding", 2.5f);
+SettingT<INISettingCollection> fINICreatureTurnSpeedScale("fCreatureTurnSpeedScale:Pathfinding", 1.25f);
+SettingT<INISettingCollection> fINICreatureCombatTurnSpeedScale("fCreatureCombatTurnSpeedScale:Pathfinding", 1.25f);
 SettingT<INISettingCollection> fLODActorAvoidanceDistance("fLODActorAvoidanceDistance:General", 500.0f);
 SettingT<INISettingCollection> fRotationSpeedIncrease("fRotationSpeedIncrease:Pathfinding", 0.43633232f);
 NiTPrimitiveArray<Actor*> DetailedActorPathHandler::AvoidanceCandidates(0, 1);
@@ -357,7 +355,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
             return ActorPathHandler::PATH_HANDLER_RESULT_OK;
         }
         if (avoidRet != DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN_FAIL) {
-            fActorAvoidanceTimer = fAvoidanceMinWaitTime.Float();
+            fActorAvoidanceTimer = fINIAvoidanceMinWaitTime.Float();
             ResetMoveModeAndDelta();
             return ActorPathHandler::PATH_HANDLER_RESULT_OK;
         }
@@ -383,7 +381,7 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::Update(float afD
         return ActorPathHandler::PATH_HANDLER_RESULT_OK;
     }
     ComputeSimpleMoveDelta(afDeltaT);
-    if (gs_bUseActorAvoidance_Pathfinding.Bool()) {
+    if (bINIUseActorAvoidance.Bool()) {
         if (!bMovementBlocked) {
             DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN eval = UpdateActorAvoidance(afDeltaT);
             if (eval) {
@@ -575,20 +573,20 @@ ActorPathHandler::PATH_HANDLER_RESULT DetailedActorPathHandler::NoPathUpdate(flo
                     if (pActor->IsCreature()) {
                         float fCreatureTurnSpeedScale;
                         if (pActor->IsInCombat()) {
-                            fCreatureTurnSpeedScale = gs_fCreatureCombatTurnSpeedScale_Pathfinding.Float();
+                            fCreatureTurnSpeedScale = fINICreatureCombatTurnSpeedScale.Float();
                         }
                         else {
-                            fCreatureTurnSpeedScale = gs_fCreatureTurnSpeedScale_Pathfinding.Float();
+                            fCreatureTurnSpeedScale = fINICreatureTurnSpeedScale.Float();
                         }
                         frotateMax = frotateMax * fCreatureTurnSpeedScale;
                     }
                     else {
                         float fTurnSpeedScale;
                         if (pActor->IsInCombat()) {
-                            fTurnSpeedScale = gs_fAICombatTurnSpeedScale_Pathfinding.Float();
+                            fTurnSpeedScale = fINICombatTurnSpeedScale.Float();
                         }
                         else {
-                            fTurnSpeedScale = gs_fAITurnSpeedScale_Pathfinding.Float();
+                            fTurnSpeedScale = fINITurnSpeedScale.Float();
                         }
                         frotateMax = frotateMax * fTurnSpeedScale;
                     }
@@ -806,9 +804,9 @@ void DetailedActorPathHandler::SetWaitForUpdatedPath(PathingRequest* apRequest) 
             else {
                 ::new (&kDestination) NiPoint3(apRequest->Destination.GetLocation());
                 float fnewLen = (apRequest->Origin.GetLocation() - kDestination).XYLength();
-                float fwaitDist = gs_fRepathingWaitDistance_Pathfinding.Float();
+                float fwaitDist = fINIRepathingWaitDistance.Float();
                 if ((MoveMode & ActorMover::MF_RUNNING) != 0) {
-                    fwaitDist = fwaitDist + gs_fRepathingWaitDistance_Pathfinding.Float();
+                    fwaitDist = fwaitDist + fINIRepathingWaitDistance.Float();
                 }
                 fwaitDist = fwaitDist + fwaitDist;
                 if (fwaitDist > static_cast<double>(fnewLen)) {
@@ -1494,9 +1492,9 @@ void DetailedActorPathHandler::ResetMoveModeAndDelta() {
 
 // Collects the actors in the way (BuildAvoidanceList) and weighs each one's detection value into
 // fAvoidanceDetectionValue. A moving actor makes a waiting handler stop waiting (1); once the detection value reaches
-// fAvoidanceDetectionTime the handler waits (1) when it should wait for one of them, or else repaths around them with
-// an avoid node array (2). An actor standing on the path's goal fails a request that may not end on an occupied goal
-// (3) and otherwise softens its goal radius. Without anything to avoid the detection value decays. The locals are
+// fINIAvoidanceDetectionTime the handler waits (1) when it should wait for one of them, or else repaths around them
+// with an avoid node array (2). An actor standing on the path's goal fails a request that may not end on an occupied
+// goal (3) and otherwise softens its goal radius. Without anything to avoid the detection value decays. The locals are
 // constructed and destroyed explicitly on typed storage that runs no C++ constructor or destructor.
 DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::UpdateActorAvoidance(float afDeltaT) {
     NiAVObject* p3D = pActor->Get3D();
@@ -1589,7 +1587,7 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
             }
             else if (!pActor->HasFollower(pOther)) {
                 bWait = 1;
-                if (fAvoidanceDetectionTime.Float() <= fAvoidanceDetectionValue) {
+                if (fINIAvoidanceDetectionTime.Float() <= fAvoidanceDetectionValue) {
                     break;
                 }
             }
@@ -1626,20 +1624,20 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
     if (fAvoidanceDetectionValue == 0.0) {
         return PATH_ACTOR_AVOID_RETURN_OK;
     }
-    if (fAvoidanceDetectionTime.Float() <= fAvoidanceDetectionValue) {
+    if (fINIAvoidanceDetectionTime.Float() <= fAvoidanceDetectionValue) {
         if (bWait) {
-            fWaitTime = fAvoidanceDefaultWaitTime.Float();
-            fActorAvoidanceTimer = fAvoidanceMinWaitTime.Float();
+            fWaitTime = fINIAvoidanceDefaultWaitTime.Float();
+            fActorAvoidanceTimer = fINIAvoidanceMinWaitTime.Float();
             pActorMover->DebugOnEvent();
             return PATH_ACTOR_AVOID_RETURN_WAIT;
         }
         if (!kActors.IsEmpty()) {
             if (eAvoidState == PATH_AVOID_REPATH_IGNORE || bPlayerAdded || (MoveMode & 0x200) != 0) {
-                float fIgnoreMinTime = fAvoidanceIgnoreMinTime.Float();
+                float fIgnoreMinTime = fINIAvoidanceIgnoreMinTime.Float();
                 fActorAvoidanceTimer = BSMAX(fActorAvoidanceTimer, fIgnoreMinTime);
             }
             else {
-                fActorAvoidanceTimer = fAvoidanceIgnoreTime.Float();
+                fActorAvoidanceTimer = fINIAvoidanceIgnoreTime.Float();
             }
             PathingAvoidNodeArray* pAvoidNodes = new PathingAvoidNodeArray;
             uint32_t uiCount = kActors.GetSize();
@@ -1694,7 +1692,7 @@ DetailedActorPathHandler::PATH_ACTOR_AVOID_RETURN DetailedActorPathHandler::Upda
                     kPosition.x = kNiPosition.x;
                     kPosition.y = kNiPosition.y;
                 }
-                pAvoidNodes->Add(PathingAvoidNode(kPosition, fAvoidRadius, fAvoidanceAvoidNodeCost.Float(), eType));
+                pAvoidNodes->Add(PathingAvoidNode(kPosition, fAvoidRadius, fINIAvoidanceAvoidNodeCost.Float(), eType));
             }
             {
                 PathingLocation kOrigin(pActor);
@@ -1779,20 +1777,20 @@ float DetailedActorPathHandler::UpdateRotation(float afDeltaT) {
             if (pActor->IsCreature()) {
                 float fCreatureTurnSpeedScale;
                 if (pActor->IsInCombat()) {
-                    fCreatureTurnSpeedScale = gs_fCreatureCombatTurnSpeedScale_Pathfinding.Float();
+                    fCreatureTurnSpeedScale = fINICreatureCombatTurnSpeedScale.Float();
                 }
                 else {
-                    fCreatureTurnSpeedScale = gs_fCreatureTurnSpeedScale_Pathfinding.Float();
+                    fCreatureTurnSpeedScale = fINICreatureTurnSpeedScale.Float();
                 }
                 frotateMax = frotateMax * fCreatureTurnSpeedScale;
             }
             else {
                 float fTurnSpeedScale;
                 if (pActor->IsInCombat()) {
-                    fTurnSpeedScale = gs_fAICombatTurnSpeedScale_Pathfinding.Float();
+                    fTurnSpeedScale = fINICombatTurnSpeedScale.Float();
                 }
                 else {
-                    fTurnSpeedScale = gs_fAITurnSpeedScale_Pathfinding.Float();
+                    fTurnSpeedScale = fINITurnSpeedScale.Float();
                 }
                 frotateMax = frotateMax * fTurnSpeedScale;
             }
@@ -2594,7 +2592,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
     NiPoint3 worldSpaceMoveDir = rot * aMoveDelta;
     NiPoint3 unitWorldSpaceMoveDir = worldSpaceMoveDir;
     float fmoveTime = appTimer.fDelta;
-    float favoidTime = gs_fAvoidanceTimeCheck_Pathfinding.Float();
+    float favoidTime = fINIAvoidanceTimeCheck.Float();
     float fabsoluteMoveLength = unitWorldSpaceMoveDir.UnitizeGetLength();
     float fabsoluteMoveSpeed = fabsoluteMoveLength / fmoveTime;
     float fabsoluteAvoidDistance = favoidTime * fabsoluteMoveSpeed;
@@ -2626,8 +2624,7 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                         relativeMoveDir -= targetWorldSpaceMoveDir;
                     }
                     float fmoveLength = relativeMoveDir.UnitizeGetLength();
-                    if (!(fflatDist2 > gs_fAvoidanceAvoidAllRadius_Pathfinding.Float() *
-                              gs_fAvoidanceAvoidAllRadius_Pathfinding.Float()) ||
+                    if (!(fflatDist2 > fINIAvoidanceAvoidAllRadius.Float() * fINIAvoidanceAvoidAllRadius.Float()) ||
                         (toTarget = pact->GetLocationOnReference(),
                          (&(toTarget -= currentPos),
                           (unitToTarget = toTarget,
@@ -2635,8 +2632,8 @@ void DetailedActorPathHandler::BuildAvoidanceList(
                         float fmoveSpeed = fmoveLength / fmoveTime;
                         float favoidDistance = favoidTime * fmoveSpeed;
                         float fcheckDistance = fourRadius + favoidDistance;
-                        if (gs_fAvoidanceAvoidAllRadius_Pathfinding.Float() > static_cast<double>(fcheckDistance)) {
-                            fcheckDistance = gs_fAvoidanceAvoidAllRadius_Pathfinding.Float();
+                        if (fINIAvoidanceAvoidAllRadius.Float() > static_cast<double>(fcheckDistance)) {
+                            fcheckDistance = fINIAvoidanceAvoidAllRadius.Float();
                         }
                         if (DetailedActorPathHandler::CheckDetection(
                                 apActor,
@@ -2850,7 +2847,7 @@ bool DetailedActorPathHandler::CheckDetection(
     actorToOtherDir.z = 0.0f;
     float fdist = actorToOtherDir.UnitizeGetLength();
     bool bignoreCone = false;
-    if (gs_fAvoidanceAvoidAllRadius_Pathfinding.Float() > static_cast<double>(fdist)) {
+    if (fINIAvoidanceAvoidAllRadius.Float() > static_cast<double>(fdist)) {
         bignoreCone = true;
     }
     fdist = fdist - factorForwardLength;
@@ -2936,19 +2933,4 @@ bool PathingRequest::GetFailIfGoalOccupied() {
 
 bool PathingSolution::IsDoorInPath(uint32_t aDoorID) {
     return DoorIDs.Find(aDoorID, 0, &BSSimpleArray<uint32_t>::DefaultEqualFunctionByAddress) != -1;
-}
-
-void NiMatrix3::MakeZRotationQ(float fAngle) {
-    float cs;
-    float sn;
-    NiSinCos_Fast(fAngle, &sn, &cs);
-    m_pEntry[0][0] = cs;
-    m_pEntry[0][1] = sn;
-    m_pEntry[0][2] = 0.0;
-    m_pEntry[1][0] = -sn;
-    m_pEntry[1][1] = cs;
-    m_pEntry[1][2] = 0.0;
-    m_pEntry[2][0] = 0.0;
-    m_pEntry[2][1] = 0.0;
-    m_pEntry[2][2] = 1.0;
 }

@@ -2,6 +2,7 @@
 
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/AI/BaseProcess.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiAnimationKey.h"
 #include "Gamebryo2.2/CoreLibs/NiAnimation/NiBezFloatKey.h"
@@ -11,7 +12,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/BSDismemberSkinInstance.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPixelFormat.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
@@ -33,6 +33,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTransform.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriBasedGeomData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiMemoryDefines.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"

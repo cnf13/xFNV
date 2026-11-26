@@ -1,10 +1,10 @@
 #include "SDK/DirectShow/CEnumPins.h"
-#include "BSCore/MemoryManager.h"
-#include "BSMovie/CRequestList.h"
+#include "BSCore/NewOverloads.h"
 #include "Gamebryo2.2/CoreLibs/NiDX9Renderer/NiD3DDefines.h"
 #include "SDK/DirectShow/CAsyncOutputPin.h"
 #include "SDK/DirectShow/CBaseFilter.h"
 #include "SDK/DirectShow/CMediaType.h"
+#include "SDK/DirectShow/CRequestList.h"
 #include "SDK/DirectShow/CUnknown.h"
 #include <stdint.h>
 

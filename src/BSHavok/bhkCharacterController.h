@@ -7,6 +7,7 @@
 #include "BSHavok/bhkSerializable.h"
 #include "BSHavok/bhkShape.h"
 #include "BSHavok/bhkShapePhantom.h"
+#include "BSHavok/bhkWorld.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
@@ -53,6 +54,20 @@ enum MOVE_RESULTS : int32_t {
     MOVE_OK = 0,
     MOVE_ERROR = 1,
     MOVE_HIT = 2,
+};
+
+// One frame's movement request that MobileObject::Move hands to the character controller (bhkCharacterController's
+// Move).
+struct MoveData {
+    MoveData();
+
+    float fTime;
+    NiPoint3 Angle;
+    NiPoint3 Displacement;
+    // The movement flags MobileObject::Move passes in.
+    uint32_t iMoveDirection;
+    float fCurrMoveSpeed;
+    bool bVisible;
 };
 
 // The game's character controller: a Havok character proxy together with the state machine that decides how the
@@ -387,6 +402,7 @@ public:
     static inline pfGetMaterialStairCallback_t pfGetMaterialStairCallback{};
     // ReleaseDefaultShape releases it.
     static NiPointer<bhkShape> spDefaultConvexShape;
+    static SettingT<INISettingCollection> fCharControllerWarpDistSqr;
 };
 
 NiSmartPointer(bhkCharacterController);
@@ -470,3 +486,28 @@ inline float gHeightOfFloor;
 
 // The elevator the character stands on, which the listener's callbacks find during the move, and its floor height.
 inline hkpRigidBody* gElevator;
+
+// The Bethesda world of the controller's shape phantom's Havok world; the phantom is deliberately not null-checked.
+inline bhkWorld* bhkCharacterController::GetWorld() {
+    return bhkWorld::Getbhk(GethkShapePhantom()->getWorld());
+}
+
+inline void bhkCharacterControllerCinfo::SetCollisionBox(bool abTF) {
+    bCollisionBox = abTF;
+}
+
+inline void bhkCharacterController::SetSupportNormal(const hkVector4& arNormal) {
+    hkSupportNorm = arNormal;
+}
+
+// iMoveDirection is deliberately left uninitialised.
+inline MoveData::MoveData()
+  : fTime(0.0f), Angle(NiPoint3::ZERO), Displacement(NiPoint3::ZERO), fCurrMoveSpeed(0.0f), bVisible(true) {}
+
+inline void bhkCharacterControllerCinfo::SetPosition(const NiPoint3& arPos) {
+    NI2HK(m_position, arPos);
+}
+
+inline void bhkCharacterControllerCinfo::SetShape(bhkShape* apShape) {
+    spShape = apShape;
+}

@@ -240,3 +240,7 @@ void hkpConstrainedSystemFilter::constraintRemovedCallback(hkpConstraintInstance
 const hkClass* hkpConstrainedSystemFilter::getClassType() const {
     return &hkpConstrainedSystemFilterClass;
 }
+
+const hkClass& hkpConstrainedSystemFilter::staticClass() {
+    return hkpConstrainedSystemFilterClass;
+}

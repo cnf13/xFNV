@@ -11,7 +11,7 @@
 #include "BSMain/BSMultiBoundNode.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/ActorValueOwner.h"
 #include "Fallout Shared/Animation.h"
 #include "Fallout Shared/BGSBodyPart.h"
@@ -141,7 +141,6 @@
 #include "Fallout/Misc/TaskQueueInterface.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -150,6 +149,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTCollection.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTMapBase.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/stdlib.h"
 
 #include <bit>
@@ -166,10 +166,6 @@ static SettingT<INISettingCollection> fINIRunningAvoidanceConeAngle("fRunningWid
 SettingT<INISettingCollection> fFindClosestEdgesRadius("fFindClosestEdgesRadius:Pathing", 512.0f);
 
 using FastNavMeshEdgeLocationProxyArray = BSSimpleArray<FastNavMeshEdgeLocationProxy, 1024>;
-
-float RandomFloatNegPiToPi() {
-    return BSRandom::GetSingleton()->FloatNegPiToPi();
-}
 
 // The qsort comparator of the closest-edge search: edges whose z delta is within (-64, 180) first, then by squared
 // distance, nearest first.
@@ -2597,13 +2593,6 @@ NiPoint3 Pathing::ComputeFinalTangentForActor(float afHeading, const PathingLoca
         }
     }
     return start - end;
-}
-
-// The double constants are the float two pi over 2^32 and the float pi; the result is rounded to a float local.
-float BSRandom::FloatNegPiToPi() {
-    uint32_t uiValue = UnsignedInt();
-    float fResult = static_cast<float>(uiValue * 1.462918119976564e-09 - 3.1415927410125732);
-    return fResult;
 }
 
 FastNavMeshEdgeLocationProxy* FastNavMeshEdgeLocationProxy::Assign(

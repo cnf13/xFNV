@@ -1,7 +1,7 @@
 #include "Fallout Shared/BGSAddonNode.h"
 
 #include "BSAudio/BSSoundHandle.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Fallout Shared/BGSAddonNodeSoundHandleExtra.h"
 #include "Fallout Shared/GlobalFunc.h"
@@ -13,7 +13,7 @@
 #include "Fallout Shared/TESSound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "xfnv/Compiler.h"
 
 // The index handed to the next master particle system loaded.
@@ -24,7 +24,7 @@ NiRTTI BGSAddonNodeSoundHandleExtra::ms_RTTI("BGSAddonNodeSoundHandleExtra", &Ni
 
 // The cap is the only multi-byte field.
 void ADDON_DATA::Endian() {
-    ENDIAN(usMasterParticleCap, false);
+    BSEndian(usMasterParticleCap, false);
 }
 
 BGSAddonNode::BGSAddonNode() : iIndex(0xFFFFFFFF) {

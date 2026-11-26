@@ -94,7 +94,7 @@
 
 #include <cstdint>
 
-bool GetVATSValueFunction(
+bool FOScriptFunctions::GetVATSValueFunction(
     const SCRIPT_PARAMETER* apParameters,
     const char* apCompiledParams,
     TESObjectREFR* apRefObject,
@@ -117,10 +117,15 @@ bool GetVATSValueFunction(
                &pParam1,
                &pParam2
            ) &&
-        Cmd_GetVATSValue(apRefObject, pParam1, pParam2, afReturnValue);
+        FOScriptFunctions::GetVATSValueConditionFunction(apRefObject, pParam1, pParam2, afReturnValue);
 }
 
-bool Cmd_GetVATSValue(TESObjectREFR* apRefObject, void* apParam1, void* apParam2, double& afReturnValue) {
+bool FOScriptFunctions::GetVATSValueConditionFunction(
+    TESObjectREFR* apRefObject,
+    void* apParam1,
+    void* apParam2,
+    double& afReturnValue
+) {
     VATS_COMMAND* pAction;
     afReturnValue = 0.0;
     bool bhandled = false;

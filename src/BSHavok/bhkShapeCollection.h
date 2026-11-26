@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BSHavok/bhkShape.h"
-
-class hkpShapeCollection;
+#include "Havok/Source/Physics/Collide/Shape/Compound/Collection/hkpShapeCollection.h"
+#include "Havok/Source/Physics/Collide/Shape/hkpShapeContainer.h"
 
 // The Gamebryo side of a shape made of child shapes, each reached through a key (a list shape, a mesh shape).
 class bhkShapeCollection : public bhkShape {
@@ -36,3 +36,26 @@ public:
     static NiRTTI ms_RTTI;
     static inline uint32_t iCount;
 };
+
+inline hkpShapeCollection* bhkShapeCollection::operator*() const {
+    if (this) {
+        return static_cast<hkpShapeCollection*>(const_cast<bhkShapeCollection*>(this)->Gethk());
+    }
+
+    return nullptr;
+}
+
+// The container base is taken without a null test, so it goes through a reference.
+inline uint32_t bhkShapeCollection::GetFirstKey() {
+    const hkpShapeContainer& kContainer = ***this;
+    return kContainer.getFirstKey();
+}
+
+inline uint32_t bhkShapeCollection::GetNextKey(uint32_t aiOldKey) {
+    const hkpShapeContainer& kContainer = ***this;
+    return kContainer.getNextKey(aiOldKey);
+}
+
+inline bhkShape* bhkShapeCollection::Getbhk(hkpShape* apShape) {
+    return bhkShape::Getbhk(apShape);
+}

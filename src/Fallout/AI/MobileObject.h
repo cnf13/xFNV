@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/TESObjectREFR.h"
 #include "Fallout/AI/ProcessArray.h"
@@ -13,20 +14,6 @@ class TESIdleForm;
 class TESPackage;
 
 int32_t get_iFrameCounter();
-
-// One frame's movement request that MobileObject::Move hands to the character controller (bhkCharacterController's
-// Move).
-struct MoveData {
-    MoveData();
-
-    float fTime;
-    NiPoint3 Angle;
-    NiPoint3 Displacement;
-    // The movement flags MobileObject::Move passes in.
-    uint32_t iMoveDirection;
-    float fCurrMoveSpeed;
-    bool bVisible;
-};
 
 // A reference that moves and runs AI: the base of Actor and of projectiles. It owns the process that drives it.
 class MobileObject : public TESObjectREFR {
@@ -283,6 +270,4 @@ extern SettingT<INISettingCollection> bBackgroundLoadLipFiles;
 extern SettingT<INISettingCollection> fDBVoiceAttenuationIn2D;
 inline int32_t iLastFrameCounter;
 
-extern SettingT<INISettingCollection> gs_iHavokSkipFrameCountTEST_Havok;
-
-extern SettingT<INISettingCollection> gs_fCharControllerWarpDistSqr_HAVOK;
+extern SettingT<INISettingCollection> iHavokSkipFrameCount;

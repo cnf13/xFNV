@@ -15,10 +15,10 @@
 #include "BSHavok/bhkRigidBody.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/GlobalFunc.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAVObject.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaPose.h"
 #include "Havok/Source/Animation/Animation/Rig/hkaSkeleton.h"
@@ -70,8 +70,8 @@
 
 // The [RagdollAnim] ini settings Update reads: the speed a penetrating bone is pushed out at along the penetration
 // normal, and the bound on the impulse that does it.
-static SettingT<INISettingCollection> gs_fDesiredVel_RagdollAnim("fDesiredVel:RagdollAnim", 15.0f);
-static SettingT<INISettingCollection> gs_fImpulseLimit_RagdollAnim("fImpulseLimit:RagdollAnim", 1500.0f);
+SettingT<INISettingCollection> bhkRagdollPenetrationUtil::fDesiredVel("fDesiredVel:RagdollAnim", 15.0f);
+SettingT<INISettingCollection> bhkRagdollPenetrationUtil::fImpulseLimit("fImpulseLimit:RagdollAnim", 1500.0f);
 SettingT<INISettingCollection>
     bhkRagdollPenetrationUtil::fDetectionUpdateTimeSec("fDetectionUpdateTimeSec:RagdollAnim", 5.0f);
 
@@ -482,8 +482,8 @@ void bhkRagdollPenetrationUtil::Update() {
                     fSpeedAlongNormal = 0.0f;
                 }
                 const float fMass = pBody->m_motion.getMass();
-                float fImpulse = (gs_fDesiredVel_RagdollAnim.uValue.f - fSpeed * fSpeedAlongNormal) * fMass;
-                const float fLimit = gs_fImpulseLimit_RagdollAnim.uValue.f;
+                float fImpulse = (bhkRagdollPenetrationUtil::fDesiredVel.uValue.f - fSpeed * fSpeedAlongNormal) * fMass;
+                const float fLimit = bhkRagdollPenetrationUtil::fImpulseLimit.uValue.f;
                 if (fLimit < fImpulse) {
                     fImpulse = fLimit;
                 }
@@ -869,8 +869,4 @@ void bhkRagdollPenetrationUtil::operator delete(void* apMemory) {
     if (apMemory) {
         MemoryManager::Instance().Deallocate(apMemory);
     }
-}
-
-void hkaRagdollRaycastInterface::operator delete(void* apMemory) {
-    MemoryManager::Instance().Deallocate(apMemory);
 }

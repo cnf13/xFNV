@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/BSString.h"
 #include <stdint.h>
 
 class Script;
@@ -9,8 +10,6 @@ class ScriptCompileData;
 class ScriptLocals;
 class TESForm;
 class TESObjectREFR;
-
-uint32_t BSstrtoul(const char* apString, char** apEndPtr, int32_t aiBase);
 
 // The expression a script line starts with: a flow keyword (FLOW_*), a console function (from 0x100) or a script
 // function (from 0x1000).
@@ -1119,6 +1118,35 @@ public:
         SCRIPT_LINE* apScriptLine,
         ScriptCompileData* apCompileData
     );
+    static bool MessageCompile(
+        const uint16_t asParamCount,
+        const SCRIPT_PARAMETER* apParameters,
+        SCRIPT_LINE* apScriptLine,
+        ScriptCompileData* apCompileData
+    );
+    static bool MessageBoxCompile(
+        const uint16_t asParamCount,
+        const SCRIPT_PARAMETER* apParameters,
+        SCRIPT_LINE* apScriptLine,
+        ScriptCompileData* apCompileData
+    );
+    // The compile function of the message commands: the three compile
+    // functions that call it pass their own four parameters on, then two flags as byte
+    // constants, which it reads as bytes.
+    static bool MessageBoxCompile(
+        const uint16_t asParamCount,
+        const SCRIPT_PARAMETER* apParameters,
+        SCRIPT_LINE* apScriptLine,
+        ScriptCompileData* apCompileData,
+        bool abButtons,
+        bool abWarning
+    );
+    static bool OldMessageCompile(
+        const uint16_t asParamCount,
+        const SCRIPT_PARAMETER* apParameters,
+        SCRIPT_LINE* apScriptLine,
+        ScriptCompileData* apCompileData
+    );
 };
 
 // The flow keywords (begin, if, set, scriptname...), searched before the function tables.
@@ -1150,12 +1178,12 @@ inline CompilerNameArray compilerNames{
     const_cast<char*>("DialogueCompileAndRun")
 };
 
-// The console's function table, indexed from 0x100: CONSOLE_COUNT entries, the bound Cmd_Help walks,
+// The console's function table, indexed from 0x100: CONSOLE_COUNT entries, the bound Script::HelpFunction walks,
 // then the end marker ("ADD NEW FUNCTIONS BEFORE THIS ONE!!!"), whose eOutput the compiler's constructor checks.
 using ScriptConsoleTable = SCRIPT_FUNCTION[CONSOLE_COUNT + 1];
 extern ScriptConsoleTable scriptConsole;
 
-// The scripts' function table, indexed from 0x1000: FUNCTION_COUNT entries, the bound Cmd_Help walks,
+// The scripts' function table, indexed from 0x1000: FUNCTION_COUNT entries, the bound Script::HelpFunction walks,
 // then the end marker, as scriptConsole's.
 using ScriptFunctionsTable = SCRIPT_FUNCTION[FUNCTION_COUNT + 1];
 extern ScriptFunctionsTable scriptFunctions;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/NiFormArray.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
 

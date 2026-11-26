@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSAudio/BSSoundHandle.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMenu/Menu.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCamera.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
@@ -124,7 +125,7 @@ public:
     uint32_t DealCard(BSSimpleList<BlackJackCard*>* pHand, char abUseLuck, char abDealer);
     int32_t DealHand();
     void SetTileCasinoEarnings();
-    void LoadNifs();
+    void Prepare3DElements();
     void UpdateHandCardVisibility();
     void ShowAllHandCards();
     void* SetTileAlphasForStage(int32_t aiStage);
@@ -191,8 +192,8 @@ public:
     NiControllerSequence* pPlayerAnimations[8];
     NiControllerSequence* pPlayerSplitAnimations[8];
     NiControllerSequence* pDealerAnimations[8];
-    // Holds the "Dealer_Reveal" sequence stored by LoadNifs; pDealerAnimations holds nine entries on other platforms,
-    // and the PC keeps the ninth in this separate field.
+    // Holds the "Dealer_Reveal" sequence stored by Prepare3DElements; pDealerAnimations holds nine entries on other
+    // platforms, and the PC keeps the ninth in this separate field.
     NiControllerSequence* pDealerReveal;
 
     // The casino the menu plays at.

@@ -1,7 +1,9 @@
 #include "BSHavok/bhkConstraint.h"
 
+#include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
 #include "BSHavok/ahkpWorld.h"
+#include "BSHavok/bhkConstraintManager.h"
 #include "BSHavok/bhkEntity.h"
 #include "BSHavok/bhkGenericConstraint.h"
 #include "BSHavok/bhkHingeLimitsConstraint.h"
@@ -18,12 +20,12 @@
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/BSCloningProcess.h"
-#include "Fallout/AI/Combat/MissileProjectile.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiCloningProcess.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStreamMacros.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTArray.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiViewerStrings.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiBinaryStream.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
@@ -542,4 +544,40 @@ void hkConstraintCinfo::SaveMotor(hkpConstraintMotor* apMotor, NiStream& arStrea
         uiComponentSize = 1;
         arStream.Ostr()->BinaryWrite(&ucType, 1, &uiComponentSize, 1);
     }
+}
+
+void hkConstraintCinfo::GetViewerStrings(NiTPrimitiveArray<char*>* apStrings) {
+    char* pViewerString;
+    char cBuffer[32];
+    AutoMemContext kMemContext(MEM_CONTEXT_HAVOK);
+    if (pData) {
+        uint32_t uiType = pData->getType();
+        const char* pTypeName = bhkConstraintManager::GetTypeName(uiType);
+        pViewerString = NiGetViewerString("Type", pTypeName);
+        uint32_t uiSize = apStrings->m_usSize;
+        if (uiSize >= apStrings->m_usMaxSize) {
+            apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
+        }
+        apStrings->SetAt(uiSize, pViewerString);
+    }
+    BSsprintf(cBuffer, 32, "0x%8X", pEntityA);
+    pViewerString = NiGetViewerString("hkpEntityA", static_cast<const char*>(cBuffer));
+    uint32_t uiSize = apStrings->m_usSize;
+    if (uiSize >= apStrings->m_usMaxSize) {
+        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(uiSize, pViewerString);
+    BSsprintf(cBuffer, 32, "0x%8X", pEntityB);
+    pViewerString = NiGetViewerString("hkpEntityB", static_cast<const char*>(cBuffer));
+    uiSize = apStrings->m_usSize;
+    if (uiSize >= apStrings->m_usMaxSize) {
+        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(uiSize, pViewerString);
+    pViewerString = NiGetViewerString("ePriority", ePriority);
+    uiSize = apStrings->m_usSize;
+    if (uiSize >= apStrings->m_usMaxSize) {
+        apStrings->SetSize(uiSize + apStrings->m_usGrowBy);
+    }
+    apStrings->SetAt(uiSize, pViewerString);
 }

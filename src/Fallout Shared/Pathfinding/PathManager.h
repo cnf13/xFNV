@@ -8,10 +8,10 @@
 #include "BSCore/BSTFreeList.h"
 #include "BSCore/BSTStaticFreeList.h"
 #include "BSMain/Setting.h"
-#include "BSSystem/BSTMessageQueue.h"
+#include "BSMain/ThreadSafeStructures.h"
 #include "BSSystem/BSTaskletGroup.h"
+#include "BSSystem/BSTMessageQueue.h"
 #include "BSSystem/Win32/BSWin32TaskletData.h"
-#include "Fallout Shared/LockFreeMap.h"
 #include "Fallout Shared/Pathfinding/ActorPathingMessage.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 

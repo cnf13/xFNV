@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSFurnitureMarker.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"

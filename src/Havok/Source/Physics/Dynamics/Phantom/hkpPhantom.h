@@ -91,3 +91,11 @@ public:
 
     static MembersArray Members;
 };
+
+inline hkpPhantom* hkpGetPhantom(const hkpCollidable* collidable) {
+    if (collidable->getType() == 2) {
+        return static_cast<hkpPhantom*>(hkGetWorldObject(collidable));
+    }
+
+    return nullptr;
+}

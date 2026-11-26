@@ -5,6 +5,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRTTI.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiShader.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiCriticalSection.h"
 
 class Ni2DBuffer;
@@ -209,3 +210,48 @@ public:
     // The texture anisotropy limit (DrawWorld_UpdateWater lowers it to 1 while the water renders).
     static inline int32_t iMaxAnisotropy = 1;
 };
+
+inline uint32_t NiRenderer::LockCount() {
+    return m_kRendererLock.GetCurrentLockCount();
+}
+
+inline bool NiRenderer::Check_RenderTargetGroupActive(const char*, bool bExpectedValue) {
+    return GetInsideFrameState() && m_bRenderTargetGroupActive == bExpectedValue;
+}
+
+inline void NiRenderer::SetSorter(NiAccumulator* pkAccum) {
+    m_spAccum = pkAccum;
+}
+
+inline bool NiRenderer::GetInsideFrameState() {
+    return m_eFrameState == FRAMESTATE_INSIDE_FRAME || m_eFrameState == FRAMESTATE_INSIDE_OFFSCREEN_FRAME;
+}
+
+inline NiAccumulator* NiRenderer::GetSorter() {
+    return m_spAccum;
+}
+
+inline void NiRenderer::SetLastErrorString(const char* pcStr) {
+    if (pcStr) {
+        strncpy_s(ms_acErrorString, sizeof(ms_acErrorString), pcStr, sizeof(ms_acErrorString) - 1);
+    }
+    else {
+        ms_acErrorString[0] = '\0';
+    }
+}
+
+// A null shader keeps the current one.
+inline void NiRenderer::SetErrorShader(NiShader* pkErrorShader) {
+    if (!pkErrorShader) {
+        return;
+    }
+    NiShader* pkOld = m_spErrorShader.m_pObject;
+    if (pkOld == pkErrorShader) {
+        return;
+    }
+    if (pkOld) {
+        pkOld->DecRefCount();
+    }
+    m_spErrorShader.m_pObject = pkErrorShader;
+    pkErrorShader->IncRefCount();
+}

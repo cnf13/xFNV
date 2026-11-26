@@ -1,8 +1,9 @@
 #include "BSShader/ImageSpaceEffectRadialBlur.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSMain/RendererSettingCollection.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSTextureManager.h"
 #include "BSShader/ImageSpaceEffect.h"

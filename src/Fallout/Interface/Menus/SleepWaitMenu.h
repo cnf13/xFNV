@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/Setting.h"
 #include "BSMenu/Menu.h"
 
@@ -15,7 +15,6 @@ public:
     int32_t GetClass() override;
     bool DoGamepad(int32_t, float) override;
 
-    bool UpdateSleep();
     bool UpdateSleeping();
     void SetCurrentTime();
     // Create calls QuantityMenu's check of the tiles on the SleepWaitMenu.
@@ -40,6 +39,6 @@ public:
     static inline int32_t iUT_CurrentValue;
 };
 
-extern SettingT<INIPrefSettingCollection> gs_bSaveOnWait_GamePlay;
+extern SettingT<INIPrefSettingCollection> bSaveOnWait;
 
-extern SettingT<INIPrefSettingCollection> gs_bSaveOnRest_GamePlay;
+extern SettingT<INIPrefSettingCollection> bSaveOnRest;

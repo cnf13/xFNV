@@ -1857,6 +1857,17 @@ void hkp3AxisSweep::calcAabbCache(
     calcAabbCacheInternal(overlaps, AabbCacheOut);
 }
 
+// A node's min x and its index before the renumbering; only the value orders the pairs.
+template <typename T>
+struct ValueIntPair {
+    hkBool operator<(const ValueIntPair& other) const {
+        return m_value < other.m_value;
+    }
+
+    T m_value;
+    T m_oldIndex;
+};
+
 // Renumbers the nodes in x order of their min end points: copies the nodes, sorts (min x, node index) pairs past node
 // 0, writes the nodes back in that order, and maps every node index the handles, markers' overlap lists and axis end
 // points hold to the new one, through three arrays from the temp allocator.
@@ -1865,8 +1876,8 @@ void hkp3AxisSweep::defragment() {
 
     hkArray<hkpBpNode, hkContainerTempAllocator> nodeCopies(numNodes);
     hkpBpNode* nodes = nodeCopies.m_data;
-    hkArray<hkpBpEndPoint, hkContainerTempAllocator> sortedArray(numNodes);
-    hkpBpEndPoint* sortedEndPoints = sortedArray.m_data;
+    hkArray<ValueIntPair<uint16_t>, hkContainerTempAllocator> sortedArray(numNodes);
+    ValueIntPair<uint16_t>* sortedEndPoints = sortedArray.m_data;
 
     {
         hkArray<int32_t, hkContainerTempAllocator> newIndex(numNodes);
@@ -1874,17 +1885,14 @@ void hkp3AxisSweep::defragment() {
         for (int32_t i = 0; i < m_nodes.m_size; ++i) {
             nodes[i] = m_nodes.m_data[i];
             sortedEndPoints[i].m_value = m_nodes.m_data[i].min_x;
-            sortedEndPoints[i].m_nodeIndex = static_cast<uint16_t>(i);
+            sortedEndPoints[i].m_oldIndex = static_cast<uint16_t>(i);
         }
 
         // Node 0 keeps its place: the sort covers entries 1 to numNodes - 1.
-        uint32_t uiLess = 0;
-        if (numNodes - 1 > 1) {
-            quickSortRecursive(sortedEndPoints + 1, 0, numNodes - 2, uiLess);
-        }
+        hkAlgorithm::quickSort(sortedEndPoints + 1, numNodes - 1);
 
         for (int32_t i = 0; i < m_nodes.m_size; ++i) {
-            int32_t oldIndex = sortedEndPoints[i].m_nodeIndex;
+            int32_t oldIndex = sortedEndPoints[i].m_oldIndex;
             newIndex.m_data[oldIndex] = i;
             m_nodes.m_data[i] = nodes[oldIndex];
         }
@@ -3366,49 +3374,6 @@ void hkp3AxisSweep::removeObjectBatch(
     }
 }
 
-// Hoare's partition on the end points: the pivot is the middle element's coordinate, the two sides walk to it with
-// unsigned 16-bit compares, the pair found is swapped whole, and only the coordinate decides the order. The left part
-// recurses, the right part is looped over.
-int32_t quickSortRecursive(hkp3AxisSweep::hkpBpEndPoint* pArr, int32_t d, int32_t h, uint32_t cmpLess) {
-    int32_t lo = d;
-    int32_t last = h;
-    // The result is whatever the last iteration left: the recursion's result when it ran, the right index otherwise.
-    int32_t result = h;
-    for (;;) {
-        uint16_t pivot = pArr[(lo + h) >> 1].m_value;
-        int32_t left = lo;
-        last = h;
-        do {
-            while (pArr[left].m_value < pivot) {
-                ++left;
-            }
-            while (pivot < pArr[last].m_value) {
-                --last;
-            }
-            if (last < left) {
-                break;
-            }
-            if (last != left) {
-                hkp3AxisSweep::hkpBpEndPoint tmp = pArr[last];
-                pArr[last] = pArr[left];
-                pArr[left] = tmp;
-            }
-            --last;
-            ++left;
-        }
-        while (left <= last);
-        result = last;
-        if (lo < last) {
-            result = quickSortRecursive(pArr, lo, last, cmpLess);
-        }
-        if (left >= h) {
-            break;
-        }
-        lo = left;
-    }
-    return result;
-}
-
 // Copies out the two 32-bit offset vectors.
 void hkp3AxisSweep::getOffsetLowHigh32bit(hkVector4& offsetLow32bit, hkVector4& offsetHigh32bit) const {
     offsetLow32bit = m_offsetLow32bit;
@@ -4003,7 +3968,7 @@ hkp3AxisSweep::hkpBpAxis::find(const hkpBpEndPoint* start, const hkpBpEndPoint* 
 // points are constructed in place.
 // KEEP: the comparator each quickSort call takes by value has only its low byte written; its upper three bytes are
 // whatever that argument's storage held before (this, or a pointer the copy loop left there). src cannot reproduce
-// those leftover bytes (as in hkpAllCdPointCollector::sortHits).
+// those leftover bytes.
 void hkp3AxisSweep::calcAabbCacheInternal(
     const hkArrayBase<const hkpBpNode*>& overlaps,
     hkpBroadPhaseAabbCache* AabbCacheOut

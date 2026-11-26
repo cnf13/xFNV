@@ -5,17 +5,18 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkBlendCollisionObject.h"
 #include "BSHavok/bhkNiCollisionObject.h"
-#include "BSHavok/bhkPickData.h"
 #include "BSHavok/bhkRagdollController.h"
 #include "BSHavok/bhkUtilFunctions.h"
+#include "BSHavok/bhkWorld.h"
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSFadeNode.h"
 #include "BSShader/BSShaderAccumulator.h"
 #include "BSShader/BSShaderManager.h"
@@ -99,7 +100,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiFixedString.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGeometry.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
@@ -117,6 +117,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTPointerMap.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTimeController.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
@@ -339,7 +340,7 @@ void AnimIdle::Update(Animation* apAnimation) {
     }
 }
 
-void AnimIdle::LoadGameTES(float afTime, Animation* apAnimation) {
+void AnimIdle::LoadGame(float afTime, Animation* apAnimation) {
     char cSequenceIndex;
     bool bHasSequence;
     pSaveLoadGameOLD->LoadGameDataOLD(&eFlags, sizeof(eFlags));
@@ -594,7 +595,7 @@ AnimIdle* AnimIdle::LoadAnimIdle(Actor* apActor, Animation* apAnimation, float a
         }
         if (pidle) {
             panimIdle = new AnimIdle(pidle, AGS_SPECIAL_IDLE, AnimIdle::PLAY_TYPE_QUEUE, apActor, true, nullptr);
-            panimIdle->LoadGameTES(afTime, apAnimation);
+            panimIdle->LoadGame(afTime, apAnimation);
         }
         else {
             const char* pEditorID = apActor->GetFormEditorID();
@@ -765,7 +766,7 @@ void Animation::ClearBlendInterps() {
 // rebases the playing sequences, refreshes the scene graph with Havok velocities off, then reads the movement state,
 // the idle replay delays, the special idle, the sequences of each section (a section whose saved sequence is gone still
 // has its data read into a throwaway sequence), the anim action and the idle's sequence, and updates the bip nodes.
-void Animation::LoadGameBGS(BGSLoadFormBuffer* apBuffer) {
+void Animation::LoadGame(BGSLoadFormBuffer* apBuffer) {
     if (!pAnimRoot) {
         return;
     }
@@ -3436,7 +3437,7 @@ void Animation::SetDelayUpdateScenegraph(bool abFlag) {
     SetBit(abFlag, 2);
 }
 
-void Animation::RevertTES(TESObjectREFR* apRef) {
+void Animation::Revert(TESObjectREFR* apRef) {
     ClearGroup(AGS_WHOLE_BODY, 0.0);
     ZeroGlobalTransform();
     if (spAnimIdle) {
@@ -3481,7 +3482,7 @@ void Animation::Revert(BGSLoadGameBuffer* apLoadGameBuffer) {
     replayDelayList.RemoveAll();
 }
 
-void Animation::SaveGameBGS(BGSSaveGameBuffer* apSaveGameBuffer) {
+void Animation::SaveGame(BGSSaveGameBuffer* apSaveGameBuffer) {
     BSAnimGroupSequence* pIdleSequence;
     NiPointer<AnimIdle>* pspSavedIdle;
     char cSequenceIndex;
@@ -3877,7 +3878,7 @@ void Animation::AnimIdleFree(NiPointer<AnimIdle>& aspAnimIdle) {
 
 // With save blocks, writes the KBLK block ID and a 2-byte size placeholder, then patches the placeholder with the
 // block's size at the end. The debug log goes through an empty printf stub.
-void Animation::SaveGameTES(TESForm* apForm) {
+void Animation::SaveGame(TESForm* apForm) {
     AnimIdle* pIdle;
     float fTime;
     float fFadeTimer;
@@ -4040,7 +4041,7 @@ void Animation::SaveGameTES(TESForm* apForm) {
 }
 
 // A save-game block: the KBLK block ID and its 2-byte size, checked against the bytes read at the end.
-void Animation::LoadGameTES(TESObjectREFR* apref) {
+void Animation::LoadGame(TESObjectREFR* apref) {
     float fFadeTimer;
     char cSequenceIndex;
     uint32_t iBlockID;
@@ -4339,7 +4340,7 @@ void Animation::SaveAnimation(TESObjectREFR* apRef, Animation* apAnimation) {
 
     pSaveLoadGameOLD->SaveGameDataOLD(&isize, sizeof(isize));
     if (apAnimation && !apRef->IsDead(false)) {
-        apAnimation->SaveGameTES(apRef);
+        apAnimation->SaveGame(apRef);
     }
 }
 
@@ -4354,14 +4355,6 @@ int16_t ComputeAnimationSaveSize(PlayerCharacter* apPlayer, Animation* apAnimati
     }
 
     return isize;
-}
-
-bool bhkRagdollController::QFootIKActive() {
-    return bActiveFootIK;
-}
-
-bool bhkRagdollController::QFootIK() {
-    return bhkRagdollController::bFootIK.Bool();
 }
 
 AnimSequenceBase::AnimSequenceBase() {}
@@ -4589,79 +4582,4 @@ BSAnimGroupSequence* MiddleHighProcess::GetAimSequence(AIM_ENUM aeDireciton) {
 
 uint32_t BGSSaveGameBuffer::GetBufferPosition() {
     return iBufferPosition;
-}
-
-void NiControllerManager::DeactivateAll(float fEaseOutTime) {
-    uint32_t i = 0;
-    while (i < m_kActiveSequences.GetSize()) {
-        NiControllerSequence* pkSequence = m_kActiveSequences.GetAt(i);
-        DeactivateSequence(pkSequence, fEaseOutTime);
-        ++i;
-    }
-}
-
-uint32_t NiControllerManager::GetSequenceCount() {
-    return m_kSequenceArray.GetSize();
-}
-
-NiControllerSequence* NiControllerManager::GetSequenceAt(uint32_t uiIndex) {
-    return m_kSequenceArray[uiIndex];
-}
-
-NiAVObject* NiControllerManager::GetAccumRoot() const {
-    if (m_bCumulative) {
-        for (uint32_t I = 0; I < m_kSequenceArray.m_usSize; ++I) {
-            if (m_kSequenceArray.GetAt(I).m_pObject) {
-                return m_kSequenceArray.GetAt(I)->m_pkAccumRoot;
-            }
-        }
-    }
-    return nullptr;
-}
-
-float NiControllerSequence::GetLastScaledTime() {
-    return m_fLastScaledTime;
-}
-
-NiInterpolator* NiControllerSequence::GetInterpolatorAt(uint32_t uiIndex) {
-    return m_pkInterpArray[uiIndex].m_spInterpolator;
-}
-
-// The index is re-read and the controller fetched again for the GetTarget call.
-NiObjectNET* NiControllerSequence::GetTargetAt(uint32_t uiIndex) {
-    if (m_pkInterpArray[uiIndex].m_spInterpCtlr) {
-        return m_pkInterpArray[uiIndex].m_spInterpCtlr->GetTarget();
-    }
-    return nullptr;
-}
-
-NiTextKeyExtraData* NiControllerSequence::GetTextKeys() {
-    return m_spTextKeys;
-}
-
-NiControllerSequence* NiControllerSequence::GetPartnerSequence() {
-    return m_pkPartnerSequence;
-}
-
-NiControllerSequence::CycleType NiControllerSequence::GetCycleType() const {
-    return m_eCycleType;
-}
-
-float NiControllerSequence::GetPhase() {
-    double dOffset = GetOffset();
-    return dOffset - GetBeginKeyTime();
-}
-
-void NiQuatTransform::SetRotateValid(bool bValid) {
-    if (!bValid) {
-        m_kRotate.SetX(-std::numeric_limits<float>::max());
-    }
-}
-
-void NiQuaternion::SetX(float x) {
-    m_fX = x;
-}
-
-NiObjectNET* NiTimeController::GetTarget() const {
-    return m_pkTarget;
 }

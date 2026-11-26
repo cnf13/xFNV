@@ -1,7 +1,8 @@
 #pragma once
 
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkShape.h"
-#include "BSHavok/bhkTransform.h"
+#include "Havok/Source/Physics/Collide/Shape/Misc/Transform/hkpTransformShape.h"
 
 class hkpTransformShape;
 struct hkTransformShapeCinfo;
@@ -58,6 +59,14 @@ public:
     static inline uint32_t iCount;
 };
 
+inline hkpTransformShape* bhkTransformShape::operator*() const {
+    if (this) {
+        return static_cast<hkpTransformShape*>(GethkObject());
+    }
+
+    return nullptr;
+}
+
 // The creation info of a transform shape: the placed shape and the transform (bhkTransform, so the struct sits on
 // Havok's 16-byte alignment).
 struct hkTransformShapeCinfo : public hkShapeCinfo {
@@ -83,3 +92,7 @@ struct hkTransformShapeCinfo : public hkShapeCinfo {
 
 static_assert(offsetof(hkTransformShapeCinfo::Serialized, m_transform) == 0x10);
 static_assert(sizeof(hkTransformShapeCinfo::Serialized) == 0x50);
+
+inline hkTransformShapeCinfo::hkTransformShapeCinfo() : m_childShape(nullptr) {
+    m_transform.setIdentity();
+}

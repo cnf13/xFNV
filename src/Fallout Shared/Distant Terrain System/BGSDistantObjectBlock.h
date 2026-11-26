@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BSCore/BSSimpleList.h"
-#include "Fallout Shared/eBool.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 
 #include <stdint.h>
@@ -47,7 +46,7 @@ public:
     void Detach();
     void Attach();
     void SwitchToLow(TESWorldSpace* apWorld, const int32_t aiLevel, const int16_t asCellX, const int16_t asCellY);
-    void LoadFromTask(eBool abLoadData);
+    void LoadFromTask(bool abLoadData);
 
     static void EnableStingerRenderAll(NiAVObject* apGeom, bool abEnable);
     // The block's mesh path under the world's LOD folder, written into the 0x104-byte apOutput.

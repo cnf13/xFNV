@@ -3,7 +3,7 @@
 #include "BSCore/BSMap.h"
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/MessageHandler.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
@@ -107,7 +107,7 @@ bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& 
         uint8_t* pdata = static_cast<uint8_t*>(apOutData);
         uint32_t itempint = icount;
         if (TESForm::QEndianSwapOnSave()) {
-            ENDIAN<uint32_t>(itempint, false);
+            BSEndian<uint32_t>(itempint, false);
         }
         *reinterpret_cast<uint32_t*>(pdata) = itempint;
         pdata += 4;
@@ -115,7 +115,7 @@ bool TESModelTextureSwap::BuildTextureSwapChunkData(void*& apOutData, uint32_t& 
             TEX_SWAP* pswap = plist->m_item;
             uint32_t isize = BSstrlen(pswap->pGeomName);
             if (TESForm::QEndianSwapOnSave()) {
-                ENDIAN<uint32_t>(itempint, false);
+                BSEndian<uint32_t>(itempint, false);
             }
             *reinterpret_cast<uint32_t*>(pdata) = isize;
             pdata += 4;
@@ -390,16 +390,6 @@ bool TESModelTextureSwap::SwapTexturesRecurse(
 
             ++aiGeomIndex;
         }
-    }
-    return false;
-}
-
-bool NiFixedString::EqualsNoCase(const char* pcStr) {
-    if (this->GetHandle() == pcStr) {
-        return true;
-    }
-    if (pcStr && this->GetHandle()) {
-        return NiStricmp(this->GetHandle(), pcStr) == 0;
     }
     return false;
 }

@@ -1,6 +1,6 @@
 #include "SpeedTree/Camera.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 
 CVec3 CIdvCamera::m_cCameraPos(0.0f, 0.0f, 0.0f);
 CVec3 CIdvCamera::m_cCameraDir(0.577f, 0.577f, 0.577f);

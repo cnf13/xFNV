@@ -147,6 +147,28 @@ public:
     hkEnum<BuildType, int8_t> m_buildType;
 };
 
+// The code's bytes go with m_data.
+inline hkpMoppCode::~hkpMoppCode() {}
+
 // The hkTypeInfo records of the reflected types declared here (constant data, the SDK's <Class>Class.cpp).
 extern hkTypeInfo hkpMoppCodeReindexedTerminalTypeInfo;
 extern hkTypeInfo hkpMoppCodeCodeInfoTypeInfo;
+
+// An empty code at a zero offset and scale, not built yet.
+inline hkpMoppCode::hkpMoppCode() {
+    m_info.m_offset.setZero4();
+    m_buildType.m_storage = BUILD_NOT_SET;
+}
+
+inline hkpMoppCode::hkpMoppCode(
+    const CodeInfo& arInfo,
+    const uint8_t* apMoppData,
+    int32_t aiMoppBytes,
+    BuildType aeBuildType
+) {
+    m_info.m_offset = arInfo.m_offset;
+    m_data.m_size = aiMoppBytes;
+    m_data.m_data = const_cast<uint8_t*>(apMoppData);
+    m_data.m_capacityAndFlags = aiMoppBytes | hkArray<uint8_t>::DONT_DEALLOCATE_FLAG;
+    m_buildType.m_storage = aeBuildType;
+}

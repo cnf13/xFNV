@@ -34,3 +34,8 @@ public:
     BSEntryMapItem* pItemA[1001];
     uint32_t iCount;
 };
+
+// The key's address is the hash (as Gamebryo's NiTPointerMap hashes pointer keys).
+inline uint32_t BSEntryMap::KeyToHashIndex(const BSFileEntry* apKey) {
+    return static_cast<uint32_t>((reinterpret_cast<uintptr_t>(apKey) >> 4) % 1001);
+}

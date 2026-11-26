@@ -5,9 +5,11 @@
 #include "BSCore/BSSimpleArray.inl"
 #include "BSCore/BSString.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/QueuedFiles.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSDistantTreeShader.h"
 #include "BSShader/BSDistantTreeShaderProperty.h"
 #include "BSShader/BSShaderManager.h"
@@ -25,7 +27,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiAlphaProperty.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiBound.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMath.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiProperty.h"
@@ -37,6 +38,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShapeData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
 #include "Gamebryo2.2/CoreLibs/NiSystem/NiFile.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/string.h"
 
 #include <limits>
@@ -644,8 +646,4 @@ uint8_t BGSDistantTreeBlockLoadTask::GetFileIndex() {
 
 void BGSDistantTreeBlockLoadTask::operator delete(void* apMemory) {
     ourFree(apMemory);
-}
-
-void BSDistantTreeShader::SetTextureAtlas(NiTexture* apTextureAtlas) {
-    BSDistantTreeShader::spTextureAtlas = apTextureAtlas;
 }

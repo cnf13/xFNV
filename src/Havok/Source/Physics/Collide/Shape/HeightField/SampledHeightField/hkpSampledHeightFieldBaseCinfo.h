@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Havok/Source/Common/Base/Math/Vector/hkVector4.h"
+#include "Havok/Source/Common/Base/Memory/Router/hkMemoryRouter.h"
 #include "Havok/Source/Common/Base/Types/hkBaseTypes.h"
 
 // The construction data every sampled heightfield shape takes: the scale of one sample and the grid resolution, and
@@ -22,3 +23,16 @@ public:
     float m_maxHeight;
     hkBool m_useProjectionBasedHeight;
 };
+
+inline void* hkpSampledHeightFieldBaseCinfo::operator new(size_t aSize) {
+    return hkMemoryRouter::getInstance().m_heap->blockAlloc(static_cast<int32_t>(aSize));
+}
+
+inline void hkpSampledHeightFieldBaseCinfo::operator delete(void* apMemory) {
+    hkMemoryRouter::getInstance().m_heap->blockFree(apMemory, sizeof(hkpSampledHeightFieldBaseCinfo));
+}
+
+inline hkpSampledHeightFieldBaseCinfo::hkpSampledHeightFieldBaseCinfo()
+  : m_xRes(2), m_zRes(2), m_minHeight(0.0f), m_maxHeight(-1.0f), m_useProjectionBasedHeight(false) {
+    m_scale.set(1.0f, 1.0f, 1.0f, 0.0f);
+}

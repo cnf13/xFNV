@@ -1,6 +1,6 @@
 #include "Fallout Shared/Pathfinding/NavMeshArray.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout/Misc/GarbageCollector.h"
 
 NavMeshArray::~NavMeshArray() {

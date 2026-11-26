@@ -2,7 +2,7 @@
 
 #include "BSShader/BSShaderManager.h"
 #include "Fallout/Interface/Menus/RaceSexMenu.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiRefObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiStream.h"
@@ -88,3 +88,7 @@ void BSShaderTextureSet::SetTextureFilename(BSShaderProperty::TextureTypeEnum ai
 NiObject* BSShaderTextureSet::CreateObject() {
     return new BSShaderTextureSet;
 }
+
+BSTextureSet::BSTextureSet() {}
+
+BSTextureSet::~BSTextureSet() {}

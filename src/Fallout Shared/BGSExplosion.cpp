@@ -1,6 +1,7 @@
 #include "Fallout Shared/BGSExplosion.h"
 
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/BSCloningProcess.h"
 #include "BSMain/IOManager.h"
@@ -122,19 +123,19 @@ BGSExplosionData::BGSExplosionData() {
 
 // Swaps all thirteen dwords read from a big-endian file, in field order. CASINO_DATA::Endian shares the code.
 void BGSExplosionData::Endian() {
-    ENDIAN(fForce, false);
-    ENDIAN(fDamage, false);
-    ENDIAN(fRadius, false);
-    ENDIAN(pLight, false);
-    ENDIAN(pSound1, false);
-    ENDIAN(iFlags, false);
-    ENDIAN(fImageSpaceRadius, false);
-    ENDIAN(pImpactDataSet, false);
-    ENDIAN(pSound2, false);
-    ENDIAN(fRadiationRads, false);
-    ENDIAN(fRadiationDissipationTime, false);
-    ENDIAN(fRadiationRadius, false);
-    ENDIAN(eSoundLevel, false);
+    BSEndian(fForce, false);
+    BSEndian(fDamage, false);
+    BSEndian(fRadius, false);
+    BSEndian(pLight, false);
+    BSEndian(pSound1, false);
+    BSEndian(iFlags, false);
+    BSEndian(fImageSpaceRadius, false);
+    BSEndian(pImpactDataSet, false);
+    BSEndian(pSound2, false);
+    BSEndian(fRadiationRads, false);
+    BSEndian(fRadiationDissipationTime, false);
+    BSEndian(fRadiationRadius, false);
+    BSEndian(eSoundLevel, false);
 }
 
 void BGSExplosionData::Initialize() {

@@ -3,6 +3,7 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/BGSTextureUseMap.h"
@@ -12,6 +13,7 @@
 #include "Fallout Shared/Magic/MagicItemObject.h"
 #include "Fallout Shared/Magic/MagicSystem.h"
 #include "Fallout Shared/ModelLoader.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout Shared/TESForm.h"
 #include "Fallout Shared/TESFullName.h"
@@ -24,17 +26,17 @@
 #include "SDK/MSVC/rtti.h"
 #include "SDK/MSVC/string.h"
 
-SettingT<GameSettingCollection> gs_sMagicCastOKText("sMagicCastOKText", "");
+SettingT<GameSettingCollection> sMagicCastOKText("sMagicCastOKText", "");
 SettingT<GameSettingCollection>
-    gs_sMagicCastInsufficientMagicka("sMagicCastInsufficientMagicka", "You don't have enough Magicka");
+    sMagicCastInsufficientMagicka("sMagicCastInsufficientMagicka", "You don't have enough Magicka");
 SettingT<GameSettingCollection>
-    gs_sMagicCastInsufficientSkill("sMagicCastInsufficientSkill", "Your Skill level is too low");
-SettingT<GameSettingCollection> gs_sMagicCastSilenced("sMagicCastSilenced", "You are currently Silenced");
-SettingT<GameSettingCollection> gs_sMagicCastPowerUsed("sMagicCastPowerUsed", "You can only cast Powers once per day");
+    sMagicCastInsufficientSkill("sMagicCastInsufficientSkill", "Your Skill level is too low");
+SettingT<GameSettingCollection> sMagicCastSilenced("sMagicCastSilenced", "You are currently Silenced");
+SettingT<GameSettingCollection> sMagicCastPowerUsed("sMagicCastPowerUsed", "You can only cast Powers once per day");
 SettingT<GameSettingCollection>
-    gs_sMagicCastMultipleBoundEffects("sMagicCastMultipleBoundEffects", "You already have that kind of Bound Item");
+    sMagicCastMultipleBoundEffects("sMagicCastMultipleBoundEffects", "You already have that kind of Bound Item");
 SettingT<GameSettingCollection>
-    gs_sMagicCastRangedUnderwater("sMagicCastRangedUnderwater", "You cannot cast ranged spells underwater");
+    sMagicCastRangedUnderwater("sMagicCastRangedUnderwater", "You cannot cast ranged spells underwater");
 static SettingT<GameSettingCollection> iMagicMaxSummonedCreatureTypes("iMagicMaxSummonedCreatureTypes", 10);
 
 // The effect list's own destructor and TESFullName's run after this.
@@ -558,13 +560,13 @@ EffectSetting* MagicItem::GetAVEffect(MagicSystem::Range aeRange) {
 
 BSStringT<char> MagicItem::GetCannotCastString(CannotCastReason aeReason) {
     switch (aeReason) {
-        case 1: return gs_sMagicCastInsufficientMagicka.String();
-        case 2: return gs_sMagicCastSilenced.String();
-        case 3: return gs_sMagicCastInsufficientSkill.String();
-        case 4: return gs_sMagicCastPowerUsed.String();
-        case 5: return gs_sMagicCastMultipleBoundEffects.String();
-        case 6: return gs_sMagicCastRangedUnderwater.String();
-        default: return gs_sMagicCastOKText.String();
+        case 1: return sMagicCastInsufficientMagicka.String();
+        case 2: return sMagicCastSilenced.String();
+        case 3: return sMagicCastInsufficientSkill.String();
+        case 4: return sMagicCastPowerUsed.String();
+        case 5: return sMagicCastMultipleBoundEffects.String();
+        case 6: return sMagicCastRangedUnderwater.String();
+        default: return sMagicCastOKText.String();
     }
 }
 

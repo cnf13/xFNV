@@ -2,22 +2,22 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSHavok/bhkCollisionFilter.h"
+#include "BSHavok/bhkConvert.h"
 #include "BSHavok/bhkShapePhantom.h"
 #include "BSHavok/bhkSimpleShapePhantom.h"
 #include "BSHavok/bhkSphereShape.h"
-#include "BSHavok/bhkTransform.h"
 #include "BSHavok/bhkWorld.h"
 #include "BSHavok/bhkWorldObject.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Havok/BGSZoneTargetListener.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TES.h"
 #include "Fallout/AI/Actor.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPoint3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiQuaternion.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "Havok/Source/Common/Base/Container/Array/hkArray.h"
 #include "Havok/Source/Common/Base/Memory/Allocator/hkMemoryAllocator.h"
 #include "Havok/Source/Common/Base/Reflection/hkClass.h"
@@ -154,12 +154,4 @@ void HitCaster::ClearInstance() {
         delete HitCaster::pSmallHitCaster;
     }
     HitCaster::pSmallHitCaster = nullptr;
-}
-
-void bhkWorldObject::SetCollisionFilter(CFilter aiFilter) {
-    hkpCollidable* pc = GetCollidableRw();
-    if (pc) {
-        static_cast<hkpLinkedCollidable*>(pc)->hkpLinkedCollidable::setCollisionInfoFlags(aiFilter.iFilter);
-    }
-    UpdateCFilter();
 }

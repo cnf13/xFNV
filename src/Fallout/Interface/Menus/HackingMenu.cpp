@@ -8,10 +8,11 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTStaticFreeList.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkShape.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/Menu.h"
 #include "BSMenu/Tile.h"
@@ -317,7 +318,7 @@ void HackingMenu::DoClick(int32_t aiID, Tile* apTarget) {
     }
     if (eStage == HackingMenu::HMS_INTRO) {
         if (BSGetTickCount() > static_cast<uint32_t>(HackingMenu::iNextAllowedHackTime)) {
-            SetupWordTiles();
+            MakePasswordFile();
         }
         return;
     }
@@ -931,7 +932,7 @@ void HackingMenu::MakeHexString(uint16_t ausVal, char* apResult) {
     apResult[6] = 0;
 }
 
-void HackingMenu::SetupWordTiles() {
+void HackingMenu::MakePasswordFile() {
     for (uint32_t i = 0; i < 46 && IOLines[i]; ++i) {
         HackingMenu::TerminalIO* pLine = IOLines[i];
         if (pLine) {
@@ -1166,7 +1167,7 @@ void HackingMenu::DoIntro() {
         }
     }
     if (i == 14 && BSGetTickCount() > iNextTextUpdateTime) {
-        SetupWordTiles();
+        MakePasswordFile();
     }
 }
 

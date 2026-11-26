@@ -17,3 +17,14 @@ public:
 
     hkpWorldRayCastOutput m_rayHit;
 };
+
+inline hkpClosestRayHitCollector::hkpClosestRayHitCollector() {
+    reset();
+}
+
+inline hkpClosestRayHitCollector::~hkpClosestRayHitCollector() {}
+
+inline void hkpClosestRayHitCollector::reset() {
+    m_rayHit.reset();
+    hkpRayHitCollector::reset();
+}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fallout Shared/FaceGen/NiGeometryDataIteratorNiPoint3.h"
+#include "Gamebryo2.2/CoreLibs/NiMain/NiGeometryDataIterators.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiMatrix3.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"

@@ -1,9 +1,10 @@
 #include "Fallout Shared/Pathfinding/NavMeshRender.h"
 
 #include "BSCore/BSSimpleArray.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTestObjects.h"
 #include "BSMain/Setting.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderManager.h"
 #include "BSShader/BSShaderNoLightingProperty.h"
 #include "BSShader/BSShaderProperty.h"

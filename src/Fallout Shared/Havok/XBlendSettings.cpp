@@ -2,7 +2,6 @@
 
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 
 SettingT<BlendSettingCollection> BlendHit::fGetUpTime("fGetUpTime:HIT", 1.0f);
 SettingT<BlendSettingCollection> BlendHit::fKnockDownTime("fKnockDownTime:HIT", 0.25f);
@@ -62,18 +61,3 @@ SettingT<BlendSettingCollection> BlendDefault::fPassOutForce("fPassOutForce:DEFA
 BlendSettingCollection::BlendSettingCollection() {}
 
 BlendSettingCollection::~BlendSettingCollection() {}
-
-// The read and the close go through the virtual ReadSettings and Close.
-bool SettingCollection::ReadSettingsFromFile(const char* apFileName) {
-    alignas(AutoMemContext) uint8_t aucContext[sizeof(AutoMemContext)];
-    AutoMemContext* pContext = reinterpret_cast<AutoMemContext*>(aucContext);
-    ::new (aucContext)
-        AutoMemContext(MEM_CONTEXT_GAMESETTING, true, "d:\\_fallout3\\platforms\\common\\code\\bsmain\\Setting.h", 413);
-    bool bOpened = OpenPath(apFileName, false);
-    if (bOpened) {
-        ReadSettings();
-        Close();
-    }
-    pContext->~AutoMemContext();
-    return bOpened;
-}

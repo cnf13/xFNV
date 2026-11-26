@@ -2,7 +2,7 @@
 
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiCollisionGroup.h"
 #include "Gamebryo2.2/CoreLibs/NiCollision/NiOBBox.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 
 class NiAVObject;
 class NiMatrix3;

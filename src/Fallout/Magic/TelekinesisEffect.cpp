@@ -192,7 +192,7 @@ void TelekinesisEffect::CopyData(ActiveEffect* apSource) {
 
 void TelekinesisEffect::Start() {
     ValueModifierEffect::Start();
-    pRef = InterfaceManager::GetTelekinesisTarget();
+    pRef = Interface::GetTelekinesisREFR();
     CreateSpring();
     bFirstUpdate = false;
 }
@@ -298,20 +298,4 @@ void TelekinesisEffect::CreateSpring() {
 
 ActiveEffect* TelekinesisEffect::Instantiate(MagicCaster* apCaster, MagicItem* apSpell, EffectItem* apEffect) {
     return new TelekinesisEffect(apCaster, apSpell, apEffect);
-}
-
-hkpMouseSpringAction* bhkMouseSpringAction::operator*() const {
-    if (this) {
-        return static_cast<hkpMouseSpringAction*>(GethkObject());
-    }
-
-    return nullptr;
-}
-
-// The game-unit overload.
-void bhkMouseSpringAction::GetMousePositionInWorld(NiPoint3& arPos) {
-    hkpMouseSpringAction* pm = **this;
-    if (pm) {
-        HK2NI(arPos, pm->m_mousePositionInWorld);
-    }
 }

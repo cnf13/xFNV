@@ -95,3 +95,39 @@ public:
 };
 
 inline int32_t iQueuedFileCount;
+
+inline void QueuedFile::NotifyChildFinished(QueuedFile* apChild) {
+    pChildren->AddFinishedChild();
+    CheckFinished();
+}
+
+inline void QueuedChildren::AddFinishedChild() {
+    NiAtomicIncrement(iNumChildrenFinished);
+}
+
+inline void QueuedFile::SetParent(QueuedFile* apParent) {
+    this->spParent = apParent;
+    if (this->spParent) {
+        this->spParent->AddChild(this);
+    }
+}
+
+inline bool QueuedFile::GetAllChildrenFinished() {
+    if (!pChildren) {
+        return true;
+    }
+    uint32_t uiSize = pChildren->GetSize();
+    return uiSize == pChildren->GetChildCountFinished();
+}
+
+inline uint32_t QueuedFile::GetChildCount() {
+    if (pChildren) {
+        return pChildren->GetSize();
+    }
+
+    return 0;
+}
+
+inline uint32_t QueuedChildren::GetChildCountFinished() {
+    return iNumChildrenFinished;
+}

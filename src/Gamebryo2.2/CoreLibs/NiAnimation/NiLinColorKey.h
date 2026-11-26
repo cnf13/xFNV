@@ -29,3 +29,5 @@ public:
 
 // NiRegisterAnimationStream(NiLinColorKey): a static of every file that includes this header.
 static int32_t NiLinColorKeyregisterloaderreturn = NiLinColorKey::RegisterLoader();
+
+inline NiLinColorKey::NiLinColorKey() {}

@@ -2,7 +2,8 @@
 
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSString.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
+#include "BSMain/XINISetting.h"
 #include "Fallout Shared/BGSWorldLocation.h"
 #include "Fallout Shared/GlobalFunc.h"
 #include "Fallout Shared/Script.h"

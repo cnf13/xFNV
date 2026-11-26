@@ -17,13 +17,6 @@ public:
     uint32_t m_index;
 };
 
-namespace hkAlgorithm {
-    // quickSortRecursive<hkValueIndexPair, hkAlgorithm::less<hkValueIndexPair>>: sorts apArr[aiLow..aiHigh] in place
-    // (inclusive bounds) by value, an unsigned compare. aiLess stands for the comparator (an empty class) and is passed
-    // on to the recursive call. Returns the last right index, or the last recursive call's result.
-    int32_t quickSortRecursive(hkValueIndexPair* apArr, int32_t aiLow, int32_t aiHigh, uint8_t aiLess);
-} // namespace hkAlgorithm
-
 // Batch operations on entities' broad-phase bounding boxes. Only the entry points this code calls are declared.
 class hkpEntityAabbUtil {
 public:

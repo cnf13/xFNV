@@ -135,3 +135,69 @@ NiSmartPointer(NiControllerManager);
 // and NiBlendInterpolator::GetViewerStrings names the sequence of each item from them.
 using ControllerManagerPair = NiControllerManager* [2];
 inline ControllerManagerPair pLastViewerStringsControllerManager{};
+
+inline BSAnimNoteListener* NiControllerManager::QNoteListener() {
+    return pListener;
+}
+
+inline void NiControllerManager::DeactivateAll(float fEaseOutTime) {
+    uint32_t i = 0;
+    while (i < m_kActiveSequences.GetSize()) {
+        NiControllerSequence* pkSequence = m_kActiveSequences.GetAt(i);
+        DeactivateSequence(pkSequence, fEaseOutTime);
+        ++i;
+    }
+}
+
+inline uint32_t NiControllerManager::GetSequenceCount() {
+    return m_kSequenceArray.GetSize();
+}
+
+inline NiControllerSequence* NiControllerManager::GetSequenceAt(uint32_t uiIndex) {
+    return m_kSequenceArray[uiIndex];
+}
+
+inline NiAVObject* NiControllerManager::GetAccumRoot() const {
+    if (m_bCumulative) {
+        for (uint32_t I = 0; I < m_kSequenceArray.m_usSize; ++I) {
+            if (m_kSequenceArray.GetAt(I).m_pObject) {
+                return m_kSequenceArray.GetAt(I)->m_pkAccumRoot;
+            }
+        }
+    }
+    return nullptr;
+}
+
+inline NiControllerSequence* NiControllerManager::GetSequenceByName(const NiFixedString& kName) {
+    NiControllerSequence* pkSequence;
+    if (m_kStringMap.GetAt(kName.GetHandleString(), pkSequence)) {
+        return pkSequence;
+    }
+    return nullptr;
+}
+
+inline bool NiControllerManager::ActivateSequence(
+    NiControllerSequence* pkSequence,
+    int32_t iPriority,
+    bool bStartOver,
+    float fWeight,
+    float fEaseInTime,
+    NiControllerSequence* pkTimeSyncSeq
+) {
+    // The priority is passed as its low byte, zero-extended.
+    return pkSequence
+        ->Activate(static_cast<uint8_t>(iPriority), bStartOver, fWeight, fEaseInTime, pkTimeSyncSeq, false);
+}
+
+// Returns the result of Deactivate unchanged as a bool rather than an int, deliberately.
+inline bool NiControllerManager::DeactivateSequence(NiControllerSequence* pkSequence, float fEaseOutTime) {
+    return pkSequence->Deactivate(fEaseOutTime, false);
+}
+
+inline NiAVObjectPalette* NiControllerManager::GetObjectPalette() {
+    return m_spObjectPalette;
+}
+
+inline bool NiControllerManager::GetCumulativeAnimations() {
+    return m_bCumulative;
+}

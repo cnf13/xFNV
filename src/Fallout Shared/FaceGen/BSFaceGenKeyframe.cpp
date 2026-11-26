@@ -1,6 +1,6 @@
 #include "Fallout Shared/FaceGen/BSFaceGenKeyframe.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "Fallout Shared/ContainerItemExtra.h"
 #include "Fallout Shared/FaceGen/BSFaceGenAnimationData.h"
 #include "Fallout Shared/FaceGen/BSFaceGenManager.h"

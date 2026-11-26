@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Fallout Shared/FaceGen/FR2MatrixVTC.h"
+#include "SDK/FaceGen/MatrixVT.h"
 
 // The four coordinate matrices FaceGen builds a head from.
 class FaceGenDatas {

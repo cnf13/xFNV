@@ -347,7 +347,7 @@ public:
         char* apTotalPlayingTime
     );
     // Returns ReadSaveGameDataOLD's save-game texture (the one caller ignores it).
-    NiRefObject* GetSaveGameData(
+    NiRefObject* GetSaveGameDataOLD(
         BSFile* apFile,
         uint32_t* apSaveGameNumber,
         char* Dst,

@@ -3,6 +3,7 @@
 #include "BSAudio/BSAudio.h"
 #include "BSAudio/BSGameSound.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XGamerProfile.h"
 #include "BSMain/Setting.h"
 #include "Fallout Shared/ActorValue.h"
@@ -115,7 +116,7 @@ void CharacterProgression::BeginLevelUp() {
         uint16_t usLevel = pPlayer->GetLevel() + 1;
         TESActorBaseData& rBaseData = *pPlayer->GetActorBase();
         rBaseData.SetLevel(usLevel);
-        LevelUpMenu::Create();
+        Interface::CreateLevelUpMenu();
     }
 }
 

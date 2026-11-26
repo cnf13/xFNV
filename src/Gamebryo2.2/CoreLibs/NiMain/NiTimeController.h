@@ -111,3 +111,25 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+inline NiTimeController* NiTimeController::GetNext() {
+    return m_spNext;
+}
+
+inline NiObjectNET* NiTimeController::GetTarget() const {
+    return m_pkTarget;
+}
+
+inline void NiTimeController::SetNext(NiTimeController* pkNext) {
+    NiTimeController* pkOld = m_spNext.m_pObject;
+    NiTimeController* pkNew = pkNext;
+    if (pkOld != pkNew) {
+        if (pkOld) {
+            NiDecRefCount(pkOld);
+        }
+        m_spNext.m_pObject = pkNew;
+        if (pkNew) {
+            NiIncRefCount(pkNew);
+        }
+    }
+}

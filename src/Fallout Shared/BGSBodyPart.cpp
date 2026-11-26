@@ -5,6 +5,7 @@
 #include "BSCore/BSSimpleArray.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSHavok/WeaponObject.h"
 #include "BSHavok/bhkLimitedHingeConstraint.h"
 #include "BSHavok/bhkMalleableConstraint.h"
@@ -190,17 +191,17 @@ bool BGSBodyPart::Load(TESFile* apFile) {
 PART_DATA::PART_DATA() {}
 
 void PART_DATA::Endian() {
-    ENDIAN(fDamageMult, false);
-    ENDIAN(fTrackingMaxAngle, false);
-    ENDIAN(fExplosionGenericDebrisScale, false);
-    ENDIAN(fDismemberGenericDebrisScale, false);
-    ENDIAN(kGoreTranslate.x, false);
-    ENDIAN(kGoreTranslate.y, false);
-    ENDIAN(kGoreTranslate.z, false);
-    ENDIAN(kGoreRotate.x, false);
-    ENDIAN(kGoreRotate.y, false);
-    ENDIAN(kGoreRotate.z, false);
-    ENDIAN(fExplosionSpecialDebrisScale, false);
+    BSEndian(fDamageMult, false);
+    BSEndian(fTrackingMaxAngle, false);
+    BSEndian(fExplosionGenericDebrisScale, false);
+    BSEndian(fDismemberGenericDebrisScale, false);
+    BSEndian(kGoreTranslate.x, false);
+    BSEndian(kGoreTranslate.y, false);
+    BSEndian(kGoreTranslate.z, false);
+    BSEndian(kGoreRotate.x, false);
+    BSEndian(kGoreRotate.y, false);
+    BSEndian(kGoreRotate.z, false);
+    BSEndian(fExplosionSpecialDebrisScale, false);
 }
 
 void PART_DATA::Initialize() {
@@ -451,20 +452,6 @@ void BGSBodyPart::ShowLimb(BGSBodyPart::LIMB_ENUM aeBodyPart, NiObject* apObject
 
 uint8_t GetGenericDebrisCount(BGSBodyPart* apThis, [[maybe_unused]] void* apEdx) {
     return apThis->Data.cDismemberGenericDebrisCount;
-}
-
-// The constraint's creation info, from the hkSerializableCinfo CreateCinfo returns, null for none. The downcast goes
-// through a pointer: the result is tested for null before subtracting the base's offset.
-hkLimitedHingeConstraintCinfo& bhkLimitedHingeConstraint::GetCinfo() {
-    bool bc;
-    hkSerializableCinfo* pCinfo = &CreateCinfo(bc);
-    return *static_cast<hkLimitedHingeConstraintCinfo*>(pCinfo);
-}
-
-hkMalleableConstraintCinfo& bhkMalleableConstraint::GetCinfo() {
-    bool bc;
-    hkSerializableCinfo* pCinfo = &CreateCinfo(bc);
-    return *static_cast<hkMalleableConstraintCinfo*>(pCinfo);
 }
 
 TESModelPSA::TESModelPSA() : TESModel() {}

@@ -1,6 +1,6 @@
 #include "Havok/Source/Common/Internal/GeometryProcessing/Mesh/hkgpMesh.h"
 
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "Havok/Source/Animation/Animation/Ik/LookAt/hkaLookAtIkSolver.h"
 #include "Havok/Source/Common/Base/Algorithm/Collide/LineSegment/hkLineSegmentUtil.h"
@@ -2587,7 +2587,7 @@ void hkgpMesh::appendFromConvexHull(const hkgpConvexHull* hull) {
 // triangles are not yet removed and that share all three positions (hasPosition both ways) has both triangles appended
 // to the removed list and removed from their meshes. Both arrays are freed, this mesh's tree rebuilt and the new mesh
 // returned.
-hkgpMesh* hkgpMesh::clipByConvexHull(const hkgpConvexHull& hull) {
+hkgpMesh* hkgpMesh::trim(const hkgpConvexHull& hull) {
     using QueryUtils = hkAabbTreeQueryUtils<hkAabbTreeData::hkAabbTreeAabb, uint32_t>;
     bool bAnyClipped = false;
     hkgpMesh* pMesh = new hkgpMesh;
@@ -7898,16 +7898,4 @@ bool IConvexOverlapImpl::checkOverlap(
     float minDist
 ) const {
     return static_cast<double>(minDist) >= distance(shapeA, shapeB, true);
-}
-
-// The list links (m_next, m_prev) are not copied: the list sets them.
-hkgpMeshBase::Triangle::Triangle(const hkgpMeshBase::Triangle& other)
-  : m_plane(other.m_plane), m_partId(other.m_partId), m_planeId(other.m_planeId), m_material(other.m_material),
-    m_tag(other.m_tag), m_leafIdx(other.m_leafIdx) {
-    m_vertices[0] = other.m_vertices[0];
-    m_vertices[1] = other.m_vertices[1];
-    m_vertices[2] = other.m_vertices[2];
-    m_links[0] = other.m_links[0];
-    m_links[1] = other.m_links[1];
-    m_links[2] = other.m_links[2];
 }

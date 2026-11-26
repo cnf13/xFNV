@@ -3,17 +3,17 @@
 #include "BSCore/BSSimpleList.h"
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
-#include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSCore/RTTI.h"
 #include "BSHavok/bhkRigidBody.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
 #include "Fallout Shared/BGSClipRoundsForm.h"
 #include "Fallout Shared/BGSDestructibleObjectForm.h"
 #include "Fallout Shared/BGSMessageIcon.h"
 #include "Fallout Shared/BGSPickupPutdownSounds.h"
 #include "Fallout Shared/BGSProjectile.h"
 #include "Fallout Shared/ExtraDataList.h"
+#include "Fallout Shared/Settings/XGameSetting.h"
 #include "Fallout Shared/TESAmmoEffect.h"
 #include "Fallout Shared/TESFile.h"
 #include "Fallout Shared/TESForm.h"
@@ -158,12 +158,12 @@ bool TESAmmo::Load(TESFile* apFile) {
 }
 
 void AMMO_DATA::Endian() {
-    ENDIAN(fSpeed, false);
+    BSEndian(fSpeed, false);
 }
 
 void AMMO_DATA_NV::Endian() {
-    ENDIAN(fWeightOverride, false);
-    ENDIAN(fAmmoConsumedChance, false);
+    BSEndian(fWeightOverride, false);
+    BSEndian(fAmmoConsumedChance, false);
 }
 
 TESAmmo::TESAmmo() {

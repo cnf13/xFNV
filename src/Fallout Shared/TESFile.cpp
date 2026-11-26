@@ -5,6 +5,7 @@
 #include "BSCore/BSString.h"
 #include "BSCore/BSStringT.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/MessageHandler.h"
 #include "BSSystem/BSFile.h"
 #include "BSSystem/BSSystemFile.h"
@@ -27,35 +28,27 @@
 #include <cstring>
 #include <zlib.h>
 
-void* simpleMalloc(void* opaque, uint32_t aiNumItems, uint32_t aSize) {
-    return MemoryManager::Instance().Allocate(aSize * aiNumItems);
-}
-
-void simpleFree(void* opaque, void* apPtr) {
-    MemoryManager::Instance().Deallocate(apPtr);
-}
-
 // Swaps every field of a record header read from a big-endian file, in field order.
 void FORM::Endian() {
-    ENDIAN(form, false);
-    ENDIAN(length, false);
-    ENDIAN(flags, false);
-    ENDIAN(iFormID, false);
-    ENDIAN(iVersionControl, false);
-    ENDIAN(sFormVersion, false);
-    ENDIAN(sVCVersion, false);
+    BSEndian(form, false);
+    BSEndian(length, false);
+    BSEndian(flags, false);
+    BSEndian(iFormID, false);
+    BSEndian(iVersionControl, false);
+    BSEndian(sFormVersion, false);
+    BSEndian(sVCVersion, false);
 }
 
 // Byte swaps both fields of a big-endian chunk header.
 void CHUNK::Endian() {
-    ENDIAN(chunk, false);
-    ENDIAN(length, false);
+    BSEndian(chunk, false);
+    BSEndian(length, false);
 }
 
 void TESFileHeaderInfo::Endian() {
-    ENDIAN(fVersion, false);
-    ENDIAN(uiFormCount, false);
-    ENDIAN(uiNextFormID, false);
+    BSEndian(fVersion, false);
+    BSEndian(uiFormCount, false);
+    BSEndian(uiNextFormID, false);
 }
 
 TESFile* TESFile::GetFileForTempID(uint32_t aiID) {
@@ -535,7 +528,7 @@ bool TESFile::ReadChunkHeader() {
         uint32_t uiSize = 0;
         GetChunkData(&uiSize, 0);
         if (QEndian()) {
-            ENDIAN(uiSize, false);
+            BSEndian(uiSize, false);
         }
         NextChunk();
         m_actualChunkSize = uiSize;
@@ -580,7 +573,7 @@ void TESFile::DecompressCurrentForm() {
         uint32_t ioriginalsize = *reinterpret_cast<uint32_t*>(pbuffer);
         char* pcompressedbuffer = pbuffer + 4;
         if (QEndian()) {
-            ENDIAN(ioriginalsize, false);
+            BSEndian(ioriginalsize, false);
         }
         pbuffer[m_currentform.length] = 0;
         pDecompressedFormBuffer = static_cast<char*>(ourMalloc(ioriginalsize));
@@ -735,7 +728,7 @@ uint32_t TESFile::GetID() const {
 bool TESFile::LoadWord(int16_t* apValue) {
     bool bResult = GetChunkData(apValue, 2);
     if (QEndian()) {
-        ENDIAN<int16_t>(*apValue, false);
+        BSEndian<int16_t>(*apValue, false);
     }
     return bResult;
 }
@@ -1034,7 +1027,7 @@ TES_RETURN_CODE TESFile::LoadTESInfo() {
                 void* pMasterData = ourMalloc(sizeof(double));
                 GetChunkData(pMasterData, 8);
                 if (QEndian()) {
-                    ENDIAN<double>(*static_cast<double*>(pMasterData), false);
+                    BSEndian<double>(*static_cast<double*>(pMasterData), false);
                 }
                 GetMasterDataList()->AddTail(static_cast<_ULARGE_INTEGER*>(pMasterData));
                 break;
@@ -1557,21 +1550,4 @@ void TESFile::RemoveFromOwnedIDMap() {
 
 BSStringT<char>* TESFile::GetSummary() {
     return &cSummary;
-}
-
-// Uses the auxiliary file position unless it is unset, then the true file position.
-uint32_t BSFile::Tell() {
-    if (iAuxTrueFilePos == -1) {
-        return iTrueFilePos;
-    }
-    return iAuxTrueFilePos;
-}
-
-// Returns the file's open state from BSFile::m_bGood.
-bool BSFile::FileIsGood() const {
-    return m_bGood;
-}
-
-bool NiSystemDesc::IsLittleEndian() const {
-    return true;
 }

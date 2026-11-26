@@ -9,6 +9,7 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSMain/BSTaskManager.h"
 #include "BSMain/MessageHandler.h"
 #include "BSMain/Setting.h"
@@ -765,8 +766,4 @@ void MessageMenu::HandlePerkActivationResults() {
             ->pScript->Run(MessageMenu::xPerkActivations[auiIndex]->pActivatedObject, nullptr, nullptr, false);
     }
     MessageMenu::xPerkActivations.Clear(true);
-}
-
-void MessageHandler::SetYesToAll(bool abTF) {
-    bYesToAll = abTF;
 }

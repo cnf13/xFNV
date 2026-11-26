@@ -7,7 +7,7 @@
 #include "BSMain/BSSceneGraph.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSShader/BSShaderBloodSplatter.h"
 #include "BSShader/BSShaderPPLightingProperty.h"
 #include "BSShader/BSShaderProperty.h"
@@ -54,7 +54,7 @@
 // The game settings this file defines, with their IDs and default values, in the game's initialization order.
 SettingT<INISettingCollection> bUsePipboyMode("bUsePipboyMode:Pipboy", true);
 SettingT<INISettingCollection> bEnableFlickerPipboy("bEnableFlickerPipboy:Pipboy", true);
-SettingT<INISettingCollection> gs_fScanlineFrequencyPipboy_Pipboy("fScanlineFrequencyPipboy:Pipboy", 100.0f);
+SettingT<INISettingCollection> fScanlineScalePipboy("fScanlineFrequencyPipboy:Pipboy", 100.0f);
 SettingT<INISettingCollection> fBlurIntensityPipboy("fBlurIntensityPipboy:Pipboy", 1.0f);
 SettingT<INISettingCollection> fBlurRadiusPipboy("fBlurRadiusPipboy:Pipboy", 2.0f);
 SettingT<INISettingCollection> fTabKnobMoveRate("fTabKnobMoveRate:Pipboy", 0.0075f);
@@ -161,7 +161,7 @@ void FOPipboyManager::Initialize() {
         }
         SetBlurIntensity(fBlurIntensityPipboy.Float());
         SetBlurRadius(fBlurRadiusPipboy.Float());
-        SetDoScanlines(true, gs_fScanlineFrequencyPipboy_Pipboy.Float());
+        SetDoScanlines(true, fScanlineScalePipboy.Float());
         bPulseAffectsLight = 1;
         ShowPipboyLightEffect(false, false, true);
         ShowPipboyLightEffect(true, false, true);

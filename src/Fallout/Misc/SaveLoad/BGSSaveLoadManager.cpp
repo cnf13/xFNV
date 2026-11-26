@@ -6,11 +6,12 @@
 #include "BSCore/BSStringT.h"
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
+#include "BSCore/NewOverloads.h"
 #include "BSDevices/Xenon/XGamerProfile.h"
 #include "BSMain/BSUtilities.h"
 #include "BSMain/IOManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Tile.h"
 #include "BSSystem/BSSystemDir.h"
 #include "BSSystem/BSSystemFile.h"
@@ -69,15 +70,6 @@ SettingT<INISettingCollection> bAllowProfileTransfer("bAllowProfileTransfer:Save
 SettingT<INISettingCollection> bOutputSaveGameScreenshot("bOutputSaveGameScreenshot:SaveGame", false);
 SettingT<INISettingCollection> bCopySaveGameToHostOrMemStick("bCopySaveGameToHostOrMemStick:SaveGame", false);
 SettingT<INISettingCollection> bDisplayMissingContentDialogue("bDisplayMissingContentDialogue:SaveGame", true);
-
-// The format's arguments go to vprintf as the argument list.
-int32_t BSprintf(const char* apFormat, ...) {
-    va_list varArgs;
-    va_start(varArgs, apFormat);
-    int32_t iResult = std::vprintf(apFormat, varArgs);
-    va_end(varArgs);
-    return iResult;
-}
 
 void BSprintf_ErrorReport(const char* apText, void* apErrorReportObject) {
     BSprintf(apText, apErrorReportObject);
@@ -1085,39 +1077,6 @@ void BGSSaveLoadManager::SysUtilSaveCompleteCallback(
 void BGSSaveLoadManager::SysUtilDeleteCompleteCallback(BSSaveDataSystemUtility::RESULT aeResult) {
     pSaveLoadManager->bSysUtilHasSaveData = BSSaveDataSystemUtility::GetSingleton()
                                                 ->GetSaveDataEntries("-SAVE-", nullptr, 0) != 0;
-}
-
-BSSystemFile::ErrorCode BSSystemFile::Read(void* apvBuffer, uint64_t auiBytes, uint64_t& auiRead) {
-    eLastError = DoRead(apvBuffer, auiBytes, auiRead);
-    return eLastError;
-}
-
-void BSSaveDataSystemUtilityFile::SetIconImage(uint32_t auiWidth, uint32_t auiHeight, void* apvBuffer) {
-    uiIconImageWidth = auiWidth;
-    uiIconImageHeight = auiHeight;
-    pvIconImageBuffer = apvBuffer;
-}
-
-void BSSaveDataSystemUtilityFile::SetSubTitle(const char* apcSubTitle) {
-    BSstrcpy(cSubTitle, 0x80u, apcSubTitle);
-}
-
-void BSSaveDataSystemUtilityFile::SetDirectoryName(const char* apcName) {
-    BSstrcpy(cDirectoryName, 256, apcName);
-}
-
-void BSSaveDataSystemUtilityFile::SetDetail(const char* apcDetail) {
-    BSstrcpy(cDetail, 1024, apcDetail);
-}
-
-void BSSaveDataSystemUtilityFile::SetBackgroundImagePath(const char* apcPath) {
-    BSstrcpy(cBackgroundImagePath, 256, apcPath);
-}
-
-void BSSaveDataSystemUtilityFile::SetSaveCompleteCallback(
-    void (*apSaveCompleteCallback)(BSSaveDataSystemUtility::RESULT, BSSaveDataSystemUtilityFile*&)
-) {
-    pSaveCompleteCallback = apSaveCompleteCallback;
 }
 
 uint32_t MessageMenu::GetCurrentButtonCount() {

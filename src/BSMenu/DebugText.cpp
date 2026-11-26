@@ -5,7 +5,7 @@
 #include "BSCore/BSTimer.h"
 #include "BSCore/MemoryManager.h"
 #include "BSMain/Setting.h"
-#include "BSMain/SettingCollection.h"
+#include "BSMain/XINISetting.h"
 #include "BSMenu/Font.h"
 #include "BSMenu/IDebugText.h"
 #include "BSShader/BSShaderManager.h"
@@ -20,7 +20,6 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiColor.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiExtraData.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiGlobalStringTable.h"
-#include "Gamebryo2.2/CoreLibs/NiMain/NiMemObject.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiNode.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiObjectNET.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiPointer.h"
@@ -30,6 +29,7 @@
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTListBase.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiTriShape.h"
 #include "Gamebryo2.2/CoreLibs/NiMain/NiUpdateData.h"
+#include "Gamebryo2.2/CoreLibs/NiSystem/NiMemObject.h"
 #include "SDK/MSVC/ehvec.h"
 #include "SDK/MSVC/stdlib.h"
 #include "SDK/MSVC/string.h"
@@ -107,7 +107,7 @@ void DebugText::Reset() {
         Setting::Info* pTopBottomSetting;
         // The setting's address is never null.
         pTopBottomSetting = &iDebugTextTopBottomOffset.uValue;
-        riHeight = pTopBottomSetting->uint + iFontHeight * (GetIsFullHelp() ? 4 : 1);
+        riHeight = pTopBottomSetting->uint + iFontHeight * (Interface::GetFullHelp() ? 4 : 1);
     }
     // The setting's address is never null.
     pRightOffsetSetting = &iDebugTextLeftRightOffset.uValue;

@@ -49,7 +49,7 @@ public:
     // increments m_uiNumPresenceEntries. No caller.
     void AddSignedInEntry(void* apEntry);
     // Tests m_bSignedIn[m_PlayerIndex], unk4, return_1_3 and bForcePresenceUpdate and reads
-    // gs_uXenonPresenceUpdateInterval_Online, with no effect left in the PC build. No caller.
+    // uXenonPresenceUpdateInterval, with no effect left in the PC build. No caller.
     void UpdatePresence();
 
     // The profile, allocated and constructed on first use.
@@ -102,4 +102,4 @@ public:
     static inline XGamerProfile* pInstance;
 };
 
-extern SettingT<INISettingCollection> gs_uXenonPresenceUpdateInterval_Online;
+extern SettingT<INISettingCollection> uXenonPresenceUpdateInterval;

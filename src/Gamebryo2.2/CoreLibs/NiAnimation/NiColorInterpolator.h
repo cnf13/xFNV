@@ -59,3 +59,18 @@ public:
 
     static NiRTTI ms_RTTI;
 };
+
+// Hands the keys to the color data, creating it on first use.
+inline void NiColorInterpolator::ReplaceKeys(NiColorKey* pkKeys, uint32_t uiNumKeys, NiAnimationKey::KeyType eType) {
+    if (uiNumKeys) {
+        if (!m_spColorData) {
+            NiColorData* pkColorData = new NiColorData;
+            m_spColorData = pkColorData;
+        }
+        m_spColorData->ReplaceAnim(pkKeys, uiNumKeys, eType);
+        m_uiLastIdx = 0;
+    }
+    else if (m_spColorData) {
+        m_spColorData->ReplaceAnim(nullptr, 0, NiAnimationKey::NOINTERP);
+    }
+}

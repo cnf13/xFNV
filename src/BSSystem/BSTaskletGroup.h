@@ -1,5 +1,9 @@
 #pragma once
 
+#include "BSSystem/BSTaskletGroupData.h"
+#include "BSSystem/BSTaskletManager.h"
+#include "BSSystem/Win32/BSWin32TaskletManager.h"
+
 class BSTasklet;
 class BSTaskletGroupData;
 
@@ -17,3 +21,24 @@ public:
 
     BSTaskletGroupData* pData;
 };
+
+inline bool BSTaskletGroup::Close() {
+    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
+    return singleton->BSTaskletManager::CloseTaskGroup(*this);
+}
+
+inline bool BSTaskletGroup::Open() {
+    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
+    return singleton->BSTaskletManager::OpenTaskGroup(*this);
+}
+
+inline bool BSTaskletGroup::AttachTask(BSTasklet& aTask, bool abLastTask) {
+    BSWin32TaskletManager* singleton = static_cast<BSWin32TaskletManager*>(&BSTaskletManager::QInstance());
+    return singleton->BSTaskletManager::AttachTask(*this, aTask, abLastTask);
+}
+
+inline void BSTaskletGroup::WaitForCompletion(bool abPoll) {
+    if (pData && !pData->QComplete()) {
+        pData->WaitForCompletion(abPoll);
+    }
+}
